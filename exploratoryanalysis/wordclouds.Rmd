@@ -1,0 +1,63 @@
+---
+title: "wordclouds"
+output: html_document
+---
+
+
+```{r}
+# Load libraries
+library(tm)
+library(wordcloud)
+library(SnowballC)
+library(RColorBrewer)
+library(dplyr)
+library(quanteda.textplots)
+library(quantmod)
+library(alphavantager)
+library(quanteda)
+library(ggplot2)
+library(lubridate)
+library(rvest)
+library(httr)
+library(tidyverse)
+library(lubridate)
+library(xml2)
+```
+
+
+
+```{r}
+tweets <- read.csv("tweets.csv")
+
+#Only keep original Tweets
+tweets <- tweets %>% filter(isRetweet != "t")
+tokens <- tokens(tweets$text)
+dfm <- dfm(tokens)
+```
+
+
+
+```{r}
+corpus_tweets <- corpus(tweets$text)
+```
+
+```{r}
+tokens_tweets <- tokens(corpus_tweets,  
+                        remove_punct = TRUE, 
+                        remove_numbers = TRUE)
+
+tokens_tweets <- tokens_remove(tokens_tweets, stopwords("en"))  # Remove stopwords
+
+```
+
+
+```{r}
+dfm_tweets <- dfm(tokens_tweets)
+
+```
+
+```{r}
+textplot_wordcloud(dfm_tweets, min_count = 5, color = RColorBrewer::brewer.pal(8, "Dark2"))
+```
+
+
