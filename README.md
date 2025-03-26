@@ -1,2 +1,2 @@
 # mmetricsproject
-Project for UNIL - HEC Macroeconomics Class
+Project for UNIL - HEC Macroeconometrics Class
