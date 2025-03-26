@@ -1,6 +1,8 @@
 ---
 title: "wordclouds"
-output: html_document
+output:
+  html_document:
+    keep_md: true
 ---
 
 
@@ -27,7 +29,7 @@ library(xml2)
 
 
 ```{r}
-tweets <- read.csv("tweets.csv")
+tweets <- read.csv("mmetricsproject/data/tweets.csv")
 
 #Only keep original Tweets
 tweets <- tweets %>% filter(isRetweet != "t")
