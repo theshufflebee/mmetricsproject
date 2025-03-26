@@ -24,12 +24,13 @@ library(httr)
 library(tidyverse)
 library(lubridate)
 library(xml2)
+library(here)
 ```
 
 
 
 ```{r}
-tweets <- read.csv("mmetricsproject/data/tweets.csv")
+tweets <- read.csv(here("data", "tweets.csv"))
 
 #Only keep original Tweets
 tweets <- tweets %>% filter(isRetweet != "t")
@@ -44,11 +45,18 @@ corpus_tweets <- corpus(tweets$text)
 ```
 
 ```{r}
+additional_words <- c("@realdonaldtrump")
+all_stopwords <- c(stopwords("en"), additional_words)
+```
+
+
+
+```{r}
 tokens_tweets <- tokens(corpus_tweets,  
                         remove_punct = TRUE, 
                         remove_numbers = TRUE)
 
-tokens_tweets <- tokens_remove(tokens_tweets, stopwords("en"))  # Remove stopwords
+tokens_tweets <- tokens_remove(tokens_tweets, all_stopwords)  # Remove stopwords
 
 ```
 
