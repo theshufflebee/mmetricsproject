@@ -9,7 +9,11 @@ output:
 
 ``` r
 # Load libraries
-library(tm)
+require(tm)
+```
+
+```
+## Lade nötiges Paket: tm
 ```
 
 ```
@@ -17,7 +21,11 @@ library(tm)
 ```
 
 ``` r
-library(wordcloud)
+require(wordcloud)
+```
+
+```
+## Lade nötiges Paket: wordcloud
 ```
 
 ```
@@ -25,9 +33,20 @@ library(wordcloud)
 ```
 
 ``` r
-library(SnowballC)
-library(RColorBrewer)
-library(dplyr)
+require(SnowballC)
+```
+
+```
+## Lade nötiges Paket: SnowballC
+```
+
+``` r
+require(RColorBrewer)
+require(dplyr)
+```
+
+```
+## Lade nötiges Paket: dplyr
 ```
 
 ```
@@ -48,8 +67,19 @@ library(dplyr)
 ```
 
 ``` r
-library(quanteda.textplots)
-library(quantmod)
+require(quanteda.textplots)
+```
+
+```
+## Lade nötiges Paket: quanteda.textplots
+```
+
+``` r
+require(quantmod)
+```
+
+```
+## Lade nötiges Paket: quantmod
 ```
 
 ```
@@ -111,8 +141,19 @@ library(quantmod)
 ```
 
 ``` r
-library(alphavantager)
-library(quanteda)
+require(alphavantager)
+```
+
+```
+## Lade nötiges Paket: alphavantager
+```
+
+``` r
+require(quanteda)
+```
+
+```
+## Lade nötiges Paket: quanteda
 ```
 
 ```
@@ -153,7 +194,11 @@ library(quanteda)
 ```
 
 ``` r
-library(ggplot2)
+require(ggplot2)
+```
+
+```
+## Lade nötiges Paket: ggplot2
 ```
 
 ```
@@ -168,7 +213,11 @@ library(ggplot2)
 ```
 
 ``` r
-library(lubridate)
+require(lubridate)
+```
+
+```
+## Lade nötiges Paket: lubridate
 ```
 
 ```
@@ -183,8 +232,19 @@ library(lubridate)
 ```
 
 ``` r
-library(rvest)
-library(httr)
+require(rvest)
+```
+
+```
+## Lade nötiges Paket: rvest
+```
+
+``` r
+require(httr)
+```
+
+```
+## Lade nötiges Paket: httr
 ```
 
 ```
@@ -199,7 +259,11 @@ library(httr)
 ```
 
 ``` r
-library(tidyverse)
+require(tidyverse)
+```
+
+```
+## Lade nötiges Paket: tidyverse
 ```
 
 ```
@@ -207,9 +271,6 @@ library(tidyverse)
 ## ✔ forcats 1.0.0     ✔ stringr 1.5.1
 ## ✔ purrr   1.0.2     ✔ tibble  3.2.1
 ## ✔ readr   2.1.5     ✔ tidyr   1.3.1
-```
-
-```
 ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ ggplot2::annotate()     masks NLP::annotate()
 ## ✖ httr::content()         masks NLP::content()
@@ -222,13 +283,16 @@ library(tidyverse)
 ```
 
 ``` r
-library(lubridate)
-library(xml2)
-library(here)
+require(lubridate)
+require(xml2)
 ```
 
 ```
-## here() starts at C:/Users/jonas/Nextcloud/jonas/71_UNIL/Sem_2/Macroeconometrics/Project/git/mmetricsproject
+## Lade nötiges Paket: xml2
+```
+
+``` r
+suppressMessages(require(here))
 ```
 
 
