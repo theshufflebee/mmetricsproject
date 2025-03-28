@@ -4,23 +4,88 @@ output:
   html_document:
     keep_md: true
 ---
-```{r}
+
+``` r
 require(here)
+```
+
+```
+## Lade nötiges Paket: here
+```
+
+```
+## here() starts at C:/Users/jonas/Nextcloud/jonas/71_UNIL/Sem_2/Macroeconometrics/Project/git/mmetricsproject
+```
+
+``` r
 require(stringr)
+```
+
+```
+## Lade nötiges Paket: stringr
+```
+
+``` r
 require(dplyr)
+```
+
+```
+## Lade nötiges Paket: dplyr
+```
+
+```
+## 
+## Attache Paket: 'dplyr'
+```
+
+```
+## Die folgenden Objekte sind maskiert von 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## Die folgenden Objekte sind maskiert von 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+``` r
 require(ggplot2)
+```
+
+```
+## Lade nötiges Paket: ggplot2
+```
+
+``` r
 require(lubridate)
 ```
 
+```
+## Lade nötiges Paket: lubridate
+```
 
-```{r}
-truths_raw <- read.csv(here("data", "trump_all_truths.csv"))
+```
+## 
+## Attache Paket: 'lubridate'
+```
 
-
+```
+## Die folgenden Objekte sind maskiert von 'package:base':
+## 
+##     date, intersect, setdiff, union
 ```
 
 
-```{r}
+
+``` r
+truths_raw <- read.csv(here("data", "trump_all_truths.csv"))
+```
+
+
+
+``` r
 truths <- truths_raw %>%
  mutate(
     # Extract the full date and time
@@ -43,7 +108,8 @@ truths <- truths_raw %>%
   )
 ```
 
-```{r}
+
+``` r
 # Create the scatter plot
 ggplot(truths, aes(x = day, y = time_shifted)) +
   geom_point(alpha = 0.5, color = "blue") +  # Scatter plot with transparency to handle overplotting
@@ -77,6 +143,8 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
     axis.text = element_text(size = 10)
   )
 ```
+
+![](thruthswordcloud_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 
 
