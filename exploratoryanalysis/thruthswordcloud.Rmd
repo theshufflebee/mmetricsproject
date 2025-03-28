@@ -1,0 +1,144 @@
+---
+title: "thruthswordcloud"
+output:
+  html_document:
+    keep_md: true
+---
+```{r}
+require(here)
+require(stringr)
+require(dplyr)
+require(ggplot2)
+require(lubridate)
+```
+
+
+```{r}
+truths_raw <- read.csv(here("data", "trump_all_truths.csv"))
+
+
+```
+
+
+```{r}
+truths <- truths_raw %>%
+ mutate(
+    # Extract the full date and time (e.g., "March 23, 2025, 11:56 AM")
+    date_time = str_extract(x, "\\b[A-Za-z]+ \\d{1,2}, \\d{4}, \\d{1,2}:\\d{2} [APM]{2}\\b"),
+    
+    # Convert 'date_time' to proper Date-Time format (e.g., "March 23, 2025, 11:56 AM")
+    date_time_parsed = mdy_hm(date_time),  # Use mdy_hm() to parse the datetime
+    
+    # Extract date only (e.g., "March 23, 2025")
+    day = as.Date(date_time_parsed),
+    
+    # Extract time only (HH:MM format)
+    time = format(date_time_parsed, "%H:%M"),
+    
+    # Convert time to numeric (hours + minutes as fractions)
+    time_numeric = hour(date_time_parsed) + minute(date_time_parsed) / 60
+  )
+
+```
+
+```{r}
+# Create the scatter plot
+ggplot(truths, aes(x = day, y = time_numeric)) +
+  geom_point(alpha = 0.5, color = "blue") +  # Scatter plot with transparency to handle overplotting
+  scale_y_continuous(
+    breaks = seq(0, 24, by = 6),  # Set breaks every 6 hours (0, 6, 12, 18, 24)
+    labels = c("12 AM", "6 AM", "12 PM", "6 PM", "12 AM")  # Custom labels for the hours
+  ) +
+  labs(title = "Terminally online: Trumps Truth Social Activity",
+       x = "Day",
+       y = "Time of Day") +
+  theme_minimal() +
+  
+  # Customize the x-axis with quarterly breaks and format the labels for better readability
+  scale_x_date(
+    date_labels = "%b %Y",  # Format labels to show month and year (e.g., Jan 2025)
+    date_breaks = "3 months"  # Set a break every 3 months
+  ) +
+  
+  # Rotate the x-axis labels for better readability
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  
+  # Adjust the theme to make it cleaner and more readable
+  theme(
+    panel.grid.minor = element_blank(),  # Remove minor gridlines
+    panel.grid.major = element_line(linewidth = 0.5),  # Major gridlines
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10)
+  )
+```
+
+
+```{r}
+ggplot(truths, aes(x = date_time_parsed, y = hour)) +
+  geom_point(alpha = 0.5, color = "blue") +  # Scatter plot with transparency to handle overplotting
+  labs(x = "Date", y = "Hour", title = "Date vs Hour Plot (30000 Data Points)") +
+  theme_minimal() +
+  
+  # Customize the x-axis with date breaks every month, and format the labels for better readability
+  scale_x_datetime(date_labels = "%b %d, %Y", 
+                    date_breaks = "1 month", 
+                    labels = date_format("%b %d, %Y")) +
+  
+  # Rotate the x-axis labels for better readability
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  
+  # Optional: Add a smoothed trend line (if it makes sense to show trends)
+  #geom_smooth(method = "loess", se = FALSE, color = "red", size = 0.5) +
+  
+  theme(
+    panel.grid.minor = element_blank(),  # Remove minor gridlines
+    panel.grid.major = element_line(linewidth = 0.5),  # Use `linewidth` instead of `size`
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10)
+  )
+```
+
+
+```{r}
+truths <- truths %>%
+  mutate(
+    hour_numeric = as.numeric(format(mdy_hm(paste(date, hour, sep = " ")), "%H"))  # Extract hour as numeric
+  )
+
+# Create the plot with ggplot2
+ggplot(truths, aes(x = date_time_parsed, y = hour_numeric)) +
+  geom_point(alpha = 0.5, color = "blue") +  # Scatter plot with transparency to handle overplotting
+  labs(x = "Date", y = "Hour", title = "Date vs Hour Plot (30000 Data Points)") +
+  theme_minimal() +
+  
+  # Customize the x-axis with quarterly breaks and format the labels for better readability
+  scale_x_datetime(
+    date_labels = "%b %Y",  # Format labels to show month and year (e.g., Jan 2025)
+    date_breaks = "3 months",  # Set a break every 3 months
+    expand = c(0, 0)  # Remove padding at both ends of the axis
+  ) +
+  
+  # Customize the y-axis to show labels every 6 hours
+  scale_y_continuous(
+    breaks = seq(0, 24, by = 6),  # Set breaks every 6 hours (0, 6, 12, 18, 24)
+    labels = c("12 AM", "6 AM", "12 PM", "6 PM", "12 AM")  # Custom labels for the hours
+  ) +
+  
+  # Rotate the x-axis labels for better readability
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  
+  # Adjust the theme to make it cleaner and more readable
+  theme(
+    panel.grid.minor = element_blank(),  # Remove minor gridlines
+    panel.grid.major = element_line(linewidth = 0.5),  # Major gridlines
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10)
+  )
+```
+
+
+
+
+
+
+
