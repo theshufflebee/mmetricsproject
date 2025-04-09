@@ -4,7 +4,7 @@ output: pdf_document
 ---
 
 # Using Alpha Vantage API
-```{r}
+```{r eval=FALSE}
 library(alphavantager)
 
 data=av_get("MSFT", av_fun = "TIME_SERIES_INTRADAY", interval = "5min", outputsize = "full")
