@@ -1,3 +1,4 @@
+---
 title: "Testing"
 output:
   pdf_document: 
@@ -8,7 +9,7 @@ header-includes:
 ---
 \newpage
 
-```{r setup.libraries, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
 rm(list=ls())
 require(tinytex) #LaTeX
 require(ggplot2) #plots
@@ -23,7 +24,7 @@ getwd()
 setwd("...")
 ```
 
-```{r setup.data, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+```{r rawdata_setup, results=FALSE, warning=FALSE, message=FALSE}
 
 #political shocks
 raw_truths <- read.csv(here("data/political_data", "trump_all_truths.csv"))
@@ -33,14 +34,30 @@ raw_tweets <- read.csv(here("data/political_data", "tweets.csv"))
 
 #market prices
 raw_ONEQ <- read.csv(here("data/market_data", "ONEQ.csv"))
-
-
-
-
+raw_SMI <- read.csv(here("data/market_data", "SMI.csv"))
+raw_SPY <- read.csv(here("data/market_data", "SPY.csv"))
+raw_VTHR <- read.csv(here("data/market_data", "VTHR.csv"))
+raw_VTI <- read.csv(here("data/market_data", "VTI.csv"))
 
 ```
 
 
+```{r cleandata_setup, results=FALSE, warning=FALSE, message=FALSE}
+
+#political shocks
+truths <- 1
+tweets <- 1
+
+
+
+#market prices
+ONEQ <- 1
+SMI <- 1
+SPY <- 1
+VTHR <- 1
+VTI <- 1
+
+```
 
 
 
