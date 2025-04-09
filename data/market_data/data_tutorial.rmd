@@ -6,11 +6,23 @@ output: pdf_document
 ```{r}
 library(alphavantager)
 
-data=av_get("NASDAQ:^IXIC", av_fun = "TIME_SERIES_INTRADAY", interval = "5min", outputsize = "full")
+data=av_get("MSFT", av_fun = "TIME_SERIES_INTRADAY", interval = "5min", outputsize = "full")
 
-write.csv(data,"~/NASDAQ:^IXIC.csv", row.names = T) #saves to onedrive documents
+write.csv(data,"~/MFST.csv", row.names = T) #saves to onedrive documents
 ```
 
 Manual smp500: https://cafim.sssup.it/~giulio/other/alpha_vantage/index.html#orgaaf54ef
 
 AlphaVantage Tutorial: https://github.com/business-science/alphavantager/blob/master/man/av_get.Rd
+
+
+# Symbols Explanation
+- ONEQ = NASDAQ Composite
+- SPY = S&P500 
+- SMI = Swiss Market Index
+- VTHR = Russell 3000 (US)
+- VTI = CRSP US Total Market Index
+- ??? = Euro Stoxx 50
+- ??? = Euro Stoxx 600
+- ??? = some world index
+- ??? = maybe add asian and emerging markets or smth
