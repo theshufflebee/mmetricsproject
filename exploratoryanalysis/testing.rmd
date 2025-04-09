@@ -1,0 +1,65 @@
+title: "Testing"
+output:
+  pdf_document: 
+    toc: true
+    fig_caption: yes
+header-includes:
+  - \usepackage{amsmath}
+---
+\newpage
+
+```{r setup.libraries, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(expm) #matrix exponents
+require(here) # ?
+require(stringr) # ?
+require(dplyr) #data management
+require(lubridate) # ?
+
+getwd()
+setwd("...")
+```
+
+```{r setup.data, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+
+#political shocks
+raw_truths <- read.csv(here("data/political_data", "trump_all_truths.csv"))
+raw_tweets <- read.csv(here("data/political_data", "tweets.csv"))
+
+
+
+#market prices
+raw_ONEQ <- read.csv(here("data/market_data", "ONEQ.csv"))
+
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

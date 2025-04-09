@@ -30,7 +30,7 @@ suppressMessages(require(here))
 
 
 ```{r}
-tweets <- read.csv(here("data", "tweets.csv"))
+tweets <- read.csv(here("data/political_data", "tweets.csv"))
 
 #Only keep original Tweets
 tweets <- tweets %>% filter(isRetweet != "t")

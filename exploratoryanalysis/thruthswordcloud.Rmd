@@ -14,7 +14,7 @@ require(lubridate)
 
 
 ```{r}
-truths_raw <- read.csv(here("data", "trump_all_truths.csv"))
+truths_raw <- read.csv(here("data/political_data", "trump_all_truths.csv"))
 ```
 
 
