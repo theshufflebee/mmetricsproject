@@ -1,8 +1,9 @@
 ---
-title: "Alpha Data Tutorial"
+title: "Data Tutorial"
 output: pdf_document
 ---
 
+# Using Alpha Vantage API
 ```{r}
 library(alphavantager)
 
@@ -10,6 +11,10 @@ data=av_get("MSFT", av_fun = "TIME_SERIES_INTRADAY", interval = "5min", outputsi
 
 write.csv(data,"~/MFST.csv", row.names = T) #saves to onedrive documents
 ```
+
+
+
+# Tutorials
 
 Manual smp500: https://cafim.sssup.it/~giulio/other/alpha_vantage/index.html#orgaaf54ef
 
