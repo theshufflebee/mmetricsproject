@@ -1,0 +1,16 @@
+---
+title: "Alpha Data Tutorial"
+output: pdf_document
+---
+
+```{r}
+library(alphavantager)
+
+data=av_get("NASDAQ:^IXIC", av_fun = "TIME_SERIES_INTRADAY", interval = "5min", outputsize = "full")
+
+write.csv(data,"~/NASDAQ:^IXIC.csv", row.names = T) #saves to onedrive documents
+```
+
+Manual smp500: https://cafim.sssup.it/~giulio/other/alpha_vantage/index.html#orgaaf54ef
+
+AlphaVantage Tutorial: https://github.com/business-science/alphavantager/blob/master/man/av_get.Rd
