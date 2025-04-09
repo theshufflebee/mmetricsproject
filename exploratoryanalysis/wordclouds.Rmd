@@ -57,13 +57,11 @@ tokens_tweets <- tokens(corpus_tweets,
                         remove_numbers = TRUE)
 
 tokens_tweets <- tokens_remove(tokens_tweets, all_stopwords)  # Remove stopwords
-
 ```
 
 
 ```{r}
 dfm_tweets <- dfm(tokens_tweets)
-
 ```
 
 ```{r}
