@@ -11,3 +11,5 @@ Project for UNIL - HEC Macroeconometrics Class
 4) Pull
 
 5) Push
+
+6) Fuck
