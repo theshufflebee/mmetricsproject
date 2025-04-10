@@ -13,7 +13,7 @@ av_api_key(Sys.getenv("ALPHAVANTAGE_API_KEY"))
 data=av_get("SPY", av_fun = "TIME_SERIES_INTRADAY", 
               interval = "5min", outputsize = "full")
 
-#for a particular month
+#for a particular month (doesnt work -_-)
 data2=av_get("SPY", av_fun = "TIME_SERIES_INTRADAY", interval = "5min", 
               month=2009-01, outputsize = "full")
 

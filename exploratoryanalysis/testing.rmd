@@ -40,7 +40,7 @@ raw_VTHR <- read.csv(here("data/market_data", "VTHR.csv"))
 raw_VTI <- read.csv(here("data/market_data", "VTI.csv"))
 
 raw_SPYq <- read.csv(here("data/market_data", "SPYq.csv"))
-
+raw_SPYqy <- read.csv(here("data/market_data", "Spyqyahoo.csv"))
 ```
 
 ```{r cleandata_setup, results=FALSE, warning=FALSE, message=FALSE}
@@ -51,10 +51,10 @@ tweets <- 1
 
 
 
-#market prices
+#market prices #only cleaning dates for the time being
 ONEQ <- 1
 SMI <- 1
-SPY <- 1
+raw_SPY$timestamp = as.POSIXct(raw_SPY$timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
 VTHR <- 1
 VTI <- 1
 
@@ -62,9 +62,20 @@ VTI <- 1
 
 ```{r dailydata, results=FALSE, warning=FALSE, message=FALSE}
 
+#political shocks
+
+
+#market prices
+day_SPY_0409 = filter(raw_SPYq, str_detect(timestamp, "^2025-04-09")) #9th of april
+day_SPY_0409$timestamp = as.POSIXct(day_SPY_0409$timestamp, 
+                                    format = "%Y-%m-%d %H:%M:%S", tz = "UTC")#+9
+#day_SPY_0409$timestamp = with_tz(day_SPY_0409$timestamp, "UTC")
+
+yahoo_ds0409 = filter(raw_SPYqy, str_detect(Date, "^2025-04-09"))
+yahoo_ds0409$Date = as.POSIXct(yahoo_ds0409$Date, 
+                                    format = "%Y-%m-%dT%H:%M:%S", tz = "UTC")
+
 ```
-
-
 
 
 # Plots
@@ -79,19 +90,6 @@ ggplot(raw_SPY, aes(x = timestamp, y = close)) +
   labs(title = "SPY Price Over Time",
        x = "Time",
        y = "Close Price") 
-
-SPY_times = as.POSIXct(raw_SPY$timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
-#SPY correct dates?
-ggplot(raw_SPY, aes(x = SPY_times, y = close)) +
-  geom_point(color = "blue", size = 0.01) +
-  geom_line(aes(group=1)) +
-  labs(title = "SPY Price Over Time",
-       x = "Time",
-       y = "Close Price") +
-   scale_x_datetime(date_labels = "%b:%d",  
-                    date_breaks = "1 day") +
-   theme_minimal() +
-   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 
@@ -222,27 +220,36 @@ ggplot(raw_VTI, aes(x = VTI_times, y = close)) +
 ## Per Day
 ```{r daily market plots}
 
-#SPYquick (1min)
-ggplot(raw_SPYq, aes(x = timestamp, y = close)) +
-  geom_point(color = "blue", size = 0.01) +
-  geom_line(aes(group=1), color="blue", linewidth=0.05) +
-  labs(title = "SPYq Price Over Time",
-       x = "Time",
-       y = "Close Price") 
 
-SPYq_times = as.POSIXct(raw_SPYq$timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
-#SPYq correct dates?
-ggplot(raw_SPYq, aes(x = SPYq_times, y = close)) +
+
+
+
+#alpha
+ggplot(day_SPY_0409, aes(x = timestamp, y = close)) +
   geom_point(color = "blue", size = 0.01) +
   geom_line(aes(group=1)) +
-  labs(title = "SPYq Price Over Time",
+  labs(title = "SPY alpha Price April 9th",
        x = "Time",
        y = "Close Price") +
-   scale_x_datetime(date_labels = "%b:%d",  
-                    date_breaks = "1 day") +
+   scale_x_datetime(date_labels = "%H:%M",  
+                    date_breaks = "60 min") +
    theme_minimal() +
    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+
+
+
+#yahoo
+ggplot(yahoo_ds0409, aes(x = Date, y = Close)) +
+  geom_point(color = "blue", size = 0.01) +
+  geom_line(aes(group=1)) +
+  labs(title = "SPY yahoo Price April 9th",
+       x = "Time",
+       y = "Close Price") +
+   scale_x_datetime(date_labels = "%H:%M",  
+                    date_breaks = "60 min") +
+   theme_minimal() +
+   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 
