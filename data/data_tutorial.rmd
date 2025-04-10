@@ -8,9 +8,17 @@ output: pdf_document
 library(alphavantager)
 
 av_api_key(Sys.getenv("ALPHAVANTAGE_API_KEY"))
-data=av_get("SPY", av_fun = "TIME_SERIES_INTRADAY", interval = "5min", outputsize = "full")
 
-write.csv(data,"~/SPY.csv", row.names = T) #saves to onedrive documents
+#for past month
+data=av_get("SPY", av_fun = "TIME_SERIES_INTRADAY", 
+              interval = "5min", outputsize = "full")
+
+#for a particular month
+data2=av_get("SPY", av_fun = "TIME_SERIES_INTRADAY", interval = "5min", 
+              month=2009-01, outputsize = "full")
+
+write.csv(data,"~/SPY.csv", row.names = T) #saves to documents
+write.csv(data2,"~/SPY1609.csv", row.names = T) 
 ```
 
 
@@ -19,7 +27,7 @@ write.csv(data,"~/SPY.csv", row.names = T) #saves to onedrive documents
 
 Manual smp500: https://cafim.sssup.it/~giulio/other/alpha_vantage/index.html#orgaaf54ef
 
-AlphaVantage Tutorial: https://github.com/business-science/alphavantager/blob/master/man/av_get.Rd
+AlphaVantageR Tutorial: https://github.com/business-science/alphavantager/blob/master/man/av_get.Rd
 
 
 # Symbols Explanation
