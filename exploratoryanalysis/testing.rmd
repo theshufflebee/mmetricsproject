@@ -85,5 +85,4 @@ ggplot(raw_SPY, aes(x = temp, y = close)) +
    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
-
 ```
