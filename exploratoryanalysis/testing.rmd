@@ -34,7 +34,11 @@ raw_tweets <- read.csv(here("data/political_data", "tweets.csv"))
 #market prices
 raw_ONEQ <- read.csv(here("data/market_data", "ONEQ.csv"))
 raw_SMI <- read.csv(here("data/market_data", "SMI.csv"))
+<<<<<<< HEAD
 raw_SPY <- read.csv(here("data/market_data", "SPY.csv")) 
+=======
+raw_SPY <- read.csv(here("data/market_data", "SPY.csv")) #1min
+>>>>>>> b2d0606848e5961e73eda3b80b11f43953304bdf
 raw_VTHR <- read.csv(here("data/market_data", "VTHR.csv"))
 raw_VTI <- read.csv(here("data/market_data", "VTI.csv"))
 
@@ -67,6 +71,10 @@ VTI <- 1
 day_SPY_0409 = filter(raw_SPY, str_detect(timestamp, "^2025-04-09")) #9th of april
 day_SPY_0409$timestamp = as.POSIXct(day_SPY_0409$timestamp, 
                                     format = "%Y-%m-%d %H:%M:%S", tz = "EST")
+<<<<<<< HEAD
+=======
+#day_SPY_0409$timestamp = with_tz(day_SPY_0409$timestamp, "UTC")
+>>>>>>> b2d0606848e5961e73eda3b80b11f43953304bdf
 
 yahoo_ds0409 = filter(raw_SPYy, str_detect(Date, "^2025-04-09"))
 yahoo_ds0409$Date = as.POSIXct(yahoo_ds0409$Date, 
