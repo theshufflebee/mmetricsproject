@@ -10,21 +10,17 @@ library(alphavantager)
 av_api_key(Sys.getenv("ALPHAVANTAGE_API_KEY"))
 
 #for past month
-data=av_get("SPY", av_fun = "TIME_SERIES_INTRADAY", 
-              interval = "5min", outputsize = "full")
+data=av_get("VTI", av_fun = "TIME_SERIES_INTRADAY", interval = "1min", 
+              adjusted="false", extended_hours="false", outputsize = "full")
 
 #for a particular month
-data2=av_get("SPY", av_fun = "TIME_SERIES_INTRADAY", interval = "5min", 
-              month="2009-01", outputsize = "full")
+data2=av_get("SPY", av_fun = "TIME_SERIES_INTRADAY", interval = "1min", 
+              adjusted="false", extended_hours="false", 
+              month="2016-09", outputsize = "full") #create loop for more
 
-write.csv(data,"~/SPY.csv", row.names = T) #saves to documents
+write.csv(data,"~/VTI.csv", row.names = T) #saves to documents
 write.csv(data2,"~/SPY1609.csv", row.names = T) 
 
-
-#test
-dataT=av_get("SPY", av_fun = "TIME_SERIES_INTRADAY", interval = "5min", 
-              adjusted="false", extended_hours="false", outputsize = "full")
-write.csv(dataT,"~/SPYT.csv", row.names = T) 
 ```
 
 
