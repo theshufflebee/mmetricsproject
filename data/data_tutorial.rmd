@@ -7,7 +7,7 @@ output: pdf_document
 ```{r eval=FALSE}
 library(alphavantager)
 
-av_api_key(ALPHAVANTAGE_API_KEY)
+av_api_key(Sys.getenv("ALPHAVANTAGE_API_KEY"))
 data=av_get("SPY", av_fun = "TIME_SERIES_INTRADAY", interval = "5min", outputsize = "full")
 
 write.csv(data,"~/SPY.csv", row.names = T) #saves to onedrive documents
