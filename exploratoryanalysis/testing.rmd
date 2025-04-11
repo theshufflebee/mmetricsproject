@@ -218,6 +218,18 @@ ggplot(day_SPY_0409, aes(x = timestamp, y = close)) +
    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
+#SPY log prices Source: alpha
+ggplot(day_SPY_0409, aes(x = timestamp, y = log(close))) +
+  geom_point(color = "blue", size = 0.01) +
+  geom_line(aes(group=1)) +
+  labs(title = "SPY Log Price April 9th",
+       x = "Time",
+       y = "Log Close Price") +
+   scale_x_datetime(date_labels = "%H:%M",  
+                    date_breaks = "60 min") +
+   theme_minimal() +
+   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 
 #SPY Source: yahoo
 ggplot(yahoo_ds0409, aes(x = Date, y = Close)) +
