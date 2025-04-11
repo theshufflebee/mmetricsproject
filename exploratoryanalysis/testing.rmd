@@ -23,7 +23,10 @@ require(lubridate) # ?
 getwd()
 setwd("...")
 ```
+
 # Data 
+
+## Raw Data
 ```{r rawdata_setup, results=FALSE, warning=FALSE, message=FALSE}
 
 #political shocks
@@ -42,6 +45,7 @@ raw_SPYy <- read.csv(here("data/market_data", "Spyqyahoo.csv")) #yahoo
 
 ```
 
+## Cleaning The Data
 ```{r cleandata_setup, results=FALSE, warning=FALSE, message=FALSE}
 
 #political shocks
@@ -52,12 +56,13 @@ tweets <- 1
 #market prices #only cleaning dates for the time being
 ONEQ <- 1
 SMI <- 1
-raw_SPY$timestamp = as.POSIXct(raw_SPY$timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
+raw_SPY$timestamp = as.POSIXct(raw_SPY$timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "EST")
 VTHR <- 1
 VTI <- 1
 
 ```
 
+## Daily Data
 ```{r dailydata, results=FALSE, warning=FALSE, message=FALSE}
 
 #political shocks
