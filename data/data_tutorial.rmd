@@ -10,7 +10,7 @@ library(alphavantager)
 av_api_key(Sys.getenv("ALPHAVANTAGE_API_KEY"))
 
 #for past month
-data=av_get("VTI", av_fun = "TIME_SERIES_INTRADAY", interval = "1min", 
+data=av_get("ASHR", av_fun = "TIME_SERIES_INTRADAY", interval = "1min", 
               adjusted="false", extended_hours="false", outputsize = "full")
 
 #for a particular month
@@ -18,7 +18,7 @@ data2=av_get("SPY", av_fun = "TIME_SERIES_INTRADAY", interval = "1min",
               adjusted="false", extended_hours="false", 
               month="2016-09", outputsize = "full") #create loop for more
 
-write.csv(data,"~/VTI.csv", row.names = T) #saves to documents
+write.csv(data,"~/ASHR.csv", row.names = T) #saves to documents
 write.csv(data2,"~/SPY1609.csv", row.names = T) 
 
 ```
@@ -38,7 +38,8 @@ AlphaVantageR Tutorial: https://github.com/business-science/alphavantager/blob/m
 - SMI = Swiss Market Index
 - VTHR = Russell 3000 (US)
 - VTI = CRSP US Total Market Index
-- ??? = Euro Stoxx 50
+- VGK = Euro Stoxx 50
+- DAX = German Market Index
 - ??? = Euro Stoxx 600
 - ??? = some world index
-- ??? = maybe add asian and emerging markets or smth
+- ASHR = basically china
