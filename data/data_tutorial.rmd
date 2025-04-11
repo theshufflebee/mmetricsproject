@@ -31,6 +31,7 @@ Manual smp500: https://cafim.sssup.it/~giulio/other/alpha_vantage/index.html#org
 
 AlphaVantageR Tutorial: https://github.com/business-science/alphavantager/blob/master/man/av_get.Rd
 
+Intra-Day Analysis: https://arxiv.org/html/2406.17198v1
 
 # Symbols Explanation
 - ONEQ = NASDAQ Composite

@@ -256,6 +256,12 @@ pacf(log(day_SPY_0409$close))
 acf(log(raw_SPY$close))
 pacf(log(raw_SPY$close))
 
+AR1 = arima(day_SPY_0409$close,c(1,0,0),method="ML")
+AR2 = arima(day_SPY_0409$close,c(2,0,0),method="ML")
+AR3 = arima(day_SPY_0409$close,c(3,0,0),method="ML")
+
+AIC(AR1,AR2,AR3)
+BIC(AR1,AR2,AR3)
 ```
 
 Looks like an AR(1) process. ACF looks a bit odd though, all equal to 1?
