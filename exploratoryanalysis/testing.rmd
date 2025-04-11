@@ -42,6 +42,7 @@ raw_VTHR <- read.csv(here("data/market_data", "VTHR.csv"))
 raw_VTI <- read.csv(here("data/market_data", "VTI.csv"))
 raw_VGK <- read.csv(here("data/market_data", "VGK.csv"))
 raw_DAX <- read.csv(here("data/market_data", "DAX.csv"))
+raw_ASHR <- read.csv(here("data/market_data", "ASHR.csv"))
 
 raw_SPYy <- read.csv(here("data/market_data", "Spyqyahoo.csv")) #yahoo
 
@@ -63,6 +64,7 @@ raw_VTHR$timestamp = as.POSIXct(raw_VTHR$timestamp, format = "%Y-%m-%d %H:%M:%S"
 raw_VTI$timestamp = as.POSIXct(raw_VTI$timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "EST")
 raw_VGK$timestamp = as.POSIXct(raw_VGK$timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "UCT")
 raw_DAX$timestamp = as.POSIXct(raw_DAX$timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "UCT")
+raw_ASHR$timestamp = as.POSIXct(raw_ASHR$timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "UCT") #fix timezone
 
 ```
 
@@ -184,6 +186,18 @@ ggplot(raw_DAX, aes(x = timestamp, y = close)) +
    theme_minimal() +
    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+
+#ASHR
+ggplot(raw_ASHR, aes(x = timestamp, y = close)) +
+  geom_point(color = "blue", size = 0.01) +
+  geom_line(aes(group=1), color="blue", linewidth=0.05) +
+  labs(title = "ASHR Price Over Time",
+       x = "Time",
+       y = "Close Price") +
+   scale_x_datetime(date_labels = "%b:%d",  
+                    date_breaks = "2 day") +
+   theme_minimal() +
+   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
 
