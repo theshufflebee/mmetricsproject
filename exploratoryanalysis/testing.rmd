@@ -247,9 +247,18 @@ ggplot(yahoo_ds0409, aes(x = Date, y = Close)) +
 
 ```
 
+# Time Series Analysis
+```{r time series}
 
+acf(log(day_SPY_0409$close))
+pacf(log(day_SPY_0409$close))
 
+acf(log(raw_SPY$close))
+pacf(log(raw_SPY$close))
 
+```
+
+Looks like an AR(1) process. ACF looks a bit odd though, all equal to 1?
 
 
 
