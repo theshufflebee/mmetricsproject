@@ -19,6 +19,9 @@ require(here) #directory finder
 require(stringr) # ?
 require(dplyr) #data management
 require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(lmtest) #reg tests
 
 getwd()
 setwd("...")
@@ -259,12 +262,27 @@ pacf(log(raw_SPY$close))
 AR1 = arima(day_SPY_0409$close,c(1,0,0),method="ML")
 AR2 = arima(day_SPY_0409$close,c(2,0,0),method="ML")
 AR3 = arima(day_SPY_0409$close,c(3,0,0),method="ML")
+table1 = export_summs(AR1,AR2,AR3, model.names = c("AR1","AR2","AR3"), digits = 4)
+huxtable::caption(table1) <- "AR Estimations"
+huxtable::set_width(table1, 0.8)
 
-AIC(AR1,AR2,AR3)
-BIC(AR1,AR2,AR3)
+AR1res = as.numeric(AR1$residuals)
+AR1res_lagged <- lag(AR1res, 1)
+iidcheck1 = lm(AR1res ~ AR1res_lagged)
+AR2res = as.numeric(AR2$residuals)
+AR2res_lagged <- lag(AR2res, 1)
+iidcheck2 = lm(AR2res ~ AR2res_lagged)
+AR3res = as.numeric(AR3$residuals)
+AR3res_lagged <- lag(AR3res, 1)
+iidcheck3 = lm(AR3res ~ AR3res_lagged)
+table2 = export_summs(iidcheck1,iidcheck2,iidcheck3, 
+             model.names = c("AR1 Residuals","AR2 Residuals","AR3 Residuals"), 
+             digits = 4)
+huxtable::caption(table2) <- "Checking Residuals"
+huxtable::set_width(table2, 0.8)
 ```
 
-Looks like an AR(1) process. ACF looks a bit odd though, all equal to 1?
+
 
 
 
