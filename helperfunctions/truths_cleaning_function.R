@@ -1,0 +1,47 @@
+truths_processer <- function(raw_data) {
+  raw_data %>%
+    mutate(
+      # Extract the full date and time
+      date_time = str_extract(x, "\\b[A-Za-z]+ \\d{1,2}, \\d{4}, \\d{1,2}:\\d{2} [APM]{2}\\b"),
+      
+      # Convert 'date_time' to proper Date-Time format
+      date_time_parsed = mdy_hm(date_time),  # Use mdy_hm() to parse the datetime
+      
+      # Extract date only for plot
+      day = as.Date(date_time_parsed),
+      
+      # Extract time only for plot
+      time = format(date_time_parsed, "%H:%M"),
+      
+      # Convert time to numeric hours & minutes as fractions
+      time_numeric = hour(date_time_parsed) + minute(date_time_parsed) / 60,
+      
+      # Shift time such that y = 0 corresponds to 12 PM
+      time_shifted = time_numeric - 12,  # Subtract 12 to make 12 PM = 0
+      
+      post = str_trim(str_remove(x, ".*\\d{1,2}, \\d{4}, \\d{1,2}:\\d{2} [APM]{2}\\s*")),
+      
+      post = str_remove(post, "^Original Post\\s*"),  # Remove Original Post string
+      
+      media = if_else(post == "", 1, 0),  # Assign 1 if post is just image/video, otherwise 0
+      
+      link = if_else(str_detect(post, "^https"), 1, 0),  # Binary variable for URLs -> starting with https
+      
+      post_lower = str_to_lower(post)  # New column with post converted to lowercase
+    )
+      
+      return(processed_data)
+}
+
+
+detect_words <- function(data, words, column) {
+  #inpot a df and 
+  
+  # Loop through the words and create a binary column for each one
+  for (word in words) {
+    # Create a new column with binary indicator (1 if word is present, 0 if not)
+    data <- data %>%
+      mutate(!!paste0("contains_", word) := if_else(str_detect(colum, word), 1, 0))
+  }
+  return(data)
+}

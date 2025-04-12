@@ -16,7 +16,7 @@ require(ggplot2) #plots
 require(AEC) #JP-Renne functions
 require(expm) #matrix exponents
 require(here) #directory finder
-require(stringr) # ?
+require(stringr) # analysis of strings, important for the detection in tweets
 require(dplyr) #data management
 require(lubridate) #data dates management
 require(zoo) #for lagging
