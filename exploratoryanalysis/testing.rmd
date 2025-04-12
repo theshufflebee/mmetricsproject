@@ -206,8 +206,7 @@ ggplot(raw_ASHR, aes(x = timestamp, y = close)) +
 
 #Get Truths April 9th
 ```{r}
-
-
+raw_truths
 
 ```
 
