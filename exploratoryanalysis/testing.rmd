@@ -204,6 +204,16 @@ ggplot(raw_ASHR, aes(x = timestamp, y = close)) +
 
 ```
 
+#Get Truths April 9th
+```{r}
+
+
+
+```
+
+
+
+
 
 ## Per Day
 ```{r daily market plots}
