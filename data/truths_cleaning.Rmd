@@ -9,20 +9,32 @@ require(stringr)
 require(dplyr)
 require(ggplot2)
 require(lubridate)
+require(purrr)
 ```
 
 
+# Load needed functions and files
 ```{r}
 truths_raw <- read.csv(here("data/political_data", "trump_all_truths.csv"))
 source(here("helperfunctions/truths_cleaning_function.R"))
 source(here("helperfunctions/scraper.R"))
 ```
+Important: Here we do NOT use the scraper but only provide an example usage. The scraping process takes aproximately half an hour. Reason for that is the delay that the scraper uses so the pages doesn't die. Instead we load the data we got from the scrapper directly
+
+Furthermore we use the link of the second page of the 50 truths so that the function works with the first page.
 
 
+#Sample usage of the scrapping function
+only use the second page link
+```{r}
+# new_truths <- trumpstruthscraper(3, "https://trumpstruth.org/?sort=desc&per_page=50&cursor=eyJzdGF0dXNfY3JlYXRlZF9hdCI6IjIwMjUtMDQtMDkgMDE6Mzg6NDQiLCJfcG9pbnRzVG9OZXh0SXRlbXMiOnRydWV9&sort=desc&per_page=50&query=&start_date=&end_date=")
+```
 
 
+# Data Preparation
+This chunk is used to prepare the Truth Social data for the analysis. In order it doesth efollowing thing. It extracts the time the post was made and then splits the date up for certain plots. This will be moved in the future.
 
-
+Then it separates the post text and converts it to lowercase only for easier analysis. Some posts are just an image or video which we do not have or a link. These "empty" post are being marked with a binary variable. This is so they can easily be identified. 
 
 
 ```{r}
@@ -34,17 +46,21 @@ truths <- truths_raw %>%
     # Convert 'date_time' to proper Date-Time format
     date_time_parsed = mdy_hm(date_time),  # Use mdy_hm() to parse the datetime
     
+    #---------------- for the plot
+    
     # Extract date only for plot
     day = as.Date(date_time_parsed),
     
     # Extract time only for plot
     time = format(date_time_parsed, "%H:%M"),
     
-    # Convert time to numeric hours & minutes as fractions
+    # Convert time to numeric with hours, minutes as fractions
     time_numeric = hour(date_time_parsed) + minute(date_time_parsed) / 60,
     
-    # Shift time such that y = 0 corresponds to 12 PM
+    # Shift time so  y = 0 corresponds to 12 PM
     time_shifted = time_numeric - 12,  # Subtract 12 to make 12 PM = 0
+    
+    #----------for the plot end
     
     post = str_trim(str_remove(x, ".*\\d{1,2}, \\d{4}, \\d{1,2}:\\d{2} [APM]{2}\\s*")),
     
@@ -59,16 +75,16 @@ truths <- truths_raw %>%
   )
 ```
 
+#Post Selection
+
+Now that we have the data prepared we need to find the posts needed for the analysis. This is made trough binary variables as well. The function below takes as input data, a selected column of it and then checks for those words in the seected colum. it adds a colum with a binary variable to the returned dataframe
 
 ```{r}
-detect_words <- function(data, words, column) {
-  #inpot a df and 
-  
-  # Loop through the words and create a binary column for each one
+detect_words <- function(data, words) {
+  # Loop through the words and create a binary column for each word
   for (word in words) {
     # Create a new column with binary indicator (1 if word is present, 0 if not)
-    data <- data %>%
-      mutate(!!paste0("contains_", word) := if_else(str_detect(colum, word), 1, 0))
+    data[[paste0("contains_", word)]] <- if_else(str_detect(data$post_lower, word), 1, 0)
   }
   return(data)
 }
@@ -77,10 +93,13 @@ detect_words <- function(data, words, column) {
 
 
 ```{r}
-detection_words <- c("tariff")
+detection_words <- c("tariff", "$DJT", "economy")
 
 new_truths <- detect_words(truths, detection_words)
 ```
 
+```{r}
+sum(new_truths$contains_tariff)
+```
 
 
