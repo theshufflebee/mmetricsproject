@@ -1,0 +1,48 @@
+---
+title: "truths_cleaning"
+output: html_document
+---
+
+```{r}
+require(here)
+require(stringr)
+require(dplyr)
+require(ggplot2)
+require(lubridate)
+```
+
+
+```{r}
+truths_raw <- read.csv(here("data/political_data", "trump_all_truths.csv"))
+```
+
+
+```{r}
+truths <- truths_raw %>%
+ mutate(
+    # Extract the full date and time
+    date_time = str_extract(x, "\\b[A-Za-z]+ \\d{1,2}, \\d{4}, \\d{1,2}:\\d{2} [APM]{2}\\b"),
+    
+    # Convert 'date_time' to proper Date-Time format
+    date_time_parsed = mdy_hm(date_time),  # Use mdy_hm() to parse the datetime
+    
+    # Extract date only for plot
+    day = as.Date(date_time_parsed),
+    
+    # Extract time only for plot
+    time = format(date_time_parsed, "%H:%M"),
+    
+    # Convert time to numeric hours & minutes as fractions
+    time_numeric = hour(date_time_parsed) + minute(date_time_parsed) / 60,
+    
+    # Shift time such that y = 0 corresponds to 12 PM
+    time_shifted = time_numeric - 12  # Subtract 12 to make 12 PM = 0
+  )
+```
+
+
+```{r}
+head(truths)
+```
+
+

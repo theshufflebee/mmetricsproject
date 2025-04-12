@@ -24,7 +24,7 @@ require(jtools) #tables
 require(lmtest) #reg tests
 
 getwd()
-setwd("...")
+#setwd("...") -> set wd at base repo folder
 ```
 
 # Data 
