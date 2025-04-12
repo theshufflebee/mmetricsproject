@@ -3,32 +3,13 @@
 
 "https://trumpstruth.org/?sort=desc&per_page=50&cursor=eyJzdGF0dXNfY3JlYXRlZF9hdCI6IjIwMjUtMDMtMjMgMTc6MzQ6MjMiLCJfcG9pbnRzVG9OZXh0SXRlbXMiOnRydWV9"
 
---------------------------------------------------------------------------------
+#Necessary libraries
+library(rvest)
+library(stringr)
+library(dplyr)
 
-trumpstruthscraper <- function(num_pages, link) {
-  current_url <- link
-  all_quotes <- c()  # Store all quotes
-  
-  for (i in 1:num_pages) {  
-    result <- scrape_page(current_url)
-    
-    # add to the end
-    all_quotes <- c(all_quotes, result$quotes)
-    
-    # Stop if no next page is found
-    if (is.na(result$next_page_url) || result$next_page_url == "") {
-      break
-    } else {
-      current_url <- result$next_page_url  # Move to the next page
-    }
-    
-    Sys.sleep(2)  # delays each request by 2 second
-  }
-  
-  return(all_quotes)
-}
+#--------------------------------------------------------------------------------
 
-# Scraper function for a single page -> returns scraped data and next page url
 scrape_page <- function(url) {
   webpage <- read_html(url)
   
@@ -56,4 +37,29 @@ scrape_page <- function(url) {
   }
   
   return(list(quotes = quotes_clean, next_page_url = next_page_url))
+}  
+  
+trumpstruthscraper <- function(num_pages, link) {
+  current_url <- link
+  all_quotes <- c()  # Store all quotes
+  
+  for (i in 1:num_pages) {  
+    result <- scrape_page(current_url)
+    
+    # add to the end
+    all_quotes <- c(all_quotes, result$quotes)
+    
+    # Stop if no next page is found
+    if (is.na(result$next_page_url) || result$next_page_url == "") {
+      break
+    } else {
+      current_url <- result$next_page_url  # Move to the next page
+    }
+    
+    Sys.sleep(2)  # delays each request by 2 second
+  }
+  
+  return(all_quotes)
 }
+
+# Scraper function for a single page -> returns scraped data and next page url

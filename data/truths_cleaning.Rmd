@@ -25,10 +25,6 @@ source(here("helperfunctions/scraper.R"))
 
 
 
-
-
-
-
 ```{r}
 truths <- truths_raw %>%
  mutate(
