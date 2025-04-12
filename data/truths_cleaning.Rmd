@@ -15,7 +15,7 @@ require(lubridate)
 ```{r}
 truths_raw <- read.csv(here("data/political_data", "trump_all_truths.csv"))
 source(here("helperfunctions/truths_cleaning_function.R"))
-source(here("helperfunctions/trumpstruths_scraper_function.R"))
+source(here("helperfunctions/scraper.R"))
 ```
 
 
