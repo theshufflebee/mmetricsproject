@@ -34,6 +34,9 @@ truths_processer <- function(raw_data) {
       
       link = if_else(str_detect(post, "^https"), 1, 0),  # Binary variable for URLs -> starting with https
       
+      post = str_replace(post, "(http[s]?://|www\\.)\\S+", ""),  # Remove URLs starting with http, https, or www
+      # here the S+ basically removes everything after http, https pr www as long as there is no whitespace
+      
       post_lower = str_to_lower(post),  # New column with post converted to lowercase
       
       
@@ -43,7 +46,7 @@ truths_processer <- function(raw_data) {
         str_split("\\s+") %>%
         lapply(function(words) {
           words <- words[words != ""]  # Remove empty strings
-          setdiff(words, stop_words_list)  # Remove stopwords
+          words <- setdiff(words, stop_words_list)  # Remove stopwords
           words <- lemmatize_words(words) # Reduces words to their base form -> is becomes be
         })
     )

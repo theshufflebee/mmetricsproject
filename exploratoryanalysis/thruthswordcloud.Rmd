@@ -5,29 +5,92 @@ output:
     keep_md: true
 ---
 ```{r}
+
+```
+
+# Load the packages, data and functions
+```{r}
 require(here)
 require(stringr)
 require(dplyr)
 require(ggplot2)
 require(lubridate)
-```
+require(RColorBrewer)
+require(wordcloud)
 
-
-```{r}
 truths_raw <- read.csv(here("data/political_data", "trump_all_truths.csv"))
 snp_raw <- read.csv(here("data/market_data", "SPY.csv"))
 
 source(here("helperfunctions/truths_cleaning_function.R"))
 ```
 
+# Process the data with the helperfunction
 ```{r}
-
-
-truths <-truths_processer(truths_raw)
+truths <-truths_processer(truths_raw) # can take one or two minutes
 head(truths)
+```
+This does multiple things. Mainly it turns the scrapped data that is a string per post, cleans it and tokenizes the post. It separates the date and prepares the date to make the plots below by creating many colums.
+
+The second part tokenizes the tweets and lemmatizes them. This means each word becomes an "obersvation and all observations are collected on the post level. Then the words are also lemmatized, meaning reduced to their basic form. For example is becomes be, runnin or ran become run ect.
+
+
+#Wordcloud
+We remove the Tweets that only contain links or nothing at all from the dataset
+```{r}
+truths_main <- truths %>%
+  filter(link != 1, media != 1)
 ```
 
 
+
+
+```{r}
+all_tokens <- unlist(truths_main$tokens)
+
+word_freqs <- table(all_tokens)
+```
+
+```{r}
+count_token_occurrences <- function(data, word) {
+  sum(sapply(data$tokens, function(token_list) {
+    sum(token_list == word)
+  }))
+}
+```
+
+```{r}
+count_token_occurrences(truths_main, "https")
+
+```
+
+
+```{r}
+wordcloud(
+  words = names(word_freqs),
+  freq = as.numeric(word_freqs),
+  min.freq = 300,  # adjust depending on how important it is
+  max.words = 400,
+  random.order = FALSE,
+  colors = brewer.pal(8, "Dark2")
+)
+
+```
+
+From this wordcloud we can gather some of the most used words by trump. Now the question is: how much does he post during open markets? For that we can plot each post on a time plot:
+
+```{r}
+Sys.setlocale("LC_TIME", "C") # avoids the weekdays being in french or german -> forces english
+
+truths_main <- truths_main %>%
+  mutate(
+    is_market_hour = case_when(
+      weekdays(day) %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") & ### Important if you use a different locale you need to 
+        #change language of this vector
+        time_shifted >= (-2.5) & time_shifted <= 4 ~ TRUE,  # 9:30 AM to 4:00 PM
+      TRUE ~ FALSE  # Non-market hours
+    )
+  )
+```
 
 
 ```{r}
@@ -63,11 +126,6 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
     axis.title = element_text(size = 12),
     axis.text = element_text(size = 10)
   )
-```
-
-
-```{r}
-
 ```
 
 
