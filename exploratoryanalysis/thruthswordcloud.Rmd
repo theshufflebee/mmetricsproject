@@ -4,9 +4,6 @@ output:
   html_document:
     keep_md: true
 ---
-```{r}
-
-```
 
 # Load the packages, data and functions
 ```{r}
@@ -17,6 +14,11 @@ require(ggplot2)
 require(lubridate)
 require(RColorBrewer)
 require(wordcloud)
+library(tidyr)
+library(randomForest)
+library(tidytext)
+library(textstem)
+library(tidyverse)
 
 truths_raw <- read.csv(here("data/political_data", "trump_all_truths.csv"))
 snp_raw <- read.csv(here("data/market_data", "SPY.csv"))
@@ -92,44 +94,117 @@ truths_main <- truths_main %>%
   )
 ```
 
-
 ```{r}
-# Create the scatter plot
-ggplot(truths, aes(x = day, y = time_shifted)) +
-  geom_point(alpha = 0.5, color = "blue") +  # Scatter plot with transparency to handle overplotting
+ggplot(truths_main, aes(x = day, y = time_shifted)) +
+  geom_point(aes(color = is_market_hour), alpha = 0.5) +
+  
+  # Custom colors for market vs non-market hours
+  scale_color_manual(values = c("FALSE" = "blue", "TRUE" = "green")) +
+  
   scale_y_continuous(
-    breaks = seq(-12, 12, by = 3),  # Set breaks for every 3 hours (-12, -9, -6, ..., 12)
-    labels = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00", "24:00")  # 24-hour format labels
+    breaks = seq(-12, 12, by = 3),
+    labels = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00", "24:00")
   ) +
-  labs(title = "Terminally Online: Trumps Truth Social Posts (EDT)",
+  labs(title = "Terminally Online: Trump's Truth Social Posts (EDT)",
        x = "Day",
-       y = "Time of Day") +
+       y = "Time of Day",
+       color = "Market Hours") +
+  
   theme_minimal() +
   
-  # quarterly breaks and better readability
   scale_x_date(
-    date_labels = "%b %Y",  # Format labels to show month and year
-    date_breaks = "3 months"  # quarterly
+    date_labels = "%b %Y",
+    date_breaks = "3 months"
   ) +
   
-  # Rotate the x-axis
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   
-  # Add vertical lines at 9:30 AM and 4:00 PM for stock market
-  geom_hline(yintercept = (9 + 30 / 60) - 12, linetype = "dashed", color = "red") + 
-  geom_hline(yintercept = 16 - 12, linetype = "dashed", color = "red") +   
-  
-  # theme adjustments
   theme(
-    panel.grid.minor = element_blank(),  # Remove minor gridlines
-    panel.grid.major = element_line(linewidth = 0.5),  # Major gridlines
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(linewidth = 0.5),
     axis.title = element_text(size = 12),
     axis.text = element_text(size = 10)
   )
 ```
 
+Now lets get only those tweets
+```{r}
+truths_market <- truths_main %>%
+  filter(is_market_hour != FALSE)
+```
+
+now get the open and close
+
+```{r}
+snp_data <- snp_raw %>%
+  mutate(timestamp = ymd_hms(timestamp))  # Or adapt if already correct
+
+truths_market <- truths_market %>%
+  mutate(post_time = ymd_hms(date_time_parsed))  # Rename or reuse as needed
+
+# Join on exact datetime
+truths_market <- truths_market %>%
+  left_join(snp_data, by = c("post_time" = "timestamp"))
+```
 
 
+```{r}
+truths_market <- truths_market %>%
+  mutate(minute_return = open - close)
+
+truths_market <- truths_market %>%
+  filter(!is.na(open))
+```
+
+```{r}
+
+# First, ensure tokens are characters and unnest them
+truths_unnested <- truths_market %>%
+  select(minute_return, tokens) %>%
+  mutate(tokens = lapply(tokens, as.character)) %>%
+  unnest(tokens) %>%
+  mutate(token_present = 1)
+
+# Now, we widen the data, making sure only tokens are pivoted
+token_wide_df <- truths_unnested %>%
+  pivot_wider(
+    names_from = tokens,
+    values_fn = max,
+    values_from = token_present,
+  )
+
+# Check the result
+print(token_wide_df)
+```
+
+
+```{r}
+library(randomForest)
+library(dplyr)
+
+#Replace NA with 0
+token_wide_df[ , -1] <- token_wide_df[ , -1] %>% replace(is.na(.), 0) #due to problems to do it during change we only now convert the NA to 0s
+
+
+```
+
+
+```{r}
+# Random Forest Model
+train_index <- sample(1:nrow(token_wide_df), size = 0.8 * nrow(token_wide_df))  # 80% training data
+train_data <- token_wide_df[train_index, ]
+test_data <- token_wide_df[-train_index, ]
+
+rf_model <- randomForest(minute_return ~ ., data = train_data, importance = TRUE, ntree = 100)
+importance(rf_model)
+varImpPlot(rf_model)
+```
+
+```{r}
+colnames(token_wide_df) <- make.names(colnames(token_wide_df))
+
+
+```
 
 
 
