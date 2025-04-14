@@ -31,29 +31,6 @@ head(truths)
 
 
 ```{r}
-truths <- truths_raw %>%
- mutate(
-    # Extract the full date and time
-    date_time = str_extract(x, "\\b[A-Za-z]+ \\d{1,2}, \\d{4}, \\d{1,2}:\\d{2} [APM]{2}\\b"),
-    
-    # Convert 'date_time' to proper Date-Time format
-    date_time_parsed = mdy_hm(date_time),  # Use mdy_hm() to parse the datetime
-    
-    # Extract date only for plot
-    day = as.Date(date_time_parsed),
-    
-    # Extract time only for plot
-    time = format(date_time_parsed, "%H:%M"),
-    
-    # Convert time to numeric hours & minutes as fractions
-    time_numeric = hour(date_time_parsed) + minute(date_time_parsed) / 60,
-    
-    # Shift time such that y = 0 corresponds to 12 PM
-    time_shifted = time_numeric - 12  # Subtract 12 to make 12 PM = 0
-  )
-```
-
-```{r}
 # Create the scatter plot
 ggplot(truths, aes(x = day, y = time_shifted)) +
   geom_point(alpha = 0.5, color = "blue") +  # Scatter plot with transparency to handle overplotting

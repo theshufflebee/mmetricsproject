@@ -2,7 +2,7 @@ truths_processer <- function(raw_data) {
   
   #Load the needed packages for the tokenization
   library("tidytext")
-  library(SnowballC)
+  library("textstem")
   data("stop_words")
   stop_words_list <- stop_words$word
   
@@ -44,6 +44,7 @@ truths_processer <- function(raw_data) {
         lapply(function(words) {
           words <- words[words != ""]  # Remove empty strings
           setdiff(words, stop_words_list)  # Remove stopwords
+          words <- lemmatize_words(words) # Reduces words to their base form -> is becomes be
         })
     )
       
