@@ -1,5 +1,12 @@
 truths_processer <- function(raw_data) {
-  raw_data %>%
+  
+  #Load the needed packages for the tokenization
+  library("tidytext")
+  library(SnowballC)
+  data("stop_words")
+  stop_words_list <- stop_words$word
+  
+  processed_data <- raw_data %>%
     mutate(
       # Extract the full date and time
       date_time = str_extract(x, "\\b[A-Za-z]+ \\d{1,2}, \\d{4}, \\d{1,2}:\\d{2} [APM]{2}\\b"),
@@ -27,7 +34,17 @@ truths_processer <- function(raw_data) {
       
       link = if_else(str_detect(post, "^https"), 1, 0),  # Binary variable for URLs -> starting with https
       
-      post_lower = str_to_lower(post)  # New column with post converted to lowercase
+      post_lower = str_to_lower(post),  # New column with post converted to lowercase
+      
+      
+      # Tokenize the tweets
+      tokens = post_lower %>%
+        str_replace_all("[^a-z\\s]", " ") %>%
+        str_split("\\s+") %>%
+        lapply(function(words) {
+          words <- words[words != ""]  # Remove empty strings
+          setdiff(words, stop_words_list)  # Remove stopwords
+        })
     )
       
       return(processed_data)

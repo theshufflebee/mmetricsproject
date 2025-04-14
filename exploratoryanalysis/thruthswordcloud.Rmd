@@ -15,7 +15,19 @@ require(lubridate)
 
 ```{r}
 truths_raw <- read.csv(here("data/political_data", "trump_all_truths.csv"))
+snp_raw <- read.csv(here("data/market_data", "SPY.csv"))
+
+source(here("helperfunctions/truths_cleaning_function.R"))
 ```
+
+```{r}
+
+
+truths <-truths_processer(truths_raw)
+head(truths)
+```
+
+
 
 
 ```{r}
@@ -77,6 +89,9 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
 ```
 
 
+```{r}
+
+```
 
 
 
