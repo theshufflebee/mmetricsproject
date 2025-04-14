@@ -160,10 +160,13 @@ truths_market <- truths_market %>%
 
 # First, ensure tokens are characters and unnest them
 truths_unnested <- truths_market %>%
-  select(minute_return, tokens) %>%
-  mutate(tokens = lapply(tokens, as.character)) %>%
-  unnest(tokens) %>%
-  mutate(token_present = 1)
+  select(minute_return, tokens) %>%#only select dependent value and tokens
+  mutate(tokens = lapply(tokens, as.character)) %>% # turn them into characters
+  unnest(tokens) %>% #unnest the tokens
+  mutate(token_present = 1)# just shows if any token is present or if any row is empty
+# at this point we have a dataframe that has one column where each token is on a separate row (so if a minute return has 3 tokens it has 3 rows
+#each with one token)
+
 
 # Now, we widen the data, making sure only tokens are pivoted
 token_wide_df <- truths_unnested %>%
@@ -172,6 +175,9 @@ token_wide_df <- truths_unnested %>%
     values_fn = max,
     values_from = token_present,
   )
+# This basically makes it so each unique token has a column and there is only 1 row for each unique value of minute_return again. Then you have a 
+# wide dataframe where each column represents a token that is NA if that token doesnt exist in a post (given by minute return) or 1 if it is in there
+
 
 # Check the result
 print(token_wide_df)
@@ -179,13 +185,8 @@ print(token_wide_df)
 
 
 ```{r}
-library(randomForest)
-library(dplyr)
-
 #Replace NA with 0
 token_wide_df[ , -1] <- token_wide_df[ , -1] %>% replace(is.na(.), 0) #due to problems to do it during change we only now convert the NA to 0s
-
-
 ```
 
 
@@ -196,15 +197,10 @@ train_data <- token_wide_df[train_index, ]
 test_data <- token_wide_df[-train_index, ]
 
 rf_model <- randomForest(minute_return ~ ., data = train_data, importance = TRUE, ntree = 100)
-importance(rf_model)
+#importance(rf_model)
 varImpPlot(rf_model)
 ```
 
-```{r}
-colnames(token_wide_df) <- make.names(colnames(token_wide_df))
-
-
-```
 
 
 
