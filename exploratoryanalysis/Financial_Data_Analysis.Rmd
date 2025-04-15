@@ -4,7 +4,7 @@ output:
   pdf_document: 
     toc: true
     fig_caption: yes
-    latex_engine: xelatex 
+    latex_engine: lualatex
 header-includes:
   - \usepackage{amsmath}
 ---
