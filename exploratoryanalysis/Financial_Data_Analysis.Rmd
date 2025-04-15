@@ -22,6 +22,7 @@ require(dplyr) #data management
 require(lubridate) #data dates management
 require(zoo) #for lagging
 require(jtools) #tables
+require(huxtable) #tables
 require(lmtest) #reg tests
 
 #load helper functions
@@ -29,8 +30,10 @@ source(here("helperfunctions/data_looper.R"))
 source(here("helperfunctions/day_selector.R"))
 source(here("helperfunctions/day_plotter.R"))
 source(here("helperfunctions/quick_arma.R"))
-source(here("helperfunctions/r_vol.R"))
-source(here("helperfunctions/r_vol_month.R"))
+source(here("helperfunctions/r.vol.R"))
+source(here("helperfunctions/r.vol_month.R"))
+source(here("helperfunctions/r.vol_hour.R"))
+source(here("helperfunctions/r.vol_month_hour.R"))
 
 getwd()
 #setwd("...") -> set wd at base repo folder
@@ -78,13 +81,26 @@ quick_arma(day_SPY_0402,1,0,0) #checking AR1,AR2,AR3
 ```
 ## Realised Volatility
 ```{r volatility}
-#for a particular day
-r.vol(day_SPY_0402)
+#for a particular day (outputs scalar)
+r.vol(day_SPY_0402) 
 
 #for a month (outputs vector of each day's realised volatility)
-r.vol_month(raw_SPY2021_01)
+r.vol_month(raw_SPY2021_01) 
 
-#can plot it
+#for each hour in a day (outputs a vector of each hour's realised volatility)
+r.vol_hour(day_SPY_0402) 
+
+#for each hour in a day for each day in a month (outputs a matrix)
+month_hour = r.vol_month_hour(raw_SPY2021_01)
+huxtable(data.frame(month_hour))
+
+#plots
+
+#hours in a day
+plot(r.vol_hour(day_SPY_0402))
+
+#days in a month
+plot(r.vol_month(raw_SPY2021_01))
 
 
 
