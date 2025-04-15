@@ -20,7 +20,7 @@ require(tidytext)
 require(textstem)
 require(tidyverse)
 
-truths_raw <- read.csv(here("data/political_data", "trump_all_truths.csv"))
+truths_raw <- read.csv(here("data/political_data", "truths_new.csv"))
 snp_raw <- read.csv(here("data/market_data", "SPY.csv"))
 
 source(here("helperfunctions/truths_cleaning_function.R"))
@@ -188,6 +188,7 @@ print(token_wide_df)
 #Replace NA with 0
 token_wide_df[ , -1] <- token_wide_df[ , -1] %>% replace(is.na(.), 0) #due to problems to do it during change we only now convert the NA to 0s
 colnames(token_wide_df) <- make.names(colnames(token_wide_df))
+
 ```
 
 
@@ -199,10 +200,60 @@ test_data <- token_wide_df[-train_index, ]
 
 rf_model <- randomForest(minute_return ~ ., data = train_data, importance = TRUE, ntree = 100)
 #importance(rf_model)
-varImpPlot(rf_model)
+varImpPlot(rf_model, n.var = 10)
 ```
 
 
+
+
+
+
+
+
+
+
+
+# This is the Tweet wordcloud
+He was banned in 2021 after Jan 6 so this is when the tweets stop
+
+```{r}
+tweets <- read.csv(here("data/political_data", "tweets.csv"))
+
+#Only keep original Tweets
+tweets <- tweets %>% filter(isRetweet != "t")
+tokens <- tokens(tweets$text)
+dfm <- dfm(tokens)
+```
+
+
+
+```{r}
+corpus_tweets <- corpus(tweets$text)
+```
+
+```{r}
+additional_words <- c("@realdonaldtrump")
+all_stopwords <- c(stopwords("en"), additional_words)
+```
+
+
+
+```{r}
+tokens_tweets <- tokens(corpus_tweets,  
+                        remove_punct = TRUE, 
+                        remove_numbers = TRUE)
+
+tokens_tweets <- tokens_remove(tokens_tweets, all_stopwords)  # Remove stopwords
+```
+
+
+```{r}
+dfm_tweets <- dfm(tokens_tweets)
+```
+
+```{r}
+textplot_wordcloud(dfm_tweets, min_count = 400, color = RColorBrewer::brewer.pal(8, "Dark2"))
+```
 
 
 
