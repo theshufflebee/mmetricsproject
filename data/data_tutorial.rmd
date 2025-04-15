@@ -18,8 +18,19 @@ data2=av_get("SPY", av_fun = "TIME_SERIES_INTRADAY", interval = "1min",
               adjusted="false", extended_hours="false", 
               month="2016-09", outputsize = "full") #create loop for more
 
-#loop
-year = "2021"
+
+
+write.csv(data,"~/ASHR.csv", row.names = T) #saves to documents
+write.csv(data2,"~/SPY1609.csv", row.names = T) 
+
+```
+
+```{r loop, eval=FALSE}
+library(alphavantager)
+
+av_api_key(Sys.getenv("ALPHAVANTAGE_API_KEY2"))
+
+year = "2022"
 months = c("01","02","03","04","05","06","07","08","09","10","11","12")
 market = "SPY"
 
@@ -33,12 +44,7 @@ filename = paste("~/", filename, sep="")
 filename = paste(filename,".csv",sep="")
 write.csv(dataloop,filename)
 }
-
-write.csv(data,"~/ASHR.csv", row.names = T) #saves to documents
-write.csv(data2,"~/SPY1609.csv", row.names = T) 
-
 ```
-
 
 
 # Tutorials
