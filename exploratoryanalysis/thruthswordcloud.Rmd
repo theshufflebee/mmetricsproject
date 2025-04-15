@@ -21,7 +21,10 @@ require(textstem)
 require(tidyverse)
 
 truths_raw <- read.csv(here("data/political_data", "truths_new.csv"))
-snp_raw <- read.csv(here("data/market_data", "SPY.csv"))
+snp_raw <- read.csv(here("data/market_data", "SPY_24_25.csv"))
+
+your_dataframe <- your_dataframe %>%
+  rename(new_name = old_name)
 
 source(here("helperfunctions/truths_cleaning_function.R"))
 ```
