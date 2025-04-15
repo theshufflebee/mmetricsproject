@@ -25,6 +25,13 @@ require(lmtest) #reg tests
 
 getwd()
 #setwd("...") -> set wd at base repo folder
+
+#load helper functions
+source(here("helperfunctions/data_looper.R"))
+source(here("helperfunctions/day_selector.R"))
+source(here("helperfunctions/day_plotter.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol.R"))
 ```
 
 # Data 
@@ -40,7 +47,9 @@ getwd()
 #market prices
 raw_ONEQ <- read.csv(here("data/market_data", "ONEQ.csv"))
 raw_SMI <- read.csv(here("data/market_data", "SMI.csv"))
-raw_SPY <- read.csv(here("data/market_data", "SPY.csv")) 
+raw_SPY <- read.csv(here("data/market_data", "SPY.csv"))
+raw_SPY2425 <- read.csv(here("data/market_data", "SPY_24_25.csv")) 
+raw_SPY2021_01 <- read.csv(here("data/market_data", "SPY-2021-01.csv")) 
 raw_VTHR <- read.csv(here("data/market_data", "VTHR.csv"))
 raw_VTI <- read.csv(here("data/market_data", "VTI.csv"))
 raw_VGK <- read.csv(here("data/market_data", "VGK.csv"))
@@ -291,7 +300,91 @@ huxtable::caption(table2) <- "Checking Residuals"
 huxtable::set_width(table2, 0.8)
 ```
 
+# Volatility 
 
+
+## JPR Formula
+$$
+\begin{aligned}
+  v_t &= \frac{1}{N}\sum_{i=1}^N(\Delta p_{t,i})^2 \\
+  &\text{where } \Delta p_t \text{ is the difference in price (open - close)} \\
+  &\text{and i represents every minute}
+\end{aligned}
+$$
+
+```{r JPR}
+#extract a particular day
+day_SPY_0402 = day_selector(raw_SPY,2025,04,02) #april 2nd 2025
+
+#let's plot it
+day_plotter(day_SPY_0402,"SPY Price on April 2nd 2025") 
+
+#quick
+quickplot = function(x){day_plotter(day_selector(raw_SPY,2025,04,x),"SPY Price 2025")}
+quickplot(9)
+
+#realized volatility 
+delta_price = day_SPY_0402$close - day_SPY_0402$open
+delta_price_sqr = delta_price^2
+day_SPY_0402 = cbind(day_selector(raw_SPY,2025,04,02),delta_price_sqr)
+v_t = sum(delta_price_sqr) / length(delta_price)
+
+#or is it like this??
+#realized volatility method2
+p_t = day_SPY_0402$close
+p_t_1 <- lag(p_t, 1)
+delta_price2 = p_t_1 - p_t
+v_t2 = sum((na.omit(delta_price2))^2) / length(na.omit(delta_price2))
+
+```
+
+```{r JPR long}
+#simplify notation
+data = raw_SPY2021_01
+
+#find all days excluding weekends etc
+days = unique(format(as.Date(data$timestamp, 
+                      format = "%Y-%m-%d %H:%M:%S"),format="%d"))
+r_vol = c(1:length(days))
+
+for (i in 1:length(days)){
+  daydata = day_selector(data,2021,01,as.numeric(days[i])) #selects data for each day
+  r_vol[i] = r.vol(daydata) #computes realized volatility for each day
+  r_vol
+}
+
+plot(r_vol)
+```
+
+
+
+## Garman and Klass (1980) Formula
+Note that this formula uses open-high-low-close information. \\
+This model is based on the assumption that price returns follow a Wiener process with zero drift and constant infinitesimal variance. It’s constructed by minimizing the variance of a quadratic estimator subject to the constraints of price and time symmetry and scale invariance of volatility. Source: https://assets.bbhub.io/professional/sites/10/intraday_volatility-3.pdf
+$$
+\begin{aligned}
+  V_{ohlc} = 0.5[log(H)-log(L)]^2 - [2log(2)-1][log(C)-log(O)]^2
+\end{aligned}
+$$
+```{r GnK}
+#extract a particular day
+day_SPY_0402 = day_selector(raw_SPY,2025,04,02) #april 2nd 2025
+
+#variables
+C = day_SPY_0402$close 
+O = day_SPY_0402$open
+H = day_SPY_0402$high 
+L = day_SPY_0402$low
+
+#realized volatility 
+V_ohlc = 0.5*(log(H)-log(L))^2 - (2*log(2)-1)*(log(C)-log(O))^2
+v_ohlc = sqrt(V_ohlc)
+day_SPY_0402 = cbind(day_selector(raw_SPY,2025,04,02),V_ohlc)
+avg = sum(V_ohlc) / length(V_ohlc)
+
+
+
+```
 
 
 

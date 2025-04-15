@@ -136,6 +136,19 @@ quick_arma = function(daydata,p,d,q){ #p,d,q as in arima
 #quick_arma(day_ONEQ_0409,2,0,0) #usage
 ```
 
+```{r realised volatility for one day}
+
+#t data is t=day's data
+r.vol = function(t_data){
+  p_t = t_data$close
+  p_t_1 <- lag(p_t, 1)
+  delta_price = p_t_1 - p_t
+  delta_price_sqr = delta_price^2
+  v_t = sum(na.omit(delta_price_sqr)) / length(na.omit(delta_price))
+  return(v_t)
+}
+
+```
 
 
 
