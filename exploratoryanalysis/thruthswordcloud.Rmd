@@ -187,6 +187,7 @@ print(token_wide_df)
 ```{r}
 #Replace NA with 0
 token_wide_df[ , -1] <- token_wide_df[ , -1] %>% replace(is.na(.), 0) #due to problems to do it during change we only now convert the NA to 0s
+colnames(token_wide_df) <- make.names(colnames(token_wide_df))
 ```
 
 
