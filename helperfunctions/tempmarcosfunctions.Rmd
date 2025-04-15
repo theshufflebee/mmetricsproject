@@ -1,0 +1,91 @@
+---
+title: "temp marcos functions"
+output:
+  pdf_document: 
+    toc: true
+    fig_caption: yes
+header-includes:
+  - \usepackage{amsmath}
+---
+\newpage
+
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(lmtest) #reg tests
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+```
+
+# Data 
+
+## Raw Data
+```{r rawdata_setup, results=FALSE, warning=FALSE, message=FALSE}
+
+#political shocks
+raw_truths <- read.csv(here("data/political_data", "trump_all_truths.csv"))
+raw_tweets <- read.csv(here("data/political_data", "tweets.csv"))
+
+
+#market prices
+raw_ONEQ <- read.csv(here("data/market_data", "ONEQ.csv"))
+raw_SMI <- read.csv(here("data/market_data", "SMI.csv"))
+raw_SPY <- read.csv(here("data/market_data", "SPY.csv")) 
+raw_VTHR <- read.csv(here("data/market_data", "VTHR.csv"))
+raw_VTI <- read.csv(here("data/market_data", "VTI.csv"))
+raw_VGK <- read.csv(here("data/market_data", "VGK.csv"))
+raw_DAX <- read.csv(here("data/market_data", "DAX.csv"))
+raw_ASHR <- read.csv(here("data/market_data", "ASHR.csv"))
+
+raw_SPYy <- read.csv(here("data/market_data", "Spyqyahoo.csv")) #yahoo
+
+```
+
+
+```{r data loop}
+
+```
+
+
+
+```{r day_selector}
+
+
+
+day_SPY_0409 = filter(raw_SPY, str_detect(timestamp, "^2025-04-09")) #9th of april
+
+day_SPY_0409$timestamp = as.POSIXct(day_SPY_0409$timestamp, 
+                                    format = "%Y-%m-%d %H:%M:%S", tz = "EST")
+
+day_selector <- function(rawdata,year,month,day){
+  year = paste(year)   
+  month = paste(month)
+  day = paste(day)
+  date = paste("^",year,"-0",month,"-0",day)
+     newdata = filter(rawdata, str_detect(timestamp, "^2025-04-09"))
+}
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
