@@ -20,8 +20,9 @@ quick_arma = function(data,p,d,q){
   AR2 = arima(data$close,c((p+1),d,q),method="ML")
   AR3 = arima(data$close,c((p+2),d,q),method="ML")
   table1 = export_summs(AR1,AR2,AR3, model.names = names, digits = 4)
-  huxtable::caption(table1) <- "AR Estimations"
-  huxtable::set_width(table1, 0.8)
+  caption(table1) <- "AR Estimations"
+  set_width(table1, 0.8)
+  print(table1)
   
   names2 = paste(names,"Residuals")
   AR1res = as.numeric(AR1$residuals)
@@ -35,10 +36,11 @@ quick_arma = function(data,p,d,q){
   iidcheck3 = lm(AR3res ~ REG3res_lagged)
   table2 = export_summs(iidcheck1,iidcheck2,iidcheck3, 
                         model.names = names2, digits = 4)
-  huxtable::caption(table2) <- "Checking Residuals"
-  huxtable::set_width(table2, 0.8)
+  caption(table2) <- "Checking Residuals"
+  set_width(table2, 0.8)
+  print(table2)
   
-  return(list(table1,table2))
+  #return(list(table1,table2))
   
 }
 
