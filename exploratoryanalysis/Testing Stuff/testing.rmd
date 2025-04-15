@@ -31,7 +31,8 @@ source(here("helperfunctions/data_looper.R"))
 source(here("helperfunctions/day_selector.R"))
 source(here("helperfunctions/day_plotter.R"))
 source(here("helperfunctions/quick_arma.R"))
-source(here("helperfunctions/r.vol.R"))
+source(here("helperfunctions/r_vol.R"))
+source(here("helperfunctions/r_vol_month.R"))
 ```
 
 # Data 
