@@ -23,8 +23,8 @@ require(tidyverse)
 truths_raw <- read.csv(here("data/political_data", "truths_new.csv"))
 snp_raw <- read.csv(here("data/market_data", "SPY_24_25.csv"))
 
-your_dataframe <- your_dataframe %>%
-  rename(new_name = old_name)
+snp_raw <- snp_raw %>%
+  rename(timestamp = X)
 
 source(here("helperfunctions/truths_cleaning_function.R"))
 ```
@@ -153,7 +153,7 @@ truths_market <- truths_market %>%
 
 ```{r}
 truths_market <- truths_market %>%
-  mutate(minute_return = open - close)
+  mutate(minute_return = Open - Close)
 
 truths_market <- truths_market %>%
   filter(!is.na(open))
@@ -191,15 +191,15 @@ print(token_wide_df)
 #Replace NA with 0
 token_wide_df[ , -1] <- token_wide_df[ , -1] %>% replace(is.na(.), 0) #due to problems to do it during change we only now convert the NA to 0s
 colnames(token_wide_df) <- make.names(colnames(token_wide_df))
-
+rfdf <- na.omit(token_wide_df)
 ```
 
 
 ```{r}
 # Random Forest Model
-train_index <- sample(1:nrow(token_wide_df), size = 0.8 * nrow(token_wide_df))  # 80% training data
-train_data <- token_wide_df[train_index, ]
-test_data <- token_wide_df[-train_index, ]
+train_index <- sample(1:nrow(rfdf), size = 0.8 * nrow(rfdf))  # 80% training data
+train_data <- rfdf[train_index, ]
+test_data <- rfdf[-train_index, ]
 
 rf_model <- randomForest(minute_return ~ ., data = train_data, importance = TRUE, ntree = 100)
 #importance(rf_model)
