@@ -1,0 +1,77 @@
+---
+title: "Financial Data Analysis"
+output:
+  pdf_document: 
+    toc: true
+    fig_caption: yes
+    latex_engine: xelatex 
+header-includes:
+  - \usepackage{amsmath}
+---
+\newpage
+
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(lmtest) #reg tests
+
+#load helper functions
+source(here("helperfunctions/data_looper.R"))
+source(here("helperfunctions/day_selector.R"))
+source(here("helperfunctions/day_plotter.R"))
+source(here("helperfunctions/quick_arma.R"))
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+```
+# Data
+
+## Raw Data
+```{r rawdata_setup, results=FALSE, warning=FALSE, message=FALSE}
+
+#political shocks
+#raw_truths <- read.csv(here("data/political_data", "trump_all_truths.csv"))
+#raw_tweets <- read.csv(here("data/political_data", "tweets.csv"))
+
+
+#market prices
+raw_ONEQ <- read.csv(here("data/market_data", "ONEQ.csv")) #USA
+raw_SMI <- read.csv(here("data/market_data", "SMI.csv")) #CH
+raw_SPY <- read.csv(here("data/market_data", "SPY.csv")) #USA
+raw_VTHR <- read.csv(here("data/market_data", "VTHR.csv")) #
+raw_VTI <- read.csv(here("data/market_data", "VTI.csv")) #
+raw_VGK <- read.csv(here("data/market_data", "VGK.csv")) #
+raw_DAX <- read.csv(here("data/market_data", "DAX.csv")) #DE
+raw_ASHR <- read.csv(here("data/market_data", "ASHR.csv")) #CHINA
+
+```
+
+
+
+# Quick Analysis
+
+## SPY April 2nd 2025
+```{r helper tutorial, warning=FALSE, message=FALSE}
+
+#extract a particular day
+day_SPY_0402 = day_selector(raw_SPY,2025,04,02) #april 2nd 2025
+
+#let's plot it
+day_plotter(day_SPY_0402,"SPY Price on April 2nd 2025") 
+
+#quickly test some ARMA specifications
+quick_arma(day_SPY_0402,1,0,0) #checking AR1,AR2,AR3
+#quick_arma(day_SPY_0402,2,0,0) #checking AR2,AR3,AR4
+
+```
+
+

@@ -299,9 +299,38 @@ huxtable::set_width(table2, 0.8)
 
 
 
+## Cleanup with HelperFunctions
 
 
+```{r helper tutorial}
+rm(list=ls())
+library(ggplot2)
+library(dplyr)
+library(jtools)
+library(lmtest)
+library(here)
 
+#load functions
+source(here("helperfunctions/data_looper.R"))
+source(here("helperfunctions/day_selector.R"))
+source(here("helperfunctions/day_plotter.R"))
+source(here("helperfunctions/quick_arma.R"))
+
+
+#load raw data
+raw_SPY <- read.csv(here("data/market_data", "SPY.csv")) 
+
+#extract a particular day
+day_SPY_0402 = day_selector(raw_SPY,2025,04,02) #april 2nd 2025
+
+#let's plot it
+day_plotter(day_SPY_0402,"SPY Price on April 2nd 2025") 
+
+#quickly test some ARMA specifications
+quick_arma(day_SPY_0402,1,0,0) #checking AR1,AR2,AR3
+#quick_arma(day_SPY_0402,2,0,0) #checking AR2,AR3,AR4
+
+```
 
 
 

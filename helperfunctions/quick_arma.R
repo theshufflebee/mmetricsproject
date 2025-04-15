@@ -4,6 +4,7 @@
 #Necessary libraries
 library(huxtable)
 library(jtools) #for tables
+library(lmtest) #for coef tests
 
 #--------------------------------------------------------------------------------
 
