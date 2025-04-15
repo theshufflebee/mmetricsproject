@@ -27,6 +27,7 @@ require(lmtest) #reg tests
 
 #load helper functions
 source(here("helperfunctions/data_looper.R"))
+source(here("helperfunctions/data_loader.R"))
 source(here("helperfunctions/day_selector.R"))
 source(here("helperfunctions/day_plotter.R"))
 source(here("helperfunctions/quick_arma.R"))
@@ -57,8 +58,7 @@ raw_VTI <- read.csv(here("data/market_data", "VTI.csv")) #
 raw_VGK <- read.csv(here("data/market_data", "VGK.csv")) #
 raw_DAX <- read.csv(here("data/market_data", "DAX.csv")) #DE
 raw_ASHR <- read.csv(here("data/market_data", "ASHR.csv")) #CHINA
-raw_SPY2021_01 <- read.csv(here("data/market_data", "SPY-2021-01.csv")) 
-
+data_loader(year=2021,months=1:6,symbol="SPY")
 ```
 
 
@@ -85,13 +85,13 @@ quick_arma(day_SPY_0402,1,0,0) #checking AR1,AR2,AR3
 r.vol(day_SPY_0402) 
 
 #for a month (outputs vector of each day's realised volatility)
-r.vol_month(raw_SPY2021_01) 
+r.vol_month(raw_SPY_2021_01) 
 
 #for each hour in a day (outputs a vector of each hour's realised volatility)
 r.vol_hour(day_SPY_0402) 
 
 #for each hour in a day for each day in a month (outputs a matrix)
-month_hour = r.vol_month_hour(raw_SPY2021_01)
+month_hour = r.vol_month_hour(raw_SPY_2021_01)
 huxtable(data.frame(month_hour))
 
 #plots
@@ -100,7 +100,7 @@ huxtable(data.frame(month_hour))
 plot(r.vol_hour(day_SPY_0402))
 
 #days in a month
-plot(r.vol_month(raw_SPY2021_01))
+plot(r.vol_month(raw_SPY_2021_01))
 
 
 
