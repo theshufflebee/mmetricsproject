@@ -345,6 +345,10 @@ data = raw_SPY2021_01
 #find all days excluding weekends etc
 days = unique(format(as.Date(data$timestamp, 
                       format = "%Y-%m-%d %H:%M:%S"),format="%d"))
+months = unique(format(as.Date(data$timestamp, 
+                      format = "%Y-%m-%d %H:%M:%S"),format="%m"))
+years = unique(format(as.Date(data$timestamp, 
+                      format = "%Y-%m-%d %H:%M:%S"),format="%Y"))
 r_vol = c(1:length(days))
 
 for (i in 1:length(days)){
