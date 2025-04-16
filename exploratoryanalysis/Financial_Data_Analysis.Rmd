@@ -25,20 +25,15 @@ require(zoo) #for lagging
 require(jtools) #tables
 require(huxtable) #tables
 require(lmtest) #reg tests
-require(vroom) #for dataloading
+require(vroom) #for loading data
 
 #load helper functions
-source(here("helperfunctions/data_looper.R"))
-source(here("helperfunctions/data_loader.R"))
-source(here("helperfunctions/data_loader2.R"))
+source(here("helperfunctions/data_loaders.R"))
 source(here("helperfunctions/date_selector.R"))
 source(here("helperfunctions/day_plotter.R"))
 source(here("helperfunctions/quick_arma.R"))
-source(here("helperfunctions/r.vol.R"))
-source(here("helperfunctions/r.vol_month.R"))
-source(here("helperfunctions/r.vol_year.R"))
-source(here("helperfunctions/r.vol_hour.R"))
-source(here("helperfunctions/r.vol_month_hour.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+
 
 getwd()
 #setwd("...") -> set wd at base repo folder
@@ -60,15 +55,17 @@ raw_VTHR <- read.csv(here("data/market_data", "VTHR.csv")) #USA
 raw_VTI <- read.csv(here("data/market_data", "VTI.csv")) #USA
 raw_DAX <- read.csv(here("data/market_data", "DAX.csv")) #DE
 raw_ASHR <- read.csv(here("data/market_data", "ASHR.csv")) #CHINA
-data_loader(year=2021,months=1:6,symbol="SPY")
-#data_loader(year=2024,months=1:12,symbol="SPY")
-data_loader(year=2025,months=1:4,symbol="SPY")
-data_loader(year=2024,months=1:12,symbol="VGK") #EU
-data_loader(year=2025,months=1:4,symbol="VGK")
-data_loader(year=2025,months=1:2,symbol="ASHR")
+data_loader_months(year=2025,months=1:2,symbol="ASHR")
 
+#S&P500
+data_loader(year=2021,months=1:6,"SPY")
+data_loader(year=2024,months=1:12,"SPY")
+data_loader(year=2025,months=1:4,"SPY")
 
-data_loader2(year=2024,months=1:12,"SPY")
+#STOXX50
+data_loader(year=2024,months=1:12,"VGK")
+data_loader(year=2025,months=1:4,"VGK")
+
 
 ```
 
@@ -80,42 +77,45 @@ data_loader2(year=2024,months=1:12,"SPY")
 ```{r helper tutorial, warning=FALSE, message=FALSE}
 
 #extract a particular day
-day_SPY_0402 = day_selector(raw_SPY_2025_04,2025,04,02) #april 2nd 2025
+SPY_25_04_02 = day_selector(raw_SPY_2025,2025,04,02) #april 2nd 2025
 
 #let's plot it
-day_plotter(day_SPY_0402,"SPY Price on April 2nd 2025") 
+day_plotter(SPY_25_04_02,"SPY Price on April 2nd 2025") 
 
 #quickly test some ARMA specifications
-quick_arma(day_SPY_0402,1,0,0) #checking AR1,AR2,AR3
-#quick_arma(day_SPY_0402,2,0,0) #checking AR2,AR3,AR4
+quick_arma(SPY_25_04_02,1,0,0) #checking AR1,AR2,AR3
+#quick_arma(SPY_25_04_02,2,0,0) #checking AR2,AR3,AR4
+
+#extract a particular month
+SPY_24_09 = month_selector(raw_SPY_2024,2024,09) #november 2024
 
 ```
 
 ## Realised Volatility
 ```{r volatility}
 #for a particular day (outputs scalar)
-r.vol(day_SPY_0402) 
+r.vol_day(SPY_25_04_02) 
 
 #for a month (outputs vector of each day's realised volatility)
-r.vol_month(raw_SPY_2025_04) 
+r.vol_month(SPY_24_09) 
 
 #for each day in each month of one year
 r.vol_year(raw_SPY_2024)
 
 #for each hour in a day (outputs a vector of each hour's realised volatility)
-r.vol_hour(day_SPY_0402) 
+r.vol_day_hour(SPY_25_04_02) 
 
 #for each hour in a day for each day in a month (outputs a matrix)
-month_hour = r.vol_month_hour(raw_SPY_2025_04)
+month_hour = r.vol_month_hour(SPY_24_09)
 huxtable(data.frame(month_hour))
 
 #plots
 
 #hours in a day
-plot(r.vol_hour(day_SPY_0402))
+plot(r.vol_day_hour(SPY_25_04_02))
 
 #days in a month
-plot(r.vol_month(raw_SPY_2025_04))
+plot(r.vol_month(SPY_24_09))
 
 
 
