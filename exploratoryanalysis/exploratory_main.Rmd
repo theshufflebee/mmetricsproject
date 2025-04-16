@@ -28,6 +28,10 @@ require(quanteda)
 require(rvest)
 require(httr)
 require(xml2)
+require(textdata)
+require(sentimentr)
+require(syuzhet)
+require(text)
 
 truths_raw <- read.csv(here("data/political_data", "truths_new.csv"))
 snp_raw <- read.csv(here("data/market_data", "SPY_24_25.csv"))
@@ -214,6 +218,14 @@ varImpPlot(rf_model, n.var = 10)
 ```
 
 
+# Assign Sentiment Scores to tweets
+
+```{r}
+nrc_scores <- get_nrc_sentiment(truths_market$post)
+
+truths_sentiment <- bind_cols(truths_market, nrc_scores)
+
+```
 
 
 
