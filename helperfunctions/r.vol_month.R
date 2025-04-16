@@ -1,15 +1,16 @@
 # This function loops the r.vol function in order to compute a vector of 
-# a month's daily realised volatility
+# a whole month's daily realised volatility
 
 #Necessary libraries
 library(dplyr)
 
 #Necessary function
 #source(here("helperfunctions/r.vol.R"))
+#source(here("helperfunctions/date_selector.R"))
 
 #--------------------------------------------------------------------------------
 
-#data as a csv file containing only 1 month of data
+#data as a csv file containing a month of data
 r.vol_month = function(data){
   days = unique(format(as.Date(data$timestamp, #find all days excluding weekends etc
                                format = "%Y-%m-%d %H:%M:%S"),format="%d"))

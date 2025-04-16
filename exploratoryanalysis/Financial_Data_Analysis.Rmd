@@ -25,16 +25,18 @@ require(zoo) #for lagging
 require(jtools) #tables
 require(huxtable) #tables
 require(lmtest) #reg tests
+require(vroom) #for dataloading
 
 #load helper functions
 source(here("helperfunctions/data_looper.R"))
 source(here("helperfunctions/data_loader.R"))
 source(here("helperfunctions/data_loader2.R"))
-source(here("helperfunctions/day_selector.R"))
+source(here("helperfunctions/date_selector.R"))
 source(here("helperfunctions/day_plotter.R"))
 source(here("helperfunctions/quick_arma.R"))
 source(here("helperfunctions/r.vol.R"))
 source(here("helperfunctions/r.vol_month.R"))
+source(here("helperfunctions/r.vol_year.R"))
 source(here("helperfunctions/r.vol_hour.R"))
 source(here("helperfunctions/r.vol_month_hour.R"))
 
@@ -59,17 +61,12 @@ raw_VTI <- read.csv(here("data/market_data", "VTI.csv")) #USA
 raw_DAX <- read.csv(here("data/market_data", "DAX.csv")) #DE
 raw_ASHR <- read.csv(here("data/market_data", "ASHR.csv")) #CHINA
 data_loader(year=2021,months=1:6,symbol="SPY")
-data_loader(year=2024,months=1:12,symbol="SPY")
+#data_loader(year=2024,months=1:12,symbol="SPY")
 data_loader(year=2025,months=1:4,symbol="SPY")
 data_loader(year=2024,months=1:12,symbol="VGK") #EU
 data_loader(year=2025,months=1:4,symbol="VGK")
 data_loader(year=2025,months=1:2,symbol="ASHR")
 
-
-
-files <- paste0(here("data", "market_data", paste(symbol, sprintf("%04d-%02d", year, months), sep = "-")), ".csv")
-
-combined_data <- bind_rows(vroom(files))
 
 data_loader2(year=2024,months=1:12,"SPY")
 
@@ -93,6 +90,7 @@ quick_arma(day_SPY_0402,1,0,0) #checking AR1,AR2,AR3
 #quick_arma(day_SPY_0402,2,0,0) #checking AR2,AR3,AR4
 
 ```
+
 ## Realised Volatility
 ```{r volatility}
 #for a particular day (outputs scalar)
@@ -100,6 +98,9 @@ r.vol(day_SPY_0402)
 
 #for a month (outputs vector of each day's realised volatility)
 r.vol_month(raw_SPY_2025_04) 
+
+#for each day in each month of one year
+r.vol_year(raw_SPY_2024)
 
 #for each hour in a day (outputs a vector of each hour's realised volatility)
 r.vol_hour(day_SPY_0402) 
