@@ -81,15 +81,13 @@ wordcloud(
 From this wordcloud we can gather some of the most used words by trump. Now the question is: how much does he post during open markets? For that we can plot each post on a time plot:
 
 ```{r}
-Sys.setlocale("LC_TIME", "C") # avoids the weekdays being in french or german -> forces english
-
 truths_main <- truths_main %>%
   mutate(
+    weekday = wday(day, label = TRUE, abbr = FALSE, week_start = 1),  # week_start = 1 makes Monday = 1
     is_market_hour = case_when(
-      weekdays(day) %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") & ### Important if you use a different locale you need to 
-        #change language of this vector
-        time_shifted >= (-2.5) & time_shifted <= 4 ~ TRUE,  # 9:30 AM to 4:00 PM
-      TRUE ~ FALSE  # Non-market hours
+      weekday %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") &
+        time_shifted >= (-2.5) & time_shifted <= 4 ~ TRUE,
+      TRUE ~ FALSE
     )
   )
 ```
@@ -137,7 +135,8 @@ now get the open and close
 
 ```{r}
 snp_data <- snp_raw %>%
-  mutate(timestamp = ymd_hms(timestamp))  # Or adapt if already correct
+  mutate(timestamp = dmy_hm(timestamp))
+
 
 truths_market <- truths_market %>%
   mutate(post_time = ymd_hms(date_time_parsed))  # Rename or reuse as needed
@@ -153,7 +152,7 @@ truths_market <- truths_market %>%
   mutate(minute_return = Open - Close)
 
 truths_market <- truths_market %>%
-  filter(!is.na(open))
+  filter(!is.na(Open))
 ```
 
 ```{r}
@@ -198,7 +197,7 @@ train_index <- sample(1:nrow(rfdf), size = 0.8 * nrow(rfdf))  # 80% training dat
 train_data <- rfdf[train_index, ]
 test_data <- rfdf[-train_index, ]
 
-rf_model <- randomForest(minute_return ~ ., data = train_data, importance = TRUE, ntree = 100)
+rf_model <- randomForest(minute_return ~ ., data = train_data, importance = TRUE, ntree = 10)
 #importance(rf_model)
 varImpPlot(rf_model, n.var = 10)
 ```
@@ -221,7 +220,7 @@ tweets <- read.csv(here("data/political_data", "tweets.csv"))
 
 #Only keep original Tweets
 tweets <- tweets %>% filter(isRetweet != "t")
-tokens <- tokens(tweets$text)
+tokens <- tokens(tweets$text, lang="en")
 dfm <- dfm(tokens)
 ```
 
