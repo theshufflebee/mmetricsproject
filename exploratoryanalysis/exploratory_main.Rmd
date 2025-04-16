@@ -19,6 +19,15 @@ require(randomForest)
 require(tidytext)
 require(textstem)
 require(tidyverse)
+require(tm)
+require(SnowballC)
+require(quanteda.textplots)
+require(quantmod)
+require(alphavantager)
+require(quanteda)
+require(rvest)
+require(httr)
+require(xml2)
 
 truths_raw <- read.csv(here("data/political_data", "truths_new.csv"))
 snp_raw <- read.csv(here("data/market_data", "SPY_24_25.csv"))
@@ -81,9 +90,11 @@ wordcloud(
 From this wordcloud we can gather some of the most used words by trump. Now the question is: how much does he post during open markets? For that we can plot each post on a time plot:
 
 ```{r}
+weekday_names <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+
 truths_main <- truths_main %>%
   mutate(
-    weekday = wday(day, label = TRUE, abbr = FALSE, week_start = 1),  # week_start = 1 makes Monday = 1
+    weekday = weekday_names[wday(day, week_start = 1)],
     is_market_hour = case_when(
       weekday %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") &
         time_shifted >= (-2.5) & time_shifted <= 4 ~ TRUE,
@@ -220,7 +231,7 @@ tweets <- read.csv(here("data/political_data", "tweets.csv"))
 
 #Only keep original Tweets
 tweets <- tweets %>% filter(isRetweet != "t")
-tokens <- tokens(tweets$text, lang="en")
+tokens <- tokens(tweets$text)
 dfm <- dfm(tokens)
 ```
 
