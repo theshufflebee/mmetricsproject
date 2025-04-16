@@ -52,13 +52,16 @@ getwd()
 #market prices
 raw_ONEQ <- read.csv(here("data/market_data", "ONEQ.csv")) #USA
 raw_SMI <- read.csv(here("data/market_data", "SMI.csv")) #CH
-raw_SPY <- read.csv(here("data/market_data", "SPY.csv")) #USA
-raw_VTHR <- read.csv(here("data/market_data", "VTHR.csv")) #
-raw_VTI <- read.csv(here("data/market_data", "VTI.csv")) #
-raw_VGK <- read.csv(here("data/market_data", "VGK.csv")) #
+raw_VTHR <- read.csv(here("data/market_data", "VTHR.csv")) #USA
+raw_VTI <- read.csv(here("data/market_data", "VTI.csv")) #USA
 raw_DAX <- read.csv(here("data/market_data", "DAX.csv")) #DE
 raw_ASHR <- read.csv(here("data/market_data", "ASHR.csv")) #CHINA
 data_loader(year=2021,months=1:6,symbol="SPY")
+data_loader(year=2024,months=1:12,symbol="SPY")
+data_loader(year=2025,months=1:4,symbol="SPY")
+data_loader(year=2024,months=1:12,symbol="VGK") #EU
+data_loader(year=2025,months=1:4,symbol="VGK")
+data_loader(year=2025,months=1:2,symbol="ASHR")
 ```
 
 
@@ -69,7 +72,7 @@ data_loader(year=2021,months=1:6,symbol="SPY")
 ```{r helper tutorial, warning=FALSE, message=FALSE}
 
 #extract a particular day
-day_SPY_0402 = day_selector(raw_SPY,2025,04,02) #april 2nd 2025
+day_SPY_0402 = day_selector(raw_SPY_2025_04,2025,04,02) #april 2nd 2025
 
 #let's plot it
 day_plotter(day_SPY_0402,"SPY Price on April 2nd 2025") 
@@ -85,13 +88,13 @@ quick_arma(day_SPY_0402,1,0,0) #checking AR1,AR2,AR3
 r.vol(day_SPY_0402) 
 
 #for a month (outputs vector of each day's realised volatility)
-r.vol_month(raw_SPY_2021_01) 
+r.vol_month(raw_SPY_2025_04) 
 
 #for each hour in a day (outputs a vector of each hour's realised volatility)
 r.vol_hour(day_SPY_0402) 
 
 #for each hour in a day for each day in a month (outputs a matrix)
-month_hour = r.vol_month_hour(raw_SPY_2021_01)
+month_hour = r.vol_month_hour(raw_SPY_2025_04)
 huxtable(data.frame(month_hour))
 
 #plots
@@ -100,7 +103,7 @@ huxtable(data.frame(month_hour))
 plot(r.vol_hour(day_SPY_0402))
 
 #days in a month
-plot(r.vol_month(raw_SPY_2021_01))
+plot(r.vol_month(raw_SPY_2025_04))
 
 
 
