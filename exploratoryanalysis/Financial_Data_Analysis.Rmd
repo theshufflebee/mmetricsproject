@@ -27,16 +27,15 @@ require(huxtable) #tables
 require(lmtest) #reg tests
 require(vroom) #for loading data
 
+getwd()
+#setwd("...") -> set wd at base repo folder
+
 #load helper functions
 source(here("helperfunctions/data_loaders.R"))
 source(here("helperfunctions/date_selector.R"))
 source(here("helperfunctions/day_plotter.R"))
 source(here("helperfunctions/quick_arma.R"))
 source(here("helperfunctions/r.vol_calculators.R"))
-
-
-getwd()
-#setwd("...") -> set wd at base repo folder
 ```
 # Data
 

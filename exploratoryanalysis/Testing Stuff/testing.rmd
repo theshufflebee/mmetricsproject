@@ -14,6 +14,7 @@ rm(list=ls())
 require(tinytex) #LaTeX
 require(ggplot2) #plots
 require(AEC) #JP-Renne functions
+require(forecast) #time series stuff
 require(expm) #matrix exponents
 require(here) #directory finder
 require(stringr) # analysis of strings, important for the detection in tweets
@@ -21,20 +22,19 @@ require(dplyr) #data management
 require(lubridate) #data dates management
 require(zoo) #for lagging
 require(jtools) #tables
+require(huxtable) #tables
 require(lmtest) #reg tests
+require(vroom) #for loading data
 
 getwd()
 #setwd("...") -> set wd at base repo folder
 
 #load helper functions
-source(here("helperfunctions/data_looper.R"))
-source(here("helperfunctions/day_selector.R"))
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
 source(here("helperfunctions/day_plotter.R"))
 source(here("helperfunctions/quick_arma.R"))
-source(here("helperfunctions/r.vol.R"))
-source(here("helperfunctions/r.vol_month.R"))
-source(here("helperfunctions/r.vol_hour.R"))
-source(here("helperfunctions/r.vol_month_hour.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
 ```
 
 # Data 
@@ -356,7 +356,7 @@ r_vol = c(1:length(days))
 
 for (i in 1:length(days)){
   daydata = day_selector(data,2021,01,as.numeric(days[i])) #selects data for each day
-  r_vol[i] = r.vol(daydata) #computes realized volatility for each day
+  r_vol[i] = r.vol_day(daydata) #computes realized volatility for each day
   r_vol
 }
 
