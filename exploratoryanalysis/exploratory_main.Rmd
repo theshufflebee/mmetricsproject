@@ -23,9 +23,6 @@ require(tidyverse)
 truths_raw <- read.csv(here("data/political_data", "truths_new.csv"))
 snp_raw <- read.csv(here("data/market_data", "SPY_24_25.csv"))
 
-snp_raw <- snp_raw %>%
-  rename(timestamp = X)
-
 source(here("helperfunctions/truths_cleaning_function.R"))
 ```
 
