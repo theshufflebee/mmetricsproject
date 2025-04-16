@@ -15,6 +15,7 @@ rm(list=ls())
 require(tinytex) #LaTeX
 require(ggplot2) #plots
 require(AEC) #JP-Renne functions
+require(forecast) #time series stuff
 require(expm) #matrix exponents
 require(here) #directory finder
 require(stringr) # analysis of strings, important for the detection in tweets
@@ -28,6 +29,7 @@ require(lmtest) #reg tests
 #load helper functions
 source(here("helperfunctions/data_looper.R"))
 source(here("helperfunctions/data_loader.R"))
+source(here("helperfunctions/data_loader2.R"))
 source(here("helperfunctions/day_selector.R"))
 source(here("helperfunctions/day_plotter.R"))
 source(here("helperfunctions/quick_arma.R"))
@@ -62,6 +64,15 @@ data_loader(year=2025,months=1:4,symbol="SPY")
 data_loader(year=2024,months=1:12,symbol="VGK") #EU
 data_loader(year=2025,months=1:4,symbol="VGK")
 data_loader(year=2025,months=1:2,symbol="ASHR")
+
+
+
+files <- paste0(here("data", "market_data", paste(symbol, sprintf("%04d-%02d", year, months), sep = "-")), ".csv")
+
+combined_data <- bind_rows(vroom(files))
+
+data_loader2(year=2024,months=1:12,"SPY")
+
 ```
 
 
