@@ -34,7 +34,7 @@ r.vol_day = function(data){
 #-----------------                     2                        -----------------
 #--------------------------------------------------------------------------------
 
-# This function computes the realised volatily of each hour in one day
+# This function computes the realised volatility of each hour in one day
 # it outputs a vector of length = nbr of hours
 
 #--------------------------------------------------------------------------------
@@ -181,6 +181,7 @@ r.vol_year = function(data){
 
 # This function loops the r.vol function in order to compute a matrix of 
 # a whole year's hourly realised volatility
+#works for datasets with more than 1 year!
 
 #--------------------------------------------------------------------------------
 

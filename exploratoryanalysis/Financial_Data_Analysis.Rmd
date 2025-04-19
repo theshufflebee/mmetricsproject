@@ -48,23 +48,31 @@ source(here("helperfunctions/r.vol_calculators.R"))
 
 
 #market prices
-raw_ONEQ <- read.csv(here("data/market_data", "ONEQ.csv")) #USA
-raw_SMI <- read.csv(here("data/market_data", "SMI.csv")) #CH
-raw_VTHR <- read.csv(here("data/market_data", "VTHR.csv")) #USA
-raw_VTI <- read.csv(here("data/market_data", "VTI.csv")) #USA
-raw_DAX <- read.csv(here("data/market_data", "DAX.csv")) #DE
-raw_ASHR <- read.csv(here("data/market_data", "ASHR.csv")) #CHINA
-data_loader_months(year=2025,months=1:2,symbol="ASHR")
+#raw_ONEQ <- read.csv(here("data/market_data", "ONEQ.csv")) #USA
+#raw_SMI <- read.csv(here("data/market_data", "SMI.csv")) #CH
+#raw_VTHR <- read.csv(here("data/market_data", "VTHR.csv")) #USA
+#raw_VTI <- read.csv(here("data/market_data", "VTI.csv")) #USA
+#raw_DAX <- read.csv(here("data/market_data", "DAX.csv")) #DE
+#raw_ASHR <- read.csv(here("data/market_data", "ASHR.csv")) #CHINA
+#full_SPY <- read.csv(here("data/market_data", "SPY_24_25.csv")) #CHINA
 
 #S&P500
-data_loader(year=2021,months=1:6,"SPY")
+data_loader(year=2021,months=1:12,"SPY")
+data_loader(year=2022,months=1:12,"SPY")
+data_loader(year=2023,months=1:12,"SPY")
 data_loader(year=2024,months=1:12,"SPY")
 data_loader(year=2025,months=1:4,"SPY")
 
 #STOXX50
+data_loader(year=2020,months=1:12,"VGK")
+data_loader(year=2021,months=1:12,"VGK")
+data_loader(year=2022,months=1:12,"VGK")
+data_loader(year=2023,months=1:12,"VGK")
 data_loader(year=2024,months=1:12,"VGK")
 data_loader(year=2025,months=1:4,"VGK")
 
+#CSI 300 (China)
+data_loader_months(year=2025,months=1:2,symbol="ASHR")
 
 ```
 
@@ -110,6 +118,7 @@ month_hour = r.vol_month_hour(SPY_24_09)
 huxtable(head(data.frame(month_hour)))
 
 #for each hour in each day of each month of an entire year
+#works for datasets with more than 1 year!
 vol_SPY2024 = r.vol_year_hour(raw_SPY_2024,merge=F)
 head(vol_SPY2024)
 vol_24_09 = month_selector(vol_SPY2024,2024,09)
