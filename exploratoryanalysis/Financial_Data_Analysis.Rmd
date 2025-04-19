@@ -54,7 +54,6 @@ source(here("helperfunctions/r.vol_calculators.R"))
 #raw_VTI <- read.csv(here("data/market_data", "VTI.csv")) #USA
 #raw_DAX <- read.csv(here("data/market_data", "DAX.csv")) #DE
 #raw_ASHR <- read.csv(here("data/market_data", "ASHR.csv")) #CHINA
-#full_SPY <- read.csv(here("data/market_data", "SPY_24_25.csv")) #CHINA
 
 #S&P500
 data_loader(year=2021,months=1:12,"SPY")
@@ -62,6 +61,7 @@ data_loader(year=2022,months=1:12,"SPY")
 data_loader(year=2023,months=1:12,"SPY")
 data_loader(year=2024,months=1:12,"SPY")
 data_loader(year=2025,months=1:4,"SPY")
+SPY = rbind(raw_SPY_2021,raw_SPY_2022,raw_SPY_2023,raw_SPY_2024,raw_SPY_2025)
 
 #STOXX50
 data_loader(year=2020,months=1:12,"VGK")
@@ -70,6 +70,8 @@ data_loader(year=2022,months=1:12,"VGK")
 data_loader(year=2023,months=1:12,"VGK")
 data_loader(year=2024,months=1:12,"VGK")
 data_loader(year=2025,months=1:4,"VGK")
+VGK = rbind(raw_VGK_2020,raw_VGK_2021,raw_VGK_2022,
+            raw_VGK_2023,raw_VGK_2024,raw_VGK_2025)
 
 #CSI 300 (China)
 data_loader_months(year=2025,months=1:2,symbol="ASHR")
@@ -132,14 +134,29 @@ plot(r.vol_day_hour(SPY_25_04_02))
 #days in a month
 plot(r.vol_month(SPY_24_09))
 
-
-
+#hours in a year
 vol_plotter(vol_SPY2024,breaks="monthly",
                               title="Realised Volatility - SPY 2024")
+
+#hours in a month
 vol_plotter(vol_24_09,breaks="daily",
                      title="Realised Volatility - SPY November 2024")
+
+#hours in a day
 vol_plotter(vol_24_04_02,breaks="hourly",
               title="Realised Volatility - SPY 2nd of November 2024")
+
+
+
+
+#the following WILL take like 10 minutes to run, you have been warned
+
+#vol_SPY = r.vol_year_hour(SPY,merge=F)
+#vol_VGK = r.vol_year_hour(VGK,merge=F)
+
+#vol_plotter(vol_SPY,breaks="monthly",title="SPY Volatility Since 2021")
+#vol_plotter(vol_VGK,breaks="monthly",title="VGK Volatility Since 2020")
+
 
 ```
 

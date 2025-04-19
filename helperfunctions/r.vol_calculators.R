@@ -19,7 +19,8 @@ library(dplyr)
 r.vol_day = function(data){
   p_t = data$close
   p_t_1 <- lag(p_t, 1)
-  delta_price = p_t_1 - p_t
+  delta_price = p_t - p_t_1
+  #delta_price = log(p_t) - log(p_t_1)
   delta_price_sqr = delta_price^2
   v_t = sum(na.omit(delta_price_sqr)) / length(na.omit(delta_price))
   return(v_t) #t as the day
@@ -56,7 +57,8 @@ r.vol_day_hour = function(data){
     newdata = filter(data, str_detect(timestamp, date))
     p_h = newdata$close
     p_h_1 <- lag(p_h, 1)
-    delta_price = p_h_1 - p_h
+    delta_price = p_h - p_h_1
+    #delta_price = log(p_h) - log(p_h_1)
     delta_price_sqr = delta_price^2
     v_h = sum(na.omit(delta_price_sqr)) / length(na.omit(delta_price)) #avg per hour
     r_vol[i] = v_h #v_h would be volatility for each hour, which is put in a vector

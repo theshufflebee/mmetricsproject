@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.22.0 (TeX Live 2025)  (format=lualatex 2025.4.15)  19 APR 2025 19:09
+This is LuaHBTeX, Version 1.22.0 (TeX Live 2025)  (format=lualatex 2025.4.15)  19 APR 2025 21:11
  restricted system commands enabled.
 **Financial_Data_Analysis.tex
 (./Financial_Data_Analysis.tex
@@ -842,11 +842,11 @@ LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
 
 {c:/Users/fries/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 148.
+(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 156.
 <Financial_Data_Analysis_files/figure-latex/helper tutorial-1.pdf, id=25, 469.755pt x 325.215pt>
 File: Financial_Data_Analysis_files/figure-latex/helper tutorial-1.pdf Graphic file (type pdf)
 <use Financial_Data_Analysis_files/figure-latex/helper tutorial-1.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/helper tutorial-1.pdf  used on input line 181.
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/helper tutorial-1.pdf  used on input line 192.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
@@ -854,15 +854,15 @@ Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/helper tutor
 <Financial_Data_Analysis_files/figure-latex/helper tutorial-2.pdf, id=33, 469.755pt x 325.215pt>
 File: Financial_Data_Analysis_files/figure-latex/helper tutorial-2.pdf Graphic file (type pdf)
 <use Financial_Data_Analysis_files/figure-latex/helper tutorial-2.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/helper tutorial-2.pdf  used on input line 190.
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/helper tutorial-2.pdf  used on input line 201.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 <Financial_Data_Analysis_files/figure-latex/helper tutorial-3.pdf, id=34, 469.755pt x 325.215pt>
 File: Financial_Data_Analysis_files/figure-latex/helper tutorial-3.pdf Graphic file (type pdf)
 <use Financial_Data_Analysis_files/figure-latex/helper tutorial-3.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/helper tutorial-3.pdf  used on input line 191.
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/helper tutorial-3.pdf  used on input line 202.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 190--192
+Underfull \hbox (badness 10000) in paragraph at lines 201--203
 [][]
  []
 
@@ -1304,12 +1304,12 @@ Missing character: There is no ─ (U+2500) in font [lmmono10-regular]:!
 <Financial_Data_Analysis_files/figure-latex/volatility-1.pdf, id=73, 469.755pt x 325.215pt>
 File: Financial_Data_Analysis_files/figure-latex/volatility-1.pdf Graphic file (type pdf)
 <use Financial_Data_Analysis_files/figure-latex/volatility-1.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-1.pdf  used on input line 607.
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-1.pdf  used on input line 619.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 <Financial_Data_Analysis_files/figure-latex/volatility-2.pdf, id=74, 469.755pt x 325.215pt>
 File: Financial_Data_Analysis_files/figure-latex/volatility-2.pdf Graphic file (type pdf)
 <use Financial_Data_Analysis_files/figure-latex/volatility-2.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-2.pdf  used on input line 616.
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-2.pdf  used on input line 628.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
@@ -1317,7 +1317,7 @@ Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-2
 <Financial_Data_Analysis_files/figure-latex/volatility-3.pdf, id=83, 469.755pt x 325.215pt>
 File: Financial_Data_Analysis_files/figure-latex/volatility-3.pdf Graphic file (type pdf)
 <use Financial_Data_Analysis_files/figure-latex/volatility-3.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-3.pdf  used on input line 633.
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-3.pdf  used on input line 646.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
@@ -1325,7 +1325,7 @@ Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-3
 <Financial_Data_Analysis_files/figure-latex/volatility-4.pdf, id=92, 469.755pt x 325.215pt>
 File: Financial_Data_Analysis_files/figure-latex/volatility-4.pdf Graphic file (type pdf)
 <use Financial_Data_Analysis_files/figure-latex/volatility-4.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-4.pdf  used on input line 642.
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-4.pdf  used on input line 656.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
@@ -1333,7 +1333,7 @@ Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-4
 <Financial_Data_Analysis_files/figure-latex/volatility-5.pdf, id=102, 469.755pt x 325.215pt>
 File: Financial_Data_Analysis_files/figure-latex/volatility-5.pdf Graphic file (type pdf)
 <use Financial_Data_Analysis_files/figure-latex/volatility-5.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-5.pdf  used on input line 651.
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-5.pdf  used on input line 666.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
@@ -1351,15 +1351,15 @@ LaTeX Warning: There were multiply-defined labels.
 
 Here is how much of LuaTeX's memory you used:
  23930 strings out of 471941
- 100000,1144653 words of node,token memory allocated
+ 125009,1144653 words of node,token memory allocated
  591 words of node memory still in use:
    6 hlist, 3 vlist, 4 rule, 3 glue, 4 kern, 1 glyph, 10 attribute, 61 glue_spec, 10 attribute_list, 1 write, 1 user_defined, 2 pdf_colorstack nodes
-   avail lists: 1:1,2:3776,3:1847,4:902,5:466,6:64,7:7103,8:1,9:3289,10:3,11:29
+   avail lists: 1:1,2:3791,3:1847,4:906,5:470,6:64,7:7193,8:1,9:3293,10:3,11:29
  50070 multiletter control sequences out of 65536+600000
- 64 fonts using 19208019 bytes
+ 64 fonts using 19208171 bytes
  90i,13n,114p,405b,1035s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmonolt10-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-italic.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman12-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman17-regular.otf>
-Output written on Financial_Data_Analysis.pdf (12 pages, 217830 bytes).
+<c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmonolt10-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-italic.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman12-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman17-regular.otf>
+Output written on Financial_Data_Analysis.pdf (12 pages, 218769 bytes).
 
 PDF statistics: 186 PDF objects out of 1000 (max. 8388607)
  133 compressed objects within 2 object streams
