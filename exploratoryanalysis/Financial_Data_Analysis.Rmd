@@ -33,7 +33,7 @@ getwd()
 #load helper functions
 source(here("helperfunctions/data_loaders.R"))
 source(here("helperfunctions/date_selector.R"))
-source(here("helperfunctions/day_plotter.R"))
+source(here("helperfunctions/plotters.R"))
 source(here("helperfunctions/quick_arma.R"))
 source(here("helperfunctions/r.vol_calculators.R"))
 ```
@@ -79,7 +79,7 @@ data_loader(year=2025,months=1:4,"VGK")
 SPY_25_04_02 = day_selector(raw_SPY_2025,2025,04,02) #april 2nd 2025
 
 #let's plot it
-day_plotter(SPY_25_04_02,"SPY Price on April 2nd 2025") 
+price_plotter_day(SPY_25_04_02,"SPY Price on April 2nd 2025") 
 
 #quickly test some ARMA specifications
 quick_arma(SPY_25_04_02,1,0,0) #checking AR1,AR2,AR3
@@ -92,21 +92,28 @@ SPY_24_09 = month_selector(raw_SPY_2024,2024,09) #november 2024
 
 ## Realised Volatility
 ```{r volatility}
-#for a particular day (outputs scalar)
+#average per day (outputs scalar)
 r.vol_day(SPY_25_04_02) 
 
-#for a month (outputs vector of each day's realised volatility)
+#average per day for each day in a month (outputs vector of each day's realised volatility)
 r.vol_month(SPY_24_09) 
 
-#for each day in each month of one year
-r.vol_year(raw_SPY_2024)
+#avg per day in each month of a year
+year_avg = r.vol_year(raw_SPY_2024)
+head(year_avg)
 
 #for each hour in a day (outputs a vector of each hour's realised volatility)
 r.vol_day_hour(SPY_25_04_02) 
 
 #for each hour in a day for each day in a month (outputs a matrix)
 month_hour = r.vol_month_hour(SPY_24_09)
-huxtable(data.frame(month_hour))
+huxtable(head(data.frame(month_hour)))
+
+#for each hour in each day of each month of an entire year
+vol_SPY2024 = r.vol_year_hour(raw_SPY_2024,merge=F)
+head(vol_SPY2024)
+vol_24_09 = month_selector(vol_SPY2024,2024,09)
+vol_24_04_02 = day_selector(vol_SPY2024,2024,04,02)
 
 #plots
 
@@ -117,6 +124,13 @@ plot(r.vol_day_hour(SPY_25_04_02))
 plot(r.vol_month(SPY_24_09))
 
 
+
+vol_plotter(vol_SPY2024,breaks="monthly",
+                              title="Realised Volatility - SPY 2024")
+vol_plotter(vol_24_09,breaks="daily",
+                     title="Realised Volatility - SPY November 2024")
+vol_plotter(vol_24_04_02,breaks="hourly",
+              title="Realised Volatility - SPY 2nd of November 2024")
 
 ```
 

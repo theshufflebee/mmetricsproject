@@ -251,6 +251,89 @@ r.vol_hour = function(t_data){
 ```
 
 
+```{r}
+#data must be data for one day, great place for the day_selector function!
+r.vol_day_hour = function(data){
+  
+  hours = unique(format(as.POSIXct(data$timestamp, 
+                                   format = "%Y-%m-%d %H:%M:%S"),format="%H"))
+  day = unique(format(as.Date(data$timestamp, 
+                              format = "%Y-%m-%d %H:%M:%S"),format="%d"))
+  month = unique(format(as.Date(data$timestamp, 
+                                format = "%Y-%m-%d %H:%M:%S"),format="%m"))
+  year = unique(format(as.Date(data$timestamp, 
+                               format = "%Y-%m-%d %H:%M:%S"),format="%Y"))
+  
+  r_vol = trunc(data$timestamp, digits = "hours") #preparing solution vector
+  
+  for (i in 1:length(hours)){
+    date = paste(year,month,day,sep="-")
+    date = paste(date,hours[i])
+    newdata = filter(data, str_detect(timestamp, date))
+    p_h = newdata$close
+    p_h_1 <- lag(p_h, 1)
+    delta_price = p_h_1 - p_h
+    delta_price_sqr = delta_price^2
+    v_h = sum(na.omit(delta_price_sqr)) / length(na.omit(delta_price)) #avg per hour
+    r_vol[i] = v_h #v_h would be volatility for each hour, which is put in a vector
+  }
+  return(r_vol)
+}
+
+#example: r.vol_day_hour(day_SPY_0402)
+```
+
+
+
+```{r}
+# This function loops the r.vol function in order to compute a matrix of 
+# a whole year's hourly realised volatility
+
+#--------------------------------------------------------------------------------
+
+#data as a csv file containing a year of data
+r.vol_year_hour = function(data){
+
+  days = unique(format(as.Date(data$timestamp, 
+                            format = "%Y-%m-%d %H:%M:%S"),format="%Y-%m-%d"))
+  
+  days = as.Date(days,format = "%Y-%m-%d")
+  
+  r_vol_y = setNames(data.frame(matrix(ncol = 2, nrow = 0)), 
+                     c("timestamp", "r_vol_h"))
+  r_vol_list <- list()
+  
+  for (d in 1:length(days)){ #loop for each day
+    
+    #find day date
+    dyear = as.numeric(format(days[d],format="%Y"))
+    dmonth = as.numeric(format(days[d],format="%m"))
+    ddays = as.numeric(format(days[d],format="%d"))
+    
+    #select data for that day
+    daydata = day_selector(data,dyear,dmonth,ddays) 
+    
+    #isolate hours and calculate volatility
+    dhours = unique(trunc(daydata$timestamp, units = "hours"))
+    dhours = as.character(dhours)
+    r_vol_h = (r.vol_day_hour(daydata)) #computes realized volatility for each day
+  
+    #add to list
+    r_vol_d = data.frame(timestamp = dhours, r_vol_h = r_vol_h)
+    r_vol_list[[d]] = r_vol_d 
+  }
+  r_vol_y <- do.call(rbind, r_vol_list)
+  r_vol_y$timestamp = as.POSIXct(r_vol_y$timestamp, format="%Y-%m-%d %H:%M:%S")
+  return(r_vol_y)
+}
+
+
+#result <- merge(raw_SPY_2024, AWOW, by.y = "timestamp", by.x = "timestamp", all.x = TRUE)
+
+#e.g. r.vol_year_hour(raw_SPY_2024)
+```
+
+
 
 
 ```{r plot this volatility}
