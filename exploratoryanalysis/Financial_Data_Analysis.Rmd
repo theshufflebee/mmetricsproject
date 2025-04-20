@@ -47,7 +47,7 @@ source(here("helperfunctions/r.vol_calculators.R"))
 #raw_tweets <- read.csv(here("data/political_data", "tweets.csv"))
 
 
-#market prices
+#market prices (loads and names them automatically)
 #raw_ONEQ <- read.csv(here("data/market_data", "ONEQ.csv")) #USA
 #raw_SMI <- read.csv(here("data/market_data", "SMI.csv")) #CH
 #raw_VTHR <- read.csv(here("data/market_data", "VTHR.csv")) #USA
@@ -56,25 +56,16 @@ source(here("helperfunctions/r.vol_calculators.R"))
 #raw_ASHR <- read.csv(here("data/market_data", "ASHR.csv")) #CHINA
 
 #S&P500
-data_loader(year=2021,months=1:12,"SPY")
-data_loader(year=2022,months=1:12,"SPY")
-data_loader(year=2023,months=1:12,"SPY")
-data_loader(year=2024,months=1:12,"SPY")
-data_loader(year=2025,months=1:4,"SPY")
-SPY = rbind(raw_SPY_2021,raw_SPY_2022,raw_SPY_2023,raw_SPY_2024,raw_SPY_2025)
+data_loader(symbol="SPY")
 
 #STOXX50
-data_loader(year=2020,months=1:12,"VGK")
-data_loader(year=2021,months=1:12,"VGK")
-data_loader(year=2022,months=1:12,"VGK")
-data_loader(year=2023,months=1:12,"VGK")
-data_loader(year=2024,months=1:12,"VGK")
-data_loader(year=2025,months=1:4,"VGK")
-VGK = rbind(raw_VGK_2020,raw_VGK_2021,raw_VGK_2022,
-            raw_VGK_2023,raw_VGK_2024,raw_VGK_2025)
+data_loader(symbol="VGK")
+
+
+
 
 #CSI 300 (China)
-data_loader_months(year=2025,months=1:2,symbol="ASHR")
+data_loader(symbol="ASHR")
 
 ```
 
@@ -86,7 +77,7 @@ data_loader_months(year=2025,months=1:2,symbol="ASHR")
 ```{r helper tutorial, warning=FALSE, message=FALSE}
 
 #extract a particular day
-SPY_25_04_02 = day_selector(raw_SPY_2025,2025,04,02) #april 2nd 2025
+SPY_25_04_02 = day_selector(raw_SPY,2025,04,02) #april 2nd 2025
 
 #let's plot it
 price_plotter_day(SPY_25_04_02,"SPY Price on April 2nd 2025") 
@@ -95,8 +86,13 @@ price_plotter_day(SPY_25_04_02,"SPY Price on April 2nd 2025")
 quick_arma(SPY_25_04_02,1,0,0) #checking AR1,AR2,AR3
 #quick_arma(SPY_25_04_02,2,0,0) #checking AR2,AR3,AR4
 
+
 #extract a particular month
-SPY_24_09 = month_selector(raw_SPY_2024,2024,09) #november 2024
+SPY_24_09 = month_selector(raw_SPY,2024,09) #november 2024
+
+
+#extract a particular year
+SPY_24 = year_selector(raw_SPY,2024) #2024
 
 ```
 
@@ -109,7 +105,7 @@ r.vol_day(SPY_25_04_02)
 r.vol_month(SPY_24_09) 
 
 #avg per day in each month of a year
-year_avg = r.vol_year(raw_SPY_2024)
+year_avg = r.vol_year(SPY_24)
 head(year_avg)
 
 #for each hour in a day (outputs a vector of each hour's realised volatility)
@@ -119,12 +115,14 @@ r.vol_day_hour(SPY_25_04_02)
 month_hour = r.vol_month_hour(SPY_24_09)
 huxtable(head(data.frame(month_hour)))
 
-#for each hour in each day of each month of an entire year
+#for each hour in each day of each month of any dataset
 #works for datasets with more than 1 year!
-vol_SPY2024 = r.vol_year_hour(raw_SPY_2024,merge=F)
-head(vol_SPY2024)
-vol_24_09 = month_selector(vol_SPY2024,2024,09)
-vol_24_04_02 = day_selector(vol_SPY2024,2024,04,02)
+vol_SPY = r.vol_hourly(raw_SPY,merge=F)
+head(vol_SPY)
+#can then filter out years, months, or days
+vol_24 = year_selector(vol_SPY,2024)
+vol_24_09 = month_selector(vol_SPY,2024,09)
+vol_24_04_02 = day_selector(vol_SPY,2024,04,02)
 
 #plots
 
@@ -135,7 +133,7 @@ plot(r.vol_day_hour(SPY_25_04_02))
 plot(r.vol_month(SPY_24_09))
 
 #hours in a year
-vol_plotter(vol_SPY2024,breaks="monthly",
+vol_plotter(vol_24,breaks="monthly",
                               title="Realised Volatility - SPY 2024")
 
 #hours in a month
@@ -150,10 +148,10 @@ vol_plotter(vol_24_04_02,breaks="hourly",
 
 #on entire datasets
 
-vol_SPY = r.vol_year_hour(SPY,merge=F)
-vol_VGK = r.vol_year_hour(VGK,merge=F)
+vol_SPY = r.vol_hourly(raw_SPY,merge=F)
+vol_VGK = r.vol_hourly(raw_VGK,merge=F)
 
-vol_plotter(vol_SPY,breaks="yearly",title="SPY Volatility Since 2021")
+vol_plotter(vol_SPY,breaks="yearly",title="SPY Volatility Since 2019")
 vol_plotter(vol_VGK,breaks="yearly",title="VGK Volatility Since 2020")
 
 

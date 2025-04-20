@@ -80,7 +80,7 @@ data_loader_months = function(year,months,symbol){
 #input months as span, i.e. 1:3 would be months 01 to 03
 #input symbol as string, e.g. "SPY"
 
-data_loader = function(year,months,symbol){
+data_loader_year = function(year,months,symbol){
   paths <- here("data", "market_data", paste(symbol, 
                                              sprintf("%04d-%02d", year, months), sep = "-"))
   
@@ -97,9 +97,40 @@ data_loader = function(year,months,symbol){
 
 
 
+#--------------------------------------------------------------------------------
+#-----------------                     4                        -----------------
+#--------------------------------------------------------------------------------
+
+# This function loads every month of every year of a symbol's datasets 
+#and binds them to have one full dataset per symbol 
+
+#--------------------------------------------------------------------------------
 
 
 
+# Function to load and merge all files with the same symbol
+data_loader <- function(symbol){
+  paths <- here("data", "market_data") 
+  
+  #list all CSV files that contain the symbol 
+  files <- list.files(paths, pattern = paste(symbol, "-", sep=""), full.names = TRUE)
+  
+  #check if files found
+  if (length(files) == 0) {
+    stop("No files found for the symbol: ", symbol)
+  }
+  
+  #read and combine
+  combined_data <- bind_rows(lapply(files, function(file) {
+    read.csv(file)
+  }))
+  
+  #name it as raw_SYMBOL 
+  assign(paste("raw", symbol, sep = "_"), combined_data, envir = .GlobalEnv)
+}
+
+#example: data_loader_all_sheets("SPY")
+#this will load all CSV files containing "SPY" in their filename and merge them
 
 
 

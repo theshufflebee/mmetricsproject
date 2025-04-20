@@ -16,12 +16,12 @@ data=av_get("ASHR", av_fun = "TIME_SERIES_INTRADAY", interval = "1min",
 #for a particular month
 data2=av_get("SPY", av_fun = "TIME_SERIES_INTRADAY", interval = "1min", 
               adjusted="false", extended_hours="false", 
-              month="2016-09", outputsize = "full") #create loop for more
+              month="2025-04", outputsize = "full") #create loop for more
 
 
 
 write.csv(data,"~/ASHR.csv", row.names = T) #saves to documents
-write.csv(data2,"~/SPY1609.csv", row.names = T) 
+write.csv(data2,"~/SPY-2025-04.csv", row.names = T) 
 
 ```
 

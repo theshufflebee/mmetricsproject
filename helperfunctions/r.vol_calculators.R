@@ -156,6 +156,53 @@ r.vol_year <- function(data) {
 }
 
 
+
+
+r.vol_daily <- function(data, merge = FALSE) {
+  original_colnames <- colnames(data)
+  data$timestamp <- as.POSIXct(data$timestamp)
+  data$date <- as.Date(data$timestamp)
+  days <- unique(data$date)
+  
+  r_vol_list <- list()
+  
+  for (d in seq_along(days)) { #loop for each day
+    
+    #select data for that day
+    daydata <- data[data$date == days[d], ]
+    
+    #calculate volatility
+    vol <- r.vol_day(daydata)
+    
+    #add to list
+    r_vol_day <- data.frame(timestamp = as.POSIXct(days[d]), r_vol_d = vol)
+    r_vol_list[[d]] <- r_vol_day
+  }
+  r_vol_y <- do.call(rbind, r_vol_list)
+  
+  #option to merge calculated volatility with original data
+  if (merge == TRUE) {
+    
+    #format for days 
+    data$timestamp_day <- as.POSIXct(format(data$timestamp, "%Y-%m-%d"))
+    
+    #merge by matching the days
+    merged_data <- merge(data, r_vol_y, by.x = "timestamp_day", by.y = "timestamp", all.x = TRUE)
+    
+    #make sure its ordered by minute (merging by day messes it up)
+    merged_data <- merged_data[order(merged_data$timestamp), ]
+    
+    #get original column order
+    final_data <- merged_data[, c(original_colnames, "r_vol_d")]
+    return(final_data)
+  } else {
+    colnames(r_vol_y)[1] <- "timestamp"
+    return(r_vol_y)
+  }
+}
+
+
+
 #e.g. r.vol_year(raw_SPY_2024)
 
 
@@ -172,7 +219,7 @@ r.vol_year <- function(data) {
 #data as a csv file containing a year of data
 
 
-r.vol_year_hour <- function(data, merge = FALSE) {
+r.vol_hourly <- function(data, merge = FALSE) {
   original_colnames <- colnames(data)
   data$timestamp <- as.POSIXct(data$timestamp)
   data$date <- as.Date(data$timestamp)
