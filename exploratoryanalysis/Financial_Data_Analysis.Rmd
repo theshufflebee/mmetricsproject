@@ -148,14 +148,13 @@ vol_plotter(vol_24_04_02,breaks="hourly",
 
 
 
+#on entire datasets
 
-#the following WILL take like 10 minutes to run, you have been warned
+vol_SPY = r.vol_year_hour(SPY,merge=F)
+vol_VGK = r.vol_year_hour(VGK,merge=F)
 
-#vol_SPY = r.vol_year_hour(SPY,merge=F)
-#vol_VGK = r.vol_year_hour(VGK,merge=F)
-
-#vol_plotter(vol_SPY,breaks="monthly",title="SPY Volatility Since 2021")
-#vol_plotter(vol_VGK,breaks="monthly",title="VGK Volatility Since 2020")
+vol_plotter(vol_SPY,breaks="yearly",title="SPY Volatility Since 2021")
+vol_plotter(vol_VGK,breaks="yearly",title="VGK Volatility Since 2020")
 
 
 ```

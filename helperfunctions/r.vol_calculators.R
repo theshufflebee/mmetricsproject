@@ -18,11 +18,10 @@ library(dplyr)
 
 r.vol_day = function(data){
   p_t = data$close
-  p_t_1 <- lag(p_t, 1)
-  delta_price = p_t - p_t_1
-  #delta_price = log(p_t) - log(p_t_1)
+  delta_price = diff(p_t)
+  #delta_price = diff(log(p_t))
   delta_price_sqr = delta_price^2
-  v_t = sum(na.omit(delta_price_sqr)) / length(na.omit(delta_price))
+  v_t = mean(delta_price_sqr, na.rm=T)
   return(v_t) #t as the day
 }
 
@@ -41,30 +40,26 @@ r.vol_day = function(data){
 #--------------------------------------------------------------------------------
 
 #data must be data for one day, great place for the day_selector function!
-r.vol_day_hour = function(data){
-  hours = unique(format(as.POSIXct(data$timestamp, 
-                                   format = "%Y-%m-%d %H:%M:%S"),format="%H"))
-  day = unique(format(as.Date(data$timestamp, 
-                              format = "%Y-%m-%d %H:%M:%S"),format="%d"))
-  month = unique(format(as.Date(data$timestamp, 
-                                format = "%Y-%m-%d %H:%M:%S"),format="%m"))
-  year = unique(format(as.Date(data$timestamp, 
-                               format = "%Y-%m-%d %H:%M:%S"),format="%Y"))
-  r_vol = c(1:length(hours)) #preparing solution vector
-  for (i in 1:length(hours)){
-    date = paste(year,month,day,sep="-")
-    date = paste(date,hours[i])
-    newdata = filter(data, str_detect(timestamp, date))
-    p_h = newdata$close
-    p_h_1 <- lag(p_h, 1)
-    delta_price = p_h - p_h_1
-    #delta_price = log(p_h) - log(p_h_1)
+
+
+r.vol_day_hour <- function(data) {
+  data$timestamp <- as.POSIXct(data$timestamp)
+  data$hour <- format(data$timestamp, "%H")
+  hours <- unique(data$hour)
+  r_vol <- numeric(length(hours))
+  
+  for (h in seq_along(hours)) {
+    subset_data <- data[data$hour == hours[h], ]
+    p_h <- subset_data$close
+    delta_price <- diff(p_h)
+    #delta_price <- diff(log(p_h))
     delta_price_sqr = delta_price^2
-    v_h = sum(na.omit(delta_price_sqr)) / length(na.omit(delta_price)) #avg per hour
-    r_vol[i] = v_h #v_h would be volatility for each hour, which is put in a vector
+    r_vol[h] <- mean(delta_price_sqr, na.rm = TRUE)
   }
+  
   return(r_vol)
 }
+
 
 #example: r.vol_day_hour(day_SPY_0402)
 
@@ -80,23 +75,21 @@ r.vol_day_hour = function(data){
 #--------------------------------------------------------------------------------
 
 #data as a csv file containing a month of data
-r.vol_month = function(data){
-  days = unique(format(as.Date(data$timestamp, #find all days excluding weekends etc
-                               format = "%Y-%m-%d %H:%M:%S"),format="%d"))
-  month = unique(format(as.Date(data$timestamp, #for day selector
-                                format = "%Y-%m-%d %H:%M:%S"),format="%m"))
-  month = as.numeric(month) #due to how day selector input is defined
-  year = unique(format(as.Date(data$timestamp, #for day selector
-                               format = "%Y-%m-%d %H:%M:%S"),format="%Y"))
-  year = as.numeric(year)
-  r_vol = c(1:length(days)) #preparing solution vector
+
+
+r.vol_month <- function(data) {
+  data$timestamp <- as.POSIXct(data$timestamp)
+  data$date <- as.Date(data$timestamp)
+  days <- unique(data$date)
+  r_vol <- numeric(length(days))
   
-  for (i in 1:length(days)){ #loop for each day
-    daydata = day_selector(data,year,month,as.numeric(days[i])) #selects data for each day
-    r_vol[i] = r.vol_day(daydata) #computes realized volatility for each day
+  for (d in seq_along(days)) {
+    daydata <- data[data$date == days[d], ]
+    r_vol[d] <- r.vol_day(daydata)
   }
   return(r_vol)
 }
+
 
 #e.g. r.vol_month(raw_SPY2021_01)
 
@@ -111,32 +104,25 @@ r.vol_month = function(data){
 #--------------------------------------------------------------------------------
 
 #data as a csv file containing only 1 month of data
-r.vol_month_hour = function(data){
-  
-  #prepare dates
-  ndays = unique(format(as.Date(data$timestamp, #find all days excluding weekends etc
-                                format = "%Y-%m-%d %H:%M:%S"),format="%d"))
-  nmonth = unique(format(as.Date(data$timestamp, #for day selector
-                                 format = "%Y-%m-%d %H:%M:%S"),format="%m"))
-  nmonth = as.numeric(nmonth) #due to how day selector input is defined
-  nyear = unique(format(as.Date(data$timestamp, #for day selector
-                                format = "%Y-%m-%d %H:%M:%S"),format="%Y"))
-  nyear = as.numeric(nyear)
+
+
+r.vol_month_hour <- function(data) {
+  data$timestamp <- as.POSIXct(data$timestamp)
+  data$date <- as.Date(data$timestamp)
+  days <- unique(data$date)
   
   #take the first day to count how many hours the market is open
-  ndaydata = day_selector(data,nyear,nmonth,as.numeric(ndays[1]))
-  nhours = unique(format(as.POSIXct(ndaydata$timestamp, 
-                                    format = "%Y-%m-%d %H:%M:%S"),format="%H"))
+  first_day <- data[data$date == days[1], ]
+  hours <- unique(format(first_day$timestamp, "%H"))
+  r_vol_h <- matrix(NA, nrow = length(hours), ncol = length(days))
   
-  #prepare solution matrix, columns are days, rows are hours
-  r_vol_h = matrix(c(1:length(days)),length(nhours),length(ndays))
-  
-  for (j in 1:length(ndays)){ #loop for each day
-    daydata = day_selector(data,nyear,nmonth,as.numeric(ndays[j])) #selects data for each day
-    r_vol_h[,j] = t(r.vol_day_hour(daydata)) #computes realized volatility for each day
+  for (d in seq_along(days)) {
+    daydata <- data[data$date == days[d], ]
+    r_vol_h[, d] <- r.vol_day_hour(daydata)
   }
   return(r_vol_h)
 }
+
 
 #e.g. r.vol_month_hour(raw_SPY2021_01)
 
@@ -151,30 +137,26 @@ r.vol_month_hour = function(data){
 #--------------------------------------------------------------------------------
 
 #data as a csv file containing a year of data
-r.vol_year = function(data){
-  mmonths = unique(format(as.Date(data$timestamp, #find all months
-                                  format = "%Y-%m-%d %H:%M:%S"),format="%m"))
-  myear = unique(format(as.Date(data$timestamp, #for day selector
-                                format = "%Y-%m-%d %H:%M:%S"),format="%Y"))
-  myear = as.numeric(myear)
+
+
+r.vol_year <- function(data) {
+  data$timestamp <- as.POSIXct(data$timestamp)
+  data$month <- format(data$timestamp, "%m")
+  months <- unique(data$month)
+  year_matrix <- matrix(NA, nrow = 31, ncol = length(months))
   
-  #columns are months, rows are days
-  r_vol_m = matrix(NA,31,length(mmonths)) #preparing solution matrix
-  
-  for (m in 1:length(mmonths)){ #loop for each month
-    monthdata = month_selector(data,myear,as.numeric(mmonths[m])) #selects data for each month
-    mdays =  unique(format(as.Date(monthdata$timestamp, 
-                                   format = "%Y-%m-%d %H:%M:%S"),format="%d"))
-    mdays = as.numeric(mdays)
-    month_vol = t(r.vol_month(monthdata)) #computes realized volatility for each month
-    r_vol_m[,m] = replace(r_vol_m[,m],mdays,month_vol) 
+  for (m in seq_along(months)) {
+    month_data <- data[data$month == months[m], ]
+    r_vol_m <- r.vol_month(month_data)
+    month_days <- as.numeric(unique(format(as.Date(month_data$timestamp), "%d")))
+    year_matrix[month_days, m] <- r_vol_m
   }
-  return(r_vol_m)
+  
+  return(year_matrix)
 }
 
+
 #e.g. r.vol_year(raw_SPY_2024)
-
-
 
 
 #--------------------------------------------------------------------------------
@@ -188,57 +170,57 @@ r.vol_year = function(data){
 #--------------------------------------------------------------------------------
 
 #data as a csv file containing a year of data
-r.vol_year_hour = function(data,merge=F){
-  
+
+
+r.vol_year_hour <- function(data, merge = FALSE) {
   original_colnames <- colnames(data)
+  data$timestamp <- as.POSIXct(data$timestamp)
+  data$date <- as.Date(data$timestamp)
+  days <- unique(data$date)
   
-  days = unique(format(as.Date(data$timestamp, 
-                               format = "%Y-%m-%d %H:%M:%S"),format="%Y-%m-%d"))
-  
-  days = as.Date(days,format = "%Y-%m-%d")
-  
-  r_vol_y = setNames(data.frame(matrix(ncol = 2, nrow = 0)), 
-                     c("timestamp", "r_vol_h"))
   r_vol_list <- list()
   
-  for (d in 1:length(days)){ #loop for each day
-    
-    #find day date
-    dyear = as.numeric(format(days[d],format="%Y"))
-    dmonth = as.numeric(format(days[d],format="%m"))
-    ddays = as.numeric(format(days[d],format="%d"))
+  for (d in seq_along(days)) { #loop for each day
     
     #select data for that day
-    daydata = day_selector(data,dyear,dmonth,ddays) 
+    daydata <- data[data$date == days[d], ]
     
     #isolate hours and calculate volatility
-    dhours = unique(trunc(daydata$timestamp, units = "hours"))
-    r_vol_h = (r.vol_day_hour(daydata)) #computes realized volatility for each day
+    hours <- unique(format(daydata$timestamp, "%Y-%m-%d %H:00:00"))
+    vol <- r.vol_day_hour(daydata)
     
     #add to list
-    r_vol_d = data.frame(timestamp_hour = dhours, r_vol_h = r_vol_h)
-    r_vol_list[[d]] = r_vol_d 
+    r_vol_day <- data.frame(timestamp = as.POSIXct(hours), r_vol_h = vol)
+    r_vol_list[[d]] <- r_vol_day
   }
   r_vol_y <- do.call(rbind, r_vol_list)
   
-  if (merge == T) {
-    #option to merge calculated volatility with original data
-    data$timestamp_hour = trunc(data$timestamp, units = "hours")
-    data$timestamp_hour = as.POSIXct(data$timestamp_hour, 
-                                     format="%Y-%m-%d %H:%M:%S")
+  #option to merge calculated volatility with original data
+  if (merge == TRUE) {
     
-    #merge with the original dataset 
-    data <- merge(data, r_vol_y, by = "timestamp_hour", all.x = TRUE)
-    data <- data[order(data$timestamp), ]
-    final_col_order <- c(original_colnames, "r_vol_h")
-    data <- data[, final_col_order]
-    return(data)}
-  else {names(r_vol_y)[1]<-paste("timestamp")
-        return(r_vol_y)}
+    #format for hours 
+    data$timestamp_hour <- as.POSIXct(format(data$timestamp, "%Y-%m-%d %H:00:00"))
+    
+    #merge by matching the hours
+    merged_data <- merge(data, r_vol_y, by.x = "timestamp_hour", by.y = "timestamp", all.x = TRUE)
+    
+    #make sure its ordered by minute (merging by hour messes it up)
+    merged_data <- merged_data[order(merged_data$timestamp), ]
+    
+    #get original column order
+    final_data <- merged_data[, c(original_colnames, "r_vol_h")]
+    return(final_data)
+  } else {
+    colnames(r_vol_y)[1] <- "timestamp"
+    return(r_vol_y)
+  }
 }
+
 
 #e.g. r.vol_year_hour(raw_SPY_2024) #default merge = False
 #e.g. with merge: r.vol_year_hour(raw_SPY_2024,merge=T)
+
+
 
 
 

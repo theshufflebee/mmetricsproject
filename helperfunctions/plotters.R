@@ -47,6 +47,7 @@ price_plotter_day = function(data,title){
 vol_plotter = function(data,breaks,title){
 
   x_scale <- switch(breaks,
+                    "yearly" = scale_x_datetime(date_labels = "%b %Y", date_breaks = "6 month"),
                     "monthly" = scale_x_datetime(date_labels = "%b %Y", date_breaks = "1 month"),
                     "daily"   = scale_x_datetime(date_labels = "%a %d", date_breaks = "1 day"),
                     "hourly"  = scale_x_datetime(date_labels = "%Hh", date_breaks = "1 hour"),
