@@ -136,26 +136,7 @@ r.vol_month_hour <- function(data) {
 
 #--------------------------------------------------------------------------------
 
-#data as a csv file containing a year of data
-
-
-r.vol_year <- function(data) {
-  data$timestamp <- as.POSIXct(data$timestamp)
-  data$month <- format(data$timestamp, "%m")
-  months <- unique(data$month)
-  year_matrix <- matrix(NA, nrow = 31, ncol = length(months))
-  
-  for (m in seq_along(months)) {
-    month_data <- data[data$month == months[m], ]
-    r_vol_m <- r.vol_month(month_data)
-    month_days <- as.numeric(unique(format(as.Date(month_data$timestamp), "%d")))
-    year_matrix[month_days, m] <- r_vol_m
-  }
-  
-  return(year_matrix)
-}
-
-
+#data as a csv file with full data
 
 
 r.vol_daily <- function(data, merge = FALSE) {
@@ -172,10 +153,11 @@ r.vol_daily <- function(data, merge = FALSE) {
     daydata <- data[data$date == days[d], ]
     
     #calculate volatility
+    day_timestamp = as.POSIXct(format(days[d], "%Y-%m-%d"))
     vol <- r.vol_day(daydata)
     
     #add to list
-    r_vol_day <- data.frame(timestamp = as.POSIXct(days[d]), r_vol_d = vol)
+    r_vol_day <- data.frame(timestamp = day_timestamp, r_vol_d = vol)
     r_vol_list[[d]] <- r_vol_day
   }
   r_vol_y <- do.call(rbind, r_vol_list)
@@ -216,7 +198,7 @@ r.vol_daily <- function(data, merge = FALSE) {
 
 #--------------------------------------------------------------------------------
 
-#data as a csv file containing a year of data
+#data as a csv file can be for a year but also more
 
 
 r.vol_hourly <- function(data, merge = FALSE) {

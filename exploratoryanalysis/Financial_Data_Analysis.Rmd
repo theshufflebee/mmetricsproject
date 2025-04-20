@@ -96,17 +96,15 @@ SPY_24 = year_selector(raw_SPY,2024) #2024
 
 ```
 
-## Realised Volatility
-```{r volatility}
+# Realised Volatility
+
+## Computations
+```{r volatility compute}
 #average per day (outputs scalar)
 r.vol_day(SPY_25_04_02) 
 
 #average per day for each day in a month (outputs vector of each day's realised volatility)
 r.vol_month(SPY_24_09) 
-
-#avg per day in each month of a year
-year_avg = r.vol_year(SPY_24)
-head(year_avg)
 
 #for each hour in a day (outputs a vector of each hour's realised volatility)
 r.vol_day_hour(SPY_25_04_02) 
@@ -115,50 +113,69 @@ r.vol_day_hour(SPY_25_04_02)
 month_hour = r.vol_month_hour(SPY_24_09)
 huxtable(head(data.frame(month_hour)))
 
-#for each hour in each day of each month of any dataset
+
+#avg per day for each month of any dataset
 #works for datasets with more than 1 year!
-vol_SPY = r.vol_hourly(raw_SPY,merge=F)
-head(vol_SPY)
+vol_SPY_daily = r.vol_daily(raw_SPY,merge=F)
+head(vol_SPY_daily)
+
 #can then filter out years, months, or days
-vol_24 = year_selector(vol_SPY,2024)
-vol_24_09 = month_selector(vol_SPY,2024,09)
-vol_24_04_02 = day_selector(vol_SPY,2024,04,02)
-
-#plots
-
-#hours in a day
-plot(r.vol_day_hour(SPY_25_04_02))
-
-#days in a month
-plot(r.vol_month(SPY_24_09))
-
-#hours in a year
-vol_plotter(vol_24,breaks="monthly",
-                              title="Realised Volatility - SPY 2024")
-
-#hours in a month
-vol_plotter(vol_24_09,breaks="daily",
-                     title="Realised Volatility - SPY November 2024")
-
-#hours in a day
-vol_plotter(vol_24_04_02,breaks="hourly",
-              title="Realised Volatility - SPY 2nd of November 2024")
+vol_24d = year_selector(vol_SPY_daily,2024)
+vol_24_08d = month_selector(vol_SPY_daily,2024,08)
+vol_24_11_02d = day_selector(vol_SPY_daily,2024,11,02) #vector
 
 
+#avg per hour for each day of each month of any dataset
+#works for datasets with more than 1 year!
+vol_SPY_hourly = r.vol_hourly(raw_SPY,merge=F)
+head(vol_SPY_hourly)
 
-#on entire datasets
-
-vol_SPY = r.vol_hourly(raw_SPY,merge=F)
-vol_VGK = r.vol_hourly(raw_VGK,merge=F)
-
-vol_plotter(vol_SPY,breaks="yearly",title="SPY Volatility Since 2019")
-vol_plotter(vol_VGK,breaks="yearly",title="VGK Volatility Since 2020")
-
+#can then filter out years, months, or days
+vol_24h = year_selector(vol_SPY_hourly,2024)
+vol_24_08h = month_selector(vol_SPY_hourly,2024,08)
+vol_24_11_02h = day_selector(vol_SPY_hourly,2024,11,02) #scalar
 
 ```
 
 
+## Plots
+```{r volatility plots}
 
+#avg per day volatility all time
+dvol_plotter(vol_SPY_daily,breaks="yearly",
+             title="SPY Volatility Since 2019")
+
+#avg per day volatility in a year
+dvol_plotter(vol_24d,breaks="monthly",
+             title="Realised Volatility - SPY 2024")
+
+#avg per day volatility in a month
+dvol_plotter(vol_24_08d,breaks="daily",
+             title="Realised Volatility - SPY August 2024")
+
+
+#hourly volatility all time
+hvol_plotter(vol_SPY_hourly,breaks="yearly",
+             title="SPY Volatility Since 2019")
+
+#hourly volatility in a year
+hvol_plotter(vol_24h,breaks="monthly",
+             title="Realised Volatility - SPY 2024")
+
+#hourly volatility in a month
+hvol_plotter(vol_24_08h,breaks="daily",
+             title="Realised Volatility - SPY August 2024")
+
+#hourly volatility in a day
+hvol_plotter(vol_24_11_02h,breaks="hourly",
+             title="Realised Volatility - SPY 2nd of November 2024")
+
+
+
+
+
+#vol_plotter(vol_VGK,breaks="yearly",title="VGK Volatility Since 2020")
+```
 
 
 

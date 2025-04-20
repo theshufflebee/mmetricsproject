@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.22.0 (TeX Live 2025)  (format=lualatex 2025.4.15)  20 APR 2025 10:36
+This is LuaHBTeX, Version 1.22.0 (TeX Live 2025)  (format=lualatex 2025.4.15)  20 APR 2025 13:08
  restricted system commands enabled.
 **Financial_Data_Analysis.tex
 (./Financial_Data_Analysis.tex
@@ -546,7 +546,10 @@ File: bkm-pdftex.def 2023-12-10 v1.31 bookmark driver for pdfTeX and luaTeX (HO)
 \BKM@id=\count341
 )) (./Financial_Data_Analysis.aux
 
-LaTeX Warning: Label `tab:volatility' multiply defined.
+LaTeX Warning: Label `tab:volatility compute' multiply defined.
+
+
+LaTeX Warning: Label `tab:volatility compute' multiply defined.
 
 )
 \openout1 = Financial_Data_Analysis.aux
@@ -843,26 +846,26 @@ LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
 {c:/Users/fries/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10> not available
 (Font)              Font shape `TU/lmtt/b/n' tried instead on input line 156.
-<Financial_Data_Analysis_files/figure-latex/helper tutorial-1.pdf, id=25, 469.755pt x 325.215pt>
+<Financial_Data_Analysis_files/figure-latex/helper tutorial-1.pdf, id=29, 469.755pt x 325.215pt>
 File: Financial_Data_Analysis_files/figure-latex/helper tutorial-1.pdf Graphic file (type pdf)
 <use Financial_Data_Analysis_files/figure-latex/helper tutorial-1.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/helper tutorial-1.pdf  used on input line 192.
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/helper tutorial-1.pdf  used on input line 183.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
 [2]
-<Financial_Data_Analysis_files/figure-latex/helper tutorial-2.pdf, id=33, 469.755pt x 325.215pt>
+<Financial_Data_Analysis_files/figure-latex/helper tutorial-2.pdf, id=37, 469.755pt x 325.215pt>
 File: Financial_Data_Analysis_files/figure-latex/helper tutorial-2.pdf Graphic file (type pdf)
 <use Financial_Data_Analysis_files/figure-latex/helper tutorial-2.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/helper tutorial-2.pdf  used on input line 201.
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/helper tutorial-2.pdf  used on input line 192.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
-<Financial_Data_Analysis_files/figure-latex/helper tutorial-3.pdf, id=34, 469.755pt x 325.215pt>
+<Financial_Data_Analysis_files/figure-latex/helper tutorial-3.pdf, id=38, 469.755pt x 325.215pt>
 File: Financial_Data_Analysis_files/figure-latex/helper tutorial-3.pdf Graphic file (type pdf)
 <use Financial_Data_Analysis_files/figure-latex/helper tutorial-3.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/helper tutorial-3.pdf  used on input line 202.
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/helper tutorial-3.pdf  used on input line 193.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 201--203
+Underfull \hbox (badness 10000) in paragraph at lines 192--194
 [][]
  []
 
@@ -1301,61 +1304,61 @@ Missing character: There is no ─ (U+2500) in font [lmmono10-regular]:!
 ]
 
 [7]
-<Financial_Data_Analysis_files/figure-latex/volatility-1.pdf, id=73, 469.755pt x 325.215pt>
-File: Financial_Data_Analysis_files/figure-latex/volatility-1.pdf Graphic file (type pdf)
-<use Financial_Data_Analysis_files/figure-latex/volatility-1.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-1.pdf  used on input line 619.
+<Financial_Data_Analysis_files/figure-latex/volatility plots-1.pdf, id=77, 469.755pt x 325.215pt>
+File: Financial_Data_Analysis_files/figure-latex/volatility plots-1.pdf Graphic file (type pdf)
+<use Financial_Data_Analysis_files/figure-latex/volatility plots-1.pdf>
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility plots-1.pdf  used on input line 685.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
-<Financial_Data_Analysis_files/figure-latex/volatility-2.pdf, id=74, 469.755pt x 325.215pt>
-File: Financial_Data_Analysis_files/figure-latex/volatility-2.pdf Graphic file (type pdf)
-<use Financial_Data_Analysis_files/figure-latex/volatility-2.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-2.pdf  used on input line 628.
-(luatex.def)             Requested size: 469.75386pt x 325.2142pt.
-
-
-[8<./Financial_Data_Analysis_files/figure-latex/volatility-1.pdf>]
-<Financial_Data_Analysis_files/figure-latex/volatility-3.pdf, id=83, 469.755pt x 325.215pt>
-File: Financial_Data_Analysis_files/figure-latex/volatility-3.pdf Graphic file (type pdf)
-<use Financial_Data_Analysis_files/figure-latex/volatility-3.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-3.pdf  used on input line 646.
+<Financial_Data_Analysis_files/figure-latex/volatility plots-2.pdf, id=78, 469.755pt x 325.215pt>
+File: Financial_Data_Analysis_files/figure-latex/volatility plots-2.pdf Graphic file (type pdf)
+<use Financial_Data_Analysis_files/figure-latex/volatility plots-2.pdf>
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility plots-2.pdf  used on input line 695.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
-[9<./Financial_Data_Analysis_files/figure-latex/volatility-2.pdf>]
-<Financial_Data_Analysis_files/figure-latex/volatility-4.pdf, id=92, 469.755pt x 325.215pt>
-File: Financial_Data_Analysis_files/figure-latex/volatility-4.pdf Graphic file (type pdf)
-<use Financial_Data_Analysis_files/figure-latex/volatility-4.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-4.pdf  used on input line 656.
+[8<./Financial_Data_Analysis_files/figure-latex/volatility plots-1.pdf>]
+<Financial_Data_Analysis_files/figure-latex/volatility plots-3.pdf, id=90, 469.755pt x 325.215pt>
+File: Financial_Data_Analysis_files/figure-latex/volatility plots-3.pdf Graphic file (type pdf)
+<use Financial_Data_Analysis_files/figure-latex/volatility plots-3.pdf>
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility plots-3.pdf  used on input line 705.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
-[10<./Financial_Data_Analysis_files/figure-latex/volatility-3.pdf>]
-<Financial_Data_Analysis_files/figure-latex/volatility-5.pdf, id=102, 469.755pt x 325.215pt>
-File: Financial_Data_Analysis_files/figure-latex/volatility-5.pdf Graphic file (type pdf)
-<use Financial_Data_Analysis_files/figure-latex/volatility-5.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-5.pdf  used on input line 666.
+[9<./Financial_Data_Analysis_files/figure-latex/volatility plots-2.pdf>]
+<Financial_Data_Analysis_files/figure-latex/volatility plots-4.pdf, id=100, 469.755pt x 325.215pt>
+File: Financial_Data_Analysis_files/figure-latex/volatility plots-4.pdf Graphic file (type pdf)
+<use Financial_Data_Analysis_files/figure-latex/volatility plots-4.pdf>
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility plots-4.pdf  used on input line 715.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
-[11<./Financial_Data_Analysis_files/figure-latex/volatility-4.pdf>]
-<Financial_Data_Analysis_files/figure-latex/volatility-6.pdf, id=113, 469.755pt x 325.215pt>
-File: Financial_Data_Analysis_files/figure-latex/volatility-6.pdf Graphic file (type pdf)
-<use Financial_Data_Analysis_files/figure-latex/volatility-6.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-6.pdf  used on input line 679.
+[10<./Financial_Data_Analysis_files/figure-latex/volatility plots-3.pdf>]
+<Financial_Data_Analysis_files/figure-latex/volatility plots-5.pdf, id=110, 469.755pt x 325.215pt>
+File: Financial_Data_Analysis_files/figure-latex/volatility plots-5.pdf Graphic file (type pdf)
+<use Financial_Data_Analysis_files/figure-latex/volatility plots-5.pdf>
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility plots-5.pdf  used on input line 725.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
-[12<./Financial_Data_Analysis_files/figure-latex/volatility-5.pdf>]
-<Financial_Data_Analysis_files/figure-latex/volatility-7.pdf, id=123, 469.755pt x 325.215pt>
-File: Financial_Data_Analysis_files/figure-latex/volatility-7.pdf Graphic file (type pdf)
-<use Financial_Data_Analysis_files/figure-latex/volatility-7.pdf>
-Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility-7.pdf  used on input line 692.
+[11<./Financial_Data_Analysis_files/figure-latex/volatility plots-4.pdf>]
+<Financial_Data_Analysis_files/figure-latex/volatility plots-6.pdf, id=121, 469.755pt x 325.215pt>
+File: Financial_Data_Analysis_files/figure-latex/volatility plots-6.pdf Graphic file (type pdf)
+<use Financial_Data_Analysis_files/figure-latex/volatility plots-6.pdf>
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility plots-6.pdf  used on input line 735.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
-[13<./Financial_Data_Analysis_files/figure-latex/volatility-6.pdf>]
+[12<./Financial_Data_Analysis_files/figure-latex/volatility plots-5.pdf>]
+<Financial_Data_Analysis_files/figure-latex/volatility plots-7.pdf, id=131, 469.755pt x 325.215pt>
+File: Financial_Data_Analysis_files/figure-latex/volatility plots-7.pdf Graphic file (type pdf)
+<use Financial_Data_Analysis_files/figure-latex/volatility plots-7.pdf>
+Package luatex.def Info: Financial_Data_Analysis_files/figure-latex/volatility plots-7.pdf  used on input line 745.
+(luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
-[14<./Financial_Data_Analysis_files/figure-latex/volatility-7.pdf>] (./Financial_Data_Analysis.aux)
+
+[13<./Financial_Data_Analysis_files/figure-latex/volatility plots-6.pdf>]
+
+[14<./Financial_Data_Analysis_files/figure-latex/volatility plots-7.pdf>] (./Financial_Data_Analysis.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-03-26>
@@ -1366,19 +1369,19 @@ LaTeX Warning: There were multiply-defined labels.
 )
 
 Here is how much of LuaTeX's memory you used:
- 23952 strings out of 471941
- 125009,1144653 words of node,token memory allocated
+ 23960 strings out of 471941
+ 125007,1144653 words of node,token memory allocated
  591 words of node memory still in use:
    6 hlist, 3 vlist, 4 rule, 3 glue, 4 kern, 1 glyph, 10 attribute, 61 glue_spec, 10 attribute_list, 1 write, 1 user_defined, 2 pdf_colorstack nodes
-   avail lists: 1:1,2:3791,3:1847,4:906,5:470,6:64,7:7193,8:1,9:3293,10:3,11:29
- 50084 multiletter control sequences out of 65536+600000
- 64 fonts using 19208247 bytes
+   avail lists: 1:1,2:4350,3:1677,4:1106,5:545,6:53,7:6942,8:1,9:3487,10:3,11:39
+ 50088 multiletter control sequences out of 65536+600000
+ 64 fonts using 19208399 bytes
  90i,13n,114p,405b,1035s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmonolt10-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-italic.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman12-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman17-regular.otf>
-Output written on Financial_Data_Analysis.pdf (14 pages, 1136243 bytes).
+Output written on Financial_Data_Analysis.pdf (14 pages, 911629 bytes).
 
-PDF statistics: 206 PDF objects out of 1000 (max. 8388607)
- 147 compressed objects within 2 object streams
- 25 named destinations out of 1000 (max. 131072)
- 41 words of extra memory for PDF output out of 10000 (max. 100000000)
+PDF statistics: 220 PDF objects out of 1000 (max. 8388607)
+ 161 compressed objects within 2 object streams
+ 29 named destinations out of 1000 (max. 131072)
+ 57 words of extra memory for PDF output out of 10000 (max. 100000000)
 

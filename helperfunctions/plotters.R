@@ -37,24 +37,65 @@ price_plotter_day = function(data,title){
 #-----------------                     2                        -----------------
 #--------------------------------------------------------------------------------
 
-# This function plots hourly realised volatility data
+# This function plots daily realised volatility data
 
 #--------------------------------------------------------------------------------
 
+#for daily vol
 #breaks and title as strings
 #breaks can be monthly, daily, or hourly
 
-vol_plotter = function(data,breaks,title){
+dvol_plotter = function(data,breaks,title){
 
   x_scale <- switch(breaks,
                     "yearly" = scale_x_datetime(date_labels = "%b %Y", date_breaks = "6 month"),
                     "monthly" = scale_x_datetime(date_labels = "%b %Y", date_breaks = "1 month"),
                     "daily"   = scale_x_datetime(date_labels = "%a %d", date_breaks = "1 day"),
                     "hourly"  = scale_x_datetime(date_labels = "%Hh", date_breaks = "1 hour"),
-                    NULL)  #default NULL if nothing matches    
+                    NULL)  #default NULL if nothing matches   
+  
+  ggplot(data, aes(x = timestamp, y = r_vol_d)) +
+    geom_line(color = "#2c7fb8", linewidth = 1) +
+    geom_point(color = "#253494", size = 2) +
+    x_scale + 
+    scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
+    labs(title = title,
+         x = NULL,
+         y = "daily realised volatility") +
+    theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          plot.title = element_text(face = "bold", hjust = 0.5))
+}
+
+#e.g. vol_plotter(vol_SPY2024,breaks="1 month",
+#                              title="Realised Volatility - SPY 2024")
+
+
+
+
+#--------------------------------------------------------------------------------
+#-----------------                     3                        -----------------
+#--------------------------------------------------------------------------------
+
+# This function plots hourly realised volatility data
+
+#--------------------------------------------------------------------------------
+
+#for hourly vol
+#breaks and title as strings 
+#breaks can be monthly, daily, or hourly
+
+hvol_plotter = function(data,breaks,title){
+  
+  x_scale <- switch(breaks,
+                    "yearly" = scale_x_datetime(date_labels = "%b %Y", date_breaks = "6 month"),
+                    "monthly" = scale_x_datetime(date_labels = "%b %Y", date_breaks = "1 month"),
+                    "daily"   = scale_x_datetime(date_labels = "%a %d", date_breaks = "1 day"),
+                    "hourly"  = scale_x_datetime(date_labels = "%Hh", date_breaks = "1 hour"),
+                    NULL)  #default NULL if nothing matches   
   
   ggplot(data, aes(x = timestamp, y = r_vol_h)) +
-    geom_line(color = "#2c7fb8", size = 1) +
+    geom_line(color = "#2c7fb8", linewidth = 1) +
     geom_point(color = "#253494", size = 2) +
     x_scale + 
     scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
@@ -66,7 +107,5 @@ vol_plotter = function(data,breaks,title){
           plot.title = element_text(face = "bold", hjust = 0.5))
 }
 
-#e.g. vol_plotter(vol_SPY2024,breaks="1 month",
+#e.g. vol_plotter(vol_SPY2024,breaks="1 month",freq="per hour",
 #                              title="Realised Volatility - SPY 2024")
-
-
