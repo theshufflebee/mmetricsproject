@@ -9,7 +9,7 @@ library(lubridate)
 #-----------------                     1                        -----------------
 #--------------------------------------------------------------------------------
 
-# This function plots daily close prices per minute
+# This function plots daily close prices per minute for a day
 
 #--------------------------------------------------------------------------------
 
@@ -33,8 +33,95 @@ price_plotter_day = function(data,title){
 
 
 
+
 #--------------------------------------------------------------------------------
 #-----------------                     2                        -----------------
+#--------------------------------------------------------------------------------
+
+# This function plots daily close prices per minute for a month
+
+#--------------------------------------------------------------------------------
+
+#input a month's financial data 
+#input title as string
+
+price_plotter_month = function(data,title){
+  ggplot(data, aes(x = as.POSIXct(timestamp), y = close)) +
+    geom_point(color = "blue", size = 0.01) +
+    geom_line(aes(group=1), linewidth=0.05) +
+    labs(title = title,
+         x = "Time",
+         y = "Close Price") +
+    scale_x_datetime(date_labels = "%d", date_breaks = "2 day") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+}
+
+#example: price_plotter_month(ONEQ_04,"ONEQ Price in April")
+
+
+
+#--------------------------------------------------------------------------------
+#-----------------                     3                        -----------------
+#--------------------------------------------------------------------------------
+
+# This function plots daily close prices per minute for a year
+
+#--------------------------------------------------------------------------------
+
+#input a year's financial data 
+#input title as string
+
+price_plotter_year = function(data,title){
+  ggplot(data, aes(x = as.POSIXct(timestamp), y = close)) +
+    geom_point(color = "blue", size = 0.01) +
+    geom_line(aes(group=1), linewidth=0.05) +
+    labs(title = title,
+         x = "Time",
+         y = "Close Price") +
+    scale_x_datetime(date_labels = "%b", date_breaks = "1 month") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+}
+
+#example: price_plotter_year(ONEQ_2024,"ONEQ Price 2024")
+
+
+
+
+#--------------------------------------------------------------------------------
+#-----------------                     4                        -----------------
+#--------------------------------------------------------------------------------
+
+# This function plots daily close prices per minute for over a year data
+
+#--------------------------------------------------------------------------------
+
+#input big financial data 
+#input title as string
+
+price_plotter = function(data,title){
+  ggplot(data, aes(x = as.POSIXct(timestamp), y = close)) +
+    geom_point(color = "blue", size = 0.01) +
+    geom_line(aes(group=1), linewidth=0.05) +
+    labs(title = title,
+         x = "Time",
+         y = "Close Price") +
+    scale_x_datetime(date_labels = "%b %Y", date_breaks = "6 month") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+}
+
+#example: price_plotter(raw_ONEQ,"ONEQ Price Over Time")
+
+
+
+
+
+
+
+#--------------------------------------------------------------------------------
+#-----------------                     5                        -----------------
 #--------------------------------------------------------------------------------
 
 # This function plots daily realised volatility data
@@ -55,8 +142,8 @@ dvol_plotter = function(data,breaks,title){
                     NULL)  #default NULL if nothing matches   
   
   ggplot(data, aes(x = timestamp, y = r_vol_d)) +
-    geom_line(color = "#2c7fb8", linewidth = 1) +
-    geom_point(color = "#253494", size = 2) +
+    geom_line(color = "#2c7fb8", linewidth = 0.9) +
+    geom_point(color = "#253494", size = 1) +
     x_scale + 
     scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
     labs(title = title,
@@ -74,7 +161,7 @@ dvol_plotter = function(data,breaks,title){
 
 
 #--------------------------------------------------------------------------------
-#-----------------                     3                        -----------------
+#-----------------                     6                        -----------------
 #--------------------------------------------------------------------------------
 
 # This function plots hourly realised volatility data
@@ -95,8 +182,8 @@ hvol_plotter = function(data,breaks,title){
                     NULL)  #default NULL if nothing matches   
   
   ggplot(data, aes(x = timestamp, y = r_vol_h)) +
-    geom_line(color = "#2c7fb8", linewidth = 1) +
-    geom_point(color = "#253494", size = 2) +
+    geom_line(color = "#2c7fb8", linewidth = 0.9) +
+    geom_point(color = "#253494", size = 1.3) +
     x_scale + 
     scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
     labs(title = title,

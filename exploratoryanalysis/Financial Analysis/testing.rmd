@@ -1,0 +1,399 @@
+---
+title: "Testing"
+output:
+  pdf_document: 
+    toc: true
+    fig_caption: yes
+header-includes:
+  - \usepackage{amsmath}
+---
+\newpage
+
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(RColorBrewer)
+require(wordcloud)
+require(tidyr)
+require(randomForest)
+require(tidytext)
+require(textstem)
+require(tidyverse)
+require(tm)
+require(SnowballC)
+require(quanteda.textplots)
+require(quantmod)
+require(quanteda)
+require(rvest)
+require(httr)
+require(xml2)
+require(textdata)
+require(sentimentr)
+require(syuzhet)
+require(text)
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+```
+
+
+# Data 
+
+## Raw Political Data
+```{r political rawdata_setup, results=FALSE, warning=FALSE, message=FALSE}
+
+#political shocks
+raw_truths <- read.csv(here("data/political_data", "truths_new.csv"))
+#raw_tweets <- read.csv(here("data/political_data", "tweets.csv"))
+
+```
+
+## Raw Data
+```{r financial rawdata_setup, results=FALSE, warning=FALSE, message=FALSE}
+#market prices (loads and names them automatically)
+#raw_ONEQ <- read.csv(here("data/market_data", "ONEQ.csv")) #USA
+#raw_SMI <- read.csv(here("data/market_data", "SMI.csv")) #CH
+#raw_VTHR <- read.csv(here("data/market_data", "VTHR.csv")) #USA
+#raw_VTI <- read.csv(here("data/market_data", "VTI.csv")) #USA
+#raw_DAX <- read.csv(here("data/market_data", "DAX.csv")) #DE
+#raw_ASHR <- read.csv(here("data/market_data", "ASHR.csv")) #CHINA
+raw_SPYy <- read.csv(here("data/market_data", "Spyqyahoo.csv")) #yahoo
+
+#S&P500
+data_loader(symbol="SPY")
+
+#STOXX50
+data_loader(symbol="VGK")
+
+
+
+
+#CSI 300 (China)
+data_loader(symbol="ASHR")
+
+```
+
+
+## Daily Data
+```{r dailydata, results=FALSE, warning=FALSE, message=FALSE}
+
+#political shocks
+
+
+#market prices
+day_SPY_0409 = filter(raw_SPY, str_detect(timestamp, "^2025-04-09")) #9th of april
+day_SPY_0409$timestamp = as.POSIXct(day_SPY_0409$timestamp, 
+                                    format = "%Y-%m-%d %H:%M:%S", tz = "EST")
+
+yahoo_ds0409 = filter(raw_SPYy, str_detect(Date, "^2025-04-09"))
+yahoo_ds0409$Date = as.POSIXct(yahoo_ds0409$Date, 
+                                    format = "%Y-%m-%dT%H:%M:%S", tz = "UTC")
+yahoo_ds0409$Date = with_tz(yahoo_ds0409$Date, "EST")
+
+
+#extract a particular month
+SPY_24_09 = month_selector(raw_SPY,2024,09) #november 2024
+
+
+#extract a particular year
+SPY_24 = year_selector(raw_SPY,2024) #2024
+
+```
+
+
+# Plots
+
+## Total 
+```{r total market plots}
+
+#SPY
+ggplot(raw_SPY, aes(x = as.POSIXct(timestamp), y = close)) +
+  geom_point(color = "blue", size = 0.01) +
+  geom_line(aes(group=1), color="blue", linewidth=0.05) +
+  labs(title = "SPY Price Over Time",
+       x = "Time",
+       y = "Close Price") +
+  scale_x_datetime(date_labels = "%b %Y", date_breaks = "6 month") +
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  
+```
+
+
+## Per Day
+```{r daily market plots}
+
+#SPY Source: alpha
+ggplot(day_SPY_0409, aes(x = timestamp, y = close)) +
+  geom_point(color = "blue", size = 0.01) +
+  geom_line(aes(group=1)) +
+  labs(title = "SPY alpha Price April 9th",
+       x = "Time",
+       y = "Close Price") +
+   scale_x_datetime(date_labels = "%H:%M",  
+                    date_breaks = "60 min") +
+   theme_minimal() +
+   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+#SPY Source: yahoo
+ggplot(yahoo_ds0409, aes(x = Date, y = Close)) +
+  geom_point(color = "blue", size = 0.01) +
+  geom_line(aes(group=1)) +
+  labs(title = "SPY yahoo Price April 9th",
+       x = "Time",
+       y = "Close Price") +
+   scale_x_datetime(date_labels = "%H:%M",  
+                    date_breaks = "60 min") +
+   theme_minimal() +
+   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+```
+
+# Time Series Analysis
+```{r time series}
+
+acf(log(day_SPY_0409$close))
+pacf(log(day_SPY_0409$close))
+
+acf(log(raw_SPY$close))
+pacf(log(raw_SPY$close))
+
+AR1 = arima(day_SPY_0409$close,c(1,0,0),method="ML")
+AR2 = arima(day_SPY_0409$close,c(2,0,0),method="ML")
+AR3 = arima(day_SPY_0409$close,c(3,0,0),method="ML")
+table1 = export_summs(AR1,AR2,AR3, model.names = c("AR1","AR2","AR3"), digits = 4)
+huxtable::caption(table1) <- "AR Estimations"
+huxtable::set_width(table1, 0.8)
+
+AR1res = as.numeric(AR1$residuals)
+AR1res_lagged <- lag(AR1res, 1)
+iidcheck1 = lm(AR1res ~ AR1res_lagged)
+AR2res = as.numeric(AR2$residuals)
+AR2res_lagged <- lag(AR2res, 1)
+iidcheck2 = lm(AR2res ~ AR2res_lagged)
+AR3res = as.numeric(AR3$residuals)
+AR3res_lagged <- lag(AR3res, 1)
+iidcheck3 = lm(AR3res ~ AR3res_lagged)
+table2 = export_summs(iidcheck1,iidcheck2,iidcheck3, 
+             model.names = c("AR1 Residuals","AR2 Residuals","AR3 Residuals"), 
+             digits = 4)
+huxtable::caption(table2) <- "Checking Residuals"
+huxtable::set_width(table2, 0.8)
+```
+
+# Volatility 
+
+
+## JPR Formula
+$$
+\begin{aligned}
+  v_t &= \frac{1}{N}\sum_{i=1}^N(\Delta p_{t,i})^2 \\
+  &\text{where } \Delta p_t \text{ is the difference in price (open - close)} \\
+  &\text{and i represents every minute}
+\end{aligned}
+$$
+
+```{r JPR}
+#extract a particular day
+SPY_25_04_02 = day_selector(raw_SPY,2025,04,02) #april 2nd 2025
+
+#let's plot it
+price_plotter_day(SPY_25_04_02,"SPY Price on April 2nd 2025") 
+
+#quick
+quickplot = function(x){price_plotter_day(day_selector(raw_SPY,2025,04,x),"SPY Price 2025")}
+quickplot(9)
+
+#realized volatility 
+delta_price = SPY_25_04_02$close - SPY_25_04_02$open
+delta_price_sqr = delta_price^2
+SPY_25_04_02 = cbind(day_selector(raw_SPY,2025,04,02),delta_price_sqr)
+v_t = sum(delta_price_sqr) / length(delta_price)
+
+#or is it like this??
+#realized volatility method2
+p_t = SPY_25_04_02$close
+p_t_1 <- lag(p_t, 1)
+delta_price2 = p_t_1 - p_t
+v_t2 = sum((na.omit(delta_price2))^2) / length(na.omit(delta_price2))
+
+```
+
+```{r JPR volatility compute}
+#average per day (outputs scalar)
+r.vol_day(SPY_25_04_02) 
+
+#average per day for each day in a month (outputs vector of each day's realised volatility)
+r.vol_month(SPY_24_09) 
+
+#for each hour in a day (outputs a vector of each hour's realised volatility)
+r.vol_day_hour(SPY_25_04_02) 
+
+#for each hour in a day for each day in a month (outputs a matrix)
+month_hour = r.vol_month_hour(SPY_24_09)
+huxtable(head(data.frame(month_hour)))
+
+
+#avg per day for each month of any dataset
+#works for datasets with more than 1 year!
+vol_SPY_daily = r.vol_daily(raw_SPY,merge=F)
+head(vol_SPY_daily)
+
+#can then filter out years, months, or days
+vol_24d = year_selector(vol_SPY_daily,2024)
+vol_24_08d = month_selector(vol_SPY_daily,2024,08)
+vol_24_11_04d = day_selector(vol_SPY_daily,2024,11,04) #scalar
+
+
+#avg per hour for each day of each month of any dataset
+#works for datasets with more than 1 year!
+vol_SPY_hourly = r.vol_hourly(raw_SPY,merge=F)
+head(vol_SPY_hourly)
+
+#can then filter out years, months, or days
+vol_24h = year_selector(vol_SPY_hourly,2024)
+vol_24_08h = month_selector(vol_SPY_hourly,2024,08)
+vol_24_11_04h = day_selector(vol_SPY_hourly,2024,11,04) #vector
+
+```
+
+
+```{r SPY volatility plots}
+
+#avg per day volatility all time
+dvol_plotter(vol_SPY_daily,breaks="yearly",
+             title="SPY Volatility Since 2019")
+
+#avg per day volatility in a year
+dvol_plotter(vol_24d,breaks="monthly",
+             title="Realised Volatility - SPY 2024")
+
+#avg per day volatility in a month
+dvol_plotter(vol_24_08d,breaks="daily",
+             title="Realised Volatility - SPY August 2024")
+
+
+#hourly volatility all time
+hvol_plotter(vol_SPY_hourly,breaks="yearly",
+             title="SPY Volatility Since 2019")
+
+#hourly volatility in a year
+hvol_plotter(vol_24h,breaks="monthly",
+             title="Realised Volatility - SPY 2024")
+
+#hourly volatility in a month
+hvol_plotter(vol_24_08h,breaks="daily",
+             title="Realised Volatility - SPY August 2024")
+
+#hourly volatility in a day
+hvol_plotter(vol_24_11_04h,breaks="hourly",
+             title="Realised Volatility - SPY 4th of November 2024")
+
+```
+
+
+## Garman and Klass (1980) Formula
+Note that this formula uses open-high-low-close information. \\
+This model is based on the assumption that price returns follow a Wiener process with zero drift and constant infinitesimal variance. It’s constructed by minimizing the variance of a quadratic estimator subject to the constraints of price and time symmetry and scale invariance of volatility. Source: https://assets.bbhub.io/professional/sites/10/intraday_volatility-3.pdf
+$$
+\begin{aligned}
+  V_{ohlc} = 0.5[log(H)-log(L)]^2 - [2log(2)-1][log(C)-log(O)]^2
+\end{aligned}
+$$
+```{r GnK}
+#extract a particular day
+day_SPY_0402 = day_selector(raw_SPY,2025,04,02) #april 2nd 2025
+
+#variables
+C = day_SPY_0402$close 
+O = day_SPY_0402$open
+H = day_SPY_0402$high 
+L = day_SPY_0402$low
+
+#realized volatility 
+V_ohlc = 0.5*(log(H)-log(L))^2 - (2*log(2)-1)*(log(C)-log(O))^2
+v_ohlc = sqrt(V_ohlc)
+day_SPY_0402 = cbind(day_selector(raw_SPY,2025,04,02),V_ohlc)
+avg = sum(V_ohlc) / length(V_ohlc)
+
+
+
+```
+
+
+
+# Tweets
+
+```{r playing around}
+
+#cleanup
+truthsbackup <- truths_processer(raw_truths) 
+truths = as.data.table(truthsbackup)
+names(truths)[names(truths) == 'date_time_parsed'] <- 'timestamp'
+truths <- truths[order(truths$timestamp, decreasing=T), ]
+
+#count by hour
+truth_count = truths[, .N, by=.(year(timestamp), month(timestamp), day(timestamp), hour(timestamp))] 
+
+#fix timestamp
+truth_count$timestamp = as.POSIXct(sprintf("%04d-%02d-%02d %02d:00:00", truth_count$year, 
+                             truth_count$month, truth_count$day, 
+                             truth_count$hour), format = "%Y-%m-%d %H:00:00")
+
+#remove useless columns
+truth_count = select(truth_count, timestamp, N)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

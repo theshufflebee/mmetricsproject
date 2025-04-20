@@ -1,0 +1,135 @@
+---
+title: "Financial Data Analysis Tutorial"
+output:
+  pdf_document: 
+    toc: true
+    fig_caption: yes
+    latex_engine: lualatex
+header-includes:
+  - \usepackage{amsmath}
+---
+\newpage
+
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+```
+# Data
+
+## Raw Data
+```{r rawdata_setup, results=FALSE, warning=FALSE, message=FALSE}
+
+#market prices (loads and names them automatically)
+
+#S&P500
+data_loader(symbol="SPY")
+
+#STOXX50
+data_loader(symbol="VGK")
+
+
+
+
+#CSI 300 (China)
+data_loader(symbol="ASHR")
+
+```
+
+
+
+# Quick Analysis
+
+## SPY April 2nd 2025
+```{r helper tutorial, warning=FALSE, message=FALSE}
+
+#extract a particular day
+SPY_25_04_02 = day_selector(raw_SPY,2025,04,02) #april 2nd 2025
+
+#let's plot it
+price_plotter_day(SPY_25_04_02,"SPY Price on April 2nd 2025") 
+
+#quickly test some ARMA specifications
+quick_arma(SPY_25_04_02,1,0,0) #checking AR1,AR2,AR3
+#quick_arma(SPY_25_04_02,2,0,0) #checking AR2,AR3,AR4
+
+
+#extract a particular month
+SPY_24_09 = month_selector(raw_SPY,2024,09) #november 2024
+
+
+#extract a particular year
+SPY_24 = year_selector(raw_SPY,2024) #2024
+
+```
+
+# Realised Volatility
+
+## Computations
+```{r volatility compute}
+
+#avg per day for each month of any dataset
+vol_SPY_daily = r.vol_daily(raw_SPY,merge=F)
+head(vol_SPY_daily)
+
+#can then filter out years, months, or days
+vol_24d = year_selector(vol_SPY_daily,2024)
+vol_24_08d = month_selector(vol_SPY_daily,2024,08)
+vol_24_11_04d = day_selector(vol_SPY_daily,2024,11,04) #scalar
+
+
+#avg per hour for each day of each month of any dataset
+vol_SPY_hourly = r.vol_hourly(raw_SPY,merge=F)
+head(vol_SPY_hourly)
+
+#can then filter out years, months, or days
+vol_24h = year_selector(vol_SPY_hourly,2024)
+vol_24_08h = month_selector(vol_SPY_hourly,2024,08)
+vol_24_11_04h = day_selector(vol_SPY_hourly,2024,11,04) #vector
+
+```
+
+
+## Plots
+```{r volatility plots}
+
+#avg per day volatility all time
+dvol_plotter(vol_SPY_daily,breaks="yearly",
+             title="Realised Volatility - SPY")
+
+
+#hourly volatility all time
+hvol_plotter(vol_SPY_hourly,breaks="yearly",
+             title="Realised Volatility - SPY")
+
+```
+
+
+
+
+
+
+
+
