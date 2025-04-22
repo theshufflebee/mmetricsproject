@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.4.15)  22 APR 2025 14:13
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.4.15)  22 APR 2025 16:55
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -756,15 +756,41 @@ Package pdftex.def Info: testing_files/figure-latex/merging tweets & truths coun
 <testing_files/figure-latex/ARMA-X-1.pdf, id=293, 469.755pt x 325.215pt>
 File: testing_files/figure-latex/ARMA-X-1.pdf Graphic file (type pdf)
 <use testing_files/figure-latex/ARMA-X-1.pdf>
-Package pdftex.def Info: testing_files/figure-latex/ARMA-X-1.pdf  used on input line 1536.
+Package pdftex.def Info: testing_files/figure-latex/ARMA-X-1.pdf  used on input line 1538.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
 [26 <./testing_files/figure-latex/ARMA-X-1.pdf>]
+<testing_files/figure-latex/ARMA-X-2.pdf, id=303, 469.755pt x 325.215pt>
+File: testing_files/figure-latex/ARMA-X-2.pdf Graphic file (type pdf)
+<use testing_files/figure-latex/ARMA-X-2.pdf>
+Package pdftex.def Info: testing_files/figure-latex/ARMA-X-2.pdf  used on input line 1581.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
-[27]
 
-[28] (./testing.aux)
+[27 <./testing_files/figure-latex/ARMA-X-2.pdf>]
+<testing_files/figure-latex/ARMA-X-3.pdf, id=313, 469.755pt x 325.215pt>
+File: testing_files/figure-latex/ARMA-X-3.pdf Graphic file (type pdf)
+<use testing_files/figure-latex/ARMA-X-3.pdf>
+Package pdftex.def Info: testing_files/figure-latex/ARMA-X-3.pdf  used on input line 1624.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+
+
+[28 <./testing_files/figure-latex/ARMA-X-3.pdf>]
+
+[29]
+
+[30]
+<testing_files/figure-latex/unnamed-chunk-1-1.pdf, id=331, 469.755pt x 325.215pt>
+File: testing_files/figure-latex/unnamed-chunk-1-1.pdf Graphic file (type pdf)
+<use testing_files/figure-latex/unnamed-chunk-1-1.pdf>
+Package pdftex.def Info: testing_files/figure-latex/unnamed-chunk-1-1.pdf  used on input line 1807.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+
+
+[31]
+
+[32 <./testing_files/figure-latex/unnamed-chunk-1-1.pdf>] (./testing.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-03-26>
@@ -774,18 +800,18 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 17729 strings out of 471607
- 334582 string characters out of 5519714
+ 17754 strings out of 471607
+ 335708 string characters out of 5519714
  726962 words of memory out of 5000000
- 43970 multiletter control sequences out of 15000+600000
+ 43991 multiletter control sequences out of 15000+600000
  680520 words of font info for 87 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 75i,17n,79p,557b,1172s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,17n,79p,557b,1174s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on testing.pdf (28 pages, 17273717 bytes).
+Output written on testing.pdf (32 pages, 17386018 bytes).
 PDF statistics:
- 445 PDF objects out of 1000 (max. 8388607)
- 348 compressed objects within 4 object streams
- 62 named destinations out of 1000 (max. 500000)
- 235 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 480 PDF objects out of 1000 (max. 8388607)
+ 373 compressed objects within 4 object streams
+ 66 named destinations out of 1000 (max. 500000)
+ 250 words of extra memory for PDF output out of 10000 (max. 10000000)
 
