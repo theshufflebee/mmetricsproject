@@ -14,7 +14,6 @@ rm(list=ls())
 require(tinytex) #LaTeX
 require(ggplot2) #plots
 require(AEC) #JP-Renne functions
-require(AER) #NW formula
 require(forecast) #time series stuff
 require(expm) #matrix exponents
 require(here) #directory finder
@@ -429,7 +428,7 @@ ggplot(tt_count, aes(x = timestamp, y = N)) +
 # ARMA-X 
 
 ## Hourly
-```{r h first fix the data}
+```{r first fix the data}
 #merge by matching the hours
 #SPY_prices = select(raw_SPY, timestamp, close, volume)
 #SPY_prices$timestamp <- as.POSIXct(raw_SPY$timestamp)
@@ -461,7 +460,7 @@ armax_vol$r_vol_h = 100*armax_vol$r_vol_h
 ```
 
 ## Daily
-```{r d first fix the data}
+```{r first fix the data}
 #merge by matching the days
 
 SPY_volatility = r.vol_daily(raw_SPY,merge=F)
