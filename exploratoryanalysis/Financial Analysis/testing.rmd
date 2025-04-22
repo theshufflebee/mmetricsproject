@@ -59,6 +59,7 @@ source(here("helperfunctions/plotters.R"))
 source(here("helperfunctions/quick_arma.R"))
 source(here("helperfunctions/r.vol_calculators.R"))
 source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/armax.R"))
 ```
 
 
@@ -454,8 +455,8 @@ armax_vol = merge(SPY_volatility, truth_count, by.x = "timestamp_hour",
 #NA tweets means no tweets
 armax_vol$N[is.na(armax_vol$N)] = 0
 
-#hmm
-armax_vol$r_vol_h = 100*armax_vol$r_vol_h
+#common names
+armax_vol$r_vol = armax_vol$r_vol_h
 
 ```
 
@@ -476,8 +477,8 @@ armax_vol = merge(SPY_volatility, truth_count, by.x = "timestamp_day",
 #NA tweets means no tweets
 armax_vol$N[is.na(armax_vol$N)] = 0
 
-#hmm REMOVE
-armax_vol$r_vol_h = armax_vol$r_vol_d
+#common names
+armax_vol$r_vol = armax_vol$r_vol_d
 
 ```
 
@@ -493,12 +494,19 @@ count_lags <- embed(armax_vol$N, nb.lags + 1)
 colnames(count_lags) <- paste0("Lag_", 0:nb.lags)
 
 # Align volatility to match count rows
-vol_aligned <- tail(armax_vol$r_vol_h, nrow(count_lags))
+vol_aligned <- tail(armax_vol$r_vol, nrow(count_lags))
 # Fit ARMAX(0,0) with 3 exogenous lags
 fit_armax <- Arima(vol_aligned, order = c(1,0,2), xreg = count_lags)
+fit_armax2 <- Arima(armax_vol$r_vol, order = c(1,0,2), xreg = armax_vol$N)
+fit_armax3 <- Arima(armax_vol$r_vol, order = c(1,0,2))
 
 summary(fit_armax)
 checkresiduals(fit_armax)
+summary(fit_armax2)
+checkresiduals(fit_armax2)
+summary(fit_armax3)
+checkresiduals(fit_armax3)
+
 
 # Refit using lm for robust SEs
 eq <- lm(vol_aligned ~ count_lags)
@@ -525,6 +533,13 @@ summary(best_model)
 
 
 
+```{r}
+result <- select_armax(armax_vol$r_vol, armax_vol$N, 
+                       max_p = 3, max_q = 3, max_r = 5, criterion = "AIC")
+
+summary(result$model) 
+result$AICplot
+```
 
 
 
