@@ -67,7 +67,7 @@ source(here("helperfunctions/truths_cleaning_function.R"))
 
 #political shocks
 raw_truths <- read.csv(here("data/political_data", "truths_new.csv"))
-#raw_tweets <- read.csv(here("data/political_data", "tweets.csv"))
+raw_tweets <- read.csv(here("data/political_data", "tweets.csv"))
 
 ```
 
@@ -346,12 +346,46 @@ avg = sum(V_ohlc) / length(V_ohlc)
 
 
 
-# Tweets
+# Tweets \& Truths
 
-```{r data and counting}
+
+## Tweets
+```{r tweets data and counting}
+tweets = raw_tweets
+
+#only keep original Tweets
+tweets <- tweets %>% filter(isRetweet != "t")
+tokens <- tokens(tweets$text)
+dfm <- dfm(tokens)
 
 #cleanup
+tweets = as.data.table(tweets)
+names(tweets)[names(tweets) == 'date'] <- 'timestamp'
+tweets <- tweets[order(tweets$timestamp, decreasing=T), ]
+
+#count by hour
+tweet_count = tweets[, .N, by=.(year(timestamp), month(timestamp), 
+                                day(timestamp), hour(timestamp))] 
+
+#fix timestamp
+tweet_count$timestamp = as.POSIXct(sprintf("%04d-%02d-%02d %02d:00:00", 
+                         tweet_count$year, tweet_count$month, tweet_count$day, 
+                         tweet_count$hour), format = "%Y-%m-%d %H:00:00")
+
+#remove useless columns and reorder by oldest first
+tweet_count = select(tweet_count, timestamp, N)
+tweet_count = tweet_count[ order(tweet_count$timestamp , decreasing = F ),]
+head(tweet_count)
+
+
+```
+
+
+## Truths
+```{r truths data and counting}
 truthsbackup <- truths_processer(raw_truths) 
+
+#cleanup
 truths = as.data.table(truthsbackup)
 names(truths)[names(truths) == 'date_time_parsed'] <- 'timestamp'
 truths <- truths[order(truths$timestamp, decreasing=T), ]
@@ -370,6 +404,21 @@ truth_count = select(truth_count, timestamp, N)
 truth_count = truth_count[ order(truth_count$timestamp , decreasing = F ),]
 head(truth_count)
 
+```
+
+## Merge
+```{r merging tweets & truths count}
+tt_count = rbind(tweet_count,truth_count) #tweets & truths 
+
+ggplot(tt_count, aes(x = timestamp, y = N)) +
+    geom_point(color = "#253494", size = 1) +
+    scale_x_datetime(date_labels = "%b %Y", date_breaks = "9 month") +
+    labs(title = "Trump Social Media Count",
+         x = NULL,
+         y = "number of tweets/truths") +
+    theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          plot.title = element_text(face = "bold", hjust = 0.5))
 ```
 
 
@@ -406,8 +455,23 @@ armax_vol$N[is.na(armax_vol$N)] = 0
 
 ```{r arma-x}
 
-
-
+T = armax_vol$timestamp_hour
+nb.lags <- 3
+FDD <- armax_vol[(nb.lags+1):T]
+names.FDD <- NULL
+for(i in 1:nb.lags){
+  FDD <- cbind(FDD,FJ$fdd[(nb.lags+1-i):(T-i)])
+  names.FDD <- c(names.FDD,paste(" Lag ",toString(i),sep=""))}
+colnames(FDD) <- c(" Lag 0",names.FDD)
+dprice <- dprice[(length(dprice)-dim(FDD)[1]+1):length(dprice)]
+eq <- lm(dprice~FDD)
+# Compute the Newey-West std errors:
+var.cov.mat <- NeweyWest(eq,lag = 7, prewhite = FALSE)
+robust_se <- sqrt(diag(var.cov.mat))
+# Stargazer output (with and without Robust SE)
+stargazer::stargazer(eq, eq, type = "text",
+                     column.labels=c("(no HAC)","(HAC)"),keep.stat="n",
+                     se = list(NULL,robust_se),no.space = TRUE)
 
 
 
