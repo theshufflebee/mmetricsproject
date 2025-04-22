@@ -27,6 +27,8 @@ require(lmtest) #reg tests
 require(vroom) #for loading data
 require(data.table) #for data filtering
 require(sysid) #for ARMA-X modeling
+require(sandwhich) #regression errors
+require(stargazer) #nice reg tables
 require(RColorBrewer)
 require(wordcloud)
 require(tidyr)
@@ -423,7 +425,9 @@ ggplot(tt_count, aes(x = timestamp, y = N)) +
 
 
 
-# ARMA-X (hourly)
+# ARMA-X 
+
+## Hourly
 ```{r first fix the data}
 #merge by matching the hours
 #SPY_prices = select(raw_SPY, timestamp, close, volume)
@@ -450,31 +454,71 @@ armax_vol = merge(SPY_volatility, truth_count, by.x = "timestamp_hour",
 #NA tweets means no tweets
 armax_vol$N[is.na(armax_vol$N)] = 0
 
+#hmm
+armax_vol$r_vol_h = 100*armax_vol$r_vol_h
+
+```
+
+## Daily
+```{r first fix the data}
+#merge by matching the days
+
+SPY_volatility = r.vol_daily(raw_SPY,merge=F)
+#since tweet database not full yet (combine tweets & truths)
+SPY_volatility = filter(SPY_volatility, 
+                        year(SPY_volatility$timestamp) >= 2022 & 
+                        month(SPY_volatility$timestamp) >= 03)
+colnames(SPY_volatility)[1] <- "timestamp_day"
+
+#take all relevant for armax
+armax_vol = merge(SPY_volatility, truth_count, by.x = "timestamp_day", 
+                   by.y = "timestamp", all.x = T)
+#NA tweets means no tweets
+armax_vol$N[is.na(armax_vol$N)] = 0
+
+#hmm REMOVE
+armax_vol$r_vol_h = armax_vol$r_vol_d
+
 ```
 
 
-```{r arma-x}
 
-T = armax_vol$timestamp_hour
+```{r ARMA-X}
+
+T <- length(armax_vol$r_vol_h)
+
+# Create lagged exogenous variables (3 lags of N)
 nb.lags <- 3
-FDD <- armax_vol[(nb.lags+1):T]
-names.FDD <- NULL
-for(i in 1:nb.lags){
-  FDD <- cbind(FDD,FJ$fdd[(nb.lags+1-i):(T-i)])
-  names.FDD <- c(names.FDD,paste(" Lag ",toString(i),sep=""))}
-colnames(FDD) <- c(" Lag 0",names.FDD)
-dprice <- dprice[(length(dprice)-dim(FDD)[1]+1):length(dprice)]
-eq <- lm(dprice~FDD)
-# Compute the Newey-West std errors:
-var.cov.mat <- NeweyWest(eq,lag = 7, prewhite = FALSE)
+count_lags <- embed(armax_vol$N, nb.lags + 1)
+colnames(count_lags) <- paste0("Lag_", 0:nb.lags)
+
+# Align volatility to match count rows
+vol_aligned <- tail(armax_vol$r_vol_h, nrow(count_lags))
+# Fit ARMAX(0,0) with 3 exogenous lags
+fit_armax <- Arima(vol_aligned, order = c(1,0,2), xreg = count_lags)
+
+summary(fit_armax)
+checkresiduals(fit_armax)
+
+# Refit using lm for robust SEs
+eq <- lm(vol_aligned ~ count_lags)
+
+# Compute Newey-West HAC standard errors
+var.cov.mat <- NeweyWest(eq, lag = 7, prewhite = FALSE)
 robust_se <- sqrt(diag(var.cov.mat))
-# Stargazer output (with and without Robust SE)
-stargazer::stargazer(eq, eq, type = "text",
-                     column.labels=c("(no HAC)","(HAC)"),keep.stat="n",
-                     se = list(NULL,robust_se),no.space = TRUE)
 
+# Stargazer output
+stargazer(eq, eq, type = "text",
+          column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
+          se = list(NULL, robust_se), no.space = TRUE)
 
+# Choosing the best model
+best_model <- auto.arima(vol_aligned, xreg = count_lags, seasonal = FALSE,
+                         max.p = 5, max.q = 5, max.d = 0,
+                         stepwise = T, approximation = FALSE, trace = TRUE)
 
+summary(best_model)
+        
 ```
 
 
@@ -484,63 +528,52 @@ stargazer::stargazer(eq, eq, type = "text",
 
 
 
-```{r eval=FALSE, include=FALSE}
-library(AEC)
-library(AER)
+
+
+
+
+
+```{r prof but with forecast library, eval=FALSE, include=FALSE}
 data("FrozenJuice")
 FJ <- as.data.frame(FrozenJuice)
 date <- time(FrozenJuice)
-price <- FJ$price/FJ$ppi
+
+# Real price = nominal / PPI
+price <- FJ$price / FJ$ppi
 T <- length(price)
-k <- 1
-dprice = 100*diff(log(price))
-fdd <- FJ$fdd[(k+1):T]
-par(mfrow=c(3,1)) #ignore (for plot)
-par(plt=c(.1,.95,.15,.75)) #ignore (for plot)
-plot(date,price,type="l",xlab="",ylab="",
-     main="(a) Price of orange Juice")
-plot(date,c(NaN,dprice),type="l",xlab="",ylab="",
-     main="(b) Monthly pct Change (y)")
-plot(date,FJ$fdd,type="l",xlab="",ylab="",
-     main="(c) Number of freezing days (x)")
 
+# Compute percent change
+dprice <- 100 * diff(log(price))
+
+# Create lagged exogenous variables (3 lags of fdd)
 nb.lags <- 3
-FDD <- FJ$fdd[(nb.lags+1):T]
-names.FDD <- NULL
-for(i in 1:nb.lags){
-  FDD <- cbind(FDD,FJ$fdd[(nb.lags+1-i):(T-i)])
-  names.FDD <- c(names.FDD,paste(" Lag ",toString(i),sep=""))}
-colnames(FDD) <- c(" Lag 0",names.FDD)
-dprice <- dprice[(length(dprice)-dim(FDD)[1]+1):length(dprice)]
-eq <- lm(dprice~FDD)
-# Compute the Newey-West std errors:
-var.cov.mat <- NeweyWest(eq,lag = 7, prewhite = FALSE)
+FDD <- embed(FJ$fdd, nb.lags + 1)
+colnames(FDD) <- paste0("Lag_", 0:nb.lags)
+
+# Align dprice to match FDD rows
+dprice_aligned <- tail(dprice, nrow(FDD))
+# Fit ARMAX(0,0) with 3 exogenous lags
+fit_armax <- Arima(dprice_aligned, order = c(0,0,0), xreg = FDD)
+
+summary(fit_armax)
+# Refit using lm for robust SEs
+eq <- lm(dprice_aligned ~ FDD)
+
+# Compute Newey-West HAC standard errors
+var.cov.mat <- NeweyWest(eq, lag = 7, prewhite = FALSE)
 robust_se <- sqrt(diag(var.cov.mat))
-# Stargazer output (with and without Robust SE)
-stargazer::stargazer(eq, eq, type = "text",
-                     column.labels=c("(no HAC)","(HAC)"),keep.stat="n",
-                     se = list(NULL,robust_se),no.space = TRUE)
 
-nb.lags.exog <- 1 # number of lags of exog. variable
-FDD <- FJ$fdd[(nb.lags.exog+1):T]
-for(i in 1:nb.lags.exog){
-  FDD <- cbind(FDD,FJ$fdd[(nb.lags.exog+1-i):(T-i)])}
-dprice <- 100*log(price[(k+1):T]/price[1:(T-k)])
-dprice <- dprice[(length(dprice)-dim(FDD)[1]+1):length(dprice)]
-res.armax <- estim.armax(Y = dprice,p=3,q=0,X=FDD)
+# Stargazer output
+stargazer(eq, eq, type = "text",
+          column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
+          se = list(NULL, robust_se), no.space = TRUE)
 
-nb.periods <- 20
-IRF1 <- sim.arma(c=0,phi=c(0),theta=eq$coefficients[2:(nb.lags+1)],sigma=1,
-                 T=nb.periods,y.0=c(0),nb.sim=1,make.IRF=1)
-IRF2 <- sim.arma(c=0,phi=res.armax$phi,theta=res.armax$beta,sigma=1,
-                 T=nb.periods,y.0=rep(0,length(res.armax$phi)),
-                 nb.sim=1,make.IRF=1)
-par(plt=c(.15,.95,.2,.95))
-plot(IRF1,type="l",lwd=2,col="red",xlab="months after shock",
-     ylab="Chge in price (percent)")
-lines(IRF2,lwd=2,col="red",lty=2)
-abline(h=0,col="grey")
 ```
+
+
+
+
+
 
 
 

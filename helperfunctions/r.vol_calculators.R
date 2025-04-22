@@ -18,8 +18,8 @@ library(dplyr)
 
 r.vol_day = function(data){
   p_t = data$close
-  #delta_price = diff(p_t)
-  delta_price = diff(log(p_t))
+  delta_price = diff(p_t)
+  #delta_price = diff(log(p_t))
   delta_price_sqr = delta_price^2
   v_t = mean(delta_price_sqr, na.rm=T)
   return(v_t) #t as the day
@@ -51,8 +51,8 @@ r.vol_day_hour <- function(data) {
   for (h in seq_along(hours)) {
     subset_data <- data[data$hour == hours[h], ]
     p_h <- subset_data$close
-    #delta_price <- diff(p_h)
-    delta_price <- diff(log(p_h))
+    delta_price <- diff(p_h)
+    #delta_price <- diff(log(p_h))
     delta_price_sqr = delta_price^2
     r_vol[h] <- mean(delta_price_sqr, na.rm = TRUE)
   }
