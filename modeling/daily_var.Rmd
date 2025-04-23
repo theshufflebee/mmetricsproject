@@ -1,0 +1,185 @@
+---
+title: "daily_var"
+output: html_document
+---
+
+```{r}
+require("fredr")
+require(here)
+require(stringr)
+require(dplyr)
+require(ggplot2)
+require(lubridate)
+require(RColorBrewer)
+require(wordcloud)
+require(tidyr)
+require(randomForest)
+require(tidytext)
+require(textstem)
+require(tidyverse)
+require(tm)
+require(SnowballC)
+require(quanteda.textplots)
+require(quantmod)
+require(alphavantager)
+require(quanteda)
+require(rvest)
+require(httr)
+require(xml2)
+require(textdata)
+require(sentimentr)
+require(syuzhet)
+require(text)
+require(xts)
+require(tseries)
+require(vars)
+require(BVAR)
+
+truths_raw <- read.csv(here("data/political_data", "truths_new.csv"))
+snp_raw <- read.csv(here("data/market_data", "SPY_24_25.csv"))
+
+source(here("helperfunctions/truths_cleaning_function.R"))
+```
+
+```{r}
+fredr_set_key(Sys.getenv("FRED_API_KEY"))
+```
+
+```{r}
+# time window
+start_date <- as.Date("2015-01-01")
+end_date <- Sys.Date()
+
+# VIX
+vix_data <- fredr(
+  series_id = "VIXCLS",
+  observation_start = start_date,
+  observation_end = end_date
+)
+
+# S&P500
+sp500_data <- fredr(
+  series_id = "SP500",
+  observation_start = start_date,
+  observation_end = end_date
+)
+
+vix_df <- vix_data %>%
+  select(date, vix = value)
+
+sp500_df <- sp500_data %>%
+  select(date, sp500 = value)
+
+# Merge into one dataframe
+combined_df <- left_join(sp500_df, vix_df, by = "date")
+head(combined_df)
+
+```
+
+```{r}
+truths <-truths_processer(truths_raw) # can take one or two minutes
+head(truths)
+```
+
+
+```{r}
+daily_truths <- truths %>%
+  group_by(day) %>%
+  summarise(
+    posts = paste(post, collapse = " "),  # Combine tweets for the day
+    tweet_count = n(),                         # Optional: number of tweets
+    .groups = "drop"
+  )
+```
+
+
+```{r}
+analysis_df <- left_join(daily_truths, combined_df, by = c("day" = "date"))
+analysis_clean_df <- analysis_df %>%
+  drop_na(sp500)
+
+```
+
+```{r}
+analysis_clean_df <- analysis_clean_df %>%
+  mutate(
+    sp_ret = log(sp500 / lag(sp500)),
+    vix_change = log(vix / lag(vix))
+  )
+```
+
+
+```{r}
+nrc_scores <- get_nrc_sentiment(analysis_clean_df$posts)
+
+analysis_final_df <- bind_cols(analysis_clean_df, nrc_scores)
+```
+
+```{r}
+analysis_norm_df <- analysis_final_df %>%
+  mutate(
+    norm_anger = anger / tweet_count,
+    norm_anticipation = anticipation / tweet_count,
+    norm_disgust= disgust / tweet_count,
+    norm_fear = fear / tweet_count,
+    norm_joy   = joy / tweet_count,
+    norm_sadness = sadness / tweet_count,
+    norm_surprise = surprise / tweet_count,
+    norm_trust = trust / tweet_count,
+    norm_negative = negative / tweet_count,
+    norm_positive = positive / tweet_count
+  )
+
+analysis_norm_df <- na.omit(analysis_norm_df) #drops first row (just announcement)
+
+```
+
+
+```{r}
+
+ts_data <- xts(analysis_norm_df[, c("vix_change", "sp_ret", "norm_anger", "norm_anticipation", "norm_disgust", "norm_fear",  "norm_joy", "norm_sadness", "norm_surprise", "norm_trust",  "norm_negative", "norm_positive", "tweet_count")], 
+               order.by = analysis_norm_df$day)
+```
+
+```{r}
+# ADF stationary test for each column
+adf_test_results <- apply(ts_data, 2, function(x) adf.test(x)$p.value) #2 means columns
+
+# print p values (greater than 0.05 non stationry?)
+adf_test_results
+```
+
+
+```{r}
+# Determine optimal lag length using AIC
+lag_selection <- VARselect(ts_data, lag.max = 15, type = "const")  # You can adjust lag.max based on your data
+
+# View the lag length selection
+lag_selection$selection
+```
+
+
+```{r}
+# Fit the VAR model with the chosen lag length
+var_model <- VAR(ts_data, p = lag_selection$selection["AIC(n)"], type = "const")
+
+# Check the summary of the model
+summary(var_model)
+```
+
+```{r}
+bvar_model <- bvar(
+  data = ts_data,
+  lags = 1,
+  hyper = set_hyper(lambda = 0.2, alpha = 2) # lambda is shrinkage, alpha is lag punishment -> lag 1 doesnt matter
+)
+```
+
+```{r}
+summary(bvar_model)
+```
+
+
+
+
+

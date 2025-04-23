@@ -212,7 +212,7 @@ train_index <- sample(1:nrow(rfdf), size = 0.8 * nrow(rfdf))  # 80% training dat
 train_data <- rfdf[train_index, ]
 test_data <- rfdf[-train_index, ]
 
-rf_model <- randomForest(minute_return ~ ., data = train_data, importance = TRUE, ntree = 10)
+rf_model <- randomForest(minute_return ~ ., data = train_data, importance = TRUE, ntree = 200)
 #importance(rf_model)
 varImpPlot(rf_model, n.var = 10)
 ```
