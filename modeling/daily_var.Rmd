@@ -64,11 +64,15 @@ sp500_data <- fredr(
   observation_end = end_date
 )
 
+# VIX
 vix_df <- vix_data %>%
-  select(date, vix = value)
+  mutate(vix = value) %>%
+  dplyr::select(date, vix)
 
+# S&P500
 sp500_df <- sp500_data %>%
-  select(date, sp500 = value)
+  mutate(sp500 = value) %>%
+  dplyr::select(date, sp500)
 
 # Merge into one dataframe
 combined_df <- left_join(sp500_df, vix_df, by = "date")
@@ -82,23 +86,43 @@ head(truths)
 ```
 
 
+
+```{r}
+# This adjust for the fact that tweets after closure only affect market in the next day (every tweet after 16:00 gets moved to next day)
+truths$analysis_day <- case_when(
+  truths$time_numeric <= 16 ~ as.Date(truths$day),    # before or at market close (16:00)
+  truths$time_numeric > 16 ~ as.Date(truths$day) + 1, # after market close
+  TRUE ~ as.Date(truths$day) # fallback
+)
+
+```
+
 ```{r}
 daily_truths <- truths %>%
-  group_by(day) %>%
+  group_by(analysis_day) %>%
   summarise(
-    posts = paste(post, collapse = " "),  # Combine tweets for the day
-    tweet_count = n(),                         # Optional: number of tweets
+    posts = paste(post, collapse = " "),  # Combine tweets on each day
+    tweet_count = n(),                         # add number of days
     .groups = "drop"
   )
 ```
 
 
 ```{r}
-analysis_df <- left_join(daily_truths, combined_df, by = c("day" = "date"))
-analysis_clean_df <- analysis_df %>%
-  drop_na(sp500)
-
+# Join dataframes and clean up
+analysis_clean_df <- daily_truths %>%
+  # Shift analysis_day back by one day to reflect its influence on the market
+  mutate(analysis_day_1 = analysis_day - lubridate::days(1)) %>%
+  # Join with combined_df on the adjusted analysis_day
+  left_join(combined_df, by = c("analysis_day" = "date")) %>%
+  # Remove rows with NA values in the 'sp500' column
+  drop_na(sp500) %>%
+  # Rename 'analysis_day' to 'day' for consistency
+  rename(day = analysis_day)
 ```
+
+
+
 
 ```{r}
 analysis_clean_df <- analysis_clean_df %>%
@@ -134,10 +158,20 @@ analysis_norm_df <- na.omit(analysis_norm_df) #drops first row (just announcemen
 
 ```
 
+```{r}
+head(analysis_norm_df)
+```
+
+
+
+
+for below full vector: c("vix_change", "sp_ret", "norm_anger", "norm_anticipation", "norm_disgust", "norm_fear",  "norm_joy", "norm_sadness", "norm_surprise", "norm_trust",  "norm_negative", "norm_positive", "tweet_count")
 
 ```{r}
 
-ts_data <- xts(analysis_norm_df[, c("vix_change", "sp_ret", "norm_anger", "norm_anticipation", "norm_disgust", "norm_fear",  "norm_joy", "norm_sadness", "norm_surprise", "norm_trust",  "norm_negative", "norm_positive", "tweet_count")], 
+variables <- c("vix_change", "sp_ret","norm_negative", "norm_positive", "tweet_count")
+
+ts_data <- xts(analysis_norm_df[, variables], 
                order.by = analysis_norm_df$day)
 ```
 
@@ -170,14 +204,17 @@ summary(var_model)
 ```{r}
 bvar_model <- bvar(
   data = ts_data,
-  lags = 1,
-  hyper = set_hyper(lambda = 0.2, alpha = 2) # lambda is shrinkage, alpha is lag punishment -> lag 1 doesnt matter
+  lags = 7,
+  hyper = set_hyper(lambda = 0.5, alpha = 3) # lambda is shrinkage, alpha is lag punishment -> lag 1 doesnt matter
 )
 ```
 
 ```{r}
 summary(bvar_model)
 ```
+
+#check problem of causality -> tweets after trading hour
+
 
 
 

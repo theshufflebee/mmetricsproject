@@ -1,0 +1,165 @@
+---
+title: "daily_var_2"
+output: html_document
+---
+
+# Load necessary packages
+```{r, message=FALSE, warning=FALSE}
+require("fredr")
+require(here)
+require(stringr)
+require(dplyr)
+require(ggplot2)
+require(lubridate)
+require(RColorBrewer)
+require(wordcloud)
+require(tidyr)
+require(randomForest)
+require(tidytext)
+require(textstem)
+require(tidyverse)
+require(tm)
+require(SnowballC)
+require(quanteda.textplots)
+require(quantmod)
+require(alphavantager)
+require(quanteda)
+require(rvest)
+require(httr)
+require(xml2)
+require(textdata)
+require(sentimentr)
+require(syuzhet)
+require(text)
+require(xts)
+require(tseries)
+require(vars)
+require(BVAR)
+
+truths_raw <- read.csv(here("data/political_data", "truths_new.csv"))
+snp_raw <- read.csv(here("data/market_data", "SPY_24_25.csv"))
+
+source(here("helperfunctions/truths_cleaning_function.R"))
+```
+
+# Get FRED Data
+```{r}
+fredr_set_key(Sys.getenv("FRED_API_KEY"))
+```
+
+```{r}
+# time window
+start_date <- as.Date("2015-01-01")
+end_date <- Sys.Date()
+
+# VIX
+vix_data <- fredr(
+  series_id = "VIXCLS",
+  observation_start = start_date,
+  observation_end = end_date
+)
+
+# S&P500
+sp500_data <- fredr(
+  series_id = "SP500",
+  observation_start = start_date,
+  observation_end = end_date
+)
+
+# VIX
+vix_df <- vix_data %>%
+  mutate(vix = value) %>%
+  dplyr::select(date, vix)
+
+# S&P500
+sp500_df <- sp500_data %>%
+  mutate(sp500 = value) %>%
+  dplyr::select(date, sp500)
+
+# Merge into one dataframe
+combined_df <- left_join(sp500_df, vix_df, by = "date")
+head(combined_df)
+
+```
+
+# Issue 1: How does causality work?
+There are two ways. First trump tweets and then the market reacts. Here we use market close so all tweets drom day 1 market close to day 2 market close affect stock prices on day 2. But there is also the very reasonable assumption that the stock market affects trumps tweets. Therefore we use a VAR model to model how the different sentiments of tweets, tweet volume affect VIX, S&P500.
+
+
+# Load Truths
+
+```{r}
+truths <-truths_processer(truths_raw) # can take one or two minutes
+```
+
+
+
+```{r}
+# Assuming you have a 'truths' dataframe with 'time' and 'date' columns
+start_date <- min(truths$day)  # First date (earliest tweet)
+end_date <- max(truths$day)    # Last date (latest tweet)
+
+# Create a vector of all dates from start to end
+date_vector <- seq.Date(from = start_date, to = end_date, by = "day")
+date_df <- data.frame(day = date_vector)
+```
+
+
+# This groups posts by day
+You have multiple posts a day that we need to summarize what tweets do influence the market at what point. Due to the structure of the VAR a tweet during t affects variables at t+1 and is affected by t-1. therefore we move all pre and during market tweets one day back. so a tweet is lagged that is shows up a day earlier in the analysis to it affects VIX and S&P on current day
+```{r}
+truths$lag_day <- case_when(
+  truths$time_numeric <= 16 ~ as.Date(truths$day) - 1,    # before or at market close (16:00)
+  truths$time_numeric > 16 ~ as.Date(truths$day), # after market close
+  TRUE ~ as.Date(truths$day) # fallback
+)
+
+```
+
+```{r}
+daily_truths <- truths %>%
+  group_by(lag_day) %>%
+  summarise(
+    posts = paste(post, collapse = " "),  # Combine tweets on each day
+    tweet_count = n(),                         # add number of days
+    .groups = "drop"
+  )
+```
+
+
+```{r}
+combined_data <- left_join(date_df, combined_df, by = c("day" = "date"))
+
+# Left join tweet data (with lag_day adjustments) to the combined_data
+final_data <- left_join(combined_data, daily_truths, by = c("day" = "lag_day")) #%>%
+  #drop_na(sp500)  # Optional: remove rows where market data is missing
+
+# View the final dataframe
+head(final_data)
+
+```
+
+```{r}
+# Backfill the 'sp500' column: fill missing (NA) values with the previous available value
+filled_data <- final_data %>%
+  arrange(day) %>%
+  mutate(sp500 = zoo::na.locf(sp500, na.rm = FALSE))  # Backward fill (carry last observation forward)
+
+filled_data <- filled_data %>%
+  group_by(sp500) %>%
+  summarise(
+    tweet_count = n(),  # Count of tweets for each sp500 value
+    posts = paste(posts, collapse = " "),  # Combine all tweet texts
+    day = max(day),  # Keep the first date (earliest) for each sp500 value
+    .groups = "drop"  # Drop the groupings after summarizing
+  )
+
+
+# View the resulting data
+head(filled_data)
+```
+
+
+
+
+
