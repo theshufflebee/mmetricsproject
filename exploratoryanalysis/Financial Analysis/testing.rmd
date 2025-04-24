@@ -363,6 +363,7 @@ dfm <- dfm(tokens)
 tweets = as.data.table(tweets)
 names(tweets)[names(tweets) == 'date'] <- 'timestamp'
 tweets <- tweets[order(tweets$timestamp, decreasing=T), ]
+tweets$timestamp = as.POSIXct(tweets$timestamp,format = "%Y-%m-%d %H:%M:%S")
 
 #count by hour
 tweet_count = tweets[, .N, by=.(year(timestamp), month(timestamp), 
