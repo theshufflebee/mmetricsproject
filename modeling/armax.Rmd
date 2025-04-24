@@ -222,6 +222,26 @@ armax_dayfit$ICplot
 armax_dayfit$params
 
 ```
+## Tweet TEMP on Daily Volatility
+```{r ARMA-X duewemmy daily}
+
+Xreg = as.matrix(countvol_day[3:4])
+
+#find best armax model and fit
+armax_dayfit <- select_armax(countvol_day$r_vol_d, Xreg, 
+                       max_p = 5, max_q = 5, max_r = 5, criterion = "AIC")
+
+summary(armax_dayfit$model) 
+armax_dayfit$ICplot
+armax_dayfit$params
+
+y = countvol_day$r_vol_d
+x = Xreg
+ max_p = 3; max_q = 3; max_r = 5; criterion = "AIC"
+```
+
+
+
 
 
 

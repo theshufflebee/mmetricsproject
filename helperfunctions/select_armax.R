@@ -6,10 +6,24 @@ select_armax <- function(y, x, max_p = 3, max_q = 3, max_r = 5, criterion = "AIC
   
   #creating lags according to r
   create_lags <- function(x, r) {
-    if (r == 0) return(matrix(x, ncol = 1, dimnames = list(NULL, "Lag_0")))
-    lagged <- embed(x, r + 1)
-    colnames(lagged) <- paste0("Lag_", 0:r)
-    return(lagged)
+    if (is.null(dim(x))) {
+      x <- matrix(x, ncol = 1)
+    }
+    
+    #applying to each column of Xreg (for each exo variable)
+    lagged_list <- lapply(1:ncol(x), function(j) {
+      col <- x[, j]
+      if (r == 0) return(matrix(col, ncol = 1, dimnames = list(NULL, paste0("X", j, "_Lag_0"))))
+      embedded <- embed(col, r + 1)
+      colnames(embedded) <- paste0("X", j, "_Lag_", 0:r)
+      return(embedded)
+    })
+    
+    #ensure all matrices have the same number of rows
+    min_rows <- min(sapply(lagged_list, nrow))
+    lagged_list <- lapply(lagged_list, function(mat) tail(mat, min_rows))
+    
+    do.call(cbind, lagged_list)
   }
   
   #prepare results
