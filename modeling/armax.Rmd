@@ -1,0 +1,230 @@
+---
+title: "ARMA-X Analysis"
+output:
+  pdf_document: 
+    toc: true
+    fig_caption: yes
+    latex_engine: lualatex
+header-includes:
+  - \usepackage{amsmath}
+---
+\newpage
+
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwhich) #regression errors
+require(stargazer) #nice reg tables
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/select_armax.R"))
+```
+
+
+# Data 
+
+## Raw Data
+```{r rawdata_setup, results=FALSE, warning=FALSE, message=FALSE}
+
+# 1. Political
+
+#truthsocial
+raw_truths <- read.csv(here("data/political_data", "truths_new.csv"))
+
+#twitter
+raw_tweets <- read.csv(here("data/political_data", "tweets.csv"))
+
+
+# 2. Financial
+
+#S&P500
+data_loader(symbol="SPY")
+
+#STOXX50
+data_loader(symbol="VGK")
+
+#CSI 300 (China)
+data_loader(symbol="ASHR")
+
+```
+
+
+## Tweet Cleanup \& Count
+
+```{r tweets data and counting}
+
+tweets = raw_tweets
+
+#only keep original Tweets
+tweets <- tweets %>% filter(isRetweet != "t")
+tokens <- tokens(tweets$text)
+dfm <- dfm(tokens)
+
+#cleanup
+tweets = as.data.table(tweets)
+names(tweets)[names(tweets) == 'date'] <- 'timestamp'
+tweets <- tweets[order(tweets$timestamp, decreasing=T), ]
+
+#count by hour
+tweet_count = tweets[, .N, by=.(year(timestamp), month(timestamp), 
+                                day(timestamp), hour(timestamp))] 
+
+#fix timestamp
+tweet_count$timestamp = as.POSIXct(sprintf("%04d-%02d-%02d %02d:00:00", 
+                         tweet_count$year, tweet_count$month, tweet_count$day, 
+                         tweet_count$hour), format = "%Y-%m-%d %H:00:00")
+
+#remove useless columns and reorder by oldest first
+tweet_count = select(tweet_count, timestamp, N)
+tweet_count = tweet_count[ order(tweet_count$timestamp , decreasing = F ),]
+
+```
+
+
+## Truths Cleanup \& Count
+
+```{r truths data and counting}
+truthsbackup <- truths_processer(raw_truths) 
+
+#cleanup
+truths = as.data.table(truthsbackup)
+names(truths)[names(truths) == 'date_time_parsed'] <- 'timestamp'
+truths <- truths[order(truths$timestamp, decreasing=T), ]
+
+#count by hour
+truth_count = truths[, .N, by=.(year(timestamp), month(timestamp), 
+                                day(timestamp), hour(timestamp))] 
+
+#fix timestamp
+truth_count$timestamp = as.POSIXct(sprintf("%04d-%02d-%02d %02d:00:00", 
+                         truth_count$year, truth_count$month, truth_count$day, 
+                         truth_count$hour), format = "%Y-%m-%d %H:00:00")
+
+#remove useless columns and reorder by oldest first
+truth_count = select(truth_count, timestamp, N)
+truth_count = truth_count[ order(truth_count$timestamp , decreasing = F ),]
+
+```
+
+
+## Tweets \& Truths Merge
+```{r merging tweets & truths count}
+tt_count = rbind(tweet_count,truth_count) #tweets & truths 
+
+ggplot(tt_count, aes(x = timestamp, y = N)) +
+    geom_point(color = "#253494", size = 1) +
+    scale_x_datetime(date_labels = "%b %Y", date_breaks = "9 month") +
+    labs(title = "Trump Social Media Count",
+         x = NULL,
+         y = "number of tweets/truths") +
+    theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          plot.title = element_text(face = "bold", hjust = 0.5))
+```
+
+## Volatility - Daily
+```{r d first fix the data}
+
+#find daily volatility
+SPY_dvolatility_alltime = r.vol_daily(raw_SPY,merge=F)
+
+#select time period
+SPY_dvolatility = filter(SPY_dvolatility_alltime,
+                  between(timestamp, as.Date('2024-09-20'), as.Date('2025-04-10')))
+colnames(SPY_dvolatility)[1] <- "timestamp_day"
+tt_count = filter(tt_count,
+                  between(timestamp, as.Date('2024-09-20'), as.Date('2025-04-10')))
+
+```
+
+
+## Volatility - Hourly
+```{r h first fix the data}
+
+#find hourly volatility
+#NOTE: this ignores tweets made outside trading hours!!
+SPY_hvolatility_alltime = r.vol_hourly(raw_SPY,merge=F)
+
+#select time period
+SPY_hvolatility = filter(SPY_hvolatility_alltime,
+                  between(timestamp, as.Date('2024-09-20'), as.Date('2025-04-10')))
+colnames(SPY_hvolatility)[1] <- "timestamp_hour"
+tt_count = filter(tt_count,
+                  between(timestamp, as.Date('2024-09-20'), as.Date('2025-04-10')))
+
+```
+
+
+# ARMA-X Models
+
+
+## Tweet Count on Daily Volatility
+```{r ARMA-X daily}
+
+#take all relevant data for armax
+countvol_day = merge(SPY_dvolatility, tt_count, by.x = "timestamp_day", 
+                   by.y = "timestamp", all.x = T)
+
+#NA tweets means no tweets
+countvol_day$N[is.na(countvol_day$N)] = 0
+
+#find best armax model and fit
+armax_dayfit <- select_armax(countvol_day$r_vol_d, countvol_day$N, 
+                       max_p = 6, max_q = 6, max_r = 2, criterion = "AIC")
+
+summary(armax_dayfit$model) 
+armax_dayfit$ICplot
+armax_dayfit$params
+
+```
+
+
+## Tweet Count on Hourly Volatility
+```{r ARMA-X hourly}
+
+#take all relevant data for armax
+countvol_hour = merge(SPY_hvolatility, tt_count, by.x = "timestamp_hour", 
+                   by.y = "timestamp", all.x = T)
+
+#NA tweets means no tweets
+countvol_hour$N[is.na(countvol_hour$N)] = 0
+
+#find best armax model and fit
+armax_hourfit <- select_armax(countvol_hour$r_vol_h, countvol_hour$N, 
+                       max_p = 6, max_q = 6, max_r = 2, criterion = "AIC")
+
+summary(armax_hourfit$model) 
+armax_hourfit$ICplot
+armax_hourfit$params
+
+```
+
+
+
+
+

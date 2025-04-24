@@ -60,7 +60,7 @@ source(here("helperfunctions/plotters.R"))
 source(here("helperfunctions/quick_arma.R"))
 source(here("helperfunctions/r.vol_calculators.R"))
 source(here("helperfunctions/truths_cleaning_function.R"))
-source(here("helperfunctions/armax.R"))
+source(here("helperfunctions/select_armax.R"))
 ```
 
 
@@ -91,9 +91,6 @@ data_loader(symbol="SPY")
 
 #STOXX50
 data_loader(symbol="VGK")
-
-
-
 
 #CSI 300 (China)
 data_loader(symbol="ASHR")
