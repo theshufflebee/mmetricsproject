@@ -204,7 +204,7 @@ or below full vector: c("vix_change", "sp_ret", "norm_anger", "norm_anticipation
 
 ```{r}
 
-variables <- c("vix_change", "sp_ret", "norm_anger", "norm_anticipation", "norm_disgust", "norm_fear",  "norm_joy", "norm_sadness", "norm_surprise", "norm_trust",  "norm_negative", "norm_positive", "tweet_count")
+variables <- c("vix_change", "sp_ret", "norm_negative", "norm_positive", "norm_fear",  "norm_joy","norm_trust")
 ts_data <- xts(analysis_norm_df[, variables], 
                order.by = analysis_norm_df$day)
 ```
@@ -219,9 +219,9 @@ adf_test_results
 
 ```{r}
 # Determine optimal lag length using AIC
-lag_selection <- VARselect(ts_data, lag.max = 15, type = "const")  # You can adjust lag.max based on your data
+lag_selection <- VARselect(ts_data, lag.max = 15, type = "const")
 
-# View the lag length selection
+# View selection
 lag_selection$selection
 ```
 
