@@ -432,26 +432,18 @@ ggplot(tt_count, aes(x = timestamp, y = N)) +
 ## Hourly
 ```{r h first fix the data}
 #merge by matching the hours
-#SPY_prices = select(raw_SPY, timestamp, close, volume)
-#SPY_prices$timestamp <- as.POSIXct(raw_SPY$timestamp)
-#SPY_prices$timestamp_hour <- as.POSIXct(format(SPY_prices$timestamp,
-#                                               "%Y-%m-%d %H:00:00"))
-#prices dont make sense cuz not hourly
-#armax_price = merge(SPY_prices, truth_count, by.x = "timestamp_hour", 
-#                   by.y = "timestamp", all.x = TRUE)
-
-
-#merge by matching the hours
 #NOTE: this ignores tweets made outside trading hours!!
-SPY_volatility = r.vol_hourly(raw_SPY,merge=F)
-#since tweet database not full yet (combine tweets & truths)
-SPY_volatility = filter(SPY_volatility, 
-                        year(SPY_volatility$timestamp) >= 2022 & 
-                        month(SPY_volatility$timestamp) >= 03)
+SPY_volatility_alltime = r.vol_hourly(raw_SPY,merge=F)
+
+#select time period
+SPY_volatility = filter(SPY_volatility_alltime,
+                  between(timestamp, as.Date('2024-09-20'), as.Date('2025-04-10')))
 colnames(SPY_volatility)[1] <- "timestamp_hour"
+tt_count = filter(tt_count,
+                  between(timestamp, as.Date('2024-09-20'), as.Date('2025-04-10')))
 
 #take all relevant for armax
-armax_vol = merge(SPY_volatility, truth_count, by.x = "timestamp_hour", 
+armax_vol = merge(SPY_volatility, tt_count, by.x = "timestamp_hour", 
                    by.y = "timestamp", all.x = T)
 #NA tweets means no tweets
 armax_vol$N[is.na(armax_vol$N)] = 0
@@ -462,7 +454,7 @@ armax_vol$r_vol = armax_vol$r_vol_h
 ```
 
 ## Daily
-```{r d first fix the data}
+```{r d first fix the data, eval=FALSE, include=FALSE}
 #merge by matching the days
 
 SPY_volatility = r.vol_daily(raw_SPY,merge=F)
@@ -487,17 +479,17 @@ armax_vol$r_vol = armax_vol$r_vol_d
 
 ```{r ARMA-X}
 
-T <- length(armax_vol$r_vol_h)
+T <- length(armax_vol$r_vol)
 
 # Create lagged exogenous variables (3 lags of N)
-nb.lags <- 3
+nb.lags <- 2
 count_lags <- embed(armax_vol$N, nb.lags + 1)
 colnames(count_lags) <- paste0("Lag_", 0:nb.lags)
 
 # Align volatility to match count rows
 vol_aligned <- tail(armax_vol$r_vol, nrow(count_lags))
 # Fit ARMAX(0,0) with 3 exogenous lags
-fit_armax <- Arima(vol_aligned, order = c(1,0,2), xreg = count_lags)
+fit_armax <- Arima(vol_aligned, order = c(2,0,0), xreg = count_lags)
 fit_armax2 <- Arima(armax_vol$r_vol, order = c(1,0,2), xreg = armax_vol$N)
 fit_armax3 <- Arima(armax_vol$r_vol, order = c(1,0,2))
 
@@ -536,7 +528,7 @@ summary(best_model)
 
 ```{r}
 result <- select_armax(armax_vol$r_vol, armax_vol$N, 
-                       max_p = 3, max_q = 3, max_r = 5, criterion = "AIC")
+                       max_p = 6, max_q = 6, max_r = 5, criterion = "AIC")
 
 summary(result$model) 
 result$AICplot

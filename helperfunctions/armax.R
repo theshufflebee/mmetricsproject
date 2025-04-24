@@ -26,8 +26,8 @@ select_armax <- function(y, x, max_p = 3, max_q = 3, max_r = 5, criterion = "AIC
     
     #second loop for each AR(p)
     for (p in 0:max_p){
-      #third loop for each MA(q)
       
+      #third loop for each MA(q)
       for (q in 0:max_q){
         model <- tryCatch({
           Arima(y_trimmed, order = c(p, 0, q), xreg = x_lags)
