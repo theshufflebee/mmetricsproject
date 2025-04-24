@@ -49,8 +49,7 @@ select_armax <- function(y, x, max_p = 3, max_q = 3, max_r = 5, criterion = "AIC
   }
   
   #plot AIC/BIC vs r
-  
-   AICplot =  ggplot(scores_by_r, aes(x = r, y = score)) +
+   ICplot =  ggplot(scores_by_r, aes(x = r, y = score)) +
       geom_line(color = "steelblue", size = 1.2) +
       geom_point(color = "red", size = 2) +
       labs(title = paste(criterion, "vs Number of Exogenous Lags (r)"),
@@ -58,13 +57,13 @@ select_armax <- function(y, x, max_p = 3, max_q = 3, max_r = 5, criterion = "AIC
       theme_minimal()
   
   #results
-  list(
-    model = best_model,
-    params = best_params,
-    score = best_score,
-    criterion = criterion,
-    scores_by_r = scores_by_r,
-    AICplot = AICplot)
+   list(
+     model = best_model,
+     params = best_params,
+     score = best_score,
+     criterion = criterion,
+     scores_by_r = scores_by_r,
+     ICplot = ICplot)
 }
 
 

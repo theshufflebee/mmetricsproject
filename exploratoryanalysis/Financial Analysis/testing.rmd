@@ -445,97 +445,255 @@ tt_count = filter(tt_count,
 #take all relevant for armax
 armax_vol = merge(SPY_volatility, tt_count, by.x = "timestamp_hour", 
                    by.y = "timestamp", all.x = T)
+
 #NA tweets means no tweets
 armax_vol$N[is.na(armax_vol$N)] = 0
 
-#common names
-armax_vol$r_vol = armax_vol$r_vol_h
-
 ```
 
-## Daily
-```{r d first fix the data, eval=FALSE, include=FALSE}
-#merge by matching the days
+```{r ARMA-X hourly}
 
-SPY_volatility = r.vol_daily(raw_SPY,merge=F)
-#since tweet database not full yet (combine tweets & truths)
-SPY_volatility = filter(SPY_volatility, 
-                        year(SPY_volatility$timestamp) >= 2022 & 
-                        month(SPY_volatility$timestamp) >= 03)
-colnames(SPY_volatility)[1] <- "timestamp_day"
-
-#take all relevant for armax
-armax_vol = merge(SPY_volatility, truth_count, by.x = "timestamp_day", 
-                   by.y = "timestamp", all.x = T)
-#NA tweets means no tweets
-armax_vol$N[is.na(armax_vol$N)] = 0
-
-#common names
-armax_vol$r_vol = armax_vol$r_vol_d
-
-```
-
-
-
-```{r ARMA-X}
-
-T <- length(armax_vol$r_vol)
-
-# Create lagged exogenous variables (3 lags of N)
-nb.lags <- 2
+#create lagged exogenous variables (3 lags of N)
+nb.lags <- 3 #r
 count_lags <- embed(armax_vol$N, nb.lags + 1)
 colnames(count_lags) <- paste0("Lag_", 0:nb.lags)
 
-# Align volatility to match count rows
-vol_aligned <- tail(armax_vol$r_vol, nrow(count_lags))
-# Fit ARMAX(0,0) with 3 exogenous lags
-fit_armax <- Arima(vol_aligned, order = c(2,0,0), xreg = count_lags)
-fit_armax2 <- Arima(armax_vol$r_vol, order = c(1,0,2), xreg = armax_vol$N)
-fit_armax3 <- Arima(armax_vol$r_vol, order = c(1,0,2))
-
-summary(fit_armax)
-checkresiduals(fit_armax)
-summary(fit_armax2)
-checkresiduals(fit_armax2)
-summary(fit_armax3)
-checkresiduals(fit_armax3)
+#align volatility to match count rows (for lag)
+vol_aligned <- tail(armax_vol$r_vol_h, nrow(count_lags))
 
 
-# Refit using lm for robust SEs
+#choosing how many lags
+# fit an ARMA(0,0,0) model with lm (with r set above)
 eq <- lm(vol_aligned ~ count_lags)
 
-# Compute Newey-West HAC standard errors
+#compute Newey-West HAC standard errors
 var.cov.mat <- NeweyWest(eq, lag = 7, prewhite = FALSE)
 robust_se <- sqrt(diag(var.cov.mat))
 
-# Stargazer output
+#output table; significant lags are how many we choose
 stargazer(eq, eq, type = "text",
           column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
           se = list(NULL, robust_se), no.space = TRUE)
 
-# Choosing the best model
-best_model <- auto.arima(vol_aligned, xreg = count_lags, seasonal = FALSE,
-                         max.p = 5, max.q = 5, max.d = 0,
-                         stepwise = T, approximation = FALSE, trace = TRUE)
 
-summary(best_model)
-        
-```
-
-
-
-
-
-```{r}
-result <- select_armax(armax_vol$r_vol, armax_vol$N, 
-                       max_p = 6, max_q = 6, max_r = 5, criterion = "AIC")
+#do it automatically with fit
+result <- select_armax(armax_vol$r_vol_h, armax_vol$N, 
+                       max_p = 6, max_q = 6, max_r = 2, criterion = "AIC")
 
 summary(result$model) 
-result$AICplot
+result$ICplot
+result$params
+
+```
+
+
+## Daily
+```{r d first fix the data, eval=FALSE, include=FALSE}
+
+#merge by matching the hours
+
+SPY_volatility_alltime = r.vol_daily(raw_SPY,merge=F)
+
+#select time period
+SPY_volatility = filter(SPY_volatility_alltime,
+                  between(timestamp, as.Date('2024-09-20'), as.Date('2025-04-10')))
+colnames(SPY_volatility)[1] <- "timestamp_day"
+tt_count = filter(tt_count,
+                  between(timestamp, as.Date('2024-09-20'), as.Date('2025-04-10')))
+
+#take all relevant for armax
+armax_vol = merge(SPY_volatility, tt_count, by.x = "timestamp_day", 
+                   by.y = "timestamp", all.x = T)
+
+#NA tweets means no tweets
+armax_vol$N[is.na(armax_vol$N)] = 0
+
+```
+
+```{r ARMA-X daily}
+
+#create lagged exogenous variables (3 lags of N)
+nb.lags <- 3 #r
+count_lags <- embed(armax_vol$N, nb.lags + 1)
+colnames(count_lags) <- paste0("Lag_", 0:nb.lags)
+
+#align volatility to match count rows (for lag)
+vol_aligned <- tail(armax_vol$r_vol_d, nrow(count_lags))
+
+
+#choosing how many lags
+# fit an ARMA(0,0,0) model with lm (with r set above)
+eq <- lm(vol_aligned ~ count_lags)
+
+#compute Newey-West HAC standard errors
+var.cov.mat <- NeweyWest(eq, lag = 7, prewhite = FALSE)
+robust_se <- sqrt(diag(var.cov.mat))
+
+#output table; significant lags are how many we choose
+stargazer(eq, eq, type = "text",
+          column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
+          se = list(NULL, robust_se), no.space = TRUE)
+
+
+#do it automatically with fit
+result <- select_armax(armax_vol$r_vol_d, armax_vol$N, 
+                       max_p = 6, max_q = 6, max_r = 2, criterion = "AIC")
+
+summary(result$model) 
+result$ICplot
+result$params
+
 ```
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r ARMA-X old, eval=FALSE, include=FALSE}
+
+#create lagged exogenous variables (3 lags of N)
+nb.lags <- 3 #r
+count_lags <- embed(armax_vol$N, nb.lags + 1)
+colnames(count_lags) <- paste0("Lag_", 0:nb.lags)
+
+#align volatility to match count rows (for lag)
+vol_aligned <- tail(armax_vol$r_vol, nrow(count_lags))
+
+
+#choosing how many lags
+# fit an ARMA(0,0,0) model with lm (with r set above)
+eq <- lm(vol_aligned ~ count_lags)
+
+#compute Newey-West HAC standard errors
+var.cov.mat <- NeweyWest(eq, lag = 7, prewhite = FALSE)
+robust_se <- sqrt(diag(var.cov.mat))
+
+#output table; significant lags are how many we choose
+stargazer(eq, eq, type = "text",
+          column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
+          se = list(NULL, robust_se), no.space = TRUE)
+
+
+
+#reset value of r to reflect how many are actually significant
+#create lagged exogenous variables
+nb.lags <- 0
+count_lags <- embed(armax_vol$N, nb.lags + 1)
+colnames(count_lags) <- paste0("Lag_", 0:nb.lags)
+
+#align volatility to match count rows (for lag)
+vol_aligned <- tail(armax_vol$r_vol, nrow(count_lags))
+
+
+#how find the best (p,d,q) specification given r
+#BROKEN
+best_model <- auto.arima(vol_aligned, xreg = count_lags, seasonal = F,
+                         max.p = 6, max.q = 6, max.d = 0, ic="aic", 
+                         stepwise=F, approximation = F, trace = T)
+
+summary(best_model)
+checkresiduals(best_model)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+```{r temp, forget eval=FALSE, include=FALSE}
+
+select.armax2 = function(y, x, max_p = 3, max_q = 3, max_r = 5){
+
+  best_score = Inf
+  
+  for(i in 0:max_r){
+  #create lagged exogenous variables
+  nb.lags <- i
+  x_lags <- embed(x, nb.lags + 1)
+  colnames(x_lags) <- paste0("Lag_", 0:nb.lags)
+  
+  #align y
+  y_aligned <- tail(y, nrow(x_lags))
+  
+  # Choosing the best model for that r 
+  model <- auto.arima(y_aligned, xreg = x_lags, seasonal = FALSE,
+                           max.p = max_p, max.q = max_q, max.d = 0,
+                           stepwise = T, approximation = FALSE, trace = TRUE)
+  
+  #finding the AIC of it
+  score = best_model$aic
+  
+  if (score < best_score){
+    best_score <- score
+    best_model <- model
+  }}
+  return(model)
+  }
+  
+  
+select.armax2(armax_vol$r_vol,armax_vol$N)
+```
 
 
 
