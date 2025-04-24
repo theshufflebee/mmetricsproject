@@ -35,6 +35,7 @@ require(xts)
 require(tseries)
 require(vars)
 require(BVAR)
+require(bvartools)
 
 truths_raw <- read.csv(here("data/political_data", "truths_new.csv"))
 snp_raw <- read.csv(here("data/market_data", "SPY_24_25.csv"))
@@ -141,11 +142,19 @@ head(final_data)
 
 ```{r}
 # Backfill the 'sp500' column: fill missing (NA) values with the previous available value
-filled_data <- final_data %>%
+complete_data <- final_data %>%
   arrange(day) %>%
-  mutate(sp500 = zoo::na.locf(sp500, na.rm = FALSE))  # Backward fill (carry last observation forward)
+  mutate(sp500 = zoo::na.locf(sp500, na.rm = FALSE)) %>%# Backward fill (carry last observation forward)
+  mutate(vix = zoo::na.locf(vix, na.rm = FALSE))%>%
+  mutate(
+    sp_ret = log(sp500 / lag(sp500)),
+    vix_change = log(vix / lag(vix))
+    )
 
-filled_data <- filled_data %>%
+market_data <- complete_data %>% dplyr::select(-c(posts, tweet_count, sp500, vix))
+  
+
+filled_data <- complete_data %>%
   group_by(sp500) %>%
   summarise(
     tweet_count = n(),  # Count of tweets for each sp500 value
@@ -159,7 +168,69 @@ filled_data <- filled_data %>%
 head(filled_data)
 ```
 
+```{r}
+
+final_data <- left_join(filled_data, market_data, by = "day")
+
+```
+
+```{r}
+nrc_scores <- get_nrc_sentiment(final_data$posts)
+
+analysis_final_df <- bind_cols(final_data, nrc_scores)
+```
 
 
+```{r}
+analysis_norm_df <- analysis_final_df %>%
+  mutate(
+    norm_anger = anger / tweet_count,
+    norm_anticipation = anticipation / tweet_count,
+    norm_disgust= disgust / tweet_count,
+    norm_fear = fear / tweet_count,
+    norm_joy   = joy / tweet_count,
+    norm_sadness = sadness / tweet_count,
+    norm_surprise = surprise / tweet_count,
+    norm_trust = trust / tweet_count,
+    norm_negative = negative / tweet_count,
+    norm_positive = positive / tweet_count
+  )
 
+analysis_norm_df <- na.omit(analysis_norm_df) #drops first row (just announcement)
+```
+
+or below full vector: c("vix_change", "sp_ret", "norm_anger", "norm_anticipation", "norm_disgust", "norm_fear",  "norm_joy", "norm_sadness", "norm_surprise", "norm_trust",  "norm_negative", "norm_positive", "tweet_count")
+
+
+```{r}
+
+variables <- c("vix_change", "sp_ret", "norm_anger", "norm_anticipation", "norm_disgust", "norm_fear",  "norm_joy", "norm_sadness", "norm_surprise", "norm_trust",  "norm_negative", "norm_positive", "tweet_count")
+ts_data <- xts(analysis_norm_df[, variables], 
+               order.by = analysis_norm_df$day)
+```
+
+```{r}
+# ADF stationary test for each column
+adf_test_results <- apply(ts_data, 2, function(x) adf.test(x)$p.value) #2 means columns
+
+# print p values (greater than 0.05 non stationry?)
+adf_test_results
+```
+
+```{r}
+# Determine optimal lag length using AIC
+lag_selection <- VARselect(ts_data, lag.max = 15, type = "const")  # You can adjust lag.max based on your data
+
+# View the lag length selection
+lag_selection$selection
+```
+
+
+```{r}
+# Fit the VAR model with the chosen lag length
+var_model <- VAR(ts_data, p = lag_selection$selection["AIC(n)"], type = "const")
+
+# Check the summary of the model
+summary(var_model)
+```
 
