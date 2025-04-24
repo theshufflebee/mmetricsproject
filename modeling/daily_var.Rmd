@@ -179,7 +179,7 @@ ts_data <- xts(analysis_norm_df[, variables],
 # ADF stationary test for each column
 adf_test_results <- apply(ts_data, 2, function(x) adf.test(x)$p.value) #2 means columns
 
-# print p values (greater than 0.05 non stationry?)
+# print p values (p<0.05 means stationary, p>0.05 means explosive)
 adf_test_results
 ```
 
