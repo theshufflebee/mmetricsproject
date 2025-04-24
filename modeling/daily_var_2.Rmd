@@ -97,7 +97,7 @@ truths <-truths_processer(truths_raw) # can take one or two minutes
 
 ```{r}
 # Assuming you have a 'truths' dataframe with 'time' and 'date' columns
-start_date <- min(truths$day)  # First date (earliest tweet)
+start_date <- as.Date(min(truths$day)) - 3  # First date (earliest tweet) minus 3 for returns as first tweet is on monday
 end_date <- max(truths$day)    # Last date (latest tweet)
 
 # Create a vector of all dates from start to end
@@ -112,7 +112,7 @@ You have multiple posts a day that we need to summarize what tweets do influence
 truths$lag_day <- case_when(
   truths$time_numeric <= 16 ~ as.Date(truths$day) - 1,    # before or at market close (16:00)
   truths$time_numeric > 16 ~ as.Date(truths$day), # after market close
-  TRUE ~ as.Date(truths$day) # fallback
+  TRUE ~ as.Date(truths$day) # ??
 )
 
 ```
@@ -122,7 +122,7 @@ daily_truths <- truths %>%
   group_by(lag_day) %>%
   summarise(
     posts = paste(post, collapse = " "),  # Combine tweets on each day
-    tweet_count = n(),                         # add number of days
+    tweet_count = n(),                         # add number of tweets
     .groups = "drop"
   )
 ```
@@ -141,70 +141,112 @@ head(final_data)
 ```
 
 ```{r}
-# Backfill the 'sp500' column: fill missing (NA) values with the previous available value
-complete_data <- final_data %>%
+# Step 1: Create a new column with the *next available trading day*
+collapsed_data <- final_data %>%
   arrange(day) %>%
-  mutate(sp500 = zoo::na.locf(sp500, na.rm = FALSE)) %>%# Backward fill (carry last observation forward)
-  mutate(vix = zoo::na.locf(vix, na.rm = FALSE))%>%
+  mutate(
+    next_trading_day = zoo::na.locf(ifelse(!is.na(sp500), day, NA), fromLast = TRUE, na.rm = FALSE)
+  )
+
+# Step 2: Group by the next trading day and summarise
+collapsed_data <- collapsed_data %>%
+  group_by(next_trading_day) %>%
+  summarise(
+    sp500 = first(na.omit(sp500)),
+    vix = first(na.omit(vix)),
+    posts = paste(na.omit(posts), collapse = " "),
+    tweet_count = sum(tweet_count, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  rename(day = next_trading_day)
+
+collapsed_data <- collapsed_data %>%
+  mutate(day = as.Date(day, origin = "1970-01-01"))  # Adjust if necessary
+
+# Check the resulting 'day' column
+head(collapsed_data)
+
+
+```
+
+
+
+
+
+
+
+
+
+```{r}
+# Backfill the 'sp500' column: fill missing (NA) values with the previous available value
+complete_data <- collapsed_data %>%
   mutate(
     sp_ret = log(sp500 / lag(sp500)),
     vix_change = log(vix / lag(vix))
     )
+    
+complete_data <- complete_data %>%
+  slice(-1) 
 
-market_data <- complete_data %>% dplyr::select(-c(posts, tweet_count, sp500, vix))
-  
-
-filled_data <- complete_data %>%
-  group_by(sp500) %>%
-  summarise(
-    tweet_count = n(),  # Count of tweets for each sp500 value
-    posts = paste(posts, collapse = " "),  # Combine all tweet texts
-    day = max(day),  # Keep the first date (earliest) for each sp500 value
-    .groups = "drop"  # Drop the groupings after summarizing
-  )
-
-
-# View the resulting data
-head(filled_data)
+head(complete_data)
 ```
 
 ```{r}
 
-final_data <- left_join(filled_data, market_data, by = "day")
 
 ```
 
 ```{r}
-nrc_scores <- get_nrc_sentiment(final_data$posts)
+nrc_scores <- get_nrc_sentiment(complete_data$posts)
 
-analysis_final_df <- bind_cols(final_data, nrc_scores)
+analysis_final_df <- bind_cols(complete_data, nrc_scores)
 ```
 
 
 ```{r}
 analysis_norm_df <- analysis_final_df %>%
   mutate(
-    norm_anger = anger / tweet_count,
-    norm_anticipation = anticipation / tweet_count,
-    norm_disgust= disgust / tweet_count,
-    norm_fear = fear / tweet_count,
-    norm_joy   = joy / tweet_count,
-    norm_sadness = sadness / tweet_count,
-    norm_surprise = surprise / tweet_count,
-    norm_trust = trust / tweet_count,
-    norm_negative = negative / tweet_count,
-    norm_positive = positive / tweet_count
+    # Calculate total sentiment count (sum of all sentiment word counts)
+    total_sentiment = anger + anticipation + disgust + fear + joy + sadness + surprise + trust + negative + positive,
+    
+    # Normalize each sentiment by dividing by total sentiment to get the proportion of each sentiment
+    prop_anger = anger / total_sentiment,
+    prop_anticipation = anticipation / total_sentiment,
+    prop_disgust = disgust / total_sentiment,
+    prop_fear = fear / total_sentiment,
+    prop_joy = joy / total_sentiment,
+    prop_sadness = sadness / total_sentiment,
+    prop_surprise = surprise / total_sentiment,
+    prop_trust = trust / total_sentiment,
+    prop_negative = negative / total_sentiment,
+    prop_positive = positive / total_sentiment,
+    
+    # Calculate total sentiment per tweet by dividing total sentiment by tweet count
+    total_sentiment_per_tweet = total_sentiment / tweet_count,
+    
+    # Create binary variables for positive and negative returns using case_when
+    return_bin = case_when(
+      sp_ret > 0 ~ 1,
+      TRUE ~ 0
+    )
   )
 
-analysis_norm_df <- na.omit(analysis_norm_df) #drops first row (just announcement)
+
+
+
+analysis_norm_df[is.na(analysis_norm_df)] <- 0
+
+
 ```
 
 or below full vector: c("vix_change", "sp_ret", "norm_anger", "norm_anticipation", "norm_disgust", "norm_fear",  "norm_joy", "norm_sadness", "norm_surprise", "norm_trust",  "norm_negative", "norm_positive", "tweet_count")
 
+"prop_anger", "prop_anticipation", "prop_disgust", "prop_fear", "prop_joy", "prop_sadness", "prop_surprise", "prop_trust",                "prop_negative", "prop_positive", "total_sentiment_per_tweet"
+
 
 ```{r}
 
-variables <- c("vix_change", "sp_ret", "norm_negative", "norm_positive", "norm_fear",  "norm_joy","norm_trust")
+variables <- c("return_bin", "prop_anticipation", "prop_disgust", "prop_fear", "prop_joy", "prop_sadness", "prop_surprise", "prop_trust", "prop_negative", "prop_positive", "total_sentiment_per_tweet")
 ts_data <- xts(analysis_norm_df[, variables], 
                order.by = analysis_norm_df$day)
 ```
@@ -225,12 +267,27 @@ lag_selection <- VARselect(ts_data, lag.max = 15, type = "const")
 lag_selection$selection
 ```
 
+lag_selection$selection["AIC(n)"]
 
 ```{r}
 # Fit the VAR model with the chosen lag length
-var_model <- VAR(ts_data, p = lag_selection$selection["AIC(n)"], type = "const")
+var_model <- VAR(ts_data, p = 2, type = "const")
 
 # Check the summary of the model
 summary(var_model)
 ```
+```{r}
+bvar_model <- bvar(
+  data = ts_data,
+  lags = 1,
+  hyper = set_hyper(lambda = 0.5, alpha = 3) # lambda is shrinkage, alpha is lag punishment -> lag 1 doesnt matter
+)
+```
+
+```{r}
+coef(bvar_model)
+```
+
+
+
 
