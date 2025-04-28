@@ -276,17 +276,17 @@ var_model <- VAR(ts_data, p = 2, type = "const")
 # Check the summary of the model
 summary(var_model)
 ```
-```{r}
+```{r eval=FALSE, include=FALSE}
 bvar_model <- bvar(
   data = ts_data,
   lags = 1,
   hyper = set_hyper(lambda = 0.5, alpha = 3) # lambda is shrinkage, alpha is lag punishment -> lag 1 doesnt matter
 )
-```
 
-```{r}
 coef(bvar_model)
 ```
+
+
 
 
 
