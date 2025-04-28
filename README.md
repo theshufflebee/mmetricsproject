@@ -24,10 +24,13 @@ Models:
 
 1) ARMAX: Tweet Count & Tweet Dummy on Volatility 
 -> Question: How to select lags? select_armax uses AIC but prof uses regression and checks significance? Then use AIC?
+-> Tweets really exogenous? Doubt
 
-2) VAR:
+3) VAR: Tweet Sentiment on Returns (FRED -> daily, not intraday)
+-> Not useful 
 
-3) GARCH: 
+5) GARCH: Tweet Dummy on Log Returns (because predicts volatility)
+->
 
 
 
