@@ -201,17 +201,16 @@ var_model <- VAR(ts_data, p = lag_selection$selection["AIC(n)"], type = "const")
 summary(var_model)
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 bvar_model <- bvar(
   data = ts_data,
   lags = 7,
   hyper = set_hyper(lambda = 0.5, alpha = 3) # lambda is shrinkage, alpha is lag punishment -> lag 1 doesnt matter
 )
+
+V
 ```
 
-```{r}
-summary(bvar_model)
-```
 
 #check problem of causality -> tweets after trading hour
 
