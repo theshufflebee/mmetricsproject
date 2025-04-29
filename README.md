@@ -22,17 +22,17 @@ Data:
 
 Models:
 
-Question: Calculate Realised Volatility then use ARMA/VAR or calculate Returns and use GARCH?
 
 1) ARMAX: Tweet Count & Tweet Dummy on Volatility 
 -> Question: How to select lags? select_armax uses AIC but prof uses regression and checks significance? Then use AIC?
+   Prof says can use both 
 -> Tweets really exogenous? Doubt
-
+   On volatility? Possibly
 3) VAR: Tweet Sentiment on Returns (FRED -> daily, not intraday)
--> Not useful 
+-> Work on specification
 
 5) GARCH: Tweet Dummy on Log Returns (because predicts volatility)
-->
+-> rip
 
 
 
