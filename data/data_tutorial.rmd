@@ -62,7 +62,34 @@ Intra-Day Analysis: https://arxiv.org/html/2406.17198v1
 - VTHR = Russell 3000 (US)
 - VTI = CRSP US Total Market Index
 - VGK = Euro Stoxx 50
-- DAX = German Market Index
-- ??? = Euro Stoxx 600
-- ??? = some world index
 - ASHR = basically china
+
+
+```{r mothership merge}
+#create dataframe each minute since 2010
+
+
+#merge with raw_financial and raw_socialmedia
+
+
+
+```
+
+
+```{r mothership add}
+# 1. Add count for tweets
+
+
+# 2. Sentiments
+
+# 3. Dummy Tweet
+
+# 4. DUmmy Important Word
+
+# 5. Dummy Emotional Word
+
+```
+
+
+
+
