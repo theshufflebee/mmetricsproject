@@ -84,7 +84,7 @@ Intra-Day Analysis: https://arxiv.org/html/2406.17198v1
 
 # 3. Dummy Tweet
 
-# 4. DUmmy Important Word
+# 4. Dummy Important Word
 
 # 5. Dummy Emotional Word
 
