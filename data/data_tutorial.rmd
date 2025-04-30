@@ -96,6 +96,9 @@ names(tweets)[names(tweets) == 'date'] <- 'timestamp'
 tweets <- tweets[order(tweets$timestamp, decreasing=T), ]
 tweets$timestamp = as.POSIXct(tweets$timestamp,format = "%Y-%m-%d %H:%M:%S")
 
+#nrc_scores <- get_nrc_sentiment(complete_data$posts)
+
+
 # 2. Truths 
 truthsbackup <- truths_processer(raw_truths) 
 
@@ -115,6 +118,7 @@ raw_ASHR$timestamp = as.POSIXct(raw_ASHR$timestamp,format = "%Y-%m-%d %H:%M:%S")
 
 # Raw Data Save
 ```{r data save}
+
 #financial
 write.csv(raw_SPY, here("data/mothership/raw_SPY.csv"))
 write.csv(raw_VGK, here("data/mothership/raw_VGK.csv"))
@@ -122,8 +126,8 @@ write.csv(raw_ASHR, here("data/mothership/raw_ASHR.csv"))
 
 #social media
 write.table(tweets, here("data/mothership/tweets.csv"))
+truths <- apply(truths,2,as.character)
 write.table(truths, here("data/mothership/truths.csv"))
-
 
 ```
 
