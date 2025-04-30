@@ -86,8 +86,8 @@ tokens <- tokens(tweets$text)
 dfm <- dfm(tokens)
 
 #cleanup
-tweets = as.data.table(tweets)
-names(tweets)[names(tweets) == 'date'] <- 'timestamp'
+tweets = data.frame(tweets$date,tweets$text)
+colnames(tweets) = c("timestamp","tweet_text")
 tweets$timestamp = as.POSIXct(tweets$timestamp,format = "%Y-%m-%d %H:%M:%S")
 second(tweets$timestamp) = 0
 
@@ -96,10 +96,12 @@ second(tweets$timestamp) = 0
 
 # 2. Truths 
 truthsbackup <- truths_processer(raw_truths) 
+truths = truthsbackup
 
 #cleanup
-truths = as.data.table(truthsbackup)
-names(truths)[names(truths) == 'date_time_parsed'] <- 'timestamp'
+truths <- truths %>% filter(media != 1)
+truths = data.frame(truths$date_time_parsed,truths$post)
+colnames(truths) = c("timestamp","truths_text")
 truths$timestamp = as.POSIXct(truths$timestamp,format = "%Y-%m-%d %H:%M:%S")
 second(truths$timestamp) = 0
 
@@ -118,18 +120,17 @@ colnames(ASHR)[-1] <- paste0("ASHR", colnames(ASHR)[-1])
 
 ```
 
-# Raw Data Save
+# Data Save
 ```{r data save}
 
 #financial
-write.csv(SPY, here("data/mothership/SPY.csv"))
-write.csv(VGK, here("data/mothership/VGK.csv"))
-write.csv(ASHR, here("data/mothership/ASHR.csv"))
+write.csv(SPY, here("data/mothership/SPY.csv"), row.names=F)
+write.csv(VGK, here("data/mothership/VGK.csv"), row.names=F)
+write.csv(ASHR, here("data/mothership/ASHR.csv"), row.names=F)
 
 #social media
-write.table(tweets, here("data/mothership/tweets.csv"))
-truths <- apply(truths,2,as.character) #fix BROKEN
-write.table(truths, here("data/mothership/truths.csv"))
+write.csv(tweets, here("data/mothership/tweets.csv"), row.names=F)
+write.csv(truths, here("data/mothership/truths.csv"), row.names=F)
 
 ```
 
@@ -140,27 +141,11 @@ write.table(truths, here("data/mothership/truths.csv"))
 ```{r mothership merge}
 
 #this will become a function
-#first load all datasets in mothership folder
-
-#mothership base (dataframe with each minute since 2010)
-mothership <- data.frame(timestamp = seq(as.POSIXct("2019-01-01"),
-                                as.POSIXct("2020-04-16"), 
-                                by=(1*60)))
-
-#make posixct
-SPY$timestamp = as.POSIXct(SPY$timestamp,format = "%Y-%m-%d %H:%M:%S")
-VGK$timestamp = as.POSIXct(VGK$timestamp,format = "%Y-%m-%d %H:%M:%S")
-ASHR$timestamp = as.POSIXct(ASHR$timestamp,format = "%Y-%m-%d %H:%M:%S")
-tweets$timestamp = as.POSIXct(tweets$timestamp,format = "%Y-%m-%d %H:%M:%S")
-truths$timestamp = as.POSIXct(truths$timestamp,format = "%Y-%m-%d %H:%M:%S")
+rm(list=ls())
+source(here("helperfunctions/fulldata_loader.R"))
 
 
-#merge with financial and socialmedia
-mothership = left_join(mothership, SPY, by = "timestamp")
-mothership = left_join(mothership, VGK, by = "timestamp")
-mothership = left_join(mothership, ASHR, by = "timestamp")
-mothership = left_join(mothership, tweets, by = "timestamp")
-mothership = left_join(mothership, truths, by = "timestamp")
+
 
 ```
 

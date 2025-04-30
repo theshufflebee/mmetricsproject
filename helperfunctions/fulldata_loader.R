@@ -1,10 +1,10 @@
 # 1. Load Political 
 
-#truthsocial
-truths <- read.csv(here("data/mothership", "truths.csv"))
-
 #twitter
 tweets <- read.csv(here("data/mothership", "tweets.csv"))
+
+#truthsocial
+truths <- read.csv(here("data/mothership", "truths.csv"))
 
 
 # 2. Load Financial
@@ -45,5 +45,4 @@ mothership = left_join(mothership, truths, by = "timestamp")
 
 
 #remove intermediary steps
-int_list = ls(tweets,truths,SPY,VGK,ASHR)
-
+rm(tweets,truths,SPY,VGK,ASHR)
