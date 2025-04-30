@@ -113,6 +113,20 @@ raw_ASHR$timestamp = as.POSIXct(raw_ASHR$timestamp,format = "%Y-%m-%d %H:%M:%S")
 
 ```
 
+# Raw Data Save
+```{r data save}
+#financial
+write.csv(raw_SPY, here("data/mothership/raw_SPY.csv"))
+write.csv(raw_VGK, here("data/mothership/raw_VGK.csv"))
+write.csv(raw_ASHR, here("data/mothership/raw_ASHR.csv"))
+
+#social media
+write.table(tweets, here("data/mothership/tweets.csv"))
+write.table(truths, here("data/mothership/truths.csv"))
+
+
+```
+
 
 # Merging All Data
 ```{r mothership merge}
@@ -120,12 +134,8 @@ raw_ASHR$timestamp = as.POSIXct(raw_ASHR$timestamp,format = "%Y-%m-%d %H:%M:%S")
 #merge with raw_financial and raw_socialmedia
 mothership = left_join(mothership, raw_SPY, by = "timestamp")
 
-#save as csv
-write.csv(mothership, here("data/mothership.csv"))
 
-write.csv(raw_SPY, here("data/mothership/raw_SPY.csv"))
-write.csv(raw_VGK, here("data/mothership/raw_VGK.csv"))
-write.csv(raw_ASHR, here("data/mothership/raw_ASHR.csv"))
+
 ```
 
 # Adding Dummies etc
