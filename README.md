@@ -19,6 +19,8 @@ Commit Tutorial:
 Data: 
 -Tweets & Truths cleaned + sentiments
 -SPY intraday prices + volatility hourly and daily averages
+-> Move Tweets outside trading hours
+
 
 Models:
 
