@@ -52,10 +52,14 @@ source(here("helperfunctions/select_armax.R"))
 # Data 
 
 ```{r data_setup, results=FALSE, warning=FALSE, message=FALSE}
+
 # 1. Load Political Social Media
 
 #contains posts from Twitter & TruthSocial
 social <- read.csv(here("data/mothership", "social.csv"))
+
+social_hourly <- read.csv(here("data/mothership", "socialhourly.csv"))
+
 
 # 2. Load Financial
 
@@ -68,62 +72,57 @@ VGK <- read.csv(here("data/mothership", "VGK.csv"))
 #CSI 300 (China)
 ASHR <- read.csv(here("data/mothership", "ASHR.CSV"))
 
-
-#temporary while we figure out mothership
-names(SPY) = gsub(pattern = "SPY*", 
-                         replacement = "", x = names(SPY)) 
-
 ```
 
 ```{r data_time, results=FALSE, warning=FALSE, message=FALSE}
+
 #make posixct
 SPY$timestamp = as.POSIXct(SPY$timestamp,format = "%Y-%m-%d %H:%M:%S")
 VGK$timestamp = as.POSIXct(VGK$timestamp,format = "%Y-%m-%d %H:%M:%S")
 ASHR$timestamp = as.POSIXct(ASHR$timestamp,format = "%Y-%m-%d %H:%M:%S")
 social$timestamp = as.POSIXct(social$timestamp,format = "%Y-%m-%d %H:%M:%S")
+social_hourly$timestamp = as.POSIXct(social_hourly$timestamp,format = "%Y-%m-%d %H:%M:%S")
+
 ```
 
 
 # Selecting Relevant Data
+
+## Volatility
 ```{r volatility}
 
 #find hourly volatility
 #NOTE: this ignores tweets made outside trading hours!!
 SPY_volatility_alltime = dplyr::select(SPY,timestamp,r_vol_h)
 
+#aggregating per hour
+SPY_volatility_alltime = SPY_volatility_alltime %>%
+          mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
+          distinct(timestamp, .keep_all = TRUE) 
+   
 #select time period
 SPY_volatility = filter(SPY_volatility_alltime,
                   between(timestamp, 
                           as.Date('2019-01-01'), 
                           as.Date('2025-04-10')))
-colnames(SPY_volatility)[1] <- "timestamp_hour"
 
 
 ```
 
-# Social Media Variables
+## Number of Posts 
+```{r social media count}
 
-## Count Number of Posts 
-```{r count}
+#find count
+tweetcount_alltime = dplyr::select(social_hourly,timestamp,N)
 
-#convert to datatable
-social = as.data.table(social)
-
-#count by hour
-tweet_count = social[, .N, by=.(year(timestamp), month(timestamp), 
-                                day(timestamp), hour(timestamp))] 
-
-#fix timestamp
-tweet_count$timestamp = as.POSIXct(sprintf("%04d-%02d-%02d %02d:00:00", 
-                         tweet_count$year, tweet_count$month, tweet_count$day, 
-                         tweet_count$hour), format = "%Y-%m-%d %H:00:00")
-
-#remove useless columns and reorder by oldest first
-tweet_count = dplyr::select(tweet_count, timestamp, N)
-tweet_count = tweet_count[ order(tweet_count$timestamp , decreasing = F ),]
+#select time period
+tweetcount = filter(tweetcount_alltime,
+                  between(timestamp, 
+                          as.Date('2019-01-01'), 
+                          as.Date('2025-04-10')))
 
 #plot
-ggplot(tweet_count, aes(x = timestamp, y = N)) +
+ggplot(tweetcount_alltime, aes(x = timestamp, y = N)) +
     geom_point(color = "#253494", size = 1) +
     scale_x_datetime(date_labels = "%b %Y", date_breaks = "9 month") +
     labs(title = "Trump Social Media Count",
@@ -136,66 +135,44 @@ ggplot(tweet_count, aes(x = timestamp, y = N)) +
 
 ## Dummy for Social Media Post
 ```{r dummy}
-tweet_count = tweet_count %>% mutate(dummy = if_else(N > 0, 1, 0))
+
+#find count
+tweedummy_alltime = dplyr::select(social_hourly,timestamp,dummy)
+
+#select time period
+tweetdummy = filter(tweedummy_alltime,
+                  between(timestamp, 
+                          as.Date('2019-01-01'), 
+                          as.Date('2025-04-10')))
+
 ```
+
+## Merge
+```{r armadata merge}
+
+#merge our dependant and independant vars
+armax_data = left_join(SPY_volatility, tweetcount, by="timestamp")
+armax_data = left_join(armax_data, tweetdummy, by="timestamp")
+
+#convert NA to zeroes
+armax_data$N[is.na(armax_data$N)] = 0
+armax_data$dummy[is.na(armax_data$dummy)] = 0
+
+```
+
 
 
 # ARMA-X Models
 
-
-## Tweet Count on Volatility by hour
-```{r ARMA-X count hourly volatility}
-
-#take all relevant data for armax
-countvol = merge(SPY_volatility, tweet_count, by.x = "timestamp_hour", 
-                   by.y = "timestamp", all.x = T)
-
-#NA tweets means no tweets
-countvol$N[is.na(countvol$N)] = 0
-
-
-
-#find best armax model and fit
-armax_fit <- select_armax(countvol$r_vol_h, countvol$N, 
-                       max_p = 5, max_q = 5, max_r = 5, criterion = "AIC")
-
-summary(armax_fit$model) 
-armax_fit$ICplot
-armax_fit$params
-
-```
-
-
-## Tweet Dummy on Volatility by hour
-```{r ARMA-X dummy hourly}
-
-#NA tweets means no tweets
-countvol$dummy[is.na(countvol$dummy)] = 0
-
-#find best armax model and fit
-armax_fit <- select_armax(countvol$r_vol_h, countvol$dummy, 
-                       max_p = 5, max_q = 5, max_r = 5, criterion = "AIC")
-
-summary(armax_fit$model) 
-armax_fit$ICplot
-armax_fit$params
-
-```
-
-
-
-
-
-
-
-```{r JPR way to check for significance of lags, eval=FALSE}
+## Find Number of Lags
+```{r JPR way to check for significance of lags, results='asis'}
 nb.lags <- 3 #r
-count_lags <- embed(countvol_day$N, nb.lags + 1)
-dummy_lags <- embed(countvol_day$dummy, nb.lags + 1)
+count_lags <- embed(armax_data$N, nb.lags + 1)
+dummy_lags <- embed(armax_data$dummy, nb.lags + 1)
 colnames(count_lags) <- paste0("Lag_", 0:nb.lags)
 
 #align volatility to match count rows (for lag)
-vol_aligned <- tail(countvol_day$r_vol_d, nrow(count_lags))
+vol_aligned <- tail(armax_data$r_vol_h, nrow(count_lags))
 
 #choosing how many lags
 # fit an ARMA(0,0,0) model with lm (with r set above)
@@ -210,15 +187,52 @@ var.cov.matD <- NeweyWest(eq2, lag = 7, prewhite = FALSE)
 robust_seD <- sqrt(diag(var.cov.matD))
 
 #output table; significant lags are how many we choose
-stargazer(eq, eq, type = "text",
+stargazer(eq, eq, type = "latex",
           column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
           se = list(NULL, robust_se), no.space = TRUE)
 
 #output table; significant lags are how many we choose
-stargazer(eq2, eq2, type = "text",
+stargazer(eq2, eq2, type = "latex",
           column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
-          se = list(NULL, robust_se), no.space = TRUE)
+          se = list(NULL, robust_seD), no.space = TRUE)
+
 ```
+
+## Tweet Count on Volatility by hour
+```{r ARMA-X count hourly volatility}
+
+#find best armax model and fit
+armax_fit <- select_armax(armax_data$r_vol_h, armax_data$N, 
+                       max_p = 5, max_q = 5, max_r = 5, criterion = "AIC")
+
+summary(armax_fit$model) 
+armax_fit$ICplot
+armax_fit$params
+
+```
+
+
+## Tweet Dummy on Volatility by hour
+```{r ARMA-X dummy hourly}
+
+#find best armax model and fit
+armax_fit <- select_armax(armax_data$r_vol_h, armax_data$dummy, 
+                       max_p = 5, max_q = 5, max_r = 5, criterion = "AIC")
+
+summary(armax_fit$model) 
+armax_fit$ICplot
+armax_fit$params
+
+```
+
+
+
+
+
+
+
+
+
 
 
 
