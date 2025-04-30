@@ -89,6 +89,7 @@ dfm <- dfm(tokens)
 tweets = as.data.table(tweets)
 names(tweets)[names(tweets) == 'date'] <- 'timestamp'
 tweets$timestamp = as.POSIXct(tweets$timestamp,format = "%Y-%m-%d %H:%M:%S")
+second(tweets$timestamp) = 0
 
 #nrc_scores <- get_nrc_sentiment(complete_data$posts)
 
@@ -99,6 +100,8 @@ truthsbackup <- truths_processer(raw_truths)
 #cleanup
 truths = as.data.table(truthsbackup)
 names(truths)[names(truths) == 'date_time_parsed'] <- 'timestamp'
+truths$timestamp = as.POSIXct(truths$timestamp,format = "%Y-%m-%d %H:%M:%S")
+second(truths$timestamp) = 0
 
 
 # 3. Financial
