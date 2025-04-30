@@ -138,8 +138,8 @@ write.table(truths, here("data/mothership/truths.csv"))
 #first load all datasets in mothership folder
 
 #mothership base (dataframe with each minute since 2010)
-mothership <- data.frame(timestamp = seq(as.POSIXct("20-01-01"),
-                                as.POSIXct("2025-04-16"), 
+mothership <- data.frame(timestamp = seq(as.POSIXct("2019-01-01"),
+                                as.POSIXct("2020-04-16"), 
                                 by=(1*60)))
 
 #make posixct
