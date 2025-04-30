@@ -105,6 +105,11 @@ colnames(truths) = c("timestamp","truths_text")
 truths$timestamp = as.POSIXct(truths$timestamp,format = "%Y-%m-%d %H:%M:%S")
 second(truths$timestamp) = 0
 
+# Merging social media data since it is not overlapping
+names(truths)[names(truths) == 'truths_text'] <- 'tweet_text'
+social = rbind(tweets,truths)
+social <- social[order(social$timestamp, decreasing=F), ]
+
 
 # 3. Financial
 
@@ -129,8 +134,7 @@ write.csv(VGK, here("data/mothership/VGK.csv"), row.names=F)
 write.csv(ASHR, here("data/mothership/ASHR.csv"), row.names=F)
 
 #social media
-write.csv(tweets, here("data/mothership/tweets.csv"), row.names=F)
-write.csv(truths, here("data/mothership/truths.csv"), row.names=F)
+write.csv(social, here("data/mothership/social.csv"), row.names=F)
 
 ```
 
@@ -151,8 +155,8 @@ source(here("helperfunctions/fulldata_loader.R"))
 
 # Adding Dummies etc
 ```{r mothership add}
-# 1. Add count for tweets
 
+# 1. Add count for tweets
 
 # 2. Sentiments
 
