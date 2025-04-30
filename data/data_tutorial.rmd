@@ -122,6 +122,10 @@ mothership = left_join(mothership, raw_SPY, by = "timestamp")
 
 #save as csv
 write.csv(mothership, here("data/mothership.csv"))
+
+write.csv(raw_SPY, here("data/mothership/raw_SPY.csv"))
+write.csv(raw_VGK, here("data/mothership/raw_VGK.csv"))
+write.csv(raw_ASHR, here("data/mothership/raw_ASHR.csv"))
 ```
 
 # Adding Dummies etc
