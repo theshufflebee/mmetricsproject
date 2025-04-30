@@ -147,8 +147,8 @@ write.csv(social, here("data/mothership/social.csv"), row.names=F)
 #this will become a function
 rm(list=ls())
 source(here("helperfunctions/fulldata_loader.R"))
-
-
+names(mothership) = gsub(pattern = "SPY*", 
+                         replacement = "", x = names(mothership)) 
 
 
 ```

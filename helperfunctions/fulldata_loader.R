@@ -31,8 +31,8 @@ social$timestamp = as.POSIXct(social$timestamp,format = "%Y-%m-%d %H:%M:%S")
 
 #merge with financial and socialmedia
 mothership = left_join(mothership, SPY, by = "timestamp")
-mothership = left_join(mothership, VGK, by = "timestamp")
-mothership = left_join(mothership, ASHR, by = "timestamp")
+#mothership = left_join(mothership, VGK, by = "timestamp")
+#mothership = left_join(mothership, ASHR, by = "timestamp")
 mothership = left_join(mothership, social, by = "timestamp")
 
 
