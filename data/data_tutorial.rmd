@@ -72,11 +72,6 @@ data_loader(symbol="VGK")
 #CSI 300 (China)
 data_loader(symbol="ASHR")
 
-# 3. Mothership base
-mothership <- data.frame(timestamp = seq(as.POSIXct("2025-01-01"),
-                                as.POSIXct("2025-04-16"), 
-                                by=(1*60)))
- #which creates a dataframe with each minute since 2010
 ```
 
 ```{r cleanup}
@@ -93,7 +88,6 @@ dfm <- dfm(tokens)
 #cleanup
 tweets = as.data.table(tweets)
 names(tweets)[names(tweets) == 'date'] <- 'timestamp'
-tweets <- tweets[order(tweets$timestamp, decreasing=T), ]
 tweets$timestamp = as.POSIXct(tweets$timestamp,format = "%Y-%m-%d %H:%M:%S")
 
 #nrc_scores <- get_nrc_sentiment(complete_data$posts)
@@ -105,14 +99,19 @@ truthsbackup <- truths_processer(raw_truths)
 #cleanup
 truths = as.data.table(truthsbackup)
 names(truths)[names(truths) == 'date_time_parsed'] <- 'timestamp'
-truths <- truths[order(truths$timestamp, decreasing=T), ]
 
 
 # 3. Financial
 
-raw_SPY$timestamp = as.POSIXct(raw_SPY$timestamp,format = "%Y-%m-%d %H:%M:%S")
-raw_VGK$timestamp = as.POSIXct(raw_VGK$timestamp,format = "%Y-%m-%d %H:%M:%S")
-raw_ASHR$timestamp = as.POSIXct(raw_ASHR$timestamp,format = "%Y-%m-%d %H:%M:%S")
+#remove index
+SPY = raw_SPY[-1]
+VGK = raw_VGK[-1]
+ASHR = raw_ASHR[-1]
+
+#rename financial columns to add symbol
+colnames(SPY)[-1] <- paste0("SPY", colnames(SPY)[-1])
+colnames(VGK)[-1] <- paste0("VGK", colnames(VGK)[-1])
+colnames(ASHR)[-1] <- paste0("ASHR", colnames(ASHR)[-1])
 
 ```
 
@@ -120,13 +119,13 @@ raw_ASHR$timestamp = as.POSIXct(raw_ASHR$timestamp,format = "%Y-%m-%d %H:%M:%S")
 ```{r data save}
 
 #financial
-write.csv(raw_SPY, here("data/mothership/raw_SPY.csv"))
-write.csv(raw_VGK, here("data/mothership/raw_VGK.csv"))
-write.csv(raw_ASHR, here("data/mothership/raw_ASHR.csv"))
+write.csv(SPY, here("data/mothership/SPY.csv"))
+write.csv(VGK, here("data/mothership/VGK.csv"))
+write.csv(ASHR, here("data/mothership/ASHR.csv"))
 
 #social media
 write.table(tweets, here("data/mothership/tweets.csv"))
-truths <- apply(truths,2,as.character)
+truths <- apply(truths,2,as.character) #fix BROKEN
 write.table(truths, here("data/mothership/truths.csv"))
 
 ```
@@ -135,10 +134,28 @@ write.table(truths, here("data/mothership/truths.csv"))
 # Merging All Data
 ```{r mothership merge}
 
-#merge with raw_financial and raw_socialmedia
-mothership = left_join(mothership, raw_SPY, by = "timestamp")
+#this will become a function
+#first load all datasets in mothership folder
+
+#mothership base (dataframe with each minute since 2010)
+mothership <- data.frame(timestamp = seq(as.POSIXct("20-01-01"),
+                                as.POSIXct("2025-04-16"), 
+                                by=(1*60)))
+
+#make posixct
+SPY$timestamp = as.POSIXct(SPY$timestamp,format = "%Y-%m-%d %H:%M:%S")
+VGK$timestamp = as.POSIXct(VGK$timestamp,format = "%Y-%m-%d %H:%M:%S")
+ASHR$timestamp = as.POSIXct(ASHR$timestamp,format = "%Y-%m-%d %H:%M:%S")
+tweets$timestamp = as.POSIXct(tweets$timestamp,format = "%Y-%m-%d %H:%M:%S")
+truths$timestamp = as.POSIXct(truths$timestamp,format = "%Y-%m-%d %H:%M:%S")
 
 
+#merge with financial and socialmedia
+mothership = left_join(mothership, SPY, by = "timestamp")
+mothership = left_join(mothership, VGK, by = "timestamp")
+mothership = left_join(mothership, ASHR, by = "timestamp")
+mothership = left_join(mothership, tweets, by = "timestamp")
+mothership = left_join(mothership, truths, by = "timestamp")
 
 ```
 
