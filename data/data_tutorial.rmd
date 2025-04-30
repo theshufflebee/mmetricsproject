@@ -134,7 +134,9 @@ write.table(truths, here("data/mothership/truths.csv"))
 ```
 
 
-# Merging All Data
+# Merging All Data Function
+
+## First Merge
 ```{r mothership merge}
 
 #this will become a function
