@@ -1,7 +1,146 @@
 ---
-title: "Data Tutorial"
-output: pdf_document
+title: "Data Management"
+output:
+  pdf_document: 
+    toc: true
+    fig_caption: yes
+    latex_engine: lualatex
+header-includes:
+  - \usepackage{amsmath}
 ---
+\newpage
+
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwhich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenization
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/select_armax.R"))
+```
+
+
+# Data Prep
+```{r rawdata_setup, results=FALSE, warning=FALSE, message=FALSE}
+
+# 1. Political 
+
+#truthsocial
+raw_truths <- read.csv(here("data/political_data", "truths_new.csv"))
+
+#twitter
+raw_tweets <- read.csv(here("data/political_data", "tweets.csv"))
+
+
+# 2. Financial
+
+#S&P500
+data_loader(symbol="SPY")
+
+#STOXX50
+data_loader(symbol="VGK")
+
+#CSI 300 (China)
+data_loader(symbol="ASHR")
+
+# 3. Mothership base
+mothership <- data.frame(timestamp = seq(as.POSIXct("2025-01-01"),
+                                as.POSIXct("2025-04-16"), 
+                                by=(1*60)))
+ #which creates a dataframe with each minute since 2010
+```
+
+```{r cleanup}
+#MAKE FUNCTIONS TO CLEANUP EASY
+
+# 1. Tweets 
+tweets = raw_tweets
+
+#only keep original Tweets
+tweets <- tweets %>% filter(isRetweet != "t")
+tokens <- tokens(tweets$text)
+dfm <- dfm(tokens)
+
+#cleanup
+tweets = as.data.table(tweets)
+names(tweets)[names(tweets) == 'date'] <- 'timestamp'
+tweets <- tweets[order(tweets$timestamp, decreasing=T), ]
+tweets$timestamp = as.POSIXct(tweets$timestamp,format = "%Y-%m-%d %H:%M:%S")
+
+# 2. Truths 
+truthsbackup <- truths_processer(raw_truths) 
+
+#cleanup
+truths = as.data.table(truthsbackup)
+names(truths)[names(truths) == 'date_time_parsed'] <- 'timestamp'
+truths <- truths[order(truths$timestamp, decreasing=T), ]
+
+
+# 3. Financial
+
+raw_SPY$timestamp = as.POSIXct(raw_SPY$timestamp,format = "%Y-%m-%d %H:%M:%S")
+raw_VGK$timestamp = as.POSIXct(raw_VGK$timestamp,format = "%Y-%m-%d %H:%M:%S")
+raw_ASHR$timestamp = as.POSIXct(raw_ASHR$timestamp,format = "%Y-%m-%d %H:%M:%S")
+
+```
+
+
+# Merging All Data
+```{r mothership merge}
+
+#merge with raw_financial and raw_socialmedia
+mothership = left_join(mothership, raw_SPY, by = "timestamp")
+
+#save as csv
+write.csv(mothership, here("data/mothership.csv"))
+```
+
+# Adding Dummies etc
+```{r mothership add}
+# 1. Add count for tweets
+
+
+# 2. Sentiments
+
+# 3. Dummy Tweet
+
+# 4. Dummy Important Word
+
+# 5. Dummy Emotional Word
+
+```
+
+
+
 
 # Using Alpha Vantage API
 ```{r eval=FALSE}
@@ -63,33 +202,3 @@ Intra-Day Analysis: https://arxiv.org/html/2406.17198v1
 - VTI = CRSP US Total Market Index
 - VGK = Euro Stoxx 50
 - ASHR = basically china
-
-
-```{r mothership merge}
-#create dataframe each minute since 2010
-
-
-#merge with raw_financial and raw_socialmedia
-
-
-
-```
-
-
-```{r mothership add}
-# 1. Add count for tweets
-
-
-# 2. Sentiments
-
-# 3. Dummy Tweet
-
-# 4. Dummy Important Word
-
-# 5. Dummy Emotional Word
-
-```
-
-
-
-
