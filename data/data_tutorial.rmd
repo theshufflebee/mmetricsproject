@@ -49,7 +49,8 @@ source(here("helperfunctions/select_armax.R"))
 ```
 
 
-# Data Prep
+
+# Raw Data
 ```{r rawdata_setup, results=FALSE, warning=FALSE, message=FALSE}
 
 # 1. Political 
@@ -74,6 +75,9 @@ data_loader(symbol="ASHR")
 
 ```
 
+
+
+# Cleanup
 ```{r cleanup}
 #MAKE FUNCTIONS TO CLEANUP EASY
 
@@ -118,43 +122,55 @@ SPY = raw_SPY[-1]
 VGK = raw_VGK[-1]
 ASHR = raw_ASHR[-1]
 
-#rename financial columns to add symbol
-colnames(SPY)[-1] <- paste0("SPY", colnames(SPY)[-1])
-colnames(VGK)[-1] <- paste0("VGK", colnames(VGK)[-1])
-colnames(ASHR)[-1] <- paste0("ASHR", colnames(ASHR)[-1])
-
-```
-
-# Data Save
-```{r data save}
-
-#financial
-write.csv(SPY, here("data/mothership/SPY.csv"), row.names=F)
-write.csv(VGK, here("data/mothership/VGK.csv"), row.names=F)
-write.csv(ASHR, here("data/mothership/ASHR.csv"), row.names=F)
-
-#social media
-write.csv(social, here("data/mothership/social.csv"), row.names=F)
 
 ```
 
 
-# Merging All Data Function
 
-## First Merge
-```{r mothership merge}
+# Building Additional Variables
 
-#this will become a function
-rm(list=ls())
-source(here("helperfunctions/fulldata_loader.R"))
-names(mothership) = gsub(pattern = "SPY*", 
-                         replacement = "", x = names(mothership)) 
+## Volatility By Hour
+```{r volatility, eval=FALSE}
+
+SPY = r.vol_hourly(SPY,merge=T)
+VGK = r.vol_hourly(VGK,merge=T)
+ASHR = r.vol_hourly(ASHR,merge=T)
+
+```
+
+## Social Media Post Count
+```{r count by hour, eval=FALSE}
+
+#convert to datatable
+social = as.data.table(social)
+
+#count by hour
+tweet_count = social[, .N, by=.(year(timestamp), month(timestamp), 
+                                day(timestamp), hour(timestamp))] 
+
+#fix timestamp by hour
+tweet_count$timestamp = as.POSIXct(sprintf("%04d-%02d-%02d %02d:00:00", 
+                         tweet_count$year, tweet_count$month, tweet_count$day, 
+                         tweet_count$hour), format = "%Y-%m-%d %H:00:00")
+
+#remove useless columns and reorder by oldest first
+tweet_count = dplyr::select(tweet_count, timestamp, N)
+tweet_count = tweet_count[ order(tweet_count$timestamp , decreasing = F ),]
 
 
 ```
 
-# Adding Dummies etc
-```{r mothership add}
+## Adding Dummy for Social Media Post
+```{r socialdummy by hour, eval=FALSE}
+
+#using post count we create dummy
+social_hourly = tweet_count %>% mutate(dummy = if_else(N > 0, 1, 0))
+
+```
+
+
+## Adding 
+```{r mothership add, eval=FALSE}
 
 # 1. Add count for tweets
 
@@ -167,6 +183,46 @@ names(mothership) = gsub(pattern = "SPY*",
 # 5. Dummy Emotional Word
 
 ```
+
+```{r merging social data, eval=FALSE}
+
+#is there a point?
+
+```
+
+
+
+
+# Data Save
+```{r data save, eval=FALSE}
+
+#financial
+write.csv(SPY, here("data/mothership/SPY.csv"), row.names=F)
+write.csv(VGK, here("data/mothership/VGK.csv"), row.names=F)
+write.csv(ASHR, here("data/mothership/ASHR.csv"), row.names=F)
+
+#social media
+write.csv(social, here("data/mothership/social.csv"), row.names=F)
+write.csv(social_hourly, here("data/mothership/socialhourly.csv"), row.names=F)
+
+```
+
+
+
+# Merging All Data 
+
+## First Merge
+```{r mothership merge, eval=FALSE}
+
+#run script to load and merge all data
+rm(list=ls())
+source(here("helperfunctions/fulldata_loader.R"))
+
+#i think there's no point to this chunk just complicates things
+
+```
+
+
 
 
 

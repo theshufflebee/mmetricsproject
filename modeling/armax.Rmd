@@ -68,6 +68,11 @@ VGK <- read.csv(here("data/mothership", "VGK.csv"))
 #CSI 300 (China)
 ASHR <- read.csv(here("data/mothership", "ASHR.CSV"))
 
+
+#temporary while we figure out mothership
+names(SPY) = gsub(pattern = "SPY*", 
+                         replacement = "", x = names(SPY)) 
+
 ```
 
 ```{r data_time, results=FALSE, warning=FALSE, message=FALSE}
@@ -79,12 +84,12 @@ social$timestamp = as.POSIXct(social$timestamp,format = "%Y-%m-%d %H:%M:%S")
 ```
 
 
-# Volatility Calculation
-```{r first fix the data}
+# Selecting Relevant Data
+```{r volatility}
 
 #find hourly volatility
 #NOTE: this ignores tweets made outside trading hours!!
-SPY_volatility_alltime = r.vol_hourly(SPY,merge=F)
+SPY_volatility_alltime = dplyr::select(SPY,timestamp,r_vol_h)
 
 #select time period
 SPY_volatility = filter(SPY_volatility_alltime,
@@ -183,7 +188,7 @@ armax_fit$params
 
 
 
-```{r JPR way to check for significance of lags}
+```{r JPR way to check for significance of lags, eval=FALSE}
 nb.lags <- 3 #r
 count_lags <- embed(countvol_day$N, nb.lags + 1)
 dummy_lags <- embed(countvol_day$dummy, nb.lags + 1)

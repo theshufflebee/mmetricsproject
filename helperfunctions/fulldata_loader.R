@@ -28,6 +28,10 @@ VGK$timestamp = as.POSIXct(VGK$timestamp,format = "%Y-%m-%d %H:%M:%S")
 ASHR$timestamp = as.POSIXct(ASHR$timestamp,format = "%Y-%m-%d %H:%M:%S")
 social$timestamp = as.POSIXct(social$timestamp,format = "%Y-%m-%d %H:%M:%S")
 
+#rename financial columns to add symbol
+colnames(SPY)[-1] <- paste0("SPY", colnames(SPY)[-1])
+colnames(VGK)[-1] <- paste0("VGK", colnames(VGK)[-1])
+colnames(ASHR)[-1] <- paste0("ASHR", colnames(ASHR)[-1])
 
 #merge with financial and socialmedia
 mothership = left_join(mothership, SPY, by = "timestamp")
