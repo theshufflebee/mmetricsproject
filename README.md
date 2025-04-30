@@ -29,6 +29,7 @@ Models:
 -> Tweets really exogenous? Doubt
    On volatility? Possibly
 -> Question: What to do for 2021-2022?
+-> r_vol_h values very low, ask prof what he thinks
 3) VAR: Tweet Sentiment on Returns (FRED -> daily, not intraday)
 -> Work on specification
 
