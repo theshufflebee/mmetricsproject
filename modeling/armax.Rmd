@@ -255,37 +255,45 @@ stargazer(eq4, eq4, type = "latex",
 ```
 
 ## Tweet Count on Volatility by hour
-```{r ARMA-X count hourly volatility, eval=FALSE}
+```{r ARMA-X count hourly volatility}
 
 #find best armax model and fit
-armax_fit <- select_armax(armax_data$r_vol_h, armax_data$N, 
-                       max_p = 5, max_q = 5, max_r = 5, criterion = "AIC")
+auto.arima(armax_data$r_vol_h, xreg=armax_data$N, 
+                       max.p = 5, max.q = 5, max.d = 0, ic = "aic")
 
-summary(armax_fit$model) 
-armax_fit$ICplot
-armax_fit$params
+
 
 ```
 
 
 ## Tweet Dummy on Volatility by hour
-```{r ARMA-X dummy hourly, eval=FALSE}
+```{r ARMA-X dummy hourly}
 
 #find best armax model and fit
-armax_fit <- select_armax(armax_data$r_vol_h, armax_data$dummy, 
-                       max_p = 5, max_q = 5, max_r = 5, criterion = "AIC")
-
-summary(armax_fit$model) 
-armax_fit$ICplot
-armax_fit$params
+auto.arima(armax_data$r_vol_h, xreg=armax_data$dummy, 
+                       max.p = 5, max.q = 5, max.d = 0, ic = "aic")
 
 ```
 
 
+## Tariff Mention on Volatility by hour
+```{r ARMA-X tariff hourly}
+
+#find best armax model and fit
+auto.arima(armax_data$r_vol_h, xreg=armax_data$total_tariff, 
+                       max.p = 5, max.q = 5, max.d = 0, ic = "aic")
+
+```
 
 
+## Trade Mention on Volatility by hour
+```{r ARMA-X trade hourly}
 
+#find best armax model and fit
+auto.arima(armax_data$r_vol_h, xreg=armax_data$total_trade, 
+                       max.p = 5, max.q = 5, max.d = 0, ic = "aic")
 
+```
 
 
 
