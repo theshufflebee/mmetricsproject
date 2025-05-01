@@ -138,11 +138,39 @@ ggplot(tweetcount_alltime, aes(x = timestamp, y = N)) +
 ## Dummy for Social Media Post
 ```{r dummy}
 
-#find count
-tweedummy_alltime = dplyr::select(social_hourly,timestamp,dummy)
+#find dummy
+tweetdummy_alltime = dplyr::select(social_hourly,timestamp,dummy)
 
 #select time period
-tweetdummy = filter(tweedummy_alltime,
+tweetdummy = filter(tweetdummy_alltime,
+                  between(timestamp, 
+                          as.Date('2019-01-01'), 
+                          as.Date('2025-04-10')))
+
+```
+
+## Number of Tweets Mentioning Tariffs 
+```{r tariff}
+
+#find count
+tariff_alltime = dplyr::select(social_hourly,timestamp,total_tariff)
+
+#select time period
+tariff = filter(tariff_alltime,
+                  between(timestamp, 
+                          as.Date('2019-01-01'), 
+                          as.Date('2025-04-10')))
+
+```
+
+## Number of Tweets Mentioning Trade 
+```{r trade}
+
+#find count
+trade_alltime = dplyr::select(social_hourly,timestamp,total_trade)
+
+#select time period
+trade = filter(trade_alltime,
                   between(timestamp, 
                           as.Date('2019-01-01'), 
                           as.Date('2025-04-10')))
@@ -155,10 +183,14 @@ tweetdummy = filter(tweedummy_alltime,
 #merge our dependant and independant vars
 armax_data = left_join(SPY_volatility, tweetcount, by="timestamp")
 armax_data = left_join(armax_data, tweetdummy, by="timestamp")
+armax_data = left_join(armax_data, tariff, by="timestamp")
+armax_data = left_join(armax_data, trade, by="timestamp")
 
 #convert NA to zeroes
 armax_data$N[is.na(armax_data$N)] = 0
 armax_data$dummy[is.na(armax_data$dummy)] = 0
+armax_data$total_tariff[is.na(armax_data$total_tariff)] = 0
+armax_data$total_trade[is.na(armax_data$total_trade)] = 0
 
 ```
 
@@ -171,7 +203,9 @@ armax_data$dummy[is.na(armax_data$dummy)] = 0
 nb.lags <- 3 #r
 count_lags <- embed(armax_data$N, nb.lags + 1)
 dummy_lags <- embed(armax_data$dummy, nb.lags + 1)
-colnames(count_lags) <- paste0("Lag_", 0:nb.lags)
+tariff_lags <- embed(armax_data$total_tariff, nb.lags + 1)
+trade_lags <- embed(armax_data$total_trade, nb.lags + 1)
+#colnames(count_lags) <- paste0("Lag_", 0:nb.lags)
 
 #align volatility to match count rows (for lag)
 vol_aligned <- tail(armax_data$r_vol_h, nrow(count_lags))
@@ -180,28 +214,48 @@ vol_aligned <- tail(armax_data$r_vol_h, nrow(count_lags))
 # fit an ARMA(0,0,0) model with lm (with r set above)
 eq <- lm(vol_aligned ~ count_lags)
 eq2 <- lm(vol_aligned ~ dummy_lags)
+eq3 <- lm(vol_aligned ~ tariff_lags)
+eq4 <- lm(vol_aligned ~ trade_lags)
 
-#compute Newey-West HAC standard errors
-var.cov.mat <- NeweyWest(eq, lag = 7, prewhite = FALSE)
-robust_se <- sqrt(diag(var.cov.mat))
-#for both
-var.cov.matD <- NeweyWest(eq2, lag = 7, prewhite = FALSE)
-robust_seD <- sqrt(diag(var.cov.matD))
+#compute Newey-West HAC standard errors for count
+var.cov.mat1 <- NeweyWest(eq, lag = 7, prewhite = FALSE)
+robust_se1 <- sqrt(diag(var.cov.mat1))
+#for dummy
+var.cov.mat2 <- NeweyWest(eq2, lag = 7, prewhite = FALSE)
+robust_se2 <- sqrt(diag(var.cov.mat2))
+#for tariff
+var.cov.mat3 <- NeweyWest(eq3, lag = 7, prewhite = FALSE)
+robust_se3 <- sqrt(diag(var.cov.mat3))
+#for trade
+var.cov.mat4 <- NeweyWest(eq4, lag = 7, prewhite = FALSE)
+robust_se4 <- sqrt(diag(var.cov.mat4))
+
+
 
 #output table; significant lags are how many we choose
 stargazer(eq, eq, type = "latex",
           column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
-          se = list(NULL, robust_se), no.space = TRUE)
+          se = list(NULL, robust_se1), no.space = TRUE)
 
 #output table; significant lags are how many we choose
 stargazer(eq2, eq2, type = "latex",
           column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
-          se = list(NULL, robust_seD), no.space = TRUE)
+          se = list(NULL, robust_se2), no.space = TRUE)
+
+#output table; significant lags are how many we choose
+stargazer(eq3, eq3, type = "latex",
+          column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
+          se = list(NULL, robust_se3), no.space = TRUE)
+
+#output table; significant lags are how many we choose
+stargazer(eq4, eq4, type = "latex",
+          column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
+          se = list(NULL, robust_se4), no.space = TRUE)
 
 ```
 
 ## Tweet Count on Volatility by hour
-```{r ARMA-X count hourly volatility}
+```{r ARMA-X count hourly volatility, eval=FALSE}
 
 #find best armax model and fit
 armax_fit <- select_armax(armax_data$r_vol_h, armax_data$N, 
@@ -215,7 +269,7 @@ armax_fit$params
 
 
 ## Tweet Dummy on Volatility by hour
-```{r ARMA-X dummy hourly}
+```{r ARMA-X dummy hourly, eval=FALSE}
 
 #find best armax model and fit
 armax_fit <- select_armax(armax_data$r_vol_h, armax_data$dummy, 
