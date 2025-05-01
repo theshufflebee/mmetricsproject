@@ -51,6 +51,9 @@ source(here("helperfunctions/select_armax.R"))
 
 # Data 
 
+
+## Load Base Data
+
 ```{r data_setup, results=FALSE, warning=FALSE, message=FALSE}
 
 # 1. Load Political Social Media
@@ -86,7 +89,6 @@ social_hourly$timestamp = as.POSIXct(social_hourly$timestamp,format = "%Y-%m-%d 
 ```
 
 
-# Selecting Relevant Data
 
 ## Volatility
 ```{r volatility}

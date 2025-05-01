@@ -219,6 +219,40 @@ social_hourly <- left_join(social_hourly, sent_hour, by="timestamp")
 
 ```
 
+## Important Words 
+```{r tariffs, eval=FALSE}
+
+#create dummy for mention of tariff
+tariff <- ifelse(str_detect(social$tweet_text, "tariff|tariffs"), 1, 0)
+social$tariff <- tariff
+
+#counts number of tweets mentioning tariffs per hour
+tariff_hour <- social %>%
+  mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
+  group_by(timestamp) %>%
+  summarise(total_tariff = sum(tariff), .groups = "drop")
+tariff_hour = as.data.frame(tariff_hour)
+social_hourly <- left_join(social_hourly, tariff_hour, by="timestamp")
+
+```
+
+```{r trade war, eval=FALSE}
+
+#create dummy for mention of trade 
+trade <- ifelse(str_detect(social$tweet_text, "trade"), 1, 0)
+social$trade <- trade
+
+#counts number of tweets mentioning tariffs per hour
+trade_hour <- social %>%
+  mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
+  group_by(timestamp) %>%
+  summarise(total_trade = sum(trade), .groups = "drop")
+trade_hour = as.data.frame(trade_hour)
+social_hourly <- left_join(social_hourly, trade_hour, by="timestamp")
+
+```
+
+
 
 ## Adding 
 ```{r mothership add, eval=FALSE}
@@ -229,7 +263,7 @@ social_hourly <- left_join(social_hourly, sent_hour, by="timestamp")
 
 # 3. Dummy Tweet (✓)
 
-# 4. Dummy Important Word
+# 4. Dummy Important Word (✓)
 
 # 5. Dummy Emotional Word
 
