@@ -252,26 +252,7 @@ lag_selector(y=armax_data$r_vol_h, xreg=armax_data$total_trade,
 ## Tweet Count on Volatility by hour
 ```{r ARMA-X count hourly volatility, results='asis'}
 
-#use selected number of lags
-nb.lags <- 0
-count_lags <- embed(armax_data$N, nb.lags + 1)
-colnames(count_lags) <- paste0("count_lag_", 0:nb.lags)
-
-#variables
-y = tail(armax_data$r_vol_h, nrow(count_lags))
-x = count_lags
-
-
-#find best armax model and fit
-tab1 = auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0,
-              stepwise = FALSE, approximation = FALSE, trace = FALSE)
-
-screenreg(tab1, digits=4)
-
-#texreg(tab1, caption = "ARMAX Model Results", label = "tab:armax", digits=4) 
-
-
-armax(armax_data$r_vol_h,xreg=armax_data$N)
+armax(armax_data$r_vol_h,xreg=armax_data$N,latex=F)
 
 ```
 
@@ -279,23 +260,7 @@ armax(armax_data$r_vol_h,xreg=armax_data$N)
 ## Tweet Dummy on Volatility by hour
 ```{r ARMA-X dummy hourly, results='asis'}
 
-#use selected number of lags
-nb.lags <- 3
-dummy_lags <- embed(armax_data$dummy, nb.lags + 1)
-colnames(dummy_lags) <- paste0("dummy_lag_", 0:nb.lags)
-
-#variables
-y = tail(armax_data$r_vol_h, nrow(dummy_lags))
-x = dummy_lags
-
-
-#find best armax model and fit
-tab2 = auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0,
-              stepwise = FALSE, approximation = FALSE, trace = FALSE)
-
-screenreg(tab2, digits=4)
-
-#texreg(tab2, caption = "ARMAX Model Results", label = "tab:armax", digits=4) 
+armax(armax_data$r_vol_h,xreg=armax_data$dummy,latex=F)
 
 ```
 
@@ -303,23 +268,7 @@ screenreg(tab2, digits=4)
 ## Tariff Mention on Volatility by hour
 ```{r ARMA-X tariff hourly, results='asis'}
 
-#use selected number of lags
-nb.lags <- 3
-tariff_lags <- embed(armax_data$total_tariff, nb.lags + 1)
-colnames(tariff_lags) <- paste0("tariff_lag_", 0:nb.lags)
-
-#variables
-y = tail(armax_data$r_vol_h, nrow(tariff_lags))
-x = tariff_lags
-
-
-#find best armax model and fit
-tab3 = auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0,
-              stepwise = FALSE, approximation = FALSE, trace = FALSE)
-
-screenreg(tab3, digits=4)
-
-#texreg(tab3, caption = "ARMAX Model Results", label = "tab:armax", digits=4) 
+armax(armax_data$r_vol_h,xreg=armax_data$total_tariff,latex=F)
 
 ```
 
@@ -327,23 +276,7 @@ screenreg(tab3, digits=4)
 ## Trade Mention on Volatility by hour
 ```{r ARMA-X trade hourly, results='asis'}
 
-#use selected number of lags
-nb.lags <- 3
-trade_lags <- embed(armax_data$total_trade, nb.lags + 1)
-colnames(trade_lags) <- paste0("trade_lag_", 0:nb.lags)
-
-#variables
-y = tail(armax_data$r_vol_h, nrow(trade_lags))
-x = trade_lags
-
-
-#find best armax model and fit
-tab4 = auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0,
-              stepwise = FALSE, approximation = FALSE, trace = FALSE)
-
-screenreg(tab4, digits=4)
-
-#texreg(tab4, caption = "ARMAX Model Results", label = "tab:armax", digits=4)
+armax(armax_data$r_vol_h,xreg=armax_data$total_trade,latex=F)
 
 ```
 

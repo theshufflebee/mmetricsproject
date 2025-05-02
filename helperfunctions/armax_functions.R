@@ -3,6 +3,7 @@
 #Necessary libraries
 library(forecast)
 library(ggplot2)
+library(texreg)
 
 #--------------------------------------------------------------------------------
 #-----------------                     1                        -----------------
@@ -167,7 +168,7 @@ armax <- function(y, xreg, nb.lags = 3, max.p = 5,
                   max.q = 5, max.d = 0, latex=FALSE){
   
   #name of the xreg variable
-  xreg_name <- deparse(substitute(xreg))
+  xreg_name <- sub(".*\\$", "", deparse(substitute(xreg)))
   
   #first create lags
   xreg_lags <- lag_creator(xreg, nb.lags, varname = xreg_name)
@@ -179,12 +180,14 @@ armax <- function(y, xreg, nb.lags = 3, max.p = 5,
   tab = auto.arima(y_aligned, xreg = xreg_lags, seasonal = FALSE, 
                    max.p = max.p, max.q = max.q, max.d = max.d,
                     stepwise = FALSE, approximation = FALSE, trace = FALSE)
-  
-  if (latex==FALSE) screenreg(tab, digits=4)
-  if (latex==TRUE) texreg(tab, caption = "ARMAX Model Results", 
-                          label = "tab:armax", digits=4) 
 
-  return(tab)
+  #print the result
+  if (latex == FALSE) {
+    print(screenreg(tab, digits = 4))} else {
+    print(texreg(tab, caption = "ARMAX Model Results", 
+                 label = "tab:armax", digits = 4))}
+  
+  return(invisible(tab))
 }
 
   
