@@ -105,7 +105,7 @@ SPY_volatility_alltime = SPY_volatility_alltime %>%
 #select time period
 SPY_volatility = filter(SPY_volatility_alltime,
                   between(timestamp, 
-                          as.Date('2025-01-01'), 
+                          as.Date('2013-01-01'), 
                           as.Date('2025-04-10')))
 
 
@@ -120,7 +120,7 @@ tweetcount_alltime = dplyr::select(social_hourly,timestamp,N)
 #select time period
 tweetcount = filter(tweetcount_alltime,
                   between(timestamp, 
-                          as.Date('2025-01-01'), 
+                          as.Date('2013-01-01'), 
                           as.Date('2025-04-10')))
 
 #plot
@@ -144,7 +144,7 @@ tweetdummy_alltime = dplyr::select(social_hourly,timestamp,dummy)
 #select time period
 tweetdummy = filter(tweetdummy_alltime,
                   between(timestamp, 
-                          as.Date('2025-01-01'), 
+                          as.Date('2013-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -158,7 +158,7 @@ tariff_alltime = dplyr::select(social_hourly,timestamp,total_tariff)
 #select time period
 tariff = filter(tariff_alltime,
                   between(timestamp, 
-                          as.Date('2025-01-01'), 
+                          as.Date('2013-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -172,7 +172,7 @@ trade_alltime = dplyr::select(social_hourly,timestamp,total_trade)
 #select time period
 trade = filter(trade_alltime,
                   between(timestamp, 
-                          as.Date('2025-01-01'), 
+                          as.Date('2013-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -200,12 +200,17 @@ armax_data$total_trade[is.na(armax_data$total_trade)] = 0
 
 ## Find Number of Lags
 ```{r JPR way to check for significance of lags, results='asis'}
-nb.lags <- 3 #r
+
+#build number of lags we will test
+nb.lags <- 12 #r
 count_lags <- embed(armax_data$N, nb.lags + 1)
 dummy_lags <- embed(armax_data$dummy, nb.lags + 1)
 tariff_lags <- embed(armax_data$total_tariff, nb.lags + 1)
 trade_lags <- embed(armax_data$total_trade, nb.lags + 1)
-#colnames(count_lags) <- paste0("Lag_", 0:nb.lags)
+colnames(count_lags) <- paste0("_", 0:nb.lags)
+colnames(dummy_lags) <- paste0("_", 0:nb.lags)
+colnames(tariff_lags) <- paste0("_", 0:nb.lags)
+colnames(trade_lags) <- paste0("_", 0:nb.lags)
 
 #align volatility to match count rows (for lag)
 vol_aligned <- tail(armax_data$r_vol_h, nrow(count_lags))
@@ -233,22 +238,22 @@ robust_se4 <- sqrt(diag(var.cov.mat4))
 
 
 #output table; significant lags are how many we choose
-stargazer(eq, eq, type = "latex",
+stargazer(eq, eq, type = "text",
           column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
           se = list(NULL, robust_se1), no.space = TRUE)
 
 #output table; significant lags are how many we choose
-stargazer(eq2, eq2, type = "latex",
+stargazer(eq2, eq2, type = "text",
           column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
           se = list(NULL, robust_se2), no.space = TRUE)
 
 #output table; significant lags are how many we choose
-stargazer(eq3, eq3, type = "latex",
+stargazer(eq3, eq3, type = "text",
           column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
           se = list(NULL, robust_se3), no.space = TRUE)
 
 #output table; significant lags are how many we choose
-stargazer(eq4, eq4, type = "latex",
+stargazer(eq4, eq4, type = "text",
           column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
           se = list(NULL, robust_se4), no.space = TRUE)
 
@@ -257,11 +262,19 @@ stargazer(eq4, eq4, type = "latex",
 ## Tweet Count on Volatility by hour
 ```{r ARMA-X count hourly volatility}
 
+#use selected number of lags
+nb.lags <- 0
+count_lags <- embed(armax_data$N, nb.lags + 1)
+colnames(count_lags) <- paste0("count_lag_", 0:nb.lags)
+
+#variables
+y = tail(armax_data$r_vol_h, nrow(count_lags))
+x = count_lags
+
+
 #find best armax model and fit
-auto.arima(armax_data$r_vol_h, xreg=armax_data$N, 
-                       max.p = 5, max.q = 5, max.d = 0, ic = "aic")
-
-
+auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0,
+              stepwise = FALSE, approximation = FALSE, trace = TRUE)
 
 ```
 
@@ -269,9 +282,19 @@ auto.arima(armax_data$r_vol_h, xreg=armax_data$N,
 ## Tweet Dummy on Volatility by hour
 ```{r ARMA-X dummy hourly}
 
+#use selected number of lags
+nb.lags <- 3
+dummy_lags <- embed(armax_data$dummy, nb.lags + 1)
+colnames(dummy_lags) <- paste0("dummy_lag_", 0:nb.lags)
+
+#variables
+y = tail(armax_data$r_vol_h, nrow(dummy_lags))
+x = dummy_lags
+
+
 #find best armax model and fit
-auto.arima(armax_data$r_vol_h, xreg=armax_data$dummy, 
-                       max.p = 5, max.q = 5, max.d = 0, ic = "aic")
+auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0,
+              stepwise = FALSE, approximation = FALSE, trace = TRUE)
 
 ```
 
@@ -279,9 +302,19 @@ auto.arima(armax_data$r_vol_h, xreg=armax_data$dummy,
 ## Tariff Mention on Volatility by hour
 ```{r ARMA-X tariff hourly}
 
+#use selected number of lags
+nb.lags <- 3
+tariff_lags <- embed(armax_data$total_tariff, nb.lags + 1)
+colnames(tariff_lags) <- paste0("tariff_lag_", 0:nb.lags)
+
+#variables
+y = tail(armax_data$r_vol_h, nrow(tariff_lags))
+x = tariff_lags
+
+
 #find best armax model and fit
-auto.arima(armax_data$r_vol_h, xreg=armax_data$total_tariff, 
-                       max.p = 5, max.q = 5, max.d = 0, ic = "aic")
+auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0,
+              stepwise = FALSE, approximation = FALSE, trace = TRUE)
 
 ```
 
@@ -289,9 +322,19 @@ auto.arima(armax_data$r_vol_h, xreg=armax_data$total_tariff,
 ## Trade Mention on Volatility by hour
 ```{r ARMA-X trade hourly}
 
+#use selected number of lags
+nb.lags <- 3
+trade_lags <- embed(armax_data$total_trade, nb.lags + 1)
+colnames(trade_lags) <- paste0("trade_lag_", 0:nb.lags)
+
+#variables
+y = tail(armax_data$r_vol_h, nrow(trade_lags))
+x = trade_lags
+
+
 #find best armax model and fit
-auto.arima(armax_data$r_vol_h, xreg=armax_data$total_trade, 
-                       max.p = 5, max.q = 5, max.d = 0, ic = "aic")
+auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0,
+              stepwise = FALSE, approximation = FALSE, trace = TRUE)
 
 ```
 
