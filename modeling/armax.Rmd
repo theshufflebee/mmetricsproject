@@ -46,7 +46,7 @@ source(here("helperfunctions/plotters.R"))
 source(here("helperfunctions/quick_arma.R"))
 source(here("helperfunctions/r.vol_calculators.R"))
 source(here("helperfunctions/truths_cleaning_function.R"))
-source(here("helperfunctions/select_armax.R"))
+source(here("helperfunctions/armax_functions.R"))
 ```
 
 
@@ -234,65 +234,14 @@ armax_data$prop_negative[is.na(armax_data$prop_negative)] = 0
 ## Find Number of Lags
 ```{r JPR way to check for significance of lags, results='asis'}
 
-#build number of lags we will test
-nb.lags <- 12 #r
-count_lags <- embed(armax_data$N, nb.lags + 1)
-dummy_lags <- embed(armax_data$dummy, nb.lags + 1)
-tariff_lags <- embed(armax_data$total_tariff, nb.lags + 1)
-trade_lags <- embed(armax_data$total_trade, nb.lags + 1)
-colnames(count_lags) <- paste0("_", 0:nb.lags)
-colnames(dummy_lags) <- paste0("_", 0:nb.lags)
-colnames(tariff_lags) <- paste0("_", 0:nb.lags)
-colnames(trade_lags) <- paste0("_", 0:nb.lags)
-
-#align volatility to match count rows (for lag)
-vol_aligned <- tail(armax_data$r_vol_h, nrow(count_lags))
-
-#choosing how many lags
-# fit an ARMA(0,0,0) model with lm (with r set above)
-eq <- lm(vol_aligned ~ count_lags)
-eq2 <- lm(vol_aligned ~ dummy_lags)
-eq3 <- lm(vol_aligned ~ tariff_lags)
-eq4 <- lm(vol_aligned ~ trade_lags)
-
-#compute Newey-West HAC standard errors for count
-var.cov.mat1 <- NeweyWest(eq, lag = 16, prewhite = FALSE)
-robust_se1 <- sqrt(diag(var.cov.mat1))
-#for dummy
-var.cov.mat2 <- NeweyWest(eq2, lag = 16, prewhite = FALSE)
-robust_se2 <- sqrt(diag(var.cov.mat2))
-#for tariff
-var.cov.mat3 <- NeweyWest(eq3, lag = 16, prewhite = FALSE)
-robust_se3 <- sqrt(diag(var.cov.mat3))
-#for trade
-var.cov.mat4 <- NeweyWest(eq4, lag = 16, prewhite = FALSE)
-robust_se4 <- sqrt(diag(var.cov.mat4))
-
-
-
-#output table; significant lags are how many we choose
-stargazer(eq, eq, type = "text",
-          column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
-          se = list(NULL, robust_se1), no.space = TRUE)
-
-#output table; significant lags are how many we choose
-stargazer(eq2, eq2, type = "text",
-          column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
-          se = list(NULL, robust_se2), no.space = TRUE)
-
-#output table; significant lags are how many we choose
-stargazer(eq3, eq3, type = "text",
-          column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
-          se = list(NULL, robust_se3), no.space = TRUE)
-
-#output table; significant lags are how many we choose
-stargazer(eq4, eq4, type = "text",
-          column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
-          se = list(NULL, robust_se4), no.space = TRUE)
-
-
-lag_selector(y=armax_data$r_vol_h,xreg=armax_data$total_tariff,nb.lags=12)
-lag_creator(xreg=armax_data$total_tariff)
+lag_selector(y=armax_data$r_vol_h, xreg=armax_data$N,
+             nb.lags=12, type="text")
+lag_selector(y=armax_data$r_vol_h, xreg=armax_data$dummy,
+             nb.lags=12, type="text")
+lag_selector(y=armax_data$r_vol_h, xreg=armax_data$total_tariff,
+             nb.lags=12, type="text")
+lag_selector(y=armax_data$r_vol_h, xreg=armax_data$total_trade,
+             nb.lags=12, type="text")
 
 ```
 
@@ -320,6 +269,9 @@ tab1 = auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0
 screenreg(tab1, digits=4)
 
 #texreg(tab1, caption = "ARMAX Model Results", label = "tab:armax", digits=4) 
+
+
+armax(armax_data$r_vol_h,xreg=armax_data$N)
 
 ```
 
