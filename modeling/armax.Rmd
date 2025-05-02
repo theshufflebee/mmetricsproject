@@ -178,6 +178,35 @@ trade = filter(trade_alltime,
 
 ```
 
+## Proportion of Positive 
+```{r positive}
+
+#find count
+positive_alltime = dplyr::select(social_hourly,timestamp,prop_positive)
+
+#select time period
+positive = filter(positive_alltime,
+                  between(timestamp, 
+                          as.Date('2013-01-01'), 
+                          as.Date('2025-04-10')))
+
+```
+
+## Proportion of Negative 
+```{r positive}
+
+#find count
+negative_alltime = dplyr::select(social_hourly,timestamp,prop_negative)
+
+#select time period
+negative = filter(negative_alltime,
+                  between(timestamp, 
+                          as.Date('2013-01-01'), 
+                          as.Date('2025-04-10')))
+
+```
+
+
 ## Merge
 ```{r armadata merge}
 
@@ -186,12 +215,16 @@ armax_data = left_join(SPY_volatility, tweetcount, by="timestamp")
 armax_data = left_join(armax_data, tweetdummy, by="timestamp")
 armax_data = left_join(armax_data, tariff, by="timestamp")
 armax_data = left_join(armax_data, trade, by="timestamp")
+armax_data = left_join(armax_data, positive, by="timestamp")
+armax_data = left_join(armax_data, negative, by="timestamp")
 
 #convert NA to zeroes
 armax_data$N[is.na(armax_data$N)] = 0
 armax_data$dummy[is.na(armax_data$dummy)] = 0
 armax_data$total_tariff[is.na(armax_data$total_tariff)] = 0
 armax_data$total_trade[is.na(armax_data$total_trade)] = 0
+armax_data$prop_positive[is.na(armax_data$prop_positive)] = 0
+armax_data$prop_negative[is.na(armax_data$prop_negative)] = 0
 
 ```
 \newpage
@@ -256,6 +289,10 @@ stargazer(eq3, eq3, type = "text",
 stargazer(eq4, eq4, type = "text",
           column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
           se = list(NULL, robust_se4), no.space = TRUE)
+
+
+lag_selector(y=armax_data$r_vol_h,xreg=armax_data$total_tariff,nb.lags=12)
+lag_creator(xreg=armax_data$total_tariff)
 
 ```
 
