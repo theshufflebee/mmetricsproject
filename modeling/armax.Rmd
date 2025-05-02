@@ -242,12 +242,12 @@ lag_selector(y=armax_data$r_vol_h, xreg=armax_data$total_tariff,
              nb.lags=12, type="text")
 lag_selector(y=armax_data$r_vol_h, xreg=armax_data$total_trade,
              nb.lags=12, type="text")
+lag_selector(y=armax_data$r_vol_h, xreg=armax_data$prop_positive,
+             nb.lags=12, type="text")
+lag_selector(y=armax_data$r_vol_h, xreg=armax_data$prop_negative,
+             nb.lags=12, type="text")
 
 ```
-
-
-
-
 
 ## Tweet Count on Volatility by hour
 ```{r ARMA-X count hourly volatility, results='asis'}
