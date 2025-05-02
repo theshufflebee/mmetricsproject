@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.22.0 (TeX Live 2025)  (format=lualatex 2025.4.15)  1 MAY 2025 17:57
+This is LuaHBTeX, Version 1.22.0 (TeX Live 2025)  (format=lualatex 2025.4.16)  2 MAY 2025 11:08
  restricted system commands enabled.
 **armax.tex
 (./armax.tex
@@ -403,6 +403,15 @@ LaTeX Warning: Label `' multiply defined.
 
 LaTeX Warning: Label `' multiply defined.
 
+
+LaTeX Warning: Label `tab:armax' multiply defined.
+
+
+LaTeX Warning: Label `tab:armax' multiply defined.
+
+
+LaTeX Warning: Label `tab:armax' multiply defined.
+
 )
 \openout1 = armax.aux
 
@@ -715,7 +724,15 @@ Package luatex.def Info: armax_files/figure-latex/social media count-1.pdf  used
 
 [8]
 
-[9] (./armax.aux)
+[9]
+
+[10]
+
+[11]
+
+[12]
+
+[13] (./armax.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-03-26>
@@ -726,19 +743,19 @@ LaTeX Warning: There were multiply-defined labels.
 )
 
 Here is how much of LuaTeX's memory you used:
- 17936 strings out of 471941
+ 17946 strings out of 471941
  100000,953878 words of node,token memory allocated
- 517 words of node memory still in use:
-   6 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 7 attribute, 57 glue_spec, 7 attribute_list, 1 write, 1 user_defined nodes
-   avail lists: 1:1,2:1804,3:382,4:492,5:409,6:65,7:5349,8:4,9:623,10:3,11:79
- 44199 multiletter control sequences out of 65536+600000
- 64 fonts using 19295571 bytes
- 90i,10n,114p,546b,450s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-italic.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmonolt10-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-italic.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman12-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman17-regular.otf>
-Output written on armax.pdf (9 pages, 994649 bytes).
+ 521 words of node memory still in use:
+   6 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 8 attribute, 57 glue_spec, 8 attribute_list, 1 write, 1 user_defined nodes
+   avail lists: 1:1,2:1906,3:247,4:584,5:437,6:65,7:5679,8:11,9:859,10:3,11:79
+ 44201 multiletter control sequences out of 65536+600000
+ 65 fonts using 19427259 bytes
+ 90i,11n,114p,546b,379s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman7-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-italic.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmonolt10-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-italic.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman12-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman17-regular.otf>
+Output written on armax.pdf (13 pages, 1008795 bytes).
 
-PDF statistics: 199 PDF objects out of 1000 (max. 8388607)
- 154 compressed objects within 2 object streams
- 29 named destinations out of 1000 (max. 131072)
+PDF statistics: 237 PDF objects out of 1000 (max. 8388607)
+ 182 compressed objects within 2 object streams
+ 37 named destinations out of 1000 (max. 131072)
  113 words of extra memory for PDF output out of 10000 (max. 100000000)
 

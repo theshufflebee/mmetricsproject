@@ -34,6 +34,7 @@ require(stargazer) #nice reg tables
 require(tidytext) #text mining
 require(textstem) #lemmatization
 require(quanteda) #tokenization
+require(texreg) #arima tables
 
 getwd()
 #setwd("...") -> set wd at base repo folder
@@ -193,8 +194,7 @@ armax_data$total_tariff[is.na(armax_data$total_tariff)] = 0
 armax_data$total_trade[is.na(armax_data$total_trade)] = 0
 
 ```
-
-
+\newpage
 
 # ARMA-X Models
 
@@ -223,16 +223,16 @@ eq3 <- lm(vol_aligned ~ tariff_lags)
 eq4 <- lm(vol_aligned ~ trade_lags)
 
 #compute Newey-West HAC standard errors for count
-var.cov.mat1 <- NeweyWest(eq, lag = 7, prewhite = FALSE)
+var.cov.mat1 <- NeweyWest(eq, lag = 16, prewhite = FALSE)
 robust_se1 <- sqrt(diag(var.cov.mat1))
 #for dummy
-var.cov.mat2 <- NeweyWest(eq2, lag = 7, prewhite = FALSE)
+var.cov.mat2 <- NeweyWest(eq2, lag = 16, prewhite = FALSE)
 robust_se2 <- sqrt(diag(var.cov.mat2))
 #for tariff
-var.cov.mat3 <- NeweyWest(eq3, lag = 7, prewhite = FALSE)
+var.cov.mat3 <- NeweyWest(eq3, lag = 16, prewhite = FALSE)
 robust_se3 <- sqrt(diag(var.cov.mat3))
 #for trade
-var.cov.mat4 <- NeweyWest(eq4, lag = 7, prewhite = FALSE)
+var.cov.mat4 <- NeweyWest(eq4, lag = 16, prewhite = FALSE)
 robust_se4 <- sqrt(diag(var.cov.mat4))
 
 
@@ -259,8 +259,12 @@ stargazer(eq4, eq4, type = "text",
 
 ```
 
+
+
+
+
 ## Tweet Count on Volatility by hour
-```{r ARMA-X count hourly volatility}
+```{r ARMA-X count hourly volatility, results='asis'}
 
 #use selected number of lags
 nb.lags <- 0
@@ -273,14 +277,18 @@ x = count_lags
 
 
 #find best armax model and fit
-auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0,
-              stepwise = FALSE, approximation = FALSE, trace = TRUE)
+tab1 = auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0,
+              stepwise = FALSE, approximation = FALSE, trace = FALSE)
+
+screenreg(tab1, digits=4)
+
+#texreg(tab1, caption = "ARMAX Model Results", label = "tab:armax", digits=4) 
 
 ```
 
 
 ## Tweet Dummy on Volatility by hour
-```{r ARMA-X dummy hourly}
+```{r ARMA-X dummy hourly, results='asis'}
 
 #use selected number of lags
 nb.lags <- 3
@@ -293,14 +301,18 @@ x = dummy_lags
 
 
 #find best armax model and fit
-auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0,
-              stepwise = FALSE, approximation = FALSE, trace = TRUE)
+tab2 = auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0,
+              stepwise = FALSE, approximation = FALSE, trace = FALSE)
+
+screenreg(tab2, digits=4)
+
+#texreg(tab2, caption = "ARMAX Model Results", label = "tab:armax", digits=4) 
 
 ```
 
 
 ## Tariff Mention on Volatility by hour
-```{r ARMA-X tariff hourly}
+```{r ARMA-X tariff hourly, results='asis'}
 
 #use selected number of lags
 nb.lags <- 3
@@ -313,14 +325,18 @@ x = tariff_lags
 
 
 #find best armax model and fit
-auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0,
-              stepwise = FALSE, approximation = FALSE, trace = TRUE)
+tab3 = auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0,
+              stepwise = FALSE, approximation = FALSE, trace = FALSE)
+
+screenreg(tab3, digits=4)
+
+#texreg(tab3, caption = "ARMAX Model Results", label = "tab:armax", digits=4) 
 
 ```
 
 
 ## Trade Mention on Volatility by hour
-```{r ARMA-X trade hourly}
+```{r ARMA-X trade hourly, results='asis'}
 
 #use selected number of lags
 nb.lags <- 3
@@ -333,8 +349,12 @@ x = trade_lags
 
 
 #find best armax model and fit
-auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0,
-              stepwise = FALSE, approximation = FALSE, trace = TRUE)
+tab4 = auto.arima(y, xreg = x, seasonal = FALSE, max.p = 5, max.q = 5, max.d = 0,
+              stepwise = FALSE, approximation = FALSE, trace = FALSE)
+
+screenreg(tab4, digits=4)
+
+#texreg(tab4, caption = "ARMAX Model Results", label = "tab:armax", digits=4)
 
 ```
 
