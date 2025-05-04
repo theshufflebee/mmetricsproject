@@ -92,7 +92,7 @@ social_hourly$timestamp = as.POSIXct(social_hourly$timestamp,format = "%Y-%m-%d 
 
 
 ## Volatility
-```{r volatility}
+```{r SPY volatility}
 
 #find hourly volatility
 #NOTE: this ignores tweets made outside trading hours!!
@@ -106,9 +106,46 @@ SPY_volatility_alltime = SPY_volatility_alltime %>%
 #select time period
 SPY_volatility = filter(SPY_volatility_alltime,
                   between(timestamp, 
-                          as.Date('2013-01-01'), 
+                          as.Date('2014-01-01'), 
                           as.Date('2025-04-10')))
 
+```
+
+```{r VGK volatility}
+
+#find hourly volatility
+#NOTE: this ignores tweets made outside trading hours!!
+VGK_volatility_alltime = dplyr::select(VGK,timestamp,r_vol_h)
+
+#aggregating per hour
+VGK_volatility_alltime = VGK_volatility_alltime %>%
+          mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
+          distinct(timestamp, .keep_all = TRUE) 
+   
+#select time period
+VGK_volatility = filter(VGK_volatility_alltime,
+                  between(timestamp, 
+                          as.Date('2014-01-01'), 
+                          as.Date('2025-04-10')))
+
+```
+
+```{r ASHR volatility}
+
+#find hourly volatility
+#NOTE: this ignores tweets made outside trading hours!!
+ASHR_volatility_alltime = dplyr::select(ASHR,timestamp,r_vol_h)
+
+#aggregating per hour
+ASHR_volatility_alltime = ASHR_volatility_alltime %>%
+          mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
+          distinct(timestamp, .keep_all = TRUE) 
+   
+#select time period
+ASHR_volatility = filter(ASHR_volatility_alltime,
+                  between(timestamp, 
+                          as.Date('2014-01-01'), 
+                          as.Date('2025-04-10')))
 
 ```
 
@@ -121,7 +158,7 @@ tweetcount_alltime = dplyr::select(social_hourly,timestamp,N)
 #select time period
 tweetcount = filter(tweetcount_alltime,
                   between(timestamp, 
-                          as.Date('2013-01-01'), 
+                          as.Date('2014-01-01'), 
                           as.Date('2025-04-10')))
 
 #plot
@@ -145,7 +182,7 @@ tweetdummy_alltime = dplyr::select(social_hourly,timestamp,dummy)
 #select time period
 tweetdummy = filter(tweetdummy_alltime,
                   between(timestamp, 
-                          as.Date('2013-01-01'), 
+                          as.Date('2014-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -159,7 +196,7 @@ tariff_alltime = dplyr::select(social_hourly,timestamp,total_tariff)
 #select time period
 tariff = filter(tariff_alltime,
                   between(timestamp, 
-                          as.Date('2013-01-01'), 
+                          as.Date('2014-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -173,7 +210,7 @@ trade_alltime = dplyr::select(social_hourly,timestamp,total_trade)
 #select time period
 trade = filter(trade_alltime,
                   between(timestamp, 
-                          as.Date('2013-01-01'), 
+                          as.Date('2014-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -187,13 +224,13 @@ positive_alltime = dplyr::select(social_hourly,timestamp,prop_positive)
 #select time period
 positive = filter(positive_alltime,
                   between(timestamp, 
-                          as.Date('2013-01-01'), 
+                          as.Date('2014-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
 
 ## Proportion of Negative 
-```{r positive}
+```{r negative}
 
 #find count
 negative_alltime = dplyr::select(social_hourly,timestamp,prop_negative)
@@ -201,7 +238,7 @@ negative_alltime = dplyr::select(social_hourly,timestamp,prop_negative)
 #select time period
 negative = filter(negative_alltime,
                   between(timestamp, 
-                          as.Date('2013-01-01'), 
+                          as.Date('2014-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -211,12 +248,19 @@ negative = filter(negative_alltime,
 ```{r armadata merge}
 
 #merge our dependant and independant vars
-armax_data = left_join(SPY_volatility, tweetcount, by="timestamp")
+armax_data = left_join(SPY_volatility, VGK_volatility, by="timestamp")
+armax_data = left_join(armax_data, ASHR_volatility, by="timestamp")
 armax_data = left_join(armax_data, tweetdummy, by="timestamp")
+armax_data = left_join(armax_data, tweetcount, by="timestamp")
 armax_data = left_join(armax_data, tariff, by="timestamp")
 armax_data = left_join(armax_data, trade, by="timestamp")
 armax_data = left_join(armax_data, positive, by="timestamp")
 armax_data = left_join(armax_data, negative, by="timestamp")
+
+#rename volatility columns
+names(armax_data)[2] <- "SPY_vol"
+names(armax_data)[3] <- "VGK_vol"
+names(armax_data)[4] <- "ASHR_vol"
 
 #convert NA to zeroes
 armax_data$N[is.na(armax_data$N)] = 0
@@ -229,61 +273,172 @@ armax_data$prop_negative[is.na(armax_data$prop_negative)] = 0
 ```
 \newpage
 
-# ARMA-X Models
+
+# S\&P500 ARMA-X Models
 
 ## Find Number of Lags
-```{r JPR way to check for significance of lags, results='asis'}
+```{r SPY lags, results='asis'}
 
-lag_selector(y=armax_data$r_vol_h, xreg=armax_data$N,
-             nb.lags=12, type="text")
-lag_selector(y=armax_data$r_vol_h, xreg=armax_data$dummy,
-             nb.lags=12, type="text")
-lag_selector(y=armax_data$r_vol_h, xreg=armax_data$total_tariff,
-             nb.lags=12, type="text")
-lag_selector(y=armax_data$r_vol_h, xreg=armax_data$total_trade,
-             nb.lags=12, type="text")
-lag_selector(y=armax_data$r_vol_h, xreg=armax_data$prop_positive,
-             nb.lags=12, type="text")
-lag_selector(y=armax_data$r_vol_h, xreg=armax_data$prop_negative,
-             nb.lags=12, type="text")
+lag_selector(y=armax_data$SPY_vol, xreg=armax_data$N,
+             nb.lags=5, type="latex")
+lag_selector(y=armax_data$SPY_vol, xreg=armax_data$dummy,
+             nb.lags=5, type="latex")
+lag_selector(y=armax_data$SPY_vol, xreg=armax_data$total_tariff,
+             nb.lags=5, type="latex")
+lag_selector(y=armax_data$SPY_vol, xreg=armax_data$total_trade,
+             nb.lags=5, type="latex")
+lag_selector(y=armax_data$SPY_vol, xreg=armax_data$prop_positive,
+             nb.lags=5, type="latex")
+lag_selector(y=armax_data$SPY_vol, xreg=armax_data$prop_negative,
+             nb.lags=5, type="latex")
 
 ```
 
 ## Tweet Count on Volatility by hour
-```{r ARMA-X count hourly volatility, results='asis'}
+```{r SPY ARMA-X count hourly volatility, results='asis'}
 
-armax(armax_data$r_vol_h,xreg=armax_data$N,latex=F)
+armax(armax_data$SPY_vol,xreg=armax_data$N,nb.lags=0,latex=T)
 
 ```
 
 
 ## Tweet Dummy on Volatility by hour
-```{r ARMA-X dummy hourly, results='asis'}
+```{r SPY ARMA-X dummy hourly, results='asis'}
 
-armax(armax_data$r_vol_h,xreg=armax_data$dummy,latex=F)
+armax(armax_data$SPY_vol,xreg=armax_data$dummy,nb.lags=3,latex=T)
 
 ```
 
 
 ## Tariff Mention on Volatility by hour
-```{r ARMA-X tariff hourly, results='asis'}
+```{r SPY ARMA-X tariff hourly, results='asis'}
 
-armax(armax_data$r_vol_h,xreg=armax_data$total_tariff,latex=F)
-
-```
-
-
-## Trade Mention on Volatility by hour
-```{r ARMA-X trade hourly, results='asis'}
-
-armax(armax_data$r_vol_h,xreg=armax_data$total_trade,latex=F)
+armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=T)
 
 ```
 
 
+## Positive Vibe on Volatility by hour
+```{r SPY ARMA-X positive hourly, results='asis'}
+
+armax(armax_data$SPY_vol,xreg=armax_data$prop_positive,nb.lags=2,latex=T)
+
+```
+
+\newpage
+
+
+# European Market ARMA-X Models
+
+## Find Number of Lags
+```{r VGK lags, results='asis'}
+
+lag_selector(y=armax_data$VGK_vol, xreg=armax_data$N,
+             nb.lags=5, type="latex")
+lag_selector(y=armax_data$VGK_vol, xreg=armax_data$dummy,
+             nb.lags=5, type="latex")
+lag_selector(y=armax_data$VGK_vol, xreg=armax_data$total_tariff,
+             nb.lags=5, type="latex")
+lag_selector(y=armax_data$VGK_vol, xreg=armax_data$total_trade,
+             nb.lags=5, type="latex")
+lag_selector(y=armax_data$VGK_vol, xreg=armax_data$prop_positive,
+             nb.lags=5, type="latex")
+lag_selector(y=armax_data$VGK_vol, xreg=armax_data$prop_negative,
+             nb.lags=5, type="latex")
+
+```
+
+## Tweet Count on Volatility by hour
+```{r VGK ARMA-X count hourly volatility, results='asis'}
+
+armax(armax_data$VGK_vol,xreg=armax_data$N,nb.lags=0,latex=T)
+
+```
+
+
+## Tweet Dummy on Volatility by hour
+```{r VGK ARMA-X dummy hourly, results='asis'}
+
+armax(armax_data$VGK_vol,xreg=armax_data$dummy,nb.lags=3,latex=T)
+
+```
+
+
+## Tariff Mention on Volatility by hour
+```{r VGK ARMA-X tariff hourly, results='asis'}
+
+armax(armax_data$VGK_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=T)
+
+```
+
+
+## Negative Vibe on Volatility by hour
+```{r VGK ARMA-X negative hourly, results='asis'}
+
+armax(armax_data$VGK_vol,xreg=armax_data$prop_negative,nb.lags=0,latex=T)
+
+```
 
 
 
+\newpage
 
+
+# Chinese Market ARMA-X Models
+
+## Find Number of Lags
+```{r ASHR lags, results='asis'}
+
+lag_selector(y=armax_data$ASHR_vol, xreg=armax_data$N,
+             nb.lags=5, type="latex")
+lag_selector(y=armax_data$ASHR_vol, xreg=armax_data$dummy,
+             nb.lags=5, type="latex")
+lag_selector(y=armax_data$ASHR_vol, xreg=armax_data$total_tariff,
+             nb.lags=5, type="latex")
+lag_selector(y=armax_data$ASHR_vol, xreg=armax_data$total_trade,
+             nb.lags=5, type="latex")
+lag_selector(y=armax_data$ASHR_vol, xreg=armax_data$prop_positive,
+             nb.lags=5, type="latex")
+lag_selector(y=armax_data$ASHR_vol, xreg=armax_data$prop_negative,
+             nb.lags=5, type="latex")
+
+```
+
+## Tweet Count on Volatility by hour
+```{r ASHR ARMA-X count hourly volatility, results='asis'}
+
+armax(armax_data$ASHR_vol,xreg=armax_data$N,nb.lags=5,latex=T)
+
+```
+
+
+## Tweet Dummy on Volatility by hour
+```{r ASHR ARMA-X dummy hourly, results='asis'}
+
+armax(armax_data$ASHR_vol,xreg=armax_data$dummy,nb.lags=5,latex=T)
+
+```
+
+
+## Tariff Mention on Volatility by hour
+```{r ASHR ARMA-X tariff hourly, results='asis'}
+
+armax(armax_data$ASHR_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=T)
+
+```
+
+
+## Positive Vibe on Volatility by hour
+```{r ASHR ARMA-X positive hourly, results='asis'}
+
+armax(armax_data$ASHR_vol,xreg=armax_data$prop_positive,nb.lags=3,latex=T)
+
+```
+## Negative Vibe on Volatility by hour
+```{r ASHR ARMA-X negative hourly, results='asis'}
+
+armax(armax_data$ASHR_vol,xreg=armax_data$prop_negative,nb.lags=5,latex=T)
+
+```
 
 

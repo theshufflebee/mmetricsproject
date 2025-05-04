@@ -49,7 +49,7 @@ lag_selector <- function(y, xreg, nb.lags = 3, type = "text") {
   robust_se <- sqrt(diag(var.cov.mat))
   
   #output table; significant lags are how many we choose
-  stargazer(eq, eq, type = type,
+  stargazer(eq, eq, type = type, header=FALSE,
             column.labels = c("(no HAC)", "(HAC)"), keep.stat = "n",
             se = list(NULL, robust_se), no.space = TRUE)
 }
