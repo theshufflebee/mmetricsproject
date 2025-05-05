@@ -39,6 +39,10 @@ Models:
 -> rip
 
 
+To do:
+- Run randomforests on volatility find words
+- 
+
 
 
 
