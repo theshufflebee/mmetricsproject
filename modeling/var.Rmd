@@ -35,6 +35,9 @@ require(tidytext) #text mining
 require(textstem) #lemmatization
 require(quanteda) #tokenization
 require(texreg) #arima tables
+require(vars) #VAR models
+require(xts) #time series objects
+require(tseries) #includes adf test
 
 getwd()
 #setwd("...") -> set wd at base repo folder
@@ -265,6 +268,87 @@ var_data$prop_negative[is.na(var_data$prop_negative)] = 0
 
 
 # S\&P500 VAR Models
+
+## Tests
+Following: https://github.com/ritvikmath/Time-Series-Analysis/blob/master/VAR%20Model.ipynb
+
+```{r spytest1}
+
+acf(var_data$SPY_vol)
+pacf(var_data$SPY_vol)
+
+
+#Correlation between "heater" and lagged "ice cream"
+
+for (lag in 1:13) {
+  
+  volatility_series <- var_data$SPY_vol[(lag+1):nrow(var_data)]
+  lagged_tweet_series <- var_data$total_tariff[1:(nrow(var_data)-lag)]
+  
+  # Print lag value
+  cat('Lag:', lag, '\n')
+  
+  # Calculate Pearson correlation
+  correlation <- cor.test(volatility_series, lagged_tweet_series, method="pearson")
+  cat("Correlation coefficient:", correlation$estimate, "\n")
+  cat("P-value:", correlation$p.value, "\n")
+  
+  # Separator line
+  cat('------\n')
+}
+
+```
+
+
+```{r spytest1 modelfit}
+
+#data
+variables <- c("SPY_vol", "total_tariff")
+
+ts_data <- xts(var_data[, variables], 
+               order.by = var_data$timestamp)
+
+
+
+#adf test
+# ADF stationary test for each column
+adf_test_results <- apply(ts_data, 2, function(x) adf.test(x)$p.value) #2 means columns
+
+# print p values (p<0.05 means stationary, p>0.05 means explosive)
+adf_test_results
+
+
+
+
+#lags
+# Determine optimal lag length using AIC
+lag_selection <- VARselect(ts_data, lag.max = 55, type = "const") 
+
+# View the lag length selection
+lag_selection$selection
+
+
+
+#fit
+# Fit the VAR model with the chosen lag length
+var_model <- VAR(ts_data, p = lag_selection$selection["AIC(n)"], type = "const")
+
+# Check the summary of the model
+summary(var_model)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Find Number of Lags
 ```{r SPY lags, results='asis'}
