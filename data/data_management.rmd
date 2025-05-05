@@ -35,6 +35,8 @@ require(tidytext) #text mining
 require(textstem) #lemmatization
 require(quanteda) #tokenization
 require(syuzhet) #sentiment analysis
+require(alphavantager)
+av_api_key(Sys.getenv("ALPHAVANTAGE_API_KEY"))
 
 getwd()
 #setwd("...") -> set wd at base repo folder
