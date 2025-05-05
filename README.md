@@ -32,12 +32,18 @@ Models:
    On volatility? Possibly
 -> Question: What to do for 2021-2022?
 -> r_vol_h values very low, ask prof what he thinks
-3) VAR: Tweet Sentiment on Returns (FRED -> daily, not intraday)
+
+   
+2) VAR: Tweet Sentiment on Returns (FRED -> daily, not intraday)
 -> Work on specification
 
-5) GARCH: Tweet Dummy on Log Returns (because predicts volatility)
+3) GARCH: Tweet Dummy on Log Returns (because predicts volatility)
 -> rip
 
+
+To do:
+- Run randomforests on volatility find words
+- Stop ignoring tweets outside hours and include them in next hour
 
 
 
