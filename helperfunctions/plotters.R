@@ -194,5 +194,4 @@ hvol_plotter = function(data,breaks,title){
           plot.title = element_text(face = "bold", hjust = 0.5))
 }
 
-#e.g. vol_plotter(vol_SPY2024,breaks="1 month",freq="per hour",
-#                              title="Realised Volatility - SPY 2024")
+#e.g. hvol_plotter(vol_SPY2024,breaks="1 month", title="Realised Volatility - SPY 2024")
