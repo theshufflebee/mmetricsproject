@@ -341,7 +341,9 @@ armax(armax_data$SPY_vol,xreg=armax_data$dummy,nb.lags=3,latex=F)
 ## Tariff Mention on Volatility by hour
 ```{r SPY ARMA-X tariff hourly, results='asis'}
 
-armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=F)
+spytariff = armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,
+                  nb.lags=5,latex=F)
+spytariff
 
 ```
 
@@ -352,6 +354,24 @@ armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=F)
 armax(armax_data$SPY_vol,xreg=armax_data$prop_positive,nb.lags=2,latex=F)
 
 ```
+
+## IRFs
+```{r irf test}
+nb.periods <- 20
+IRF1 <- sim.arma(c=0,phi=c(0),theta=eq$coefficients[2:(nb.lags+1)],sigma=1,
+                 T=nb.periods,y.0=c(0),nb.sim=1,make.IRF=1)
+IRF2 <- sim.arma(c=0,phi=res.armax$phi,theta=res.armax$beta,sigma=1,
+                 T=nb.periods,y.0=rep(0,length(res.armax$phi)),
+                 nb.sim=1,make.IRF=1)
+par(plt=c(.15,.95,.2,.95))
+plot(IRF1,type="l",lwd=2,col="red",xlab="months after shock",
+     ylab="Chge in price (percent)")
+lines(IRF2,lwd=2,col="red",lty=2)
+abline(h=0,col="grey")
+```
+
+
+
 
 \newpage
 
