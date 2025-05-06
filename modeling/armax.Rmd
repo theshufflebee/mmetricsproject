@@ -362,9 +362,10 @@ armax(armax_data$SPY_vol,xreg=armax_data$prop_positive,nb.lags=2,latex=F)
 
 ## IRFs
 ```{r irf test}
-nb.periods <- 20
-IRF1 <- sim.arma(c=0,phi=c(0),theta=eq$coefficients[2:(nb.lags+1)],sigma=1,
-                 T=nb.periods,y.0=c(0),nb.sim=1,make.IRF=1)
+nb.periods <- 10
+nb.lags=5
+IRF1 <- sim.arma(c=0,phi=c(0),theta=spytariffsimple$coefficients[2:(nb.lags+2)]
+                 ,sigma=1, T=nb.periods,y.0=c(0),nb.sim=1,make.IRF=1)
 IRF2 <- sim.arma(c=0,phi=spytariff$coef[1:4],theta=spytariff$coef[6:11],sigma=1,
                  T=nb.periods,y.0=rep(0,length(spytariff$coef[1:4])),
                  nb.sim=1,make.IRF=1)
@@ -374,6 +375,7 @@ plot(IRF1,type="l",lwd=2,col="red",xlab="months after shock",
 lines(IRF2,lwd=2,col="red",lty=2)
 abline(h=0,col="grey")
 
+plot(IRF1)
 plot(IRF2)
 ```
 
