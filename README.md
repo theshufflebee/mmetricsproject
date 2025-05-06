@@ -45,6 +45,7 @@ To do:
 - Run randomforests on volatility find words
 - Stop ignoring tweets outside hours and include them in next hour
 - Redownload april data
+- Rename variables for final latex tables
 
 
 
