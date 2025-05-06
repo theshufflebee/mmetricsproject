@@ -47,6 +47,7 @@ source(here("helperfunctions/quick_arma.R"))
 source(here("helperfunctions/r.vol_calculators.R"))
 source(here("helperfunctions/truths_cleaning_function.R"))
 source(here("helperfunctions/armax_functions.R"))
+source(here("helperfunctions/various_proc_TS.R"))
 ```
 
 
