@@ -341,14 +341,7 @@ armax(armax_data$SPY_vol,xreg=armax_data$dummy,nb.lags=3,latex=F)
 ## Tariff Mention on Volatility by hour
 ```{r SPY ARMA-X tariff hourly, results='asis'}
 
-spytariffsimple = lag_selector(y=armax_data$SPY_vol,
-                               xreg=armax_data$total_tariff,
-                               nb.lags=5, type="text")
-
-spytariff = armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,
-                  nb.lags=5,latex=F)
-
-spytariff
+armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=3,latex=F)
 
 ```
 
@@ -361,13 +354,28 @@ armax(armax_data$SPY_vol,xreg=armax_data$prop_positive,nb.lags=2,latex=F)
 ```
 
 ## IRFs
+
+```{r irftest}
+
+spytariffsimple = lag_selector(y=armax_data$SPY_vol,
+                               xreg=armax_data$total_tariff,
+                               nb.lags=5, type="text")
+
+spytariff = armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,
+                  nb.lags=5,latex=F)
+
+spytariff
+
+```
+
+
 ```{r irf test}
 nb.periods <- 10
 nb.lags=5
 IRF1 <- sim.arma(c=0,phi=c(0),theta=spytariffsimple$coefficients[2:(nb.lags+2)]
                  ,sigma=1, T=nb.periods,y.0=c(0),nb.sim=1,make.IRF=1)
-IRF2 <- sim.arma(c=0,phi=spytariff$coef[1:4],theta=spytariff$coef[6:11],sigma=1,
-                 T=nb.periods,y.0=rep(0,length(spytariff$coef[1:4])),
+IRF2 <- sim.arma(c=0,phi=spytariff$coef[1:5],theta=spytariff$coef[7:12],sigma=1,
+                 T=nb.periods,y.0=rep(0,length(spytariff$coef[1:5])),
                  nb.sim=1,make.IRF=1)
 par(plt=c(.15,.95,.2,.95))
 plot(IRF1,type="l",lwd=2,col="red",xlab="months after shock",
