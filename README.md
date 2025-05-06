@@ -21,7 +21,6 @@ Data:
 -SPY intraday prices + volatility hourly and daily averages
 -> Move Tweets outside trading hours
 
-
 Models:
 
 
@@ -32,19 +31,23 @@ Models:
    On volatility? Possibly
 -> Question: What to do for 2021-2022?
 -> r_vol_h values very low, ask prof what he thinks
+-> Add interaction term count*tariff
 
-   
-2) VAR: Tweet Sentiment on Returns (FRED -> daily, not intraday)
+3) VAR: Tweet Sentiment on Returns 
 -> Work on specification
+-> Plenty of lags 'cause lags?
 
-3) GARCH: Tweet Dummy on Log Returns (because predicts volatility)
+4) GARCH: Tweet Dummy on Log Returns (because predicts volatility)
 -> rip
 
 
 To do:
 - Run randomforests on volatility find words
 - Stop ignoring tweets outside hours and include them in next hour
-
+- Redownload april data
+- Rename variables for final latex tables
+- IRF for base (HAC) function (just plot the coefs for each lag)
+- IRF for armax (and hopefully the two IRFs match)
 
 
 
