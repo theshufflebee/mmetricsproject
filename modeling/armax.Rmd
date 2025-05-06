@@ -308,24 +308,24 @@ armax_data$prop_negative[is.na(armax_data$prop_negative)] = 0
 ```{r SPY lags, results='asis'}
 
 lag_selector(y=armax_data$SPY_vol, xreg=armax_data$N,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 lag_selector(y=armax_data$SPY_vol, xreg=armax_data$dummy,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 lag_selector(y=armax_data$SPY_vol, xreg=armax_data$total_tariff,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 lag_selector(y=armax_data$SPY_vol, xreg=armax_data$total_trade,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 lag_selector(y=armax_data$SPY_vol, xreg=armax_data$prop_positive,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 lag_selector(y=armax_data$SPY_vol, xreg=armax_data$prop_negative,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 
 ```
 
 ## Tweet Count on Volatility by hour
 ```{r SPY ARMA-X count hourly volatility, results='asis'}
 
-armax(armax_data$SPY_vol,xreg=armax_data$N,nb.lags=0,latex=T)
+armax(armax_data$SPY_vol,xreg=armax_data$N,nb.lags=0,latex=F)
 
 ```
 
@@ -333,7 +333,7 @@ armax(armax_data$SPY_vol,xreg=armax_data$N,nb.lags=0,latex=T)
 ## Tweet Dummy on Volatility by hour
 ```{r SPY ARMA-X dummy hourly, results='asis'}
 
-armax(armax_data$SPY_vol,xreg=armax_data$dummy,nb.lags=3,latex=T)
+armax(armax_data$SPY_vol,xreg=armax_data$dummy,nb.lags=3,latex=F)
 
 ```
 
@@ -341,7 +341,7 @@ armax(armax_data$SPY_vol,xreg=armax_data$dummy,nb.lags=3,latex=T)
 ## Tariff Mention on Volatility by hour
 ```{r SPY ARMA-X tariff hourly, results='asis'}
 
-armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=T)
+armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=F)
 
 ```
 
@@ -349,7 +349,7 @@ armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=T)
 ## Positive Vibe on Volatility by hour
 ```{r SPY ARMA-X positive hourly, results='asis'}
 
-armax(armax_data$SPY_vol,xreg=armax_data$prop_positive,nb.lags=2,latex=T)
+armax(armax_data$SPY_vol,xreg=armax_data$prop_positive,nb.lags=2,latex=F)
 
 ```
 
@@ -362,24 +362,24 @@ armax(armax_data$SPY_vol,xreg=armax_data$prop_positive,nb.lags=2,latex=T)
 ```{r VGK lags, results='asis'}
 
 lag_selector(y=armax_data$VGK_vol, xreg=armax_data$N,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 lag_selector(y=armax_data$VGK_vol, xreg=armax_data$dummy,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 lag_selector(y=armax_data$VGK_vol, xreg=armax_data$total_tariff,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 lag_selector(y=armax_data$VGK_vol, xreg=armax_data$total_trade,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 lag_selector(y=armax_data$VGK_vol, xreg=armax_data$prop_positive,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 lag_selector(y=armax_data$VGK_vol, xreg=armax_data$prop_negative,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 
 ```
 
 ## Tweet Count on Volatility by hour
 ```{r VGK ARMA-X count hourly volatility, results='asis'}
 
-armax(armax_data$VGK_vol,xreg=armax_data$N,nb.lags=0,latex=T)
+armax(armax_data$VGK_vol,xreg=armax_data$N,nb.lags=0,latex=F)
 
 ```
 
@@ -387,7 +387,7 @@ armax(armax_data$VGK_vol,xreg=armax_data$N,nb.lags=0,latex=T)
 ## Tweet Dummy on Volatility by hour
 ```{r VGK ARMA-X dummy hourly, results='asis'}
 
-armax(armax_data$VGK_vol,xreg=armax_data$dummy,nb.lags=3,latex=T)
+armax(armax_data$VGK_vol,xreg=armax_data$dummy,nb.lags=3,latex=F)
 
 ```
 
@@ -395,7 +395,7 @@ armax(armax_data$VGK_vol,xreg=armax_data$dummy,nb.lags=3,latex=T)
 ## Tariff Mention on Volatility by hour
 ```{r VGK ARMA-X tariff hourly, results='asis'}
 
-armax(armax_data$VGK_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=T)
+armax(armax_data$VGK_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=F)
 
 ```
 
@@ -403,7 +403,7 @@ armax(armax_data$VGK_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=T)
 ## Negative Vibe on Volatility by hour
 ```{r VGK ARMA-X negative hourly, results='asis'}
 
-armax(armax_data$VGK_vol,xreg=armax_data$prop_negative,nb.lags=0,latex=T)
+armax(armax_data$VGK_vol,xreg=armax_data$prop_negative,nb.lags=0,latex=F)
 
 ```
 
@@ -418,24 +418,24 @@ armax(armax_data$VGK_vol,xreg=armax_data$prop_negative,nb.lags=0,latex=T)
 ```{r ASHR lags, results='asis'}
 
 lag_selector(y=armax_data$ASHR_vol, xreg=armax_data$N,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 lag_selector(y=armax_data$ASHR_vol, xreg=armax_data$dummy,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 lag_selector(y=armax_data$ASHR_vol, xreg=armax_data$total_tariff,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 lag_selector(y=armax_data$ASHR_vol, xreg=armax_data$total_trade,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 lag_selector(y=armax_data$ASHR_vol, xreg=armax_data$prop_positive,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 lag_selector(y=armax_data$ASHR_vol, xreg=armax_data$prop_negative,
-             nb.lags=5, type="latex")
+             nb.lags=5, type="text")
 
 ```
 
 ## Tweet Count on Volatility by hour
 ```{r ASHR ARMA-X count hourly volatility, results='asis'}
 
-armax(armax_data$ASHR_vol,xreg=armax_data$N,nb.lags=5,latex=T)
+armax(armax_data$ASHR_vol,xreg=armax_data$N,nb.lags=5,latex=F)
 
 ```
 
@@ -443,7 +443,7 @@ armax(armax_data$ASHR_vol,xreg=armax_data$N,nb.lags=5,latex=T)
 ## Tweet Dummy on Volatility by hour
 ```{r ASHR ARMA-X dummy hourly, results='asis'}
 
-armax(armax_data$ASHR_vol,xreg=armax_data$dummy,nb.lags=5,latex=T)
+armax(armax_data$ASHR_vol,xreg=armax_data$dummy,nb.lags=5,latex=F)
 
 ```
 
@@ -451,7 +451,7 @@ armax(armax_data$ASHR_vol,xreg=armax_data$dummy,nb.lags=5,latex=T)
 ## Tariff Mention on Volatility by hour
 ```{r ASHR ARMA-X tariff hourly, results='asis'}
 
-armax(armax_data$ASHR_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=T)
+armax(armax_data$ASHR_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=F)
 
 ```
 
@@ -459,13 +459,13 @@ armax(armax_data$ASHR_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=T)
 ## Positive Vibe on Volatility by hour
 ```{r ASHR ARMA-X positive hourly, results='asis'}
 
-armax(armax_data$ASHR_vol,xreg=armax_data$prop_positive,nb.lags=3,latex=T)
+armax(armax_data$ASHR_vol,xreg=armax_data$prop_positive,nb.lags=3,latex=F)
 
 ```
 ## Negative Vibe on Volatility by hour
 ```{r ASHR ARMA-X negative hourly, results='asis'}
 
-armax(armax_data$ASHR_vol,xreg=armax_data$prop_negative,nb.lags=5,latex=T)
+armax(armax_data$ASHR_vol,xreg=armax_data$prop_negative,nb.lags=5,latex=F)
 
 ```
 
