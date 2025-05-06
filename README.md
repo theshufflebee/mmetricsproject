@@ -21,7 +21,6 @@ Data:
 -SPY intraday prices + volatility hourly and daily averages
 -> Move Tweets outside trading hours
 
-
 Models:
 
 
@@ -45,7 +44,7 @@ Models:
 To do:
 - Run randomforests on volatility find words
 - Stop ignoring tweets outside hours and include them in next hour
-
+- Redownload april data
 
 
 
