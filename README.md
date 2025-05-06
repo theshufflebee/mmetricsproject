@@ -46,6 +46,8 @@ To do:
 - Stop ignoring tweets outside hours and include them in next hour
 - Redownload april data
 - Rename variables for final latex tables
+- IRF for base (HAC) function (just plot the coefs for each lag)
+- IRF for armax (and hopefully the two IRFs match)
 
 
 
