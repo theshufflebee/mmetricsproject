@@ -341,8 +341,13 @@ armax(armax_data$SPY_vol,xreg=armax_data$dummy,nb.lags=3,latex=F)
 ## Tariff Mention on Volatility by hour
 ```{r SPY ARMA-X tariff hourly, results='asis'}
 
+spytariffsimple = lag_selector(y=armax_data$SPY_vol,
+                               xreg=armax_data$total_tariff,
+                               nb.lags=5, type="text")
+
 spytariff = armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,
                   nb.lags=5,latex=F)
+
 spytariff
 
 ```
