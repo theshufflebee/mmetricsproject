@@ -243,6 +243,7 @@ social_hourly <- left_join(social_hourly, tariff_hour, by="timestamp")
 
 #create dummy for mention of trade 
 trade <- ifelse(str_detect(social$tweet_text, "trade"), 1, 0)
+trade = str_count(social$tweet_text,pattern = "trade")
 social$trade <- trade
 
 #counts number of tweets mentioning tariffs per hour
