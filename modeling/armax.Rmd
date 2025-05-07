@@ -341,7 +341,13 @@ armax(armax_data$SPY_vol,xreg=armax_data$dummy,nb.lags=3,latex=F)
 ## Tariff Mention on Volatility by hour
 ```{r SPY ARMA-X tariff hourly, results='asis'}
 
-armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=3,latex=F)
+armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=F,
+      max.p = 5, max.q = 5)
+
+result <- select_armax_ic(armax_data$SPY_vol, x=armax_data$total_tariff, 
+                        max_p = 5, max_q = 5, max_r = 5, criterion = "AIC")
+
+summary(result$model)
 
 ```
 
@@ -371,9 +377,9 @@ spytariff
 ```
 
 
-```{r irf test}
+```{r irf test, warning=FALSE}
 
-nb.periods = 20
+nb.periods = nb.lags
 
 IRF1 <- sim.arma(c=0,phi=c(0),theta=spytariffsimple$coefficients[2:(nb.lags+2)]
                  ,sigma=1, T=nb.periods,y.0=c(0),nb.sim=1,make.IRF=1)
@@ -385,19 +391,25 @@ IRF = cbind.data.frame(1:nb.periods,IRF1,IRF2)
 colnames(IRF) = c("Period","IRF1","IRF2")
 
 
-plot(spytariffsimple$coefficients[2:(nb.lags+2)])
 
 ggplot(IRF,aes(x = Period, y = IRF1)) +
     geom_line(color = "steelblue", size = 1.2) +
     geom_point(color = "red", size = 2) +
-    labs(title = paste("criterion", "vs Number of Exogenous Lags (r)")) +
+    scale_x_continuous(expand=c(0, 0), limits=c(0, nb.periods+1)) +
+    scale_y_continuous(expand=c(0, 0), limits=c(-0.001,0.1)) +
+    labs(title = "OLS IRF") +
     theme_minimal()
 
 ggplot(IRF,aes(x = Period, y = IRF2)) +
     geom_line(color = "steelblue", size = 1.2) +
     geom_point(color = "red", size = 2) +
-    labs(title = paste("criterion", "vs Number of Exogenous Lags (r)")) +
+    scale_x_continuous(expand=c(0, 0), limits=c(0, nb.periods+1)) +
+    scale_y_continuous(expand=c(0, 0), limits=c(-0.1,0.001)) +
+    labs(title = "ARMAX IRF") +
     theme_minimal()
+
+
+
 
 ```
 

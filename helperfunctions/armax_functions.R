@@ -39,10 +39,10 @@ lag_selector <- function(y, xreg, nb.lags = 3, type = "text") {
   xreg_lags <- lag_creator(xreg, nb.lags, varname = xreg_name)
   
   #align y to match lagged xreg
-  y_aligned <- tail(y, nrow(xreg_lags))
-  
+  y <- tail(y, nrow(xreg_lags))
+
   #fit an ARMA(0,0,0) model with lm (with r set above)
-  eq <- lm(y_aligned ~ xreg_lags)
+  eq <- lm(y ~ xreg_lags)
   
   #compute Newey-West HAC standard errors 
   var.cov.mat <- NeweyWest(eq, lag = nb.lags + 4, prewhite = FALSE)
@@ -70,7 +70,7 @@ lag_selector <- function(y, xreg, nb.lags = 3, type = "text") {
 
 #--------------------------------------------------------------------------------
 
-lag_selector_ic <- function(y, x, max_p = 3, max_q = 3, 
+select_armax_ic <- function(y, x, max_p = 3, max_q = 3, 
                              max_r = 5, criterion = "AIC") {
   
   #creating lags according to r
@@ -176,10 +176,10 @@ armax <- function(y, xreg, nb.lags = 3, max.p = 5,
   xreg_lags <- lag_creator(xreg, nb.lags, varname = xreg_name)
   
   #align y to match lagged xreg
-  y_aligned <- tail(y, nrow(xreg_lags))
-  
+  y <- tail(y, nrow(xreg_lags))
+
   #find best armax model and fit
-  tab = auto.arima(y_aligned, xreg = xreg_lags, seasonal = FALSE, 
+  tab = auto.arima(y, xreg = xreg_lags, seasonal = FALSE, 
                    max.p = max.p, max.q = max.q, max.d = max.d,
                     stepwise = FALSE, approximation = FALSE, trace = FALSE)
 
