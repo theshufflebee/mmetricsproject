@@ -25,13 +25,13 @@ Models:
 
 
 1) ARMAX: Tweet Count & Tweet Dummy on Volatility 
--> Question: How to select lags? select_armax uses AIC but prof uses regression and checks significance? Then use AIC?
+- Question: How to select lags? select_armax uses AIC but prof uses regression and checks significance? Then use AIC?
    Prof says can use both 
--> Tweets really exogenous? Doubt
+- Tweets really exogenous? Doubt
    On volatility? Possibly
--> Question: What to do for 2021-2022?
--> r_vol_h values very low, ask prof what he thinks
--> Add interaction term count*tariff
+- Question: What to do for 2021-2022?
+- r_vol_h values very low, ask prof what he thinks
+- Add interaction term count*tariff
 
 3) VAR: Tweet Sentiment on Returns 
 -> Work on specification
