@@ -78,6 +78,61 @@ ASHR <- read.csv(here("data/mothership", "ASHR.CSV"))
 
 ```
 
+
+```{r}
+social_hourly_collapsed <- social_hourly %>%
+  mutate(
+    hour = hour(timestamp),
+    date = as.Date(timestamp),
+    weekday = wday(timestamp),  # day of the week (1 is Sunday 7 is Saturday)
+  
+    move_before_9 = hour < 9,  
+    move_after_16 = hour >= 16,  
+    is_weekend = weekday %in% c(1, 7),  # Check if it's Saturday (7) or Sunday (1)
+    
+    # between 0000 and 0859 move to 0900
+    adjusted_datetime = if_else(
+      move_before_9,
+      as.POSIXct(paste(date, "09:00:00"), format = "%Y-%m-%d %H:%M:%S", tz = tz(timestamp)),
+      
+      # after 16:00 before 2400, move to 0900  next day
+      if_else(
+        move_after_16,
+        as.POSIXct(paste(date + 1, "09:00:00"), format = "%Y-%m-%d %H:%M:%S", tz = tz(timestamp)),
+        
+        # Otherwise keep same timestamp (between 09:00 and 16:00)
+        timestamp
+      )
+    ),
+    
+    adjusted_datetime = if_else(
+      is_weekend & weekday == 7,  # Saturday
+      as.POSIXct(paste(date + 2, "09:00:00"), format = "%Y-%m-%d %H:%M:%S", tz = tz(timestamp)),
+      adjusted_datetime  # otherwise date stays same
+    ),
+    
+    adjusted_datetime = if_else(
+      is_weekend & weekday == 1,  # Sunday
+      as.POSIXct(paste(date + 1, "09:00:00"), format = "%Y-%m-%d %H:%M:%S", tz = tz(timestamp)),
+      adjusted_datetime  
+    )
+  )
+
+social_hourly_fin <- social_hourly
+
+social_hourly_fin$timestamp <- social_hourly_collapsed$adjusted_datetime
+
+#Final collapsed on next trading hours at 0900 (including weekend)
+social_hourly_final <- social_hourly_fin %>%
+  group_by(timestamp) %>%
+  summarise(across(where(is.numeric), sum, na.rm = TRUE), .groups = "drop")
+
+```
+
+
+
+
+
 ```{r data_time, results=FALSE, warning=FALSE, message=FALSE}
 
 #make posixct
