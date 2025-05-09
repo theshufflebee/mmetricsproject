@@ -96,7 +96,6 @@ truths <-truths_processer(truths_raw) # can take one or two minutes
 
 
 ```{r}
-# Assuming you have a 'truths' dataframe with 'time' and 'date' columns
 start_date <- as.Date(min(truths$day)) - 3  # First date (earliest tweet) minus 3 for returns as first tweet is on monday
 end_date <- max(truths$day)    # Last date (latest tweet)
 
