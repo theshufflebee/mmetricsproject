@@ -151,7 +151,7 @@ select_armax_ic <- function(y, x, max_p = 3, max_q = 3,
 
 
 
-#e.g. result <- select_armax(armax_vol$r_vol, armax_vol$N, 
+#e.g. result <- select_armax(armax_data$SPY_vol, armax_data$N, 
 #                       max_p = 3, max_q = 3, max_r = 5, criterion = "AIC")
 
 #summary(result$model) 
