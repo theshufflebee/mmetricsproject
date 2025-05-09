@@ -106,7 +106,7 @@ SPY_volatility_alltime = SPY_volatility_alltime %>%
 #select time period
 SPY_volatility = filter(SPY_volatility_alltime,
                   between(timestamp, 
-                          as.Date('2014-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-04-10')))
 
 
@@ -153,7 +153,7 @@ VGK_volatility_alltime = VGK_volatility_alltime %>%
 #select time period
 VGK_volatility = filter(VGK_volatility_alltime,
                   between(timestamp, 
-                          as.Date('2014-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -172,7 +172,7 @@ ASHR_volatility_alltime = ASHR_volatility_alltime %>%
 #select time period
 ASHR_volatility = filter(ASHR_volatility_alltime,
                   between(timestamp, 
-                          as.Date('2014-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -186,7 +186,7 @@ tweetcount_alltime = dplyr::select(social_hourly,timestamp,N)
 #select time period
 tweetcount = filter(tweetcount_alltime,
                   between(timestamp, 
-                          as.Date('2014-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-04-10')))
 
 #plot
@@ -210,7 +210,7 @@ tweetdummy_alltime = dplyr::select(social_hourly,timestamp,dummy)
 #select time period
 tweetdummy = filter(tweetdummy_alltime,
                   between(timestamp, 
-                          as.Date('2014-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -224,7 +224,7 @@ tariff_alltime = dplyr::select(social_hourly,timestamp,total_tariff)
 #select time period
 tariff = filter(tariff_alltime,
                   between(timestamp, 
-                          as.Date('2014-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -238,7 +238,7 @@ trade_alltime = dplyr::select(social_hourly,timestamp,total_trade)
 #select time period
 trade = filter(trade_alltime,
                   between(timestamp, 
-                          as.Date('2014-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -252,7 +252,7 @@ positive_alltime = dplyr::select(social_hourly,timestamp,prop_positive)
 #select time period
 positive = filter(positive_alltime,
                   between(timestamp, 
-                          as.Date('2014-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -266,7 +266,7 @@ negative_alltime = dplyr::select(social_hourly,timestamp,prop_negative)
 #select time period
 negative = filter(negative_alltime,
                   between(timestamp, 
-                          as.Date('2014-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -312,7 +312,7 @@ lag_selector(y=armax_data$SPY_vol, xreg=armax_data$N,
 lag_selector(y=armax_data$SPY_vol, xreg=armax_data$dummy,
              nb.lags=5, type="text")
 lag_selector(y=armax_data$SPY_vol, xreg=armax_data$total_tariff,
-             nb.lags=5, type="text")
+             nb.lags=8, type="text")
 lag_selector(y=armax_data$SPY_vol, xreg=armax_data$total_trade,
              nb.lags=5, type="text")
 lag_selector(y=armax_data$SPY_vol, xreg=armax_data$prop_positive,
@@ -369,8 +369,8 @@ spytariffsimple = lag_selector(y=armax_data$SPY_vol,
                                xreg=armax_data$total_tariff,
                                nb.lags=nb.lags, type="text")
 
-spytariff = armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,
-                  nb.lags=nb.lags,latex=F)
+spytariff = armax(armax_data$SPY_vol,xreg=armax_data$total_tariff, max.p=5, 
+                  max.q = 5,nb.lags=nb.lags,latex=F)
 
 spytariff
 
@@ -407,7 +407,6 @@ ggplot(IRF,aes(x = Period, y = IRF2)) +
     scale_y_continuous(expand=c(0, 0), limits=c(-0.1,0.001)) +
     labs(title = "ARMAX IRF") +
     theme_minimal()
-
 
 
 
