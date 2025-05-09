@@ -1,0 +1,363 @@
+---
+title: "ARMA-X Analysis Testing"
+output:
+  pdf_document: 
+    toc: true
+    fig_caption: yes
+    latex_engine: lualatex
+header-includes:
+  - \usepackage{amsmath}
+---
+\newpage
+
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwhich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenization
+require(texreg) #arima tables
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/armax_functions.R"))
+```
+
+
+# Data 
+
+
+## Load Base Data
+
+```{r data_setup, results=FALSE, warning=FALSE, message=FALSE}
+
+# 1. Load Political Social Media
+
+#contains posts from Twitter & TruthSocial
+social <- read.csv(here("data/mothership", "social.csv"))
+
+social_hourly <- read.csv(here("data/mothership", "socialhourly.csv"))
+
+
+# 2. Load Financial
+
+#S&P500
+SPY <- read.csv(here("data/mothership", "SPY.csv"))
+
+#STOXX50
+VGK <- read.csv(here("data/mothership", "VGK.csv"))
+
+#CSI 300 (China)
+ASHR <- read.csv(here("data/mothership", "ASHR.CSV"))
+
+```
+
+```{r data_time, results=FALSE, warning=FALSE, message=FALSE}
+
+#make posixct
+SPY$timestamp = as.POSIXct(SPY$timestamp,format = "%Y-%m-%d %H:%M:%S")
+VGK$timestamp = as.POSIXct(VGK$timestamp,format = "%Y-%m-%d %H:%M:%S")
+ASHR$timestamp = as.POSIXct(ASHR$timestamp,format = "%Y-%m-%d %H:%M:%S")
+social$timestamp = as.POSIXct(social$timestamp,format = "%Y-%m-%d %H:%M:%S")
+social_hourly$timestamp = as.POSIXct(social_hourly$timestamp,format = "%Y-%m-%d %H:%M:%S")
+
+```
+
+
+
+## Volatility
+```{r SPY volatility}
+
+#find hourly volatility
+#NOTE: this ignores tweets made outside trading hours!!
+SPY_volatility_alltime = dplyr::select(SPY,timestamp,r_vol_h)
+
+#aggregating per hour
+SPY_volatility_alltime = SPY_volatility_alltime %>%
+          mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
+          distinct(timestamp, .keep_all = TRUE) 
+   
+#select time period
+SPY_volatility = filter(SPY_volatility_alltime,
+                  between(timestamp, 
+                          as.Date('2018-01-01'), 
+                          as.Date('2025-04-10')))
+
+
+
+
+
+#temp: check seasonality etc
+hvol_plotter = function(data,breaks,title){
+  x_scale <- switch(breaks,
+                    "yearly" = scale_x_datetime(date_labels = "%b %Y", date_breaks = "6 month"),
+                    "monthly" = scale_x_datetime(date_labels = "%b %Y", date_breaks = "1 month"),
+                    "daily"   = scale_x_datetime(date_labels = "%a %d", date_breaks = "1 day"),
+                    "hourly"  = scale_x_datetime(date_labels = "%Hh", date_breaks = "1 hour"),
+                    NULL)  #default NULL if nothing matches   
+  
+  ggplot(data, aes(x = timestamp, y = r_vol_h)) +
+    geom_line(color = "#2c7fb8", linewidth = 0.1) +
+    geom_point(color = "#253494", size = 0) +
+    x_scale + 
+    scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
+    ylim(0,0.1) +
+    labs(title = title,
+         x = NULL,
+         y = "hourly realised volatility") +
+    theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          plot.title = element_text(face = "bold", hjust = 0.5))}
+
+hvol_plotter(SPY_volatility,breaks="1 month", 
+             title="Realised Volatility - SPY")
+```
+
+```{r VGK volatility}
+
+#find hourly volatility
+#NOTE: this ignores tweets made outside trading hours!!
+VGK_volatility_alltime = dplyr::select(VGK,timestamp,r_vol_h)
+
+#aggregating per hour
+VGK_volatility_alltime = VGK_volatility_alltime %>%
+          mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
+          distinct(timestamp, .keep_all = TRUE) 
+   
+#select time period
+VGK_volatility = filter(VGK_volatility_alltime,
+                  between(timestamp, 
+                          as.Date('2018-01-01'), 
+                          as.Date('2025-04-10')))
+
+```
+
+```{r ASHR volatility}
+
+#find hourly volatility
+#NOTE: this ignores tweets made outside trading hours!!
+ASHR_volatility_alltime = dplyr::select(ASHR,timestamp,r_vol_h)
+
+#aggregating per hour
+ASHR_volatility_alltime = ASHR_volatility_alltime %>%
+          mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
+          distinct(timestamp, .keep_all = TRUE) 
+   
+#select time period
+ASHR_volatility = filter(ASHR_volatility_alltime,
+                  between(timestamp, 
+                          as.Date('2018-01-01'), 
+                          as.Date('2025-04-10')))
+
+```
+
+## Number of Posts 
+```{r social media count}
+
+#find count
+tweetcount_alltime = dplyr::select(social_hourly,timestamp,N)
+
+#select time period
+tweetcount = filter(tweetcount_alltime,
+                  between(timestamp, 
+                          as.Date('2018-01-01'), 
+                          as.Date('2025-04-10')))
+
+#plot
+ggplot(tweetcount_alltime, aes(x = timestamp, y = N)) +
+    geom_point(color = "#253494", size = 1) +
+    scale_x_datetime(date_labels = "%b %Y", date_breaks = "9 month") +
+    labs(title = "Trump Social Media Count",
+         x = NULL,
+         y = "number of tweets/truths") +
+    theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          plot.title = element_text(face = "bold", hjust = 0.5))
+```
+
+## Dummy for Social Media Post
+```{r dummy}
+
+#find dummy
+tweetdummy_alltime = dplyr::select(social_hourly,timestamp,dummy)
+
+#select time period
+tweetdummy = filter(tweetdummy_alltime,
+                  between(timestamp, 
+                          as.Date('2018-01-01'), 
+                          as.Date('2025-04-10')))
+
+```
+
+## Number of Tweets Mentioning Tariffs 
+```{r tariff}
+
+#find count
+tariff_alltime = dplyr::select(social_hourly,timestamp,total_tariff)
+
+#select time period
+tariff = filter(tariff_alltime,
+                  between(timestamp, 
+                          as.Date('2018-01-01'), 
+                          as.Date('2025-04-10')))
+
+```
+
+## Number of Tweets Mentioning Trade 
+```{r trade}
+
+#find count
+trade_alltime = dplyr::select(social_hourly,timestamp,total_trade)
+
+#select time period
+trade = filter(trade_alltime,
+                  between(timestamp, 
+                          as.Date('2018-01-01'), 
+                          as.Date('2025-04-10')))
+
+```
+
+## Proportion of Positive 
+```{r positive}
+
+#find count
+positive_alltime = dplyr::select(social_hourly,timestamp,prop_positive)
+
+#select time period
+positive = filter(positive_alltime,
+                  between(timestamp, 
+                          as.Date('2018-01-01'), 
+                          as.Date('2025-04-10')))
+
+```
+
+## Proportion of Negative 
+```{r negative}
+
+#find count
+negative_alltime = dplyr::select(social_hourly,timestamp,prop_negative)
+
+#select time period
+negative = filter(negative_alltime,
+                  between(timestamp, 
+                          as.Date('2018-01-01'), 
+                          as.Date('2025-04-10')))
+
+```
+
+
+## Merge
+```{r armadata merge}
+
+#merge our dependant and independant vars
+armax_data = left_join(SPY_volatility, VGK_volatility, by="timestamp")
+armax_data = left_join(armax_data, ASHR_volatility, by="timestamp")
+armax_data = left_join(armax_data, tweetdummy, by="timestamp")
+armax_data = left_join(armax_data, tweetcount, by="timestamp")
+armax_data = left_join(armax_data, tariff, by="timestamp")
+armax_data = left_join(armax_data, trade, by="timestamp")
+armax_data = left_join(armax_data, positive, by="timestamp")
+armax_data = left_join(armax_data, negative, by="timestamp")
+
+#rename volatility columns
+names(armax_data)[2] <- "SPY_vol"
+names(armax_data)[3] <- "VGK_vol"
+names(armax_data)[4] <- "ASHR_vol"
+
+#convert NA to zeroes
+armax_data$N[is.na(armax_data$N)] = 0
+armax_data$dummy[is.na(armax_data$dummy)] = 0
+armax_data$total_tariff[is.na(armax_data$total_tariff)] = 0
+armax_data$total_trade[is.na(armax_data$total_trade)] = 0
+armax_data$prop_positive[is.na(armax_data$prop_positive)] = 0
+armax_data$prop_negative[is.na(armax_data$prop_negative)] = 0
+
+```
+\newpage
+
+
+# S\&P500 ARMA-X Models
+
+## Tariff: Finding Model
+```{r armax tariff}
+
+armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=F,
+      max.p = 5, max.q = 5)
+
+result <- select_armax_ic(armax_data$SPY_vol, x=armax_data$total_tariff, 
+                        max_p = 5, max_q = 5, max_r = 5, criterion = "AIC", latex=F)
+
+```
+
+
+## Tariff: IRF
+```{r IRF}
+nb.periods = 5
+
+
+IRFdata <- sim.arma(c=0,phi=spytariff$coef[1:5],theta=spytariff$coef[7:12],sigma=1,
+                 T=nb.periods,y.0=rep(0,length(spytariff$coef[1:5])),
+                 nb.sim=1,make.IRF=1)
+
+IRF = cbind.data.frame(1:nb.periods,IRFdata)
+colnames(IRF) = c("Period","IRF")
+
+ggplot(IRF,aes(x = Period, y = IRFdata)) +
+    geom_line(color = "steelblue", size = 1.2) +
+    geom_point(color = "red", size = 2) +
+    scale_x_continuous(expand=c(0, 0), limits=c(0, nb.periods+1)) +
+    scale_y_continuous(expand=c(0, 0), limits=c(-0.001,0.1)) +
+    labs(title = "OLS IRF") +
+    theme_minimal()
+
+ggplot(IRF,aes(x = Period, y = IRFdata)) +
+    geom_line(color = "steelblue", size = 1.2) +
+    geom_point(color = "red", size = 2) +
+    scale_x_continuous(expand=c(0, 0), limits=c(0, nb.periods+1)) +
+    scale_y_continuous(expand=c(0, 0), limits=c(-0.1,0.001)) +
+    labs(title = "ARMAX IRF") +
+    theme_minimal()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
