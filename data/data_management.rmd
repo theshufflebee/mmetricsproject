@@ -275,13 +275,6 @@ social_hourly <- left_join(social_hourly, trade_hour, by="timestamp")
 
 ```
 
-```{r merging social data, eval=FALSE}
-
-#is there a point?
-
-```
-
-
 
 
 # Data Save
