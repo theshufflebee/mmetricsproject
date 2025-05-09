@@ -123,9 +123,11 @@ social_hourly_fin <- social_hourly
 social_hourly_fin$timestamp <- social_hourly_collapsed$adjusted_datetime
 
 #Final collapsed on next trading hours at 0900 (including weekend)
-social_hourly_final <- social_hourly_fin %>%
+#social_hourly <- social_hourly_fin %>%
   group_by(timestamp) %>%
   summarise(across(where(is.numeric), sum, na.rm = TRUE), .groups = "drop")
+
+#social_hourly$dummy <- if_else(social_hourly$dummy==0, 0, 1)
 
 ```
 
