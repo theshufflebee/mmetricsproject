@@ -81,7 +81,7 @@ data_loader(symbol="ASHR")
 
 
 # Cleanup
-```{r cleanup, eval=FALSE}
+```{r cleanup}
 #MAKE FUNCTIONS TO CLEANUP EASY
 
 # 1. Tweets 
@@ -225,8 +225,9 @@ social_hourly <- left_join(social_hourly, sent_hour, by="timestamp")
 ```{r tariffs, eval=FALSE}
 
 #create dummy for mention of tariff
-tariff <- ifelse(str_detect(social$tweet_text, "tariff|tariffs"), 1, 0)
 tariff = str_count(social$tweet_text,pattern = "tariff|tariffs")
+Tariff = str_count(social$tweet_text,pattern = "Tariff|Tariffs")
+tariff = tariff + Tariff
 social$tariff <- tariff
 
 #counts number of tweets mentioning tariffs per hour
@@ -242,8 +243,9 @@ social_hourly <- left_join(social_hourly, tariff_hour, by="timestamp")
 ```{r trade war, eval=FALSE}
 
 #create dummy for mention of trade 
-trade <- ifelse(str_detect(social$tweet_text, "trade"), 1, 0)
 trade = str_count(social$tweet_text,pattern = "trade")
+Trade = str_count(social$tweet_text,pattern = "Trade")
+trade = trade + Trade
 social$trade <- trade
 
 #counts number of tweets mentioning tariffs per hour
@@ -272,13 +274,6 @@ social_hourly <- left_join(social_hourly, trade_hour, by="timestamp")
 # 5. Dummy Emotional Word
 
 ```
-
-```{r merging social data, eval=FALSE}
-
-#is there a point?
-
-```
-
 
 
 
