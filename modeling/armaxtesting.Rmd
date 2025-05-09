@@ -331,8 +331,12 @@ IRFdata <- sim.arma(c=0,phi=phi,beta=beta,theta=theta,sigma=sigma,
                  T=nb.periods,y.0=rep(0,length(phi)),
                  nb.sim=1,make.IRF=1)
 
-IRFdata2 <- sim.arma(c=0,phi=res.old$coef[1:5],theta=res.old$coef[7:12],sigma=1,
-                 T=nb.periods,y.0=rep(0,length(res.old$coef[1:5])),
+IRFdata2 <- sim.arma(c=0,phi=res.old$coef[1:5],theta=res.old$coef[7:12],
+                 sigma=1,T=nb.periods,y.0=rep(0,length(res.old$coef[1:5])),
+                 nb.sim=1,make.IRF=1)
+
+IRFdata2 <- sim.arma(c=0,phi=res.old$coef[1:5],beta=res.old$coef[7:12],theta=1,
+                 sigma=1,T=nb.periods,y.0=rep(0,length(res.old$coef[1:5])),
                  nb.sim=1,make.IRF=1)
 
 IRF = cbind.data.frame(1:nb.periods,IRFdata,IRFdata2)
