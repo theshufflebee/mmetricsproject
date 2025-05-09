@@ -438,7 +438,7 @@ nb.periods = nb.lags
 
 IRF1 <- sim.arma(c=0,phi=c(0),theta=spytariffsimple$coefficients[2:(nb.lags+2)]
                  ,sigma=1, T=nb.periods,y.0=c(0),nb.sim=1,make.IRF=1)
-IRF2 <- sim.arma(c=0,phi=spytariff$coef[1:5],theta=spytariff$coef[7:12],sigma=1,
+IRF2 <- sim.arma(c=0,phi=spytariff$coef[1:5],beta=spytariff$coef[7:12],sigma=1,
                  T=nb.periods,y.0=rep(0,length(spytariff$coef[1:5])),
                  nb.sim=1,make.IRF=1)
 

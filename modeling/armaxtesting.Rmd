@@ -307,42 +307,51 @@ armax_data$prop_negative[is.na(armax_data$prop_negative)] = 0
 ## Tariff: Finding Model
 ```{r armax tariff}
 
-armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=5,latex=F,
-      max.p = 5, max.q = 5)
+res.old = armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=5,
+                latex=F,max.p = 5, max.q = 5)
 
-result <- select_armax_ic(armax_data$SPY_vol, x=armax_data$total_tariff, 
-                        max_p = 5, max_q = 5, max_r = 5, criterion = "AIC", latex=F)
+res.armax = select_armax_ic(armax_data$SPY_vol, x=armax_data$total_tariff, 
+                max_p = 5, max_q = 5, max_r = 5, criterion = "AIC", latex=F)
 
 ```
 
 
 ## Tariff: IRF
 ```{r IRF}
-nb.periods = 5
 
+nb.periods = 20
+phi = res.armax$model$model$phi
+theta = res.armax$model$model$theta
+sigma = sqrt(res.armax$model$sigma2)
+coefficients = coef(res.armax$model)
+beta = coefficients[grep("^total_tariff", names(coefficients))]
+#c = coefficients[grep("intercept", names(coefficients))]
 
-IRFdata <- sim.arma(c=0,phi=spytariff$coef[1:5],theta=spytariff$coef[7:12],sigma=1,
-                 T=nb.periods,y.0=rep(0,length(spytariff$coef[1:5])),
+IRFdata <- sim.arma(c=0,phi=phi,beta=beta,theta=theta,sigma=sigma,
+                 T=nb.periods,y.0=rep(0,length(phi)),
                  nb.sim=1,make.IRF=1)
 
-IRF = cbind.data.frame(1:nb.periods,IRFdata)
-colnames(IRF) = c("Period","IRF")
+IRFdata2 <- sim.arma(c=0,phi=res.old$coef[1:5],theta=res.old$coef[7:12],sigma=1,
+                 T=nb.periods,y.0=rep(0,length(res.old$coef[1:5])),
+                 nb.sim=1,make.IRF=1)
 
-ggplot(IRF,aes(x = Period, y = IRFdata)) +
+IRF = cbind.data.frame(1:nb.periods,IRFdata,IRFdata2)
+colnames(IRF) = c("Period","IRF","IRF2")
+
+ggplot(IRF,aes(x = Period, y = IRFdata2)) +
     geom_line(color = "steelblue", size = 1.2) +
     geom_point(color = "red", size = 2) +
-    scale_x_continuous(expand=c(0, 0), limits=c(0, nb.periods+1)) +
-    scale_y_continuous(expand=c(0, 0), limits=c(-0.001,0.1)) +
-    labs(title = "OLS IRF") +
+    labs(title = "OLS IRF 1") +
     theme_minimal()
 
 ggplot(IRF,aes(x = Period, y = IRFdata)) +
     geom_line(color = "steelblue", size = 1.2) +
     geom_point(color = "red", size = 2) +
-    scale_x_continuous(expand=c(0, 0), limits=c(0, nb.periods+1)) +
-    scale_y_continuous(expand=c(0, 0), limits=c(-0.1,0.001)) +
     labs(title = "ARMAX IRF") +
     theme_minimal()
+
+
+
 ```
 
 
