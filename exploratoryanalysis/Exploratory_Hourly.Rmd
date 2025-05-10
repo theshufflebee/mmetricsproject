@@ -1,15 +1,48 @@
 ---
 title: "Exploratory_Hourly"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r}
 rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwhich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenization
+require(texreg) #arima tables
 
+getwd()
+#setwd("...") -> set wd at base repo folder
 
-library("tidytext")
-library("textstem")
-library(dplyr)
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/armax_functions.R"))
+
 data("stop_words")
 stop_words_list <- stop_words$word
 
@@ -39,13 +72,6 @@ posts <- posts %>%
     )
 ```
 
-
-```{r}
-posts <- posts %>%
-  mutate(
-    tariff_count = str_count(posts_2$post_clean ,pattern = "tariff|tariffs")
-  )
-```
 
 
 
@@ -236,7 +262,7 @@ lag_selector(y=analysis_data_fin$r_vol_h, xreg=analysis_data_fin$tariff,
 
 
 ```{r}
-armax(analysis_data_fin$r_vol_h,xreg=analysis_data_fin$tariff,nb.lags=5,latex=F)
+armax(analysis_data_fin$r_vol_h,xreg=analysis_data_fin$tariff,nb.lags=4,latex=F)
 
 ```
 
