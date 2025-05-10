@@ -6,7 +6,8 @@ output:
 ---
 
 # Load the packages, data and functions
-```{r}
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+rm(list=ls())
 require(here)
 require(stringr)
 require(dplyr)

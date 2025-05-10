@@ -1,0 +1,151 @@
+---
+title: "Exploratory_Hourly"
+output: html_document
+---
+
+```{r}
+rm(list=ls())
+
+
+library("tidytext")
+library("textstem")
+data("stop_words")
+stop_words_list <- stop_words$word
+
+```
+
+
+
+```{r}
+posts <- read.csv(here("data/mothership", "social.csv"))
+```
+
+
+```{r}
+posts <- posts %>% select(timestamp, tweet_text)
+```
+
+
+```{r}
+posts <- posts %>%
+    mutate(
+      tweet_clean = str_replace_all(tweet_text, "(http[s]?://|www\\.)\\S+", ""),  # Remove URLs
+      
+      post_lower = str_to_lower(tweet_clean),  # New column with post converted to lowercase
+      post_clean = str_replace_all(post_lower, "[^a-z\\s]", " ")
+    )
+```
+
+```{r}
+posts <- posts %>%
+  select(-post_lower, -tweet_clean, -tweet_text)
+
+posts$timestamp <- as.POSIXct(posts$timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
+
+
+
+```
+
+```{r}
+posts <- posts %>%
+  mutate(hour_timestamp = floor_date(timestamp, unit = "hour")) %>%   # Round to hour
+  group_by(hour_timestamp) %>%
+  summarise(
+    combined_text = str_c(post_clean, collapse = " "),   # Concatenate texts
+    .groups = "drop"
+  )
+
+posts <- posts %>%
+  rename(timestamp = hour_timestamp)
+```
+
+
+```{r}
+posts <- posts %>%
+  mutate(
+    hour = hour(timestamp),
+    date = as.Date(timestamp),
+    weekday = wday(timestamp),  # 1 = Sunday, 7 = Saturday
+
+    move_before_9 = hour < 9,  
+    move_after_16 = hour >= 16,  
+    is_weekend = weekday %in% c(1, 7),  # Check if weekend (Sunday = 1, Saturday = 7)
+    
+    # Move before 09:00 to the same day at 09:00
+    adjusted_datetime = if_else(
+      move_before_9,
+      as.POSIXct(paste(date, "09:00:00"), format = "%Y-%m-%d %H:%M:%S", tz = tz(timestamp)),
+      
+      # Move after 16:00 to the next day at 09:00
+      if_else(
+        move_after_16,
+        as.POSIXct(paste(date + 1, "09:00:00"), format = "%Y-%m-%d %H:%M:%S", tz = tz(timestamp)),
+        
+        # Otherwise, keep the same timestamp (between 09:00 and 16:00)
+        timestamp
+      )
+    ),
+    
+    # Move Saturday posts to Monday at 09:00
+    adjusted_datetime = if_else(
+      is_weekend & weekday == 7,  # Saturday
+      as.POSIXct(paste(date + 2, "09:00:00"), format = "%Y-%m-%d %H:%M:%S", tz = tz(timestamp)),
+      adjusted_datetime
+    ),
+    
+    # Move Sunday posts to Monday at 09:00
+    adjusted_datetime = if_else(
+      is_weekend & weekday == 1,  # Sunday
+      as.POSIXct(paste(date + 1, "09:00:00"), format = "%Y-%m-%d %H:%M:%S", tz = tz(timestamp)),
+      adjusted_datetime
+    )
+  )
+
+
+posts <- posts %>%
+  select(timestamp = adjusted_datetime, combined_text)
+
+```
+
+```{r}
+posts_token <- posts %>%
+  mutate(
+    tokens = combined_text %>%
+        str_replace_all("[^a-z\\s]", " ") %>%
+        str_split("\\s+") %>%
+        lapply(function(words) {
+          words <- words[words != ""]  # Remove empty strings
+          words <- setdiff(words, stop_words_list)  # Remove stopwords
+          words <- lemmatize_words(words) # Reduces words to their base form -> is becomes be
+        }
+    
+  )
+  )
+
+
+
+```
+
+
+```{r}
+# Define the tokens you want to check
+specific_tokens <- c("trade")
+
+# Count the occurrences of specific tokens
+token_count <- posts_token %>%
+  pull(tokens) %>%  # Extract the 'tokens' column as a list of token vectors
+  unlist() %>%      # Flatten the list into a single vector of tokens
+  .[ . %in% specific_tokens ] %>%  # Filter only the tokens that match the specific ones
+  length()  # Get the total count
+
+# Print the result
+print(token_count)
+```
+
+
+
+
+
+
+
+

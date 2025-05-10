@@ -27,7 +27,7 @@ Furthermore we use the link of the second page of the 50 truths so that the func
 #Sample usage of the scrapping function
 only use the second page link
 ```{r}
-# new_truths <- trumpstruthscraper(3, "https://trumpstruth.org/?sort=desc&per_page=50&cursor=eyJzdGF0dXNfY3JlYXRlZF9hdCI6IjIwMjUtMDQtMDkgMDE6Mzg6NDQiLCJfcG9pbnRzVG9OZXh0SXRlbXMiOnRydWV9&sort=desc&per_page=50&query=&start_date=&end_date=")
+new_truths <- trumpstruthscraper(3, "https://trumpstruth.org/?sort=desc&per_page=50&cursor=eyJzdGF0dXNfY3JlYXRlZF9hdCI6IjIwMjUtMDUtMDggMDk6NDI6MzciLCJfcG9pbnRzVG9OZXh0SXRlbXMiOnRydWV9&sort=desc&per_page=50&query=&start_date=&end_date=")
 ```
 
 
