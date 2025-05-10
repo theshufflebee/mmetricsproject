@@ -9,6 +9,7 @@ rm(list=ls())
 
 library("tidytext")
 library("textstem")
+library(dplyr)
 data("stop_words")
 stop_words_list <- stop_words$word
 
@@ -17,12 +18,12 @@ stop_words_list <- stop_words$word
 
 
 ```{r}
-posts <- read.csv(here("data/mothership", "social.csv"))
+posts_raw <- read.csv(here("data/mothership", "social.csv"))
 ```
 
 
 ```{r}
-posts <- posts %>% select(timestamp, tweet_text)
+posts <- posts_raw %>% select(timestamp, tweet_text)
 ```
 
 
@@ -36,11 +37,22 @@ posts <- posts %>%
     )
 ```
 
+
+```{r}
+posts <- posts %>%
+  mutate(
+    tariff_count = str_count(posts_2$post_clean ,pattern = "tariff|tariffs")
+  )
+```
+
+
+
+
 ```{r}
 posts <- posts %>%
   select(-post_lower, -tweet_clean, -tweet_text)
 
-posts$timestamp <- as.POSIXct(posts$timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
+posts$timestamp <- as.POSIXct(posts$timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "EST")
 
 
 
@@ -59,58 +71,87 @@ posts <- posts %>%
   rename(timestamp = hour_timestamp)
 ```
 
-
 ```{r}
-posts <- posts %>%
+posts2 <- posts %>%
   mutate(
+    # --- Step 1: Adjust based on time ---
     hour = hour(timestamp),
     date = as.Date(timestamp),
-    weekday = wday(timestamp),  # 1 = Sunday, 7 = Saturday
-
-    move_before_9 = hour < 9,  
-    move_after_16 = hour >= 16,  
-    is_weekend = weekday %in% c(1, 7),  # Check if weekend (Sunday = 1, Saturday = 7)
     
-    # Move before 09:00 to the same day at 09:00
-    adjusted_datetime = if_else(
-      move_before_9,
-      as.POSIXct(paste(date, "09:00:00"), format = "%Y-%m-%d %H:%M:%S", tz = tz(timestamp)),
-      
-      # Move after 16:00 to the next day at 09:00
-      if_else(
-        move_after_16,
-        as.POSIXct(paste(date + 1, "09:00:00"), format = "%Y-%m-%d %H:%M:%S", tz = tz(timestamp)),
-        
-        # Otherwise, keep the same timestamp (between 09:00 and 16:00)
-        timestamp
-      )
+    move_before_9 = hour < 9,
+    move_after_16 = hour >= 16,
+    
+    adjusted_timestamp = case_when(
+      move_before_9 ~ as.POSIXct(paste(date, "09:00:00"), format = "%Y-%m-%d %H:%M:%S", tz = tz(timestamp)),
+      move_after_16 ~ as.POSIXct(paste(date + 1, "09:00:00"), format = "%Y-%m-%d %H:%M:%S", tz = tz(timestamp)),
+      TRUE ~ timestamp
     ),
     
-    # Move Saturday posts to Monday at 09:00
-    adjusted_datetime = if_else(
-      is_weekend & weekday == 7,  # Saturday
-      as.POSIXct(paste(date + 2, "09:00:00"), format = "%Y-%m-%d %H:%M:%S", tz = tz(timestamp)),
-      adjusted_datetime
-    ),
-    
-    # Move Sunday posts to Monday at 09:00
-    adjusted_datetime = if_else(
-      is_weekend & weekday == 1,  # Sunday
-      as.POSIXct(paste(date + 1, "09:00:00"), format = "%Y-%m-%d %H:%M:%S", tz = tz(timestamp)),
-      adjusted_datetime
+    # --- Step 2: Adjust for weekends on adjusted_timestamp ---
+    weekday = wday(adjusted_timestamp),  # <- use adjusted_timestamp here
+    final_timestamp = case_when(
+      weekday == 7 ~ as.POSIXct(paste(as.Date(adjusted_timestamp) + 2, "09:00:00"), format = "%Y-%m-%d %H:%M:%S", tz = tz(timestamp)),
+      weekday == 1 ~ as.POSIXct(paste(as.Date(adjusted_timestamp) + 1, "09:00:00"), format = "%Y-%m-%d %H:%M:%S", tz = tz(timestamp)),
+      TRUE ~ adjusted_timestamp
     )
+  ) %>%
+  select(final_timestamp, combined_text) %>%
+  rename(timestamp = final_timestamp)
+
+posts2 <- posts2 %>%
+  group_by(timestamp) %>%
+  summarise(
+    text = str_c(combined_text, collapse = " "),   # Concatenate texts
+    .groups = "drop"
   )
-
-
-posts <- posts %>%
-  select(timestamp = adjusted_datetime, combined_text)
 
 ```
 
+
 ```{r}
-posts_token <- posts %>%
+start_date <- '2018-01-01'
+end_date <- '2025-04-10'
+```
+
+
+# Market Data
+
+```{r}
+SPY <- read.csv(here("data/mothership", "SPY.csv"))
+SPY$timestamp = as.POSIXct(SPY$timestamp,format = "%Y-%m-%d %H:%M:%S", tz="EST")
+
+#find hourly volatility
+#NOTE: this ignores tweets made outside trading hours!!
+SPY_volatility_alltime = dplyr::select(SPY,timestamp,r_vol_h)
+
+#aggregating per hour
+SPY_volatility_alltime = SPY_volatility_alltime %>%
+          mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
+          distinct(timestamp, .keep_all = TRUE) 
+   
+#select time period
+SPY_volatility = filter(SPY_volatility_alltime,
+                  between(timestamp, 
+                          as.Date(start_date), 
+                          as.Date(end_date)))
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+```{r}
+posts_token <- posts2 %>%
   mutate(
-    tokens = combined_text %>%
+    tokens = text %>%
         str_replace_all("[^a-z\\s]", " ") %>%
         str_split("\\s+") %>%
         lapply(function(words) {
@@ -121,15 +162,14 @@ posts_token <- posts %>%
     
   )
   )
-
-
-
 ```
+
+sum(wday(posts2$timestamp) %in% c(1,7))
 
 
 ```{r}
 # Define the tokens you want to check
-specific_tokens <- c("trade")
+specific_tokens <- c("tariff")
 
 # Count the occurrences of specific tokens
 token_count <- posts_token %>%
@@ -142,10 +182,62 @@ token_count <- posts_token %>%
 print(token_count)
 ```
 
+```{r}
+afinn <- tidytext::get_sentiments("afinn")
+
+
+posts_sentiment <- posts_token %>%
+  unnest_tokens(word, text) %>%  # Tokenize the text
+  inner_join(afinn, by = "word") %>%  # Join with the AFINN lexicon to get sentiment scores
+  group_by(timestamp) %>%  # Group by timestamp to aggregate by post
+  summarise(sentiment_score = sum(value, na.rm = TRUE))  # Sum up the sentiment scores for each post
+
+# Merge the sentiment scores back into the original posts_token dataframe
+posts_token_with_sentiment <- posts_token %>%
+  left_join(posts_sentiment, by = "timestamp")
+```
+
+#Join analysis data
+
+```{r}
+posts_armax = filter(posts_token_with_sentiment,
+                  between(timestamp, 
+                          as.Date(start_date), 
+                          as.Date(end_date)))
+
+```
 
 
 
+```{r}
+analysis_data <- full_join(posts_armax, SPY_volatility, by = "timestamp")
+analysis_data <- analysis_data %>% arrange(timestamp)
 
+analysis_data <- analysis_data %>% mutate(dummy_post = if_else(!is.na(text), 1, 0))
+
+analysis_data <- analysis_data %>%
+  mutate(
+    sentiment_score = ifelse(is.na(sentiment_score), 0, sentiment_score),
+    tariff = ifelse(str_count(text,pattern = "tariff|tariffs") >= 1, 1,0),
+    tariff = if_else(is.na(tariff), 0, tariff) 
+  )
+
+analysis_data_fin <- analysis_data %>% filter(r_vol_h != 0)
+
+
+
+```
+
+```{r}
+lag_selector(y=analysis_data_fin$r_vol_h, xreg=analysis_data_fin$tariff,
+             nb.lags=8, type="text")
+```
+
+
+```{r}
+armax(analysis_data_fin$r_vol_h,xreg=analysis_data_fin$tariff,nb.lags=4,latex=F)
+
+```
 
 
 
