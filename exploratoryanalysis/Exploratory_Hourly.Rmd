@@ -13,6 +13,8 @@ library(dplyr)
 data("stop_words")
 stop_words_list <- stop_words$word
 
+SPY <- read.csv(here("data/mothership", "SPY.csv"))
+
 ```
 
 
@@ -109,7 +111,7 @@ posts2 <- posts2 %>%
 
 
 ```{r}
-start_date <- '2018-01-01'
+start_date <- '2025-01-01'
 end_date <- '2025-04-10'
 ```
 
@@ -117,7 +119,6 @@ end_date <- '2025-04-10'
 # Market Data
 
 ```{r}
-SPY <- read.csv(here("data/mothership", "SPY.csv"))
 SPY$timestamp = as.POSIXct(SPY$timestamp,format = "%Y-%m-%d %H:%M:%S", tz="EST")
 
 #find hourly volatility
@@ -218,7 +219,7 @@ analysis_data <- analysis_data %>% mutate(dummy_post = if_else(!is.na(text), 1, 
 analysis_data <- analysis_data %>%
   mutate(
     sentiment_score = ifelse(is.na(sentiment_score), 0, sentiment_score),
-    tariff = ifelse(str_count(text,pattern = "tariff|tariffs") >= 1, 1,0),
+    tariff = ifelse(str_count(text,pattern = "tariff") >= 1, 1,0),
     tariff = if_else(is.na(tariff), 0, tariff) 
   )
 
@@ -235,7 +236,7 @@ lag_selector(y=analysis_data_fin$r_vol_h, xreg=analysis_data_fin$tariff,
 
 
 ```{r}
-armax(analysis_data_fin$r_vol_h,xreg=analysis_data_fin$tariff,nb.lags=4,latex=F)
+armax(analysis_data_fin$r_vol_h,xreg=analysis_data_fin$tariff,nb.lags=5,latex=F)
 
 ```
 
