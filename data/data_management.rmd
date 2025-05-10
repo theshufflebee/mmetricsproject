@@ -60,6 +60,7 @@ source(here("helperfunctions/armax_functions.R"))
 
 #truthsocial
 raw_truths <- read.csv(here("data/political_data", "truths_new.csv"))
+raw_truths <- read.csv(here("data/political_data", "truths250510.csv"))
 
 #twitter
 raw_tweets <- read.csv(here("data/political_data", "tweets.csv"))
@@ -104,7 +105,7 @@ truthsbackup <- truths_processer(raw_truths)
 truths = truthsbackup
 
 #cleanup
-truths <- truths %>% filter(media != 1)
+#truths <- truths %>% filter(media != 1)
 truths = data.frame(truths$date_time_parsed,truths$post)
 colnames(truths) = c("timestamp","truths_text")
 truths$timestamp = as.POSIXct(truths$timestamp,format = "%Y-%m-%d %H:%M:%S")
@@ -122,7 +123,6 @@ social <- social[order(social$timestamp, decreasing=F), ]
 SPY = raw_SPY[-1]
 VGK = raw_VGK[-1]
 ASHR = raw_ASHR[-1]
-
 
 ```
 
