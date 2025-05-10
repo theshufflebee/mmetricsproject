@@ -79,7 +79,7 @@ ASHR <- read.csv(here("data/mothership", "ASHR.CSV"))
 ```
 
 
-```{r}
+```{r collapse, eval=F}
 social_hourly_collapsed <- social_hourly %>%
   mutate(
     hour = hour(timestamp),
@@ -469,7 +469,148 @@ ggplot(IRF,aes(x = Period, y = IRF2)) +
 
 ```
 
+# S\&P500 ARMA-X Tariff Models
 
+## Finding Model
+```{r armax tariff}
+
+res.old = auto.armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=2,
+                latex=F,max.p = 7, max.q = 7, max.d=0)
+
+res.custom = armax(armax_data$SPY_vol, xreg=armax_data$total_tariff, nb.lags=2,
+                   p=5, q=0, d=0, latex=F)
+
+res.armax = auto.armax.r(armax_data$SPY_vol, x=armax_data$total_tariff, 
+                max_p = 7, max_q = 7, max_r = 3, criterion = "AIC", latex=F)
+
+```
+
+
+## IRF Simulations
+```{r IRF}
+nb.periods = 20
+
+phi = res.old$model$phi
+theta = res.old$model$theta
+sigma = sqrt(res.old$sigma2)
+coefficients = coef(res.old)
+beta = coefficients[grep("^total_tariff", names(coefficients))]
+
+IRFdata1 <- sim.arma(c=0,phi=phi,theta=beta,sigma=sigma,
+                 T=nb.periods,y.0=rep(0,length(phi)),
+                 nb.sim=1,make.IRF=1)
+
+
+phi = res.custom$model$phi
+theta = res.custom$model$theta
+sigma = sqrt(res.custom$sigma2)
+coefficients = coef(res.custom)
+beta = coefficients[grep("^total_tariff", names(coefficients))]
+
+IRFdata2 <- sim.arma(c=0,phi=phi,theta=beta,sigma=sigma,
+                 T=nb.periods,y.0=rep(0,length(phi)),
+                 nb.sim=1,make.IRF=1)
+
+
+phi = res.armax$model$model$phi
+theta = res.armax$model$model$theta
+sigma = sqrt(res.armax$model$sigma2)
+coefficients = coef(res.armax$model)
+beta = coefficients[grep("^total_tariff", names(coefficients))]
+
+IRFdata3 <- sim.arma(c=0,phi=phi,theta=beta,sigma=sigma,
+                 T=nb.periods,y.0=rep(0,length(phi)),
+                 nb.sim=1,make.IRF=1)
+
+
+IRF = cbind.data.frame(1:nb.periods,IRFdata1,IRFdata2,IRFdata3)
+colnames(IRF) = c("Period","IRF","IRF2","IRF3")
+
+ggplot(IRF,aes(x = Period, y = IRFdata1)) +
+    geom_line(color = "steelblue", size = 1.2) +
+    geom_point(color = "red", size = 2) +
+    labs(title = "AutoArmaX IRF") +
+    theme_minimal()
+
+ggplot(IRF,aes(x = Period, y = IRFdata2)) +
+    geom_line(color = "steelblue", size = 1.2) +
+    geom_point(color = "red", size = 2) +
+    labs(title = "Custom ArmaX IRF") +
+    theme_minimal()
+
+ggplot(IRF,aes(x = Period, y = IRFdata3)) +
+    geom_line(color = "steelblue", size = 1.2) +
+    geom_point(color = "red", size = 2) +
+    labs(title = "Select AIC ARMAX IRF") +
+    theme_minimal()
+
+
+irf.plot(res.old,nb.periods)
+irf.plot(res.custom,nb.periods)
+irf.plot(res.armax$model,nb.periods)
+
+```
+
+
+# Time Series Simulations
+```{r sim armax, warning=F, message=F}
+nb.periods = length(SPY_volatility$r_vol_h)
+
+phi = res.old$model$phi
+theta = res.old$model$theta
+sigma = sqrt(res.old$sigma2)
+coefficients = coef(res.old)
+beta = coefficients[grep("^total_tariff", names(coefficients))]
+
+IRFdata1 <- sim.arma(c=0,phi=phi,theta=beta,sigma=sigma,
+                 T=nb.periods,y.0=rep(0,length(phi)),
+                 nb.sim=1,make.IRF=0)
+
+
+phi = res.custom$model$phi
+theta = res.custom$model$theta
+sigma = sqrt(res.custom$sigma2)
+coefficients = coef(res.custom)
+beta = coefficients[grep("^total_tariff", names(coefficients))]
+
+IRFdata2 <- sim.arma(c=0,phi=phi,theta=beta,sigma=sigma,
+                 T=nb.periods,y.0=rep(0,length(phi)),
+                 nb.sim=1,make.IRF=0)
+
+
+phi = res.armax$model$model$phi
+theta = res.armax$model$model$theta
+sigma = sqrt(res.armax$model$sigma2)
+coefficients = coef(res.armax$model)
+beta = coefficients[grep("^total_tariff", names(coefficients))]
+
+IRFdata3 <- sim.arma(c=0,phi=phi,theta=beta,sigma=sigma,
+                 T=nb.periods,y.0=rep(0,length(phi)),
+                 nb.sim=1,make.IRF=0)
+
+
+IRF = cbind.data.frame(1:nb.periods,IRFdata1,IRFdata2,IRFdata3)
+colnames(IRF) = c("Period","IRF","IRF2","IRF3")
+
+ggplot(IRF,aes(x = Period, y = IRFdata1)) +
+    geom_line(color = "steelblue", size = .2) +
+    labs(title = "AutoArmaX") +
+    theme_minimal()
+
+ggplot(IRF,aes(x = Period, y = IRFdata2)) +
+    geom_line(color = "steelblue", size = .2) +
+    labs(title = "Custom ArmaX") +
+    theme_minimal()
+
+hvol_plotter(SPY_volatility,breaks="1 month", 
+             title="Realised Volatility - SPY")
+
+ggplot(IRF,aes(x = Period, y = IRFdata3)) +
+    geom_line(color = "steelblue", size = .2) +
+    labs(title = "Select AIC ARMAX") +
+    theme_minimal()
+
+```
 
 
 \newpage

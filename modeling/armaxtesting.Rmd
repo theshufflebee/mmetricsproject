@@ -1,5 +1,5 @@
 ---
-title: "ARMA-X Analysis Testing"
+title: "ARMA-X Analysis Tutorial"
 output:
   pdf_document: 
     toc: true
@@ -123,7 +123,7 @@ hvol_plotter = function(data,breaks,title){
                     NULL)  #default NULL if nothing matches   
   
   ggplot(data, aes(x = timestamp, y = r_vol_h)) +
-    geom_line(color = "#2c7fb8", linewidth = 0.1) +
+    geom_line(color = "#2c7fb8", linewidth = 0.5) +
     geom_point(color = "#253494", size = 0) +
     x_scale + 
     scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
@@ -135,7 +135,7 @@ hvol_plotter = function(data,breaks,title){
     theme(axis.text.x = element_text(angle = 45, hjust = 1),
           plot.title = element_text(face = "bold", hjust = 0.5))}
 
-hvol_plotter(SPY_volatility,breaks="1 month", 
+hvol_plotter(SPY_volatility,breaks="9 month", 
              title="Realised Volatility - SPY")
 ```
 
@@ -302,86 +302,35 @@ armax_data$prop_negative[is.na(armax_data$prop_negative)] = 0
 \newpage
 
 
-# S\&P500 ARMA-X Models
+# S\&P500 ARMA-X Tariff Models
 
-## Tariff: Finding Model
+## Finding Model
 ```{r armax tariff}
 
-res.old = auto.armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=7,
-                latex=F,max.p = 5, max.q = 0, max.d=0)
+#auto.armax selects the lowest AIC value given r (exogenous variable lags) 
+res1 = auto.armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=7,
+                latex=F,max.p = 7, max.q = 7, max.d=0)
 
-res.custom = armax(armax_data$SPY_vol, xreg=armax_data$total_tariff, nb.lags=6,
-                   p=3, q=9, d=0, latex=F)
+#armax enables a custom armax specification with p,q,r 
+res2 = armax(armax_data$SPY_vol, xreg=armax_data$total_tariff, nb.lags=2,
+                   p=5, q=0, d=0, latex=F)
 
-res.armax = select_armax_ic(armax_data$SPY_vol, x=armax_data$total_tariff, 
-                max_p = 5, max_q = 5, max_r = 5, criterion = "AIC", latex=F)
+#auto.armax.r selects the lowest AIC checking all 3 p,q,r values
+res3 = auto.armax.r(armax_data$SPY_vol, x=armax_data$total_tariff, 
+                max_p = 7, max_q = 7, max_r = 3, criterion = "AIC", latex=F)
 
 ```
 
-
-## Tariff: IRF
-```{r IRF}
+## Plotting IRFs
+```{r tariff irf plots}
 
 nb.periods = 20
-phi = res.armax$model$model$phi
-theta = res.armax$model$model$theta
-sigma = sqrt(res.armax$model$sigma2)
-coefficients = coef(res.armax$model)
-beta = coefficients[grep("^total_tariff", names(coefficients))]
-#c = coefficients[grep("intercept", names(coefficients))]
 
-IRFdata <- sim.arma(c=0,phi=phi,beta=beta,theta=theta,sigma=sigma,
-                 T=nb.periods,y.0=rep(0,length(phi)),
-                 nb.sim=1,make.IRF=1)
-
-IRFdata2 <- sim.arma(c=0,phi=res.old$coef[1:5],theta=res.old$coef[7:12],
-                 sigma=1,T=nb.periods,y.0=rep(0,length(res.old$coef[1:5])),
-                 nb.sim=1,make.IRF=1)
-
-IRFdata2 <- sim.arma(c=0,phi=res.old$coef[1:5],beta=res.old$coef[7:12],theta=1,
-                 sigma=1,T=nb.periods,y.0=rep(0,length(res.old$coef[1:5])),
-                 nb.sim=1,make.IRF=1)
-
-phi = res.custom$model$phi
-theta = res.custom$model$theta
-sigma = sqrt(res.custom$sigma2)
-coefficients = coef(res.custom)
-beta = coefficients[grep("^total_tariff", names(coefficients))]
-#c = coefficients[grep("intercept", names(coefficients))]
-
-IRFdata3 <- sim.arma(c=0,phi=res.custom$coef[1:5],beta=res.custom$coef[7:12],theta=1,
-                 sigma=1,T=nb.periods,y.0=rep(0,length(res.custom$coef[1:5])),
-                 nb.sim=1,make.IRF=1)
-
-
-IRF = cbind.data.frame(1:nb.periods,IRFdata,IRFdata2,IRFdata3)
-colnames(IRF) = c("Period","IRF","IRF2","IRF3")
-
-ggplot(IRF,aes(x = Period, y = IRFdata2)) +
-    geom_line(color = "steelblue", size = 1.2) +
-    geom_point(color = "red", size = 2) +
-    labs(title = "AutoArmax IRF") +
-    theme_minimal()
-
-ggplot(IRF,aes(x = Period, y = IRFdata3)) +
-    geom_line(color = "steelblue", size = 1.2) +
-    geom_point(color = "red", size = 2) +
-    labs(title = "ARMAX IRF") +
-    theme_minimal()
-
-ggplot(IRF,aes(x = Period, y = IRFdata)) +
-    geom_line(color = "steelblue", size = 1.2) +
-    geom_point(color = "red", size = 2) +
-    labs(title = "Selectic ARMAX IRF") +
-    theme_minimal()
+irf.plot(res1,nb.periods)
+irf.plot(res2,nb.periods)
+irf.plot(res3$model,nb.periods)
 
 ```
-
-
-
-
-
-
 
 
 

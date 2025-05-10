@@ -70,7 +70,7 @@ lag_selector <- function(y, xreg, nb.lags = 3, type = "text") {
 
 #--------------------------------------------------------------------------------
 
-select_armax_ic <- function(y, x, max_p = 3, max_q = 3, 
+auto.armax.r <- function(y, x, max_p = 3, max_q = 3, 
                             max_r = 5, criterion = "AIC", latex = TRUE) {
   
   # get clean variable name
@@ -234,3 +234,60 @@ armax <- function(y, xreg, nb.lags = 3, p=5, q=0, d=0, latex=FALSE){
   return(invisible(tab))
 }
 
+
+
+#--------------------------------------------------------------------------------
+#-----------------                     5                        -----------------
+#--------------------------------------------------------------------------------
+
+# Function for plotting IRFs from ARMAX functions above
+
+#--------------------------------------------------------------------------------
+
+irf.plot = function(model,T){
+  
+    phi = model$model$phi
+    sigma = sqrt(model$sigma2)
+    coefficients = coef(model)
+    p = model$arma[1]
+    q = model$arma[2]
+    beta = coefficients[(p+q+2):length(coefficients)]
+    
+    
+    IRFdata <- sim.arma(c=0,phi=phi,theta=beta,sigma=sigma,
+                         T=T,y.0=rep(0,length(phi)),
+                         nb.sim=1,make.IRF=1)
+    
+    IRF = cbind.data.frame(1:T,IRFdata)
+    colnames(IRF) = c("Period","IRF")
+    
+    plot = ggplot(IRF,aes(x = Period, y = IRFdata)) +
+            geom_line(color = "steelblue", size = 1.2) +
+            labs(title = "ARMA-X IRF", y="") +
+            theme_minimal()
+
+  return(plot)}
+
+
+#--------------------------------------------------------------------------------
+#-----------------                     *                        -----------------
+#--------------------------------------------------------------------------------
+
+# IRF code from JPR notes (appendix 8.5.2)
+
+#--------------------------------------------------------------------------------
+
+irf.function <- function(THETA){
+  c <- THETA[1]
+  phi <- THETA[2:(p+1)]
+  if(q>0){
+    theta <- c(1,THETA[(1+p+1):(1+p+q)])
+  }else{theta <- 1}
+  sigma <- THETA[1+p+q+1]
+  r <- dim(Matrix.of.Exog)[2] - 1
+  beta <- THETA[(1+p+q+1+1):(1+p+q+1+(r+1))]
+  
+  irf <- sim.arma(0,phi,beta,sigma=sd(Ramey$ED3_TC,na.rm=TRUE),T=60,
+                  y.0=rep(0,length(x$phi)),nb.sim=1,make.IRF=1,
+                  X=NaN,beta=NaN)
+  return(irf)}
