@@ -178,7 +178,9 @@ select_armax_ic <- function(y, x, max_p = 3, max_q = 3,
 
 #--------------------------------------------------------------------------------
 
-armax <- function(y, xreg, nb.lags = 3, max.p = 5, 
+#this first one finds the lowest AIC value for a certain number of xlags
+
+auto.armax <- function(y, xreg, nb.lags = 3, max.p = 5, 
                   max.q = 5, max.d = 0, latex=FALSE){
   
   #name of the xreg variable
@@ -205,4 +207,30 @@ armax <- function(y, xreg, nb.lags = 3, max.p = 5,
 }
 
   
+#-------------------------------------------------
+
+#this one just fits a model
+
+armax <- function(y, xreg, nb.lags = 3, p=5, q=0, d=0, latex=FALSE){
+  
+  #name of the xreg variable
+  xreg_name <- sub(".*\\$", "", deparse(substitute(xreg)))
+  
+  #first create lags
+  xreg_lags <- lag_creator(xreg, nb.lags, varname = xreg_name)
+  
+  #align y to match lagged xreg
+  y <- tail(y, nrow(xreg_lags))
+  
+  #find best armax model and fit
+  tab = Arima(y, xreg = xreg_lags, order = c(p,d,q), seasonal = F)
+  
+  #print the result
+  if (latex == FALSE) {
+    print(screenreg(tab, digits = 4))} else {
+      print(texreg(tab, caption = "ARMAX Model Results", 
+                   label = "tab:armax", digits = 4))}
+  
+  return(invisible(tab))
+}
 

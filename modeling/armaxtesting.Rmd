@@ -106,7 +106,7 @@ SPY_volatility_alltime = SPY_volatility_alltime %>%
 #select time period
 SPY_volatility = filter(SPY_volatility_alltime,
                   between(timestamp, 
-                          as.Date('2018-01-01'), 
+                          as.Date('2024-01-01'), 
                           as.Date('2025-04-10')))
 
 
@@ -153,7 +153,7 @@ VGK_volatility_alltime = VGK_volatility_alltime %>%
 #select time period
 VGK_volatility = filter(VGK_volatility_alltime,
                   between(timestamp, 
-                          as.Date('2018-01-01'), 
+                          as.Date('2024-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -172,7 +172,7 @@ ASHR_volatility_alltime = ASHR_volatility_alltime %>%
 #select time period
 ASHR_volatility = filter(ASHR_volatility_alltime,
                   between(timestamp, 
-                          as.Date('2018-01-01'), 
+                          as.Date('2024-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -186,7 +186,7 @@ tweetcount_alltime = dplyr::select(social_hourly,timestamp,N)
 #select time period
 tweetcount = filter(tweetcount_alltime,
                   between(timestamp, 
-                          as.Date('2018-01-01'), 
+                          as.Date('2024-01-01'), 
                           as.Date('2025-04-10')))
 
 #plot
@@ -210,7 +210,7 @@ tweetdummy_alltime = dplyr::select(social_hourly,timestamp,dummy)
 #select time period
 tweetdummy = filter(tweetdummy_alltime,
                   between(timestamp, 
-                          as.Date('2018-01-01'), 
+                          as.Date('2024-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -224,7 +224,7 @@ tariff_alltime = dplyr::select(social_hourly,timestamp,total_tariff)
 #select time period
 tariff = filter(tariff_alltime,
                   between(timestamp, 
-                          as.Date('2018-01-01'), 
+                          as.Date('2024-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -238,7 +238,7 @@ trade_alltime = dplyr::select(social_hourly,timestamp,total_trade)
 #select time period
 trade = filter(trade_alltime,
                   between(timestamp, 
-                          as.Date('2018-01-01'), 
+                          as.Date('2024-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -252,7 +252,7 @@ positive_alltime = dplyr::select(social_hourly,timestamp,prop_positive)
 #select time period
 positive = filter(positive_alltime,
                   between(timestamp, 
-                          as.Date('2018-01-01'), 
+                          as.Date('2024-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -266,7 +266,7 @@ negative_alltime = dplyr::select(social_hourly,timestamp,prop_negative)
 #select time period
 negative = filter(negative_alltime,
                   between(timestamp, 
-                          as.Date('2018-01-01'), 
+                          as.Date('2024-01-01'), 
                           as.Date('2025-04-10')))
 
 ```
@@ -307,8 +307,11 @@ armax_data$prop_negative[is.na(armax_data$prop_negative)] = 0
 ## Tariff: Finding Model
 ```{r armax tariff}
 
-res.old = armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=5,
-                latex=F,max.p = 5, max.q = 5)
+res.old = auto.armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=7,
+                latex=F,max.p = 5, max.q = 0, max.d=0)
+
+res.custom = armax(armax_data$SPY_vol, xreg=armax_data$total_tariff, nb.lags=6,
+                   p=3, q=9, d=0, latex=F)
 
 res.armax = select_armax_ic(armax_data$SPY_vol, x=armax_data$total_tariff, 
                 max_p = 5, max_q = 5, max_r = 5, criterion = "AIC", latex=F)
@@ -339,22 +342,38 @@ IRFdata2 <- sim.arma(c=0,phi=res.old$coef[1:5],beta=res.old$coef[7:12],theta=1,
                  sigma=1,T=nb.periods,y.0=rep(0,length(res.old$coef[1:5])),
                  nb.sim=1,make.IRF=1)
 
-IRF = cbind.data.frame(1:nb.periods,IRFdata,IRFdata2)
-colnames(IRF) = c("Period","IRF","IRF2")
+phi = res.custom$model$phi
+theta = res.custom$model$theta
+sigma = sqrt(res.custom$sigma2)
+coefficients = coef(res.custom)
+beta = coefficients[grep("^total_tariff", names(coefficients))]
+#c = coefficients[grep("intercept", names(coefficients))]
+
+IRFdata3 <- sim.arma(c=0,phi=res.custom$coef[1:5],beta=res.custom$coef[7:12],theta=1,
+                 sigma=1,T=nb.periods,y.0=rep(0,length(res.custom$coef[1:5])),
+                 nb.sim=1,make.IRF=1)
+
+
+IRF = cbind.data.frame(1:nb.periods,IRFdata,IRFdata2,IRFdata3)
+colnames(IRF) = c("Period","IRF","IRF2","IRF3")
 
 ggplot(IRF,aes(x = Period, y = IRFdata2)) +
     geom_line(color = "steelblue", size = 1.2) +
     geom_point(color = "red", size = 2) +
-    labs(title = "OLS IRF 1") +
+    labs(title = "AutoArmax IRF") +
     theme_minimal()
 
-ggplot(IRF,aes(x = Period, y = IRFdata)) +
+ggplot(IRF,aes(x = Period, y = IRFdata3)) +
     geom_line(color = "steelblue", size = 1.2) +
     geom_point(color = "red", size = 2) +
     labs(title = "ARMAX IRF") +
     theme_minimal()
 
-
+ggplot(IRF,aes(x = Period, y = IRFdata)) +
+    geom_line(color = "steelblue", size = 1.2) +
+    geom_point(color = "red", size = 2) +
+    labs(title = "Selectic ARMAX IRF") +
+    theme_minimal()
 
 ```
 
