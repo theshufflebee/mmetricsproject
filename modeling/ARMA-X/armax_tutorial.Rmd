@@ -107,35 +107,10 @@ SPY_volatility_alltime = SPY_volatility_alltime %>%
 SPY_volatility = filter(SPY_volatility_alltime,
                   between(timestamp, 
                           as.Date('2024-01-01'), 
-                          as.Date('2025-04-10')))
+                          as.Date('2025-05-07')))
 
-
-
-
-
-#temp: check seasonality etc
-hvol_plotter = function(data,breaks,title){
-  x_scale <- switch(breaks,
-                    "yearly" = scale_x_datetime(date_labels = "%b %Y", date_breaks = "6 month"),
-                    "monthly" = scale_x_datetime(date_labels = "%b %Y", date_breaks = "1 month"),
-                    "daily"   = scale_x_datetime(date_labels = "%a %d", date_breaks = "1 day"),
-                    "hourly"  = scale_x_datetime(date_labels = "%Hh", date_breaks = "1 hour"),
-                    NULL)  #default NULL if nothing matches   
-  
-  ggplot(data, aes(x = timestamp, y = r_vol_h)) +
-    geom_line(color = "#2c7fb8", linewidth = 0.5) +
-    geom_point(color = "#253494", size = 0) +
-    x_scale + 
-    scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
-    ylim(0,0.1) +
-    labs(title = title,
-         x = NULL,
-         y = "hourly realised volatility") +
-    theme_minimal(base_size = 14) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1),
-          plot.title = element_text(face = "bold", hjust = 0.5))}
-
-hvol_plotter(SPY_volatility,breaks="9 month", 
+#plot
+hvol_plotter(SPY_volatility,breaks="3 month", 
              title="Realised Volatility - SPY")
 ```
 
@@ -154,7 +129,7 @@ VGK_volatility_alltime = VGK_volatility_alltime %>%
 VGK_volatility = filter(VGK_volatility_alltime,
                   between(timestamp, 
                           as.Date('2024-01-01'), 
-                          as.Date('2025-04-10')))
+                          as.Date('2025-05-07')))
 
 ```
 
@@ -173,7 +148,7 @@ ASHR_volatility_alltime = ASHR_volatility_alltime %>%
 ASHR_volatility = filter(ASHR_volatility_alltime,
                   between(timestamp, 
                           as.Date('2024-01-01'), 
-                          as.Date('2025-04-10')))
+                          as.Date('2025-05-07')))
 
 ```
 
@@ -187,12 +162,12 @@ tweetcount_alltime = dplyr::select(social_hourly,timestamp,N)
 tweetcount = filter(tweetcount_alltime,
                   between(timestamp, 
                           as.Date('2024-01-01'), 
-                          as.Date('2025-04-10')))
+                          as.Date('2025-05-07')))
 
 #plot
-ggplot(tweetcount_alltime, aes(x = timestamp, y = N)) +
+ggplot(tweetcount, aes(x = timestamp, y = N)) +
     geom_point(color = "#253494", size = 1) +
-    scale_x_datetime(date_labels = "%b %Y", date_breaks = "9 month") +
+    scale_x_datetime(date_labels = "%b %Y", date_breaks = "3 month") +
     labs(title = "Trump Social Media Count",
          x = NULL,
          y = "number of tweets/truths") +
@@ -211,7 +186,7 @@ tweetdummy_alltime = dplyr::select(social_hourly,timestamp,dummy)
 tweetdummy = filter(tweetdummy_alltime,
                   between(timestamp, 
                           as.Date('2024-01-01'), 
-                          as.Date('2025-04-10')))
+                          as.Date('2025-05-07')))
 
 ```
 
@@ -225,7 +200,7 @@ tariff_alltime = dplyr::select(social_hourly,timestamp,total_tariff)
 tariff = filter(tariff_alltime,
                   between(timestamp, 
                           as.Date('2024-01-01'), 
-                          as.Date('2025-04-10')))
+                          as.Date('2025-05-07')))
 
 ```
 
@@ -239,7 +214,7 @@ trade_alltime = dplyr::select(social_hourly,timestamp,total_trade)
 trade = filter(trade_alltime,
                   between(timestamp, 
                           as.Date('2024-01-01'), 
-                          as.Date('2025-04-10')))
+                          as.Date('2025-05-07')))
 
 ```
 
@@ -253,7 +228,7 @@ positive_alltime = dplyr::select(social_hourly,timestamp,prop_positive)
 positive = filter(positive_alltime,
                   between(timestamp, 
                           as.Date('2024-01-01'), 
-                          as.Date('2025-04-10')))
+                          as.Date('2025-05-07')))
 
 ```
 
@@ -267,7 +242,7 @@ negative_alltime = dplyr::select(social_hourly,timestamp,prop_negative)
 negative = filter(negative_alltime,
                   between(timestamp, 
                           as.Date('2024-01-01'), 
-                          as.Date('2025-04-10')))
+                          as.Date('2025-05-07')))
 
 ```
 
