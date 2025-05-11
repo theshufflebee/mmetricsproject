@@ -784,3 +784,193 @@ grangertest(y15[,c("positive", "vol")], order = 16)
 
 
 
+```{r setup, interaction N and tariff}
+#N and tariff
+#y1 is vol, y2 is N, y3 is tariff, y4 is interaction
+int1 = Vdata$total_tariff * Vdata$N
+y27 = cbind(Vdata$r_vol_h, Vdata$N)
+y27 = cbind(y27, int1)
+y27 = cbind(y27, Vdata$total_tariff)
+colnames(y27)[1:4] <- c("vol", "N", "interaction", "tariff")
+
+
+
+est.VAR27 = VAR(y27,p=16)
+summary(est.VAR27)
+
+
+
+
+
+
+
+
+
+
+
+
+```
+
+
+```{r setup, SVAR int1}
+
+##create SVAR model¨
+bmat2 = matrix(c(1, 0, 0, 0, NA, 1, NA, NA, NA, NA, 1, 0, NA, 0, 0, 1), ncol=4)
+SVAR27 = SVAR(est.VAR27, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat2)
+summary(SVAR27)
+
+
+```
+
+
+```{r setup, IRF interaction on vol}
+IRF27 <- irf(SVAR27, response = "vol", impulse = "interaction", 
+             n.ahead = 60, ortho = TRUE, boot = TRUE)
+IRF27.1 <- irf(SVAR27, response = "vol", impulse = "tariff", 
+             n.ahead = 60, ortho = TRUE, boot = TRUE)
+IRF27.2 <- irf(SVAR27, response = "vol", impulse = "N", 
+               n.ahead = 60, ortho = TRUE, boot = TRUE)
+par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
+plot(IRF27)
+
+```
+
+
+```{r setup, IRF tarrif on vol}
+
+plot(IRF27.1)
+
+```
+
+
+```{r setup, IRF N on vol}
+plot(IRF27.2)
+
+
+```
+
+
+```{r setup, int1 cause vol}
+#granger causality
+#we want the smaller p-value => h0 test if there is no causality
+
+
+grangertest(y27[,c("interaction", "vol")], order = 16)
+
+
+
+
+
+```
+
+
+```{r setup, N cause vol}
+grangertest(y27[,c("N", "vol")], order = 16)
+
+
+```
+
+
+
+```{r setup, tarif cause vol}
+grangertest(y27[,c("tariff", "vol")], order = 16)
+
+
+```
+
+
+```{r setup, VD}
+#Variane decomposition
+vd27 = fevd(SVAR27, n.ahead = 20)
+plot(vd27)
+
+
+```
+
+
+```{r setup, interactin N and Trade}
+#N, Ntrade, trade
+int5 = Vdata$total_trade * Vdata$N
+y30 = cbind(Vdata$r_vol_h, Vdata$N)
+y30 = cbind(y30, Vdata$total_trade)
+y30 = cbind(y30, int5)
+colnames(y30)[1:4] <- c("vol", "N", "trade", "Ntrade")
+
+
+est.VAR30 = VAR(y30,p=16)
+summary(est.VAR30)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```
+
+
+```{r setup, SVAR int2}
+##create SVAR model¨
+bmat4 = matrix(c(1, 0, 0, 0, NA, 1, NA, NA, NA, NA, 1, 0, NA, 0, 0, 1), ncol=4)
+SVAR30 = SVAR(est.VAR30, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat4)
+summary(SVAR30)
+
+```
+
+
+```{r setup, IRF Ntrade on vol}
+
+IRF30 <- irf(SVAR30, response = "vol", impulse = "Ntrade", 
+             n.ahead = 60, ortho = TRUE, boot = TRUE)
+IRF30.1 <- irf(SVAR30, response = "vol", impulse = "N", 
+             n.ahead = 60, ortho = TRUE, boot = TRUE)
+IRF30.2 <- irf(SVAR30, response = "vol", impulse = "trade", 
+               n.ahead = 60, ortho = TRUE, boot = TRUE)
+par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
+plot(IRF30)
+```
+
+
+```{r setup, IRF N on vol}
+plot(IRF30.1)
+
+
+```
+
+
+```{r setup, IRF trade on vol}
+plot(IRF30.2)
+
+
+```
+
+
+
+```{r setup, int2 cause vol}
+grangertest(y27[,c("Ntrade", "vol")], order = 16)
+
+
+```
+
+
+```{r setup, N cause vol}
+grangertest(y27[,c("N", "vol")], order = 16)
+
+
+```
+
+
+```{r setup, trade cause vol}
+grangertest(y27[,c("trade", "vol")], order = 16)
+
+
+```
+
+
