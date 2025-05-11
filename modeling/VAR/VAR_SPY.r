@@ -1597,3 +1597,171 @@ grangertest(y26[,c("prop_positive", "vol")], order = 16)
 #Variane decomposition
 vd26 = fevd(SVAR26, n.ahead = 20)
 plot(vd26)
+
+
+
+
+#------------------------------------------------------------------------------------------
+#interactions 
+
+#N and tariff
+#y1 is vol, y2 is N, y3 is tariff, y4 is interaction
+int1 = Vdata$total_tariff * Vdata$N
+y27 = cbind(Vdata$r_vol_h, Vdata$N)
+y27 = cbind(y27, int1)
+y27 = cbind(y27, Vdata$total_tariff)
+colnames(y27)[1:4] <- c("vol", "N", "interaction", "tariff")
+
+
+y_lag27 = VARselect(y27, lag.max = 80)
+y_list27 = list(y_lag27)
+
+est.VAR27 = VAR(y27,p=16)
+summary(est.VAR27)
+
+
+##create SVAR model¨
+bmat2 = matrix(c(1, 0, 0, 0, NA, 1, NA, NA, NA, NA, 1, 0, NA, 0, 0, 1), ncol=4)
+SVAR27 = SVAR(est.VAR27, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat2)
+summary(SVAR27)
+
+IRF27 <- irf(SVAR27, response = "vol", impulse = "interaction", 
+             n.ahead = 60, ortho = TRUE, boot = TRUE)
+IRF27.1 <- irf(SVAR27, response = "vol", impulse = "N", 
+             n.ahead = 60, ortho = TRUE, boot = TRUE)
+IRF27.2 <- irf(SVAR27, response = "vol", impulse = "N", 
+               n.ahead = 60, ortho = TRUE, boot = TRUE)
+par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
+plot(IRF27)
+plot(IRF27.1)
+plot(IRF27.2)
+
+
+#granger causality
+#we want the smaller p-value => h0 test if there is no causality
+
+
+grangertest(y27[,c("interaction", "vol")], order = 16)
+
+grangertest(y27[,c("N", "vol")], order = 16)
+
+
+#Variane decomposition
+vd27 = fevd(SVAR27, n.ahead = 20)
+plot(vd27)
+
+
+
+
+
+
+
+
+
+
+
+
+#N and positive and negative
+#y1 is vol, y2 is posN, y3 is negN
+#find count
+tweetnegN_alltime = dplyr::select(social_hourly,timestamp,N, positive, negative)
+#select time period
+tweetnegN = filter(tweetnegN_alltime,
+                    between(timestamp,
+                            as.Date('2013-01-01'),
+                            as.Date('2025-04-10')))
+
+tweetnegN = tweetnegN %>%
+  mutate(
+    int3 = positive*N,
+    int4 = negative*N
+)
+
+
+Vdata4  = left_join(Vdata , tweetnegN, by="timestamp")
+Vdata4$int3[is.na(Vdata4$int3)] <- 0
+Vdata4$int4[is.na(Vdata4$int4)] = 0
+
+y28 = cbind(Vdata4$r_vol_h, Vdata4$int3)
+y28 = cbind(y28, Vdata4$int4)
+
+
+colnames(y28)[1:3] <- c("vol", "posN", "negN")
+
+
+est.VAR28 = VAR(y28,p=16)
+summary(est.VAR28)
+
+
+##create SVAR model¨
+bmat3 = matrix(c(1, 0, 0, NA, 1, 0, NA, 0, 1), ncol=3)
+SVAR28 = SVAR(est.VAR28, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat3)
+summary(SVAR28)
+
+IRF29 <- irf(SVAR28, response = "vol", impulse = "negN", 
+             n.ahead = 60, ortho = TRUE, boot = TRUE)
+IRF29.1 <- irf(SVAR28, response = "vol", impulse = "posN", 
+             n.ahead = 60, ortho = TRUE, boot = TRUE)
+par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
+plot(IRF29)
+plot(IRF29.1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#N, Ntrade, trade
+int5 = Vdata$total_trade * Vdata$N
+y30 = cbind(Vdata$r_vol_h, Vdata$N)
+y30 = cbind(y30, Vdata$total_trade)
+y30 = cbind(y30, int5)
+colnames(y30)[1:4] <- c("vol", "N", "trade", "Ntrade")
+
+
+y_lag30 = VARselect(y30, lag.max = 80)
+y_list30 = list(y_lag30)
+
+est.VAR30 = VAR(y30,p=16)
+summary(est.VAR30)
+
+
+##create SVAR model¨
+bmat4 = matrix(c(1, 0, 0, 0, NA, 1, NA, NA, NA, NA, 1, 0, NA, 0, 0, 1), ncol=4)
+SVAR30 = SVAR(est.VAR30, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat4)
+summary(SVAR30)
+
+IRF30 <- irf(SVAR30, response = "vol", impulse = "Ntrade", 
+             n.ahead = 60, ortho = TRUE, boot = TRUE)
+IRF30.1 <- irf(SVAR30, response = "vol", impulse = "N", 
+             n.ahead = 60, ortho = TRUE, boot = TRUE)
+IRF30.2 <- irf(SVAR30, response = "vol", impulse = "trade", 
+               n.ahead = 60, ortho = TRUE, boot = TRUE)
+par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
+plot(IRF30)
+plot(IRF30.1)
+plot(IRF30.2)
+
+#granger causality
+
+
+grangertest(y27[,c("Ntrade", "vol")], order = 16)
+
+
+grangertest(y27[,c("N", "vol")], order = 16)
+
+
+grangertest(y27[,c("trade", "vol")], order = 16)
+
+
+#Variane decomposition
+vd27 = fevd(SVAR27, n.ahead = 20)
+plot(vd27)
