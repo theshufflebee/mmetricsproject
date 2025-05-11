@@ -198,7 +198,7 @@ sum(wday(posts2$timestamp) %in% c(1,7))
 # Define the tokens you want to check
 specific_tokens <- c("tariff")
 
-# Count the occurrences of specific tokens
+# Count occurrences
 token_count <- posts_token %>%
   pull(tokens) %>%  # Extract the 'tokens' column as a list of token vectors
   unlist() %>%      # Flatten the list into a single vector of tokens
