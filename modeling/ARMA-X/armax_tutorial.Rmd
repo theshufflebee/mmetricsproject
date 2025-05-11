@@ -29,7 +29,7 @@ require(lmtest) #reg tests
 require(vroom) #for loading data
 require(data.table) #for data filtering
 require(sysid) #for ARMA-X modeling
-require(sandwhich) #regression errors
+require(sandwich) #regression errors
 require(stargazer) #nice reg tables
 require(tidytext) #text mining
 require(textstem) #lemmatization
@@ -274,30 +274,30 @@ armax_data$prop_positive[is.na(armax_data$prop_positive)] = 0
 armax_data$prop_negative[is.na(armax_data$prop_negative)] = 0
 
 ```
-\newpage
+
 
 
 # S\&P500 ARMA-X Tariff Models
 
 ## Finding Model
-```{r armax tariff}
+```{r armax tariff, results="asis", warning=F, message=F}
 
 #auto.armax selects the lowest AIC value given r (exogenous variable lags) 
 res1 = auto.armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=7,
-                latex=F,max.p = 7, max.q = 7, max.d=0)
+                latex=T,max.p = 7, max.q = 7, max.d=0)
 
 #armax enables a custom armax specification with p,q,r 
 res2 = armax(armax_data$SPY_vol, xreg=armax_data$total_tariff, nb.lags=2,
-                   p=5, q=0, d=0, latex=F)
+                   p=5, q=0, d=0, latex=T)
 
 #auto.armax.r selects the lowest AIC checking all 3 p,q,r values
 res3 = auto.armax.r(armax_data$SPY_vol, x=armax_data$total_tariff, 
-                max_p = 7, max_q = 7, max_r = 3, criterion = "AIC", latex=F)
+                max_p = 7, max_q = 7, max_r = 3, criterion = "AIC", latex=T)
 
 ```
 
 ## Plotting IRFs
-```{r tariff irf plots}
+```{r tariff irf plots, warning=F, message=F}
 
 nb.periods = 20
 

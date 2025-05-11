@@ -1,0 +1,378 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  pdf_document: default
+---
+
+
+
+```{r, load packages}
+library("quantmod")
+library("TSA")
+library("aTSA")
+library("rugarch")
+library("rmgarch")
+library("ggplot2")
+library("tibble")
+library("dplyr")
+library("lubridate")
+library(tibble)
+library(tidyverse)
+library(knitr)
+library("fGarch")
+library(FinTS)
+library(kableExtra)
+library(writexl)
+library(texreg)
+library("purrr")
+library("forecast")
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwhich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenizationc vfv 
+require(vars)
+
+
+
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwhich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenization
+require(syuzhet) #sentiment analysis
+require(alphavantager)
+require(tseries)
+```
+
+
+
+```{r, link to git}
+rm(list = ls())
+
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/armax_functions.R"))
+source(here("helperfunctions/fulldata_loader.R"))
+```
+
+
+```{r, load data}
+# 1. Load Political Social Media
+#contains posts from Twitter & TruthSocial
+social <- read.csv(here("data/mothership", "social.csv"))
+social_hourly <- read.csv(here("data/mothership", "socialhourly.csv"))
+
+
+# 2. Load Financial
+#S&P500
+#SPY <- read.csv(here("data/mothership", "SPY.csv"))
+#STOXX50
+#VGK <- read.csv(here("data/mothership", "VGK.csv"))
+#CSI 300 (China)
+ASHR <- read.csv(here("data/mothership", "ASHR.CSV"))
+```
+
+
+```{r, clean data}
+#make posixct
+#SPY$timestamp = as.POSIXct(SPY$timestamp,format = "%Y-%m-%d %H:%M:%S")
+#VGK$timestamp = as.POSIXct(VGK$timestamp,format = "%Y-%m-%d %H:%M:%S")
+ASHR$timestamp = as.POSIXct(ASHR$timestamp,format = "%Y-%m-%d %H:%M:%S")
+social$timestamp = as.POSIXct(social$timestamp,format = "%Y-%m-%d %H:%M:%S")
+social_hourly$timestamp = as.POSIXct(social_hourly$timestamp,format = "%Y-%m-%d %H:%M:%S")
+
+
+#find hourly volatility
+#NOTE: this ignores tweets made outside trading hours!!
+ASHR_volatility_alltime = dplyr::select(ASHR,timestamp,r_vol_h)
+#aggregating per hour
+ASHR_volatility_alltime = ASHR_volatility_alltime %>%
+  mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
+  distinct(timestamp, .keep_all = TRUE)
+#select time period
+ASHR_volatility = filter(ASHR_volatility_alltime,
+                        between(timestamp,
+                                as.Date('2013-01-01'),
+                                as.Date('2025-04-10')))
+
+#find count
+tweetcount_alltime = dplyr::select(social_hourly,timestamp,N)
+#select time period
+tweetcount = filter(tweetcount_alltime,
+                    between(timestamp,
+                            as.Date('2013-01-01'),
+                            as.Date('2025-04-10')))
+
+#find dummy
+tweetdummy_alltime = dplyr::select(social_hourly,timestamp,dummy)
+#select time period
+tweetdummy = filter(tweetdummy_alltime,
+                    between(timestamp,
+                            as.Date('2013-01-01'),
+                            as.Date('2025-04-10')))
+
+#find count
+tariff_alltime = dplyr::select(social_hourly,timestamp,total_tariff)
+#select time period
+tariff = filter(tariff_alltime,
+                between(timestamp,
+                        as.Date('2013-01-01'),
+                        as.Date('2025-04-10')))
+
+
+#find count
+trade_alltime = dplyr::select(social_hourly,timestamp,total_trade)
+#select time period
+trade = filter(trade_alltime,
+               between(timestamp,
+                       as.Date('2013-01-01'),
+                       as.Date('2025-04-10')))
+
+
+
+
+#merge our dependant and independant vars
+Vdata = left_join(ASHR_volatility, tweetcount, by="timestamp")
+Vdata  = left_join(Vdata , tweetdummy, by="timestamp")
+Vdata  = left_join(Vdata , tariff, by="timestamp")
+Vdata  = left_join(Vdata , trade, by="timestamp")
+#convert NA to zeroes
+Vdata $N[is.na(Vdata $N)] = 0
+Vdata $dummy[is.na(Vdata $dummy)] = 0
+Vdata $total_tariff[is.na(Vdata $total_tariff)] = 0
+Vdata $total_trade[is.na(Vdata $total_trade)] = 0
+
+Vdata <- Vdata %>%
+  filter(!is.na(r_vol_h))
+```
+
+
+```{r, acf}
+#check the data  
+##stationarity
+
+###acf/pacf
+acf(Vdata$r_vol_h)
+
+```
+
+
+```{r, pacf}
+pacf(Vdata$r_vol_h)
+```
+
+
+```{r, adf test}
+####adf test (for stationarity of the outcome data) 
+####p-value test H0, the probability that the process is not stationary
+adf.test(Vdata$r_vol_h, k = 30)
+```
+
+
+```{r, series graph}
+#series
+
+pro_v = ts(Vdata$r_vol_h)
+
+autoplot(pro_v)
+
+```
+
+
+```{r, Estimate the Process}
+#Estimate the Process
+##with dummy
+y = cbind(Vdata$r_vol_h, Vdata$dummy)
+
+##with dummy
+y = cbind(Vdata$r_vol_h, Vdata$dummy)
+
+y_lag = VARselect(y, lag.max = 28)
+y_lag
+
+#dummy
+est.VAR <- VAR(y,p=28)
+summary(est.VAR)
+```
+
+
+```{r, serial correlation test}
+#bunch of test 
+
+##serial correlation
+serial = serial.test(est.VAR, lags.pt = 20, type = "PT.asymptotic")
+serial
+
+#y1 is vol ; y2 is tweet (dummy or N)
+plot(serial, names = "y1")
+```
+
+
+```{r, heteroscedasticity test}
+#heteroscedasticity
+hete = arch.test(est.VAR, lags.multi = 80, multivariate.only = TRUE)
+hete
+```
+
+
+```{r, Distribution of residuals test}
+#Distribution of residuals
+norm = normality.test(est.VAR, multivariate.only = TRUE)
+norm
+```
+
+
+
+
+```{r, SVAR dummy}
+bmat = matrix(c(1, 0, NA, 1), 2)
+SVAR = SVAR(est.VAR, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
+summary(SVAR)
+
+```
+
+
+```{r, irf dummy}
+IRF <- irf(SVAR, response = "y1", impulse = "y2", 
+           n.ahead = 80, ortho = TRUE, boot = TRUE)
+par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
+plot(IRF)
+
+```
+
+
+```{r, granger test of dum causing vol}
+colnames(y)[1:2] <- c("vol", "dum")
+
+#does dum granger cause vol
+grangertest(y[,c("dum", "vol")], order = 29)
+```
+
+
+```{r, Variane decomposition}
+#Variane decomposition
+vd = fevd(SVAR, n.ahead = 20)
+plot(vd)
+
+```
+
+
+```{r, tarrif}
+#tarrif
+y3 =cbind(Vdata$r_vol_h, Vdata$total_tariff)
+
+est.VAR3 = VAR(y3,p=21)
+summary(est.VAR3)
+```
+
+
+```{r, Structural breaks}
+#Structural breaks in the errors (stability)
+stru3 = stability(est.VAR3, type ="OLS-CUSUM") #OLS-CUSUM or Rec-CUSUM
+plot(stru3)
+```
+
+
+```{r, SVAR tarrif}
+##create SVAR model
+SVAR2 = SVAR(est.VAR3, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
+summary(SVAR2)
+```
+
+
+```{r, irf tarrif}
+IRF2 <- irf(SVAR2, response = "y1", impulse = "y2", 
+            n.ahead = 40, ortho = TRUE, boot = TRUE)
+par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
+plot(IRF2)
+```
+
+```{r, granger test of tarrif causing vol}
+
+colnames(y3)[1:2] <- c("vol", "tarrif")
+
+#does tarrif granger cause vol
+grangertest(y3[,c("tarrif", "vol")], order = 29)
+```
+
+
+```{r, trade}
+#trade
+y4 =cbind(Vdata$r_vol_h, Vdata$total_trade)
+
+est.VAR4 = VAR(y4,p=21)
+summary(est.VAR4)
+```
+
+
+```{r, SVAR trade}
+##create SVAR model
+SVAR4 = SVAR(est.VAR4, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
+summary(SVAR4)
+```
+
+
+```{r, irf trade}
+IRF4 <- irf(SVAR4, response = "y1", impulse = "y2", 
+            n.ahead = 40, ortho = TRUE, boot = TRUE)
+par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
+plot(IRF4)
+```
+
+
+```{r, granger trade cause}
+colnames(y4)[1:2] <- c("vol", "trade")
+
+#does tarrif granger cause vol
+grangertest(y4[,c("trade", "vol")], order = 29)
+```
+
+
+
