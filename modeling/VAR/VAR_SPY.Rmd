@@ -1,0 +1,786 @@
+---
+title: "SPY-md"
+author: "pte"
+date: "2025-05-10"
+output: html_document
+---
+
+```{r setup, load packages}
+
+library("quantmod")
+library("TSA")
+library("aTSA")
+library("rugarch")
+library("rmgarch")
+library("ggplot2")
+library("tibble")
+library("dplyr")
+library("lubridate")
+library(tibble)
+library(tidyverse)
+library(knitr)
+library("fGarch")
+library(FinTS)
+library(kableExtra)
+library(writexl)
+library(texreg)
+library("purrr")
+library("forecast")
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwhich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenizationc vfv 
+require(vars)
+
+
+
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwhich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenization
+require(syuzhet) #sentiment analysis
+require(alphavantager)
+require(tseries)
+av_api_key(Sys.getenv("ALPHAVANTAGE_API_KEY"))
+
+rm(list=ls())
+
+
+
+
+
+```
+
+
+
+```{r setup, link to git}
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/armax_functions.R"))
+source(here("helperfunctions/fulldata_loader.R"))
+
+```
+
+
+
+```{r setup, load data}
+# 1. Load Political Social Media
+#contains posts from Twitter & TruthSocial
+social <- read.csv(here("data/mothership", "social.csv"))
+social_hourly <- read.csv(here("data/mothership", "socialhourly.csv"))
+
+
+# 2. Load Financial
+#S&P500
+SPY <- read.csv(here("data/mothership", "SPY.csv"))
+#STOXX50
+VGK <- read.csv(here("data/mothership", "VGK.csv"))
+#CSI 300 (China)
+ASHR <- read.csv(here("data/mothership", "ASHR.CSV"))
+
+
+#make posixct
+SPY$timestamp = as.POSIXct(SPY$timestamp,format = "%Y-%m-%d %H:%M:%S")
+VGK$timestamp = as.POSIXct(VGK$timestamp,format = "%Y-%m-%d %H:%M:%S")
+ASHR$timestamp = as.POSIXct(ASHR$timestamp,format = "%Y-%m-%d %H:%M:%S")
+social$timestamp = as.POSIXct(social$timestamp,format = "%Y-%m-%d %H:%M:%S")
+social_hourly$timestamp = as.POSIXct(social_hourly$timestamp,format = "%Y-%m-%d %H:%M:%S")
+```
+
+
+```{r setup, clean data}
+#find hourly volatility
+#NOTE: this ignores tweets made outside trading hours!!
+SPY_volatility_alltime = dplyr::select(SPY,timestamp,r_vol_h)
+#aggregating per hour
+SPY_volatility_alltime = SPY_volatility_alltime %>%
+  mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
+  distinct(timestamp, .keep_all = TRUE)
+#select time period
+SPY_volatility = filter(SPY_volatility_alltime,
+                        between(timestamp,
+                                as.Date('2013-01-01'),
+                                as.Date('2025-04-10')))
+
+#find count
+tweetcount_alltime = dplyr::select(social_hourly,timestamp,N)
+#select time period
+tweetcount = filter(tweetcount_alltime,
+                    between(timestamp,
+                            as.Date('2013-01-01'),
+                            as.Date('2025-04-10')))
+
+#find dummy
+tweetdummy_alltime = dplyr::select(social_hourly,timestamp,dummy)
+#select time period
+tweetdummy = filter(tweetdummy_alltime,
+                    between(timestamp,
+                            as.Date('2013-01-01'),
+                            as.Date('2025-04-10')))
+
+#find count
+tariff_alltime = dplyr::select(social_hourly,timestamp,total_tariff)
+#select time period
+tariff = filter(tariff_alltime,
+                between(timestamp,
+                        as.Date('2013-01-01'),
+                        as.Date('2025-04-10')))
+
+
+#find count
+trade_alltime = dplyr::select(social_hourly,timestamp,total_trade)
+#select time period
+trade = filter(trade_alltime,
+               between(timestamp,
+                       as.Date('2013-01-01'),
+                       as.Date('2025-04-10')))
+
+
+
+
+#merge our dependant and independant vars
+Vdata = left_join(SPY_volatility, tweetcount, by="timestamp")
+Vdata  = left_join(Vdata , tweetdummy, by="timestamp")
+Vdata  = left_join(Vdata , tariff, by="timestamp")
+Vdata  = left_join(Vdata , trade, by="timestamp")
+#convert NA to zeroes
+Vdata $N[is.na(Vdata $N)] = 0
+Vdata $dummy[is.na(Vdata $dummy)] = 0
+Vdata $total_tariff[is.na(Vdata $total_tariff)] = 0
+Vdata $total_trade[is.na(Vdata $total_trade)] = 0
+
+```
+
+
+```{r setup, acf}
+#check the data 
+###acf/pacf
+acf(Vdata$r_vol_h)
+```
+
+
+```{r setup, pacf}
+pacf(Vdata$r_vol_h)
+```
+
+```{r setup, adf test}
+adf.test(Vdata$r_vol_h, k = 16)
+
+```
+
+```{r setup, graph series}
+#graph the series
+ggplot(Vdata, aes(x= timestamp, y=r_vol_h)) + 
+  geom_line(color = "blue", size = 0.8, type="l") +
+  scale_x_datetime(date_labels = "%b %Y", date_breaks = "9 month") +
+  labs(title = "Volatility SPY",
+       x = "time",
+       y = "Volatility") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(face = "bold", hjust = 0.5))
+```
+
+```{r setup, nb lag for dummy}
+#Estimate the Process
+##with dummy
+y = cbind(Vdata$r_vol_h, Vdata$dummy)
+
+y_lag = VARselect(y, lag.max = 80)
+y_list = list(y_lag)
+```
+
+```{r setup, AIC}
+##AIC
+resultats1 <- lapply(y_list, function(x) x$criteria["AIC(n)", ])
+
+resultats1 = as.data.frame(resultats1)
+
+resultats1 = resultats1 %>%
+  rename(name = 1) %>%
+  mutate(
+    n = c(1:length(name))
+  )
+
+ggplot (resultats1, aes(x=n, y= name)) +
+  geom_line(color = "steelblue") +
+  labs(title = "hourly Returns AIC",x="n" , y = "AIC") +
+  theme_minimal()
+```
+
+```{r setup, HQ}
+##HQ
+resultats2 <- lapply(y_list, function(x) x$criteria["HQ(n)", ])
+
+resultats2 = as.data.frame(resultats2)
+
+resultats2 = resultats2 %>%
+  rename(name = 1) %>%
+  mutate(
+    n = c(1:length(name))
+  )
+
+ggplot (resultats2, aes(x=n, y= name)) +
+  geom_line(color = "steelblue") +
+  labs(title = "hourly Returns HQ",x="dum" , y = "HQ") +
+  theme_minimal()
+```
+
+```{r setup, SC}
+##SC
+resultats3 <- lapply(y_list, function(x) x$criteria["SC(n)", ])
+
+resultats3 = as.data.frame(resultats3)
+
+resultats3 = resultats3 %>%
+  rename(name = 1) %>%
+  mutate(
+    n = c(1:length(name))
+  )
+
+ggplot (resultats3, aes(x=n, y= name)) +
+  geom_line(color = "steelblue") +
+  labs(title = "hourly Returns SC",x="dum" , y = "SC") +
+  theme_minimal()
+
+```
+
+```{r setup, FPE}
+##FPE
+resultats4 <- lapply(y_list, function(x) x$criteria["FPE(n)", ])
+
+resultats4 = as.data.frame(resultats4)
+
+resultats4 = resultats4 %>%
+  rename(name = 1) %>%
+  mutate(
+    n = c(1:length(name))
+  )
+
+ggplot (resultats4, aes(x=n, y= name)) +
+  geom_line(color = "steelblue") +
+  labs(title = "hourly Returns FPE",x="dum" , y = "FPE") +
+  theme_minimal()
+```
+
+```{r setup, estime VAR dummy}
+#dummy
+est.VAR <- VAR(y,p=16)
+summary(est.VAR)
+```
+
+```{r setup, serial correlation test}
+#bunch of test 
+
+##serial correlation
+##h0 test if there is no ...
+serial = serial.test(est.VAR, lags.pt = 20, type = "PT.asymptotic")
+serial
+```
+
+```{r setup, plot serial}
+plot(serial, names = "y1")
+
+```
+
+```{r setup, heteroscedasticity test}
+#heteroscedasticity
+hete = arch.test(est.VAR, lags.multi = 80, multivariate.only = TRUE)
+hete
+```
+
+```{r setup, normal dist.}
+#Distribution of residuals
+norm = normality.test(est.VAR, multivariate.only = TRUE)
+norm
+```
+
+```{r setup, structural breaks}
+#Structural breaks in the errors (stability)
+stru2 = stability(est.VAR, type ="OLS-CUSUM") #OLS-CUSUM or Rec-CUSUM
+plot(stru2)
+```
+
+```{r setup, SVAR dummy}
+bmat = matrix(c(1, 0, NA, 1), 2)
+SVAR = SVAR(est.VAR, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
+summary(SVAR)
+
+
+
+
+
+
+
+
+
+
+
+
+```
+
+```{r setup, irf dummy}
+IRF <- irf(SVAR, response = "y1", impulse = "y2", 
+           n.ahead = 40, ortho = TRUE, boot = TRUE)
+par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
+plot(IRF)
+```
+
+```{r setup, does vol cause dummy}
+#granger causality
+#we want the smaller p-value => h0 test if there is no causality
+colnames(y)[1:2] <- c("vol", "dum")
+
+#does vol granger cause dum
+grangertest(y[,c("vol","dum")], order = 16)
+
+```
+
+```{r setup, does dummy cause vol}
+#does dum granger cause vol
+grangertest(y[,c("dum", "vol")], order = 16)
+```
+
+```{r setup, variance decomposition}
+#Variane decomposition
+vd = fevd(SVAR, n.ahead = 20)
+plot(vd)
+```
+
+```{r setup, tarrif estimation}
+#tarrif
+y3 =cbind(Vdata$r_vol_h, Vdata$total_tariff)
+
+est.VAR3 = VAR(y3,p=16)
+summary(est.VAR3)
+```
+
+```{r setup, structural breaks}
+#Structural breaks in the errors (stability)
+stru3 = stability(est.VAR3, type ="OLS-CUSUM") #OLS-CUSUM or Rec-CUSUM
+plot(stru3)
+```
+
+```{r setup, SVAR estimation}
+##create SVAR model
+SVAR2 = SVAR(est.VAR3, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
+summary(SVAR2)
+```
+
+```{r setup, irf tarrif}
+
+IRF2 <- irf(SVAR2, response = "y1", impulse = "y2", 
+           n.ahead = 40, ortho = TRUE, boot = TRUE)
+par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
+plot(IRF2)
+```
+
+```{r setup, tarrif granger cause vol}
+#we want the smaller p-value => h0 test if there is no causality
+colnames(y3)[1:2] <- c("vol", "tarrif")
+
+#does tarrif granger cause vol
+grangertest(y3[,c("tarrif", "vol")], order = 16)
+```
+
+```{r setup, Variane decomposition tarrif}
+#Variane decomposition
+vd2 = fevd(SVAR2, n.ahead = 20)
+plot(vd2)
+
+```
+
+```{r setup, trade estimation}
+#trade
+y4 =cbind(Vdata$r_vol_h, Vdata$total_trade)
+
+est.VAR4 = VAR(y4,p=16)
+summary(est.VAR4)
+```
+
+```{r setup, SVAR trade}
+##create SVAR model
+SVAR4 = SVAR(est.VAR4, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
+summary(SVAR4)
+
+IRF4 <- irf(SVAR4, response = "y1", impulse = "y2", 
+            n.ahead = 40, ortho = TRUE, boot = TRUE)
+par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
+plot(IRF4)
+
+```
+
+```{r setup, does trade cause vol}
+#granger causality
+#we want the smaller p-value => h0 test if there is no causality
+colnames(y4)[1:2] <- c("vol", "trade")
+
+#does tarrif granger cause vol
+grangertest(y4[,c("trade", "vol")], order = 16)
+```
+
+```{r setup, sentiment analysis data load}
+##sentiment analysis(N)
+
+#find anger
+tweetanger_alltime = dplyr::select(social_hourly,timestamp,anger)
+#select time period
+tweetanger = filter(tweetanger_alltime,
+                    between(timestamp,
+                            as.Date('2013-01-01'),
+                            as.Date('2025-04-10')))
+
+#find fear
+tweetfear_alltime = dplyr::select(social_hourly,timestamp,fear)
+#select time period
+tweetfear = filter(tweetfear_alltime,
+                    between(timestamp,
+                            as.Date('2013-01-01'),
+                            as.Date('2025-04-10')))
+
+#find anticipation
+anti_alltime = dplyr::select(social_hourly,timestamp,anticipation)
+#select time period
+anti = filter(anti_alltime,
+                between(timestamp,
+                        as.Date('2013-01-01'),
+                        as.Date('2025-04-10')))
+
+
+#find disgust
+disgust_alltime = dplyr::select(social_hourly,timestamp,disgust)
+#select time period
+disgust = filter(disgust_alltime,
+               between(timestamp,
+                       as.Date('2013-01-01'),
+                       as.Date('2025-04-10')))
+
+
+#find joy
+joy_alltime = dplyr::select(social_hourly,timestamp,joy)
+#select time period
+joy = filter(joy_alltime,
+                 between(timestamp,
+                         as.Date('2013-01-01'),
+                         as.Date('2025-04-10')))
+
+#find sadness
+sadness_alltime = dplyr::select(social_hourly,timestamp,sadness)
+#select time period
+sadness = filter(sadness_alltime,
+                 between(timestamp,
+                         as.Date('2013-01-01'),
+                         as.Date('2025-04-10')))
+
+#find surprise
+surprise_alltime = dplyr::select(social_hourly,timestamp,surprise)
+#select time period
+surprise = filter(surprise_alltime,
+                 between(timestamp,
+                         as.Date('2013-01-01'),
+                         as.Date('2025-04-10')))
+
+#find trust
+trust_alltime = dplyr::select(social_hourly,timestamp,trust)
+#select time period
+trust = filter(trust_alltime,
+                 between(timestamp,
+                         as.Date('2013-01-01'),
+                         as.Date('2025-04-10')))
+
+#find negative
+negative_alltime = dplyr::select(social_hourly,timestamp,negative)
+#select time period
+negative = filter(negative_alltime,
+                 between(timestamp,
+                         as.Date('2013-01-01'),
+                         as.Date('2025-04-10')))
+
+#find positive
+positive_alltime = dplyr::select(social_hourly,timestamp,positive)
+#select time period
+positive = filter(positive_alltime,
+                 between(timestamp,
+                         as.Date('2013-01-01'),
+                         as.Date('2025-04-10')))
+
+#find tot_posneg
+tot_posneg_alltime = dplyr::select(social_hourly,timestamp,total_posneg)
+#select time period
+tot_posneg = filter(tot_posneg_alltime,
+                  between(timestamp,
+                          as.Date('2013-01-01'),
+                          as.Date('2025-04-10')))
+
+#find total_sentiment
+tot_sent_alltime = dplyr::select(social_hourly,timestamp,total_sentiment)
+#select time period
+tot_sent = filter(tot_sent_alltime,
+                  between(timestamp,
+                          as.Date('2013-01-01'),
+                          as.Date('2025-04-10')))
+
+
+
+
+#merge our dependant and independant vars
+Vdata2 = left_join(SPY_volatility, tweetanger, by="timestamp")
+Vdata2  = left_join(Vdata2 , tweetfear, by="timestamp")
+Vdata2  = left_join(Vdata2 , anti, by="timestamp")
+Vdata2  = left_join(Vdata2 , disgust, by="timestamp")
+Vdata2  = left_join(Vdata2 , joy, by="timestamp")
+Vdata2  = left_join(Vdata2 , sadness, by="timestamp")
+Vdata2  = left_join(Vdata2 , surprise, by="timestamp")
+Vdata2  = left_join(Vdata2 , trust, by="timestamp")
+Vdata2  = left_join(Vdata2 , negative, by="timestamp")
+Vdata2  = left_join(Vdata2 , positive, by="timestamp")
+Vdata2  = left_join(Vdata2 , tot_posneg, by="timestamp")
+Vdata2  = left_join(Vdata2 , tot_sent, by="timestamp")
+
+#convert NA to zeroes
+Vdata2 $anger[is.na(Vdata2 $anger)] = 0
+Vdata2 $fear[is.na(Vdata2 $fear)] = 0
+Vdata2 $anticipation[is.na(Vdata2 $anticipation)] = 0
+Vdata2 $disgust[is.na(Vdata2 $disgust)] = 0
+Vdata2 $joy[is.na(Vdata2 $joy)] = 0
+Vdata2 $sadness[is.na(Vdata2 $sadness)] = 0
+Vdata2 $surprise[is.na(Vdata2 $surprise)] = 0
+Vdata2 $trust[is.na(Vdata2 $trust)] = 0
+Vdata2 $negative[is.na(Vdata2 $negative)] = 0
+Vdata2 $positive[is.na(Vdata2 $positive)] = 0
+Vdata2 $total_posneg[is.na(Vdata2 $total_posneg)] = 0
+Vdata2 $total_sentiment[is.na(Vdata2 $total_sentiment)] = 0
+
+```
+
+```{r setup, estim anti}
+#estimation 3 : anticipation
+y7 =cbind(Vdata2$r_vol_h, Vdata2$anticipation)
+
+est.VAR7 = VAR(y7,p=16)
+summary(est.VAR7)
+
+```
+
+```{r setup, svar anti}
+##create SVAR model
+SVAR7 = SVAR(est.VAR7, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
+summary(SVAR7)
+```
+
+```{r setup, irf anti}
+IRF7 <- irf(SVAR7, response = "y1", impulse = "y2", 
+            n.ahead = 40, ortho = TRUE, boot = TRUE)
+par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
+plot(IRF7)
+```
+
+```{r setup, does anti cause vol}
+colnames(y7)[1:2] <- c("vol", "anticipation")
+ 
+
+#does anticipation granger cause vol
+grangertest(y7[,c("anticipation", "vol")], order = 16)
+```
+
+```{r setup, estim joy}
+#estimation 5 : joy
+y10 =cbind(Vdata2$r_vol_h, Vdata2$joy)
+
+est.VAR10 = VAR(y10,p=16)
+summary(est.VAR10)
+
+
+```
+
+```{r setup, svar joy}
+##create SVAR model
+SVAR10 = SVAR(est.VAR10, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
+summary(SVAR10)
+```
+
+```{r setup, irf joy}
+IRF10 <- irf(SVAR10, response = "y1", impulse = "y2", 
+            n.ahead = 50, ortho = TRUE, boot = TRUE)
+par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
+plot(IRF10)
+```
+
+```{r setup, joy cause vol}
+colnames(y10)[1:2] <- c("vol", "joy")
+
+grangertest(y10[,c("joy", "vol")], order = 16)
+
+```
+
+```{r setup, estim trust}
+#estimation 8 : trust
+y13 =cbind(Vdata2$r_vol_h, Vdata2$trust)
+
+est.VAR13 = VAR(y13,p=16)
+summary(est.VAR13)
+
+
+
+
+```
+
+```{r setup, svar trust}
+##create SVAR model
+SVAR13 = SVAR(est.VAR13, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
+summary(SVAR13)
+
+
+```
+
+```{r setup, irf trust}
+IRF13 <- irf(SVAR13, response = "y1", impulse = "y2", 
+            n.ahead = 40, ortho = TRUE, boot = TRUE)
+par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
+plot(IRF13)
+
+
+
+
+```
+
+```{r setup, trust cause vol}
+#granger causality
+#we want the smaller p-value => h0 test if there is no causality
+colnames(y13)[1:2] <- c("vol", "trust")
+
+ 
+
+#does trust granger cause vol
+grangertest(y13[,c("trust", "vol")], order = 16)
+```
+
+```{r setup, estime negative}
+#estimation 9 : negative
+y14 =cbind(Vdata2$r_vol_h, Vdata2$negative)
+
+est.VAR14 = VAR(y14,p=16)
+summary(est.VAR14)
+
+
+
+```
+
+```{r setup, svar negative}
+##create SVAR model
+SVAR14 = SVAR(est.VAR14, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
+summary(SVAR14)
+
+
+
+
+```
+
+```{r setup, irf negative}
+IRF14 <- irf(SVAR14, response = "y1", impulse = "y2", 
+            n.ahead = 40, ortho = TRUE, boot = TRUE)
+par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
+plot(IRF14)
+
+```
+
+```{r setup, negative cause vol}
+#granger causality
+#we want the smaller p-value => h0 test if there is no causality
+colnames(y14)[1:2] <- c("vol", "negative")
+ 
+
+#does negative granger cause vol
+grangertest(y14[,c("negative", "vol")], order = 16)
+```
+
+
+
+```{r setup, estim positive}
+#estimation 10 : positive
+y15 =cbind(Vdata2$r_vol_h, Vdata2$positive)
+
+est.VAR15 = VAR(y15,p=16)
+summary(est.VAR15)
+
+
+
+
+```
+
+```{r setup, svar positive}
+##create SVAR model
+SVAR15 = SVAR(est.VAR15, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
+summary(SVAR15)
+
+
+```
+
+```{r setup, irf positive}
+IRF15 <- irf(SVAR15, response = "y1", impulse = "y2", 
+            n.ahead = 40, ortho = TRUE, boot = TRUE)
+par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
+plot(IRF15)
+
+
+
+```
+
+```{r setup, positive cause vol}
+#granger causality
+#we want the smaller p-value => h0 test if there is no causality
+colnames(y15)[1:2] <- c("vol", "positive")
+
+
+#does positive granger cause vol
+grangertest(y15[,c("positive", "vol")], order = 16)
+```
+
+
+
+
