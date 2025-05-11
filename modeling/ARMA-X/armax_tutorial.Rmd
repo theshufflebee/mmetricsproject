@@ -106,7 +106,7 @@ SPY_volatility_alltime = SPY_volatility_alltime %>%
 #select time period
 SPY_volatility = filter(SPY_volatility_alltime,
                   between(timestamp, 
-                          as.Date('2024-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-05-07')))
 
 #plot
@@ -128,7 +128,7 @@ VGK_volatility_alltime = VGK_volatility_alltime %>%
 #select time period
 VGK_volatility = filter(VGK_volatility_alltime,
                   between(timestamp, 
-                          as.Date('2024-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-05-07')))
 
 ```
@@ -147,7 +147,7 @@ ASHR_volatility_alltime = ASHR_volatility_alltime %>%
 #select time period
 ASHR_volatility = filter(ASHR_volatility_alltime,
                   between(timestamp, 
-                          as.Date('2024-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-05-07')))
 
 ```
@@ -161,7 +161,7 @@ tweetcount_alltime = dplyr::select(social_hourly,timestamp,N)
 #select time period
 tweetcount = filter(tweetcount_alltime,
                   between(timestamp, 
-                          as.Date('2024-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-05-07')))
 
 #plot
@@ -185,7 +185,7 @@ tweetdummy_alltime = dplyr::select(social_hourly,timestamp,dummy)
 #select time period
 tweetdummy = filter(tweetdummy_alltime,
                   between(timestamp, 
-                          as.Date('2024-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-05-07')))
 
 ```
@@ -199,7 +199,7 @@ tariff_alltime = dplyr::select(social_hourly,timestamp,total_tariff)
 #select time period
 tariff = filter(tariff_alltime,
                   between(timestamp, 
-                          as.Date('2024-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-05-07')))
 
 ```
@@ -213,7 +213,7 @@ trade_alltime = dplyr::select(social_hourly,timestamp,total_trade)
 #select time period
 trade = filter(trade_alltime,
                   between(timestamp, 
-                          as.Date('2024-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-05-07')))
 
 ```
@@ -227,7 +227,7 @@ positive_alltime = dplyr::select(social_hourly,timestamp,prop_positive)
 #select time period
 positive = filter(positive_alltime,
                   between(timestamp, 
-                          as.Date('2024-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-05-07')))
 
 ```
@@ -241,7 +241,7 @@ negative_alltime = dplyr::select(social_hourly,timestamp,prop_negative)
 #select time period
 negative = filter(negative_alltime,
                   between(timestamp, 
-                          as.Date('2024-01-01'), 
+                          as.Date('2018-01-01'), 
                           as.Date('2025-05-07')))
 
 ```
@@ -277,28 +277,24 @@ armax_data$prop_negative[is.na(armax_data$prop_negative)] = 0
 
 
 
-# S\&P500 ARMA-X Tariff Models
+# S\&P500 Univariate ARMA-X Models
 
-## Finding Model
-```{r armax tariff, results="asis", warning=F, message=F}
+## Tweet Dummy as Exogenous
+```{r armax dummy, results="asis", warning=F, message=F}
 
 #auto.armax selects the lowest AIC value given r (exogenous variable lags) 
-res1 = auto.armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=7,
-                latex=T,max.p = 7, max.q = 7, max.d=0)
+res1 = auto.armax(armax_data$SPY_vol,xreg=armax_data$dummy,nb.lags=7,
+                latex=F,max.p = 7, max.q = 7, max.d=0)
 
 #armax enables a custom armax specification with p,q,r 
-res2 = armax(armax_data$SPY_vol, xreg=armax_data$total_tariff, nb.lags=2,
-                   p=5, q=0, d=0, latex=T)
+res2 = armax(armax_data$SPY_vol, xreg=armax_data$dummy, nb.lags=2,
+                   p=5, q=0, d=0, latex=F)
 
 #auto.armax.r selects the lowest AIC checking all 3 p,q,r values
-res3 = auto.armax.r(armax_data$SPY_vol, x=armax_data$total_tariff, 
-                max_p = 7, max_q = 7, max_r = 3, criterion = "AIC", latex=T)
+res3 = auto.armax.r(armax_data$SPY_vol, x=armax_data$dummy, 
+                max_p = 7, max_q = 7, max_r = 3, criterion = "AIC", latex=F)
 
-```
-
-## Plotting IRFs
-```{r tariff irf plots, warning=F, message=F}
-
+#we want to plot the IRFs of these models
 nb.periods = 20
 
 irf.plot(res1,nb.periods)
@@ -306,6 +302,95 @@ irf.plot(res2,nb.periods)
 irf.plot(res3$model,nb.periods)
 
 ```
+
+
+## Tweet Count as Exogenous
+```{r armax dummy, results="asis", warning=F, message=F}
+
+#auto.armax selects the lowest AIC value given r (exogenous variable lags) 
+res1 = auto.armax(armax_data$SPY_vol,xreg=armax_data$N,nb.lags=7,
+                latex=F,max.p = 7, max.q = 7, max.d=0)
+
+#armax enables a custom armax specification with p,q,r 
+res2 = armax(armax_data$SPY_vol, xreg=armax_data$N, nb.lags=2,
+                   p=5, q=0, d=0, latex=F)
+
+#auto.armax.r selects the lowest AIC checking all 3 p,q,r values
+res3 = auto.armax.r(armax_data$SPY_vol, x=armax_data$N, 
+                max_p = 7, max_q = 7, max_r = 3, criterion = "AIC", latex=F)
+
+#we want to plot the IRFs of these models
+nb.periods = 20
+
+irf.plot(res1,nb.periods)
+irf.plot(res2,nb.periods)
+irf.plot(res3$model,nb.periods)
+
+```
+
+
+## Tariff as Exogenous
+```{r armax tariff, results="asis", warning=F, message=F}
+
+#auto.armax selects the lowest AIC value given r (exogenous variable lags) 
+res1 = auto.armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=2,
+                latex=F,max.p = 7, max.q = 7, max.d=0)
+
+#armax enables a custom armax specification with p,q,r 
+res2 = armax(armax_data$SPY_vol, xreg=armax_data$total_tariff, nb.lags=2,
+                   p=5, q=0, d=0, latex=F)
+
+#auto.armax.r selects the lowest AIC checking all 3 p,q,r values
+res3 = auto.armax.r(armax_data$SPY_vol, x=armax_data$total_tariff, 
+                max_p = 7, max_q = 7, max_r = 7, criterion = "AIC", latex=F)
+
+#we want to plot the IRFs of these models
+nb.periods = 20
+
+irf.plot(res1,nb.periods)
+irf.plot(res2,nb.periods)
+irf.plot(res3$model,nb.periods)
+
+```
+
+
+
+
+
+
+
+
+# Interaction Terms
+
+## Dummy * Tariff
+```{r dummytariff}
+
+#create X matrix with both exogenous regressors
+X = cbind(armax_data$total_tariff,armax_data$N*armax_data$total_tariff)
+colnames(X) <- c("Tariff","Tariff*Count")
+head(X)
+
+#auto.armax.r selects the lowest AIC checking all 3 p,q,r values
+res3 = auto.armax.r(armax_data$SPY_vol, x=X, 
+                max_p = 7, max_q = 7, max_r = 3, criterion = "AIC", latex=F)
+
+#we want to plot the IRFs of these models
+nb.periods = 20
+
+irf.plot(res3$model,nb.periods)
+
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
