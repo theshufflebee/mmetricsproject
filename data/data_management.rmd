@@ -36,6 +36,8 @@ require(textstem) #lemmatization
 require(quanteda) #tokenization
 require(syuzhet) #sentiment analysis
 require(alphavantager)
+data("stop_words")
+stop_words_list <- stop_words$word
 av_api_key(Sys.getenv("ALPHAVANTAGE_API_KEY"))
 
 getwd()
