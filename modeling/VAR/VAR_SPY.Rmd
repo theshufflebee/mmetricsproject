@@ -5,7 +5,7 @@ date: "2025-05-10"
 output: html_document
 ---
 
-```{r setup, load packages}
+```{r setup load packages}
 
 library("quantmod")
 library("TSA")
@@ -89,7 +89,7 @@ rm(list=ls())
 
 
 
-```{r setup, link to git}
+```{r setup link to git}
 
 getwd()
 #setwd("...") -> set wd at base repo folder
@@ -108,7 +108,7 @@ source(here("helperfunctions/fulldata_loader.R"))
 
 
 
-```{r setup, load data}
+```{r setup load data}
 # 1. Load Political Social Media
 #contains posts from Twitter & TruthSocial
 social <- read.csv(here("data/mothership", "social.csv"))
@@ -133,7 +133,7 @@ social_hourly$timestamp = as.POSIXct(social_hourly$timestamp,format = "%Y-%m-%d 
 ```
 
 
-```{r setup, clean data}
+```{r setup clean data}
 #find hourly volatility
 #NOTE: this ignores tweets made outside trading hours!!
 SPY_volatility_alltime = dplyr::select(SPY,timestamp,r_vol_h)
@@ -197,23 +197,23 @@ Vdata $total_trade[is.na(Vdata $total_trade)] = 0
 ```
 
 
-```{r setup, acf}
+```{r setup acf}
 #check the data 
 ###acf/pacf
 acf(Vdata$r_vol_h)
 ```
 
 
-```{r setup, pacf}
+```{r setup pacf}
 pacf(Vdata$r_vol_h)
 ```
 
-```{r setup, adf test}
+```{r setup adf test}
 adf.test(Vdata$r_vol_h, k = 16)
 
 ```
 
-```{r setup, graph series}
+```{r setup graph series}
 #graph the series
 ggplot(Vdata, aes(x= timestamp, y=r_vol_h)) + 
   geom_line(color = "blue", size = 0.8, type="l") +
@@ -226,7 +226,7 @@ ggplot(Vdata, aes(x= timestamp, y=r_vol_h)) +
         plot.title = element_text(face = "bold", hjust = 0.5))
 ```
 
-```{r setup, nb lag for dummy}
+```{r setup nb lag for dummy}
 #Estimate the Process
 ##with dummy
 y = cbind(Vdata$r_vol_h, Vdata$dummy)
@@ -235,7 +235,7 @@ y_lag = VARselect(y, lag.max = 80)
 y_list = list(y_lag)
 ```
 
-```{r setup, AIC}
+```{r setup AIC}
 ##AIC
 resultats1 <- lapply(y_list, function(x) x$criteria["AIC(n)", ])
 
@@ -253,7 +253,7 @@ ggplot (resultats1, aes(x=n, y= name)) +
   theme_minimal()
 ```
 
-```{r setup, HQ}
+```{r setup HQ}
 ##HQ
 resultats2 <- lapply(y_list, function(x) x$criteria["HQ(n)", ])
 
@@ -271,7 +271,7 @@ ggplot (resultats2, aes(x=n, y= name)) +
   theme_minimal()
 ```
 
-```{r setup, SC}
+```{r setup SC}
 ##SC
 resultats3 <- lapply(y_list, function(x) x$criteria["SC(n)", ])
 
@@ -290,7 +290,7 @@ ggplot (resultats3, aes(x=n, y= name)) +
 
 ```
 
-```{r setup, FPE}
+```{r setup FPE}
 ##FPE
 resultats4 <- lapply(y_list, function(x) x$criteria["FPE(n)", ])
 
@@ -308,13 +308,13 @@ ggplot (resultats4, aes(x=n, y= name)) +
   theme_minimal()
 ```
 
-```{r setup, estime VAR dummy}
+```{r setup estime VAR dummy}
 #dummy
 est.VAR <- VAR(y,p=16)
 summary(est.VAR)
 ```
 
-```{r setup, serial correlation test}
+```{r setup serial correlation test}
 #bunch of test 
 
 ##serial correlation
@@ -323,30 +323,30 @@ serial = serial.test(est.VAR, lags.pt = 20, type = "PT.asymptotic")
 serial
 ```
 
-```{r setup, plot serial}
+```{r setup plot serial}
 plot(serial, names = "y1")
 
 ```
 
-```{r setup, heteroscedasticity test}
+```{r setup heteroscedasticity test}
 #heteroscedasticity
 hete = arch.test(est.VAR, lags.multi = 80, multivariate.only = TRUE)
 hete
 ```
 
-```{r setup, normal dist.}
+```{r setup normal dist.}
 #Distribution of residuals
 norm = normality.test(est.VAR, multivariate.only = TRUE)
 norm
 ```
 
-```{r setup, structural breaks}
+```{r setup structural breaks}
 #Structural breaks in the errors (stability)
 stru2 = stability(est.VAR, type ="OLS-CUSUM") #OLS-CUSUM or Rec-CUSUM
 plot(stru2)
 ```
 
-```{r setup, SVAR dummy}
+```{r setup SVAR dummy}
 bmat = matrix(c(1, 0, NA, 1), 2)
 SVAR = SVAR(est.VAR, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
 summary(SVAR)
@@ -364,14 +364,14 @@ summary(SVAR)
 
 ```
 
-```{r setup, irf dummy}
+```{r setup irf dummy}
 IRF <- irf(SVAR, response = "y1", impulse = "y2", 
            n.ahead = 40, ortho = TRUE, boot = TRUE)
 par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
 plot(IRF)
 ```
 
-```{r setup, does vol cause dummy}
+```{r setup does vol cause dummy}
 #granger causality
 #we want the smaller p-value => h0 test if there is no causality
 colnames(y)[1:2] <- c("vol", "dum")
@@ -381,18 +381,18 @@ grangertest(y[,c("vol","dum")], order = 16)
 
 ```
 
-```{r setup, does dummy cause vol}
+```{r setup does dummy cause vol}
 #does dum granger cause vol
 grangertest(y[,c("dum", "vol")], order = 16)
 ```
 
-```{r setup, variance decomposition}
+```{r setup variance decomposition}
 #Variane decomposition
 vd = fevd(SVAR, n.ahead = 20)
 plot(vd)
 ```
 
-```{r setup, tarrif estimation}
+```{r setup tarrif estimation}
 #tarrif
 y3 =cbind(Vdata$r_vol_h, Vdata$total_tariff)
 
@@ -400,19 +400,19 @@ est.VAR3 = VAR(y3,p=16)
 summary(est.VAR3)
 ```
 
-```{r setup, structural breaks}
+```{r setup structural breaks}
 #Structural breaks in the errors (stability)
 stru3 = stability(est.VAR3, type ="OLS-CUSUM") #OLS-CUSUM or Rec-CUSUM
 plot(stru3)
 ```
 
-```{r setup, SVAR estimation}
+```{r setup SVAR estimation}
 ##create SVAR model
 SVAR2 = SVAR(est.VAR3, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
 summary(SVAR2)
 ```
 
-```{r setup, irf tarrif}
+```{r setup irf tarrif}
 
 IRF2 <- irf(SVAR2, response = "y1", impulse = "y2", 
            n.ahead = 40, ortho = TRUE, boot = TRUE)
@@ -420,7 +420,7 @@ par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
 plot(IRF2)
 ```
 
-```{r setup, tarrif granger cause vol}
+```{r setup tarrif granger cause vol}
 #we want the smaller p-value => h0 test if there is no causality
 colnames(y3)[1:2] <- c("vol", "tarrif")
 
@@ -428,14 +428,14 @@ colnames(y3)[1:2] <- c("vol", "tarrif")
 grangertest(y3[,c("tarrif", "vol")], order = 16)
 ```
 
-```{r setup, Variane decomposition tarrif}
+```{r setup Variane decomposition tarrif}
 #Variane decomposition
 vd2 = fevd(SVAR2, n.ahead = 20)
 plot(vd2)
 
 ```
 
-```{r setup, trade estimation}
+```{r setup trade estimation}
 #trade
 y4 =cbind(Vdata$r_vol_h, Vdata$total_trade)
 
@@ -443,7 +443,7 @@ est.VAR4 = VAR(y4,p=16)
 summary(est.VAR4)
 ```
 
-```{r setup, SVAR trade}
+```{r setup SVAR trade}
 ##create SVAR model
 SVAR4 = SVAR(est.VAR4, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
 summary(SVAR4)
@@ -455,7 +455,7 @@ plot(IRF4)
 
 ```
 
-```{r setup, does trade cause vol}
+```{r setup does trade cause vol}
 #granger causality
 #we want the smaller p-value => h0 test if there is no causality
 colnames(y4)[1:2] <- c("vol", "trade")
@@ -464,7 +464,7 @@ colnames(y4)[1:2] <- c("vol", "trade")
 grangertest(y4[,c("trade", "vol")], order = 16)
 ```
 
-```{r setup, sentiment analysis data load}
+```{r setup sentiment analysis data load}
 ##sentiment analysis(N)
 
 #find anger
@@ -598,7 +598,7 @@ Vdata2 $total_sentiment[is.na(Vdata2 $total_sentiment)] = 0
 
 ```
 
-```{r setup, estim anti}
+```{r setup estim anti}
 #estimation 3 : anticipation
 y7 =cbind(Vdata2$r_vol_h, Vdata2$anticipation)
 
@@ -607,20 +607,20 @@ summary(est.VAR7)
 
 ```
 
-```{r setup, svar anti}
+```{r setup svar anti}
 ##create SVAR model
 SVAR7 = SVAR(est.VAR7, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
 summary(SVAR7)
 ```
 
-```{r setup, irf anti}
+```{r setup irf anti}
 IRF7 <- irf(SVAR7, response = "y1", impulse = "y2", 
             n.ahead = 40, ortho = TRUE, boot = TRUE)
 par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
 plot(IRF7)
 ```
 
-```{r setup, does anti cause vol}
+```{r setup does anti cause vol}
 colnames(y7)[1:2] <- c("vol", "anticipation")
  
 
@@ -628,7 +628,7 @@ colnames(y7)[1:2] <- c("vol", "anticipation")
 grangertest(y7[,c("anticipation", "vol")], order = 16)
 ```
 
-```{r setup, estim joy}
+```{r setup estim joy}
 #estimation 5 : joy
 y10 =cbind(Vdata2$r_vol_h, Vdata2$joy)
 
@@ -638,27 +638,27 @@ summary(est.VAR10)
 
 ```
 
-```{r setup, svar joy}
+```{r setup svar joy}
 ##create SVAR model
 SVAR10 = SVAR(est.VAR10, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
 summary(SVAR10)
 ```
 
-```{r setup, irf joy}
+```{r setup irf joy}
 IRF10 <- irf(SVAR10, response = "y1", impulse = "y2", 
             n.ahead = 50, ortho = TRUE, boot = TRUE)
 par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
 plot(IRF10)
 ```
 
-```{r setup, joy cause vol}
+```{r setup joy cause vol}
 colnames(y10)[1:2] <- c("vol", "joy")
 
 grangertest(y10[,c("joy", "vol")], order = 16)
 
 ```
 
-```{r setup, estim trust}
+```{r setup estim trust}
 #estimation 8 : trust
 y13 =cbind(Vdata2$r_vol_h, Vdata2$trust)
 
@@ -670,7 +670,7 @@ summary(est.VAR13)
 
 ```
 
-```{r setup, svar trust}
+```{r setup svar trust}
 ##create SVAR model
 SVAR13 = SVAR(est.VAR13, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
 summary(SVAR13)
@@ -678,7 +678,7 @@ summary(SVAR13)
 
 ```
 
-```{r setup, irf trust}
+```{r setup irf trust}
 IRF13 <- irf(SVAR13, response = "y1", impulse = "y2", 
             n.ahead = 40, ortho = TRUE, boot = TRUE)
 par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
@@ -689,7 +689,7 @@ plot(IRF13)
 
 ```
 
-```{r setup, trust cause vol}
+```{r setup trust cause vol}
 #granger causality
 #we want the smaller p-value => h0 test if there is no causality
 colnames(y13)[1:2] <- c("vol", "trust")
@@ -700,7 +700,7 @@ colnames(y13)[1:2] <- c("vol", "trust")
 grangertest(y13[,c("trust", "vol")], order = 16)
 ```
 
-```{r setup, estime negative}
+```{r setup estime negative}
 #estimation 9 : negative
 y14 =cbind(Vdata2$r_vol_h, Vdata2$negative)
 
@@ -711,7 +711,7 @@ summary(est.VAR14)
 
 ```
 
-```{r setup, svar negative}
+```{r setup svar negative}
 ##create SVAR model
 SVAR14 = SVAR(est.VAR14, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
 summary(SVAR14)
@@ -721,7 +721,7 @@ summary(SVAR14)
 
 ```
 
-```{r setup, irf negative}
+```{r setup irf negative}
 IRF14 <- irf(SVAR14, response = "y1", impulse = "y2", 
             n.ahead = 40, ortho = TRUE, boot = TRUE)
 par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
@@ -729,7 +729,7 @@ plot(IRF14)
 
 ```
 
-```{r setup, negative cause vol}
+```{r setup negative cause vol}
 #granger causality
 #we want the smaller p-value => h0 test if there is no causality
 colnames(y14)[1:2] <- c("vol", "negative")
@@ -741,7 +741,7 @@ grangertest(y14[,c("negative", "vol")], order = 16)
 
 
 
-```{r setup, estim positive}
+```{r setup estim positive}
 #estimation 10 : positive
 y15 =cbind(Vdata2$r_vol_h, Vdata2$positive)
 
@@ -753,7 +753,7 @@ summary(est.VAR15)
 
 ```
 
-```{r setup, svar positive}
+```{r setup svar positive}
 ##create SVAR model
 SVAR15 = SVAR(est.VAR15, estmethod = c("scoring", "direct"), Amat = NULL, Bmat = bmat)
 summary(SVAR15)
@@ -761,7 +761,7 @@ summary(SVAR15)
 
 ```
 
-```{r setup, irf positive}
+```{r setup irf positive}
 IRF15 <- irf(SVAR15, response = "y1", impulse = "y2", 
             n.ahead = 40, ortho = TRUE, boot = TRUE)
 par(mfrow = c(1, 1), mar = c(2.2, 2.2, 1, 1), cex = 0.6)
@@ -771,7 +771,7 @@ plot(IRF15)
 
 ```
 
-```{r setup, positive cause vol}
+```{r setup positive cause vol}
 #granger causality
 #we want the smaller p-value => h0 test if there is no causality
 colnames(y15)[1:2] <- c("vol", "positive")
