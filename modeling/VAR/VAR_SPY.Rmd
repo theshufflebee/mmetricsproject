@@ -43,7 +43,7 @@ require(lmtest) #reg tests
 require(vroom) #for loading data
 require(data.table) #for data filtering
 require(sysid) #for ARMA-X modeling
-require(sandwhich) #regression errors
+require(sandwich) #regression errors
 require(stargazer) #nice reg tables
 require(tidytext) #text mining
 require(textstem) #lemmatization
