@@ -86,6 +86,7 @@ VGK$timestamp = as.POSIXct(VGK$timestamp,format = "%Y-%m-%d %H:%M:%S")
 ASHR$timestamp = as.POSIXct(ASHR$timestamp,format = "%Y-%m-%d %H:%M:%S")
 social$timestamp = as.POSIXct(social$timestamp,format = "%Y-%m-%d %H:%M:%S")
 social_hourly$timestamp = as.POSIXct(social_hourly$timestamp,format = "%Y-%m-%d %H:%M:%S")
+social_hourly$adjusted_time = as.POSIXct(social_hourly$timestamp,format = "%Y-%m-%d %H:%M:%S")
 
 ```
 
@@ -95,7 +96,6 @@ social_hourly$timestamp = as.POSIXct(social_hourly$timestamp,format = "%Y-%m-%d 
 ```{r SPY volatility}
 
 #find hourly volatility
-#NOTE: this ignores tweets made outside trading hours!!
 SPY_volatility_alltime = dplyr::select(SPY,timestamp,r_vol_h)
 
 #aggregating per hour
@@ -117,7 +117,6 @@ hvol_plotter(SPY_volatility,breaks="3 month",
 ```{r VGK volatility}
 
 #find hourly volatility
-#NOTE: this ignores tweets made outside trading hours!!
 VGK_volatility_alltime = dplyr::select(VGK,timestamp,r_vol_h)
 
 #aggregating per hour
@@ -136,7 +135,6 @@ VGK_volatility = filter(VGK_volatility_alltime,
 ```{r ASHR volatility}
 
 #find hourly volatility
-#NOTE: this ignores tweets made outside trading hours!!
 ASHR_volatility_alltime = dplyr::select(ASHR,timestamp,r_vol_h)
 
 #aggregating per hour
@@ -156,7 +154,7 @@ ASHR_volatility = filter(ASHR_volatility_alltime,
 ```{r social media count}
 
 #find count
-tweetcount_alltime = dplyr::select(social_hourly,timestamp,N)
+tweetcount_alltime = dplyr::select(social_hourly,timestamp,adjusted_time,N)
 
 #select time period
 tweetcount = filter(tweetcount_alltime,
@@ -180,7 +178,7 @@ ggplot(tweetcount, aes(x = timestamp, y = N)) +
 ```{r dummy}
 
 #find dummy
-tweetdummy_alltime = dplyr::select(social_hourly,timestamp,dummy)
+tweetdummy_alltime = dplyr::select(social_hourly,timestamp,adjusted_time,dummy)
 
 #select time period
 tweetdummy = filter(tweetdummy_alltime,
@@ -194,7 +192,7 @@ tweetdummy = filter(tweetdummy_alltime,
 ```{r tariff}
 
 #find count
-tariff_alltime = dplyr::select(social_hourly,timestamp,total_tariff)
+tariff_alltime = dplyr::select(social_hourly,timestamp,adjusted_time,total_tariff)
 
 #select time period
 tariff = filter(tariff_alltime,
@@ -208,10 +206,24 @@ tariff = filter(tariff_alltime,
 ```{r trade}
 
 #find count
-trade_alltime = dplyr::select(social_hourly,timestamp,total_trade)
+trade_alltime = dplyr::select(social_hourly,timestamp,adjusted_time,total_trade)
 
 #select time period
 trade = filter(trade_alltime,
+                  between(timestamp, 
+                          as.Date('2018-01-01'), 
+                          as.Date('2025-05-07')))
+
+```
+
+## Number of Tweets Mentioning China 
+```{r trade}
+
+#find count
+china_alltime = dplyr::select(social_hourly,timestamp,adjusted_time,total_china)
+
+#select time period
+china = filter(china_alltime,
                   between(timestamp, 
                           as.Date('2018-01-01'), 
                           as.Date('2025-05-07')))
@@ -222,7 +234,7 @@ trade = filter(trade_alltime,
 ```{r positive}
 
 #find count
-positive_alltime = dplyr::select(social_hourly,timestamp,prop_positive)
+positive_alltime = dplyr::select(social_hourly,timestamp,adjusted_time,prop_positive)
 
 #select time period
 positive = filter(positive_alltime,
@@ -236,7 +248,7 @@ positive = filter(positive_alltime,
 ```{r negative}
 
 #find count
-negative_alltime = dplyr::select(social_hourly,timestamp,prop_negative)
+negative_alltime = dplyr::select(social_hourly,timestamp,adjusted_time,prop_negative)
 
 #select time period
 negative = filter(negative_alltime,
@@ -251,14 +263,36 @@ negative = filter(negative_alltime,
 ```{r armadata merge}
 
 #merge our dependant and independant vars
+
+#case 1: ignore tweets outside trading hours
 armax_data = left_join(SPY_volatility, VGK_volatility, by="timestamp")
 armax_data = left_join(armax_data, ASHR_volatility, by="timestamp")
-armax_data = left_join(armax_data, tweetdummy, by="timestamp")
-armax_data = left_join(armax_data, tweetcount, by="timestamp")
-armax_data = left_join(armax_data, tariff, by="timestamp")
-armax_data = left_join(armax_data, trade, by="timestamp")
-armax_data = left_join(armax_data, positive, by="timestamp")
-armax_data = left_join(armax_data, negative, by="timestamp")
+armax_data = left_join(armax_data, select(tweetdummy, -adjusted_time), by="timestamp")
+armax_data = left_join(armax_data, select(tweetcount, -adjusted_time), by="timestamp")
+armax_data = left_join(armax_data, select(tariff, -adjusted_time), by="timestamp")
+armax_data = left_join(armax_data, select(trade, -adjusted_time), by="timestamp")
+armax_data = left_join(armax_data, select(china, -adjusted_time), by="timestamp")
+armax_data = left_join(armax_data, select(positive, -adjusted_time), by="timestamp")
+armax_data = left_join(armax_data, select(negative, -adjusted_time), by="timestamp")
+
+rm(armax_data)
+#case 2: push tweets made outside market hours to the next open hour
+armax_data = left_join(SPY_volatility, VGK_volatility, by="timestamp")
+armax_data = left_join(armax_data, ASHR_volatility, by="timestamp")
+armax_data <- armax_data %>%
+  left_join(select(tweetdummy, -timestamp), by = c("timestamp" = "adjusted_time")) 
+armax_data <- armax_data %>%
+  left_join(select(tweetcount, -timestamp), by = c("timestamp" = "adjusted_time")) 
+armax_data <- armax_data %>%
+  left_join(select(tariff, -timestamp), by = c("timestamp" = "adjusted_time")) 
+armax_data <- armax_data %>%
+  left_join(select(trade, -timestamp), by = c("timestamp" = "adjusted_time")) 
+armax_data <- armax_data %>%
+  left_join(select(china, -timestamp), by = c("timestamp" = "adjusted_time")) 
+armax_data <- armax_data %>%
+  left_join(select(positive, -timestamp), by = c("timestamp" = "adjusted_time")) 
+armax_data <- armax_data %>%
+  left_join(select(negative, -timestamp), by = c("timestamp" = "adjusted_time")) 
 
 #rename volatility columns
 names(armax_data)[2] <- "SPY_vol"
@@ -270,6 +304,7 @@ armax_data$N[is.na(armax_data$N)] = 0
 armax_data$dummy[is.na(armax_data$dummy)] = 0
 armax_data$total_tariff[is.na(armax_data$total_tariff)] = 0
 armax_data$total_trade[is.na(armax_data$total_trade)] = 0
+armax_data$total_china[is.na(armax_data$total_china)] = 0
 armax_data$prop_positive[is.na(armax_data$prop_positive)] = 0
 armax_data$prop_negative[is.na(armax_data$prop_negative)] = 0
 
