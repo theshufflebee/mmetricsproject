@@ -17,6 +17,8 @@ github-repo: theshufflebee/mmetricsproject
 
 This is a Website for a class project from the 2025 Class Macroeconometrics at Université de Lausanne.
 
+IMPORTANT: set wd to root/final -> then use: bookdown::render_book("index.Rmd") to render site
+
 ## Usage 
 
 You can find all sections on the left. There is the Main Report which we hand in. This serves as a complete collection of the whole project to make sure everything is available to readers.
