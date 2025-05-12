@@ -107,17 +107,34 @@ truthsbackup <- truths_processer(raw_truths)
 truths = truthsbackup
 
 #cleanup
-#truths <- truths %>% filter(media != 1)
 truths = data.frame(truths$date_time_parsed,truths$post)
 colnames(truths) = c("timestamp","truths_text")
 truths$timestamp = as.POSIXct(truths$timestamp,format = "%Y-%m-%d %H:%M:%S")
 second(truths$timestamp) = 0
+
+#note: we are keeping tweets of just an image/video/link in order to have 
+#them in the tweet count and tweet dummy
 
 # Merging social media data since it is not overlapping
 names(truths)[names(truths) == 'truths_text'] <- 'tweet_text'
 social = rbind(tweets,truths)
 social <- social[order(social$timestamp, decreasing=F), ]
 
+# Round 2 cleanup
+social <- social %>%
+    mutate(
+      tweet_clean = str_replace_all(tweet_text, "(http[s]?://|www\\.)\\S+", ""),  # Remove URLs
+      
+      post_lower = str_to_lower(tweet_clean),  # New column with post converted to lowercase
+      post_clean = str_replace_all(post_lower, "[^a-z\\s]", " "))
+social <- social %>%
+  select(-post_lower, -tweet_clean, -tweet_text)
+names(social)[names(social) == 'post_clean'] <- 'tweet_text'
+social$timestamp <- as.POSIXct(social$timestamp, format = "%Y-%m-%d %H:%M:%S")
+#select time period
+social = filter(social,between(timestamp,
+                            as.Date('2009-01-01'),
+                            as.Date('2025-12-12')))
 
 # 3. Financial
 
