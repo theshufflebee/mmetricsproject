@@ -6,8 +6,7 @@ about
 usage
 render-book
 preview-book
-hello-bookdown
-a-section
+abstract
 cross
 chapters-and-sub-chapters
 captioned-figures-and-tables
