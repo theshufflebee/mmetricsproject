@@ -292,15 +292,15 @@ armax_data$total_china[is.na(armax_data$total_china)] = 0
 
 #auto.armax selects the lowest AIC value given r (exogenous variable lags) 
 res1 = auto.armax(armax_data$SPY_vol,xreg=armax_data$dummy,nb.lags=7,
-                latex=F,max.p = 7, max.q = 7, max.d=0)
+                latex=T,max.p = 7, max.q = 7, max.d=0)
 
 #armax enables a custom armax specification with p,q,r 
 res2 = armax(armax_data$SPY_vol, xreg=armax_data$dummy, nb.lags=2,
-                   p=5, q=0, d=0, latex=F)
+                   p=5, q=0, d=0, latex=T)
 
 #auto.armax.r selects the lowest AIC checking all 3 p,q,r values
 res3 = auto.armax.r(armax_data$SPY_vol, x=armax_data$dummy, 
-                max_p = 7, max_q = 7, max_r = 3, criterion = "AIC", latex=F)
+                max_p = 7, max_q = 7, max_r = 3, criterion = "AIC", latex=T)
 
 #we want to plot the IRFs of these models
 nb.periods = 20
@@ -317,15 +317,15 @@ irf.plot(res3$model,nb.periods)
 
 #auto.armax selects the lowest AIC value given r (exogenous variable lags) 
 res1 = auto.armax(armax_data$SPY_vol,xreg=armax_data$N,nb.lags=7,
-                latex=F,max.p = 7, max.q = 7, max.d=0)
+                latex=T,max.p = 7, max.q = 7, max.d=0)
 
 #armax enables a custom armax specification with p,q,r 
 res2 = armax(armax_data$SPY_vol, xreg=armax_data$N, nb.lags=2,
-                   p=5, q=0, d=0, latex=F)
+                   p=5, q=0, d=0, latex=T)
 
 #auto.armax.r selects the lowest AIC checking all 3 p,q,r values
 res3 = auto.armax.r(armax_data$SPY_vol, x=armax_data$N, 
-                max_p = 7, max_q = 7, max_r = 3, criterion = "AIC", latex=F)
+                max_p = 7, max_q = 7, max_r = 3, criterion = "AIC", latex=T)
 
 #we want to plot the IRFs of these models
 nb.periods = 20
@@ -342,15 +342,15 @@ irf.plot(res3$model,nb.periods)
 
 #auto.armax selects the lowest AIC value given r (exogenous variable lags) 
 res1 = auto.armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=2,
-                latex=F,max.p = 6, max.q = 6, max.d=0)
+                latex=T,max.p = 6, max.q = 6, max.d=0)
 
 #armax enables a custom armax specification with p,q,r 
 res2 = armax(armax_data$SPY_vol, xreg=armax_data$total_tariff, nb.lags=2,
-                   p=5, q=0, d=0, latex=F)
+                   p=5, q=0, d=0, latex=T)
 
 #auto.armax.r selects the lowest AIC checking all 3 p,q,r values
 res3 = auto.armax.r(armax_data$SPY_vol, x=armax_data$total_tariff, 
-                max_p = 6, max_q = 6, max_r = 6, criterion = "AIC", latex=F)
+                max_p = 6, max_q = 6, max_r = 6, criterion = "AIC", latex=T)
 
 #we want to plot the IRFs of these models
 nb.periods = 20
@@ -371,7 +371,7 @@ irf.plot(res3$model,nb.periods)
 # Interaction Terms
 
 ## Dummy * Tariff
-```{r dummytariff, eval=FALSE}
+```{r dummytariff, eval=FALSE, include=FALSE}
 
 #create X matrix with both exogenous regressors
 X = cbind(armax_data$total_tariff,armax_data$N*armax_data$total_tariff)
@@ -380,7 +380,7 @@ head(X)
 
 #auto.armax.r selects the lowest AIC checking all 3 p,q,r values
 res3 = auto.armax.r(armax_data$SPY_vol, x=X, 
-                max_p = 7, max_q = 7, max_r = 3, criterion = "AIC", latex=F)
+                max_p = 7, max_q = 7, max_r = 3, criterion = "AIC", latex=T)
 
 #we want to plot the IRFs of these models
 nb.periods = 20
