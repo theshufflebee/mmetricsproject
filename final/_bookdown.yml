@@ -14,5 +14,5 @@ rmd_files:
   - "03-methodology.Rmd"
   - "04-discussion.Rmd"
   - "05-conclusion.Rmd"
-  - "06-bibliogrphy.Rmd"
+  - "06-bibliography.Rmd"
   - "07-appendix.Rmd"
