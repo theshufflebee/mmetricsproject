@@ -89,11 +89,11 @@ social_hourly$timestamp = as.POSIXct(social_hourly$timestamp,format = "%Y-%m-%d 
 social_hourly$adjusted_time = as.POSIXct(social_hourly$adjusted_time,format = "%Y-%m-%d %H:%M:%S")
 
 #select timeframe 
-SPY = filter(SPY,between(timestamp, as.Date('2025-01-01'), as.Date('2025-05-07')))
-VGK = filter(VGK,between(timestamp, as.Date('2025-01-01'), as.Date('2025-05-07')))
-ASHR = filter(ASHR,between(timestamp, as.Date('2025-01-01'), as.Date('2025-05-07')))
-social = filter(social,between(timestamp, as.Date('2025-01-01'), as.Date('2025-05-07')))
-social_hourly = filter(social_hourly,between(timestamp, as.Date('2025-01-01'), as.Date('2025-05-07')))
+SPY = filter(SPY,between(timestamp, as.Date('2018-01-01'), as.Date('2025-05-07')))
+VGK = filter(VGK,between(timestamp, as.Date('2018-01-01'), as.Date('2025-05-07')))
+ASHR = filter(ASHR,between(timestamp, as.Date('2018-01-01'), as.Date('2025-05-07')))
+social = filter(social,between(timestamp, as.Date('2018-01-01'), as.Date('2025-05-07')))
+social_hourly = filter(social_hourly,between(timestamp, as.Date('2018-01-01'), as.Date('2025-05-07')))
 
 ```
 
@@ -205,7 +205,7 @@ trade2 <- trade %>%
 ```
 
 ## Number of Tweets Mentioning China 
-```{r trade}
+```{r china}
 
 #find count
 china = dplyr::select(social_hourly,timestamp,adjusted_time,total_china)
@@ -313,7 +313,7 @@ irf.plot(res3$model,nb.periods)
 
 
 ## Tweet Count as Exogenous
-```{r armax dummy, results="asis", warning=F, message=F}
+```{r armax count, results="asis", warning=F, message=F}
 
 #auto.armax selects the lowest AIC value given r (exogenous variable lags) 
 res1 = auto.armax(armax_data$SPY_vol,xreg=armax_data$N,nb.lags=7,
