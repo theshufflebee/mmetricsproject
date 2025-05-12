@@ -1,12 +1,23 @@
-truths_processer <- function(raw_data) {
+
+
+
+truths_processer_2 <- function(raw_data) {
   
-  #Load the needed packages for the tokenization
-  library("tidytext")
-  library("textstem")
+  # Load the needed packages for the tokenization
+  library(dplyr)
+  library(stringr)
+  library(lubridate)
+  library(tidytext)
+  library(textstem)
+  
   data("stop_words")
   stop_words_list <- stop_words$word
   
   processed_data <- raw_data %>%
+    
+    # Filters out retweets
+    filter(str_starts(x, "Donald")) %>%
+    
     mutate(
       # Extract the full date and time
       date_time = str_extract(x, "\\b[A-Za-z]+ \\d{1,2}, \\d{4}, \\d{1,2}:\\d{2} [APM]{2}\\b"),
@@ -24,21 +35,25 @@ truths_processer <- function(raw_data) {
       time_numeric = hour(date_time_parsed) + minute(date_time_parsed) / 60,
       
       # Shift time such that y = 0 corresponds to 12 PM
-      time_shifted = time_numeric - 12,  # Subtract 12 to make 12 PM = 0
+      time_shifted = time_numeric - 12,
       
+      # Extract post text after timestamp
       post = str_trim(str_remove(x, ".*\\d{1,2}, \\d{4}, \\d{1,2}:\\d{2} [APM]{2}\\s*")),
       
-      post = str_remove(post, "^Original Post\\s*"),  # Remove Original Post string
+      # Remove "Original Post" string if present
+      post = str_remove(post, "^Original Post\\s*"),
       
-      media = if_else(post == "", 1, 0),  # Assign 1 if post is just image/video, otherwise 0
+      # Binary variable for media-only posts
+      media = if_else(post == "", 1, 0),
       
-      link = if_else(str_detect(post, "^https"), 1, 0),  # Binary variable for URLs -> starting with https
+      # Binary variable for URLs
+      link = if_else(str_detect(post, "^https"), 1, 0),
       
-      post = str_replace(post, "(http[s]?://|www\\.)\\S+", ""),  # Remove URLs starting with http, https, or www
-      # here the S+ basically removes everything after http, https pr www as long as there is no whitespace
+      # Remove URLs
+      post = str_replace(post, "(http[s]?://|www\\.)\\S+", ""),
       
-      post_lower = str_to_lower(post),  # New column with post converted to lowercase
-      
+      # Lowercase post
+      post_lower = str_to_lower(post),
       
       # Tokenize the tweets
       tokens = post_lower %>%
@@ -47,11 +62,11 @@ truths_processer <- function(raw_data) {
         lapply(function(words) {
           words <- words[words != ""]  # Remove empty strings
           words <- setdiff(words, stop_words_list)  # Remove stopwords
-          words <- lemmatize_words(words) # Reduces words to their base form -> is becomes be
+          words <- lemmatize_words(words) # Lemmatize
         })
     )
-      
-      return(processed_data)
+  
+  return(processed_data)
 }
 
 

@@ -21,34 +21,6 @@ This is a Website for a class project from the 2025 Class Macroeconometrics at U
 
 You can find all sections on the left. There is the Main Report which we hand in. This serves as a complete collection of the whole project to make sure everything is available to readers.
 
-## Render book
+# Abstract 
 
-You can render the HTML version of this example book without changing anything:
-
-1. Find the **Build** pane in the RStudio IDE, and
-
-1. Click on **Build Book**, then select your output format, or select "All formats" if you'd like to use multiple formats from the same book source files.
-
-Or build the book from the R console:
-
-```{r, eval=FALSE}
-bookdown::render_book()
-```
-
-To render this example to PDF as a `bookdown::pdf_book`, you'll need to install XeLaTeX. You are recommended to install TinyTeX (which includes XeLaTeX): <https://yihui.org/tinytex/>.
-
-## Preview book
-
-As you work, you may start a local server to live preview this HTML book. This preview will update as you edit the book when you save individual .Rmd files. You can start the server in a work session by using the RStudio add-in "Preview book", or from the R console:
-
-```{r eval=FALSE}
-bookdown::serve_book()
-```
-
-
-```{r include=FALSE}
-# automatically create a bib database for R packages
-knitr::write_bib(c(
-  .packages(), 'bookdown', 'knitr', 'rmarkdown'
-), 'packages.bib')
-```
+This Project assesses to what extent Financial Markets react to information provided by Donald Trump on either Twitter (now known as X) and Truth Social. We asses the impact of posts on hourly volatility using ARMA-X. We evaluate multimple tie horizons and independent variables, such as if Trump posts anything, specific words such as tariff and sentiments. We then calculate IRFS and show that there are significant impacts on volatility.
