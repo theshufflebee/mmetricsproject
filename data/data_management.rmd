@@ -295,6 +295,52 @@ social_hourly <- left_join(social_hourly, china_hour, by="timestamp")
 
 ```
 
+## Non-Market Hours
+```{r non-market hours}
+
+#just to make sure (often causes problems)
+social_hourly$timestamp = as.POSIXct(social_hourly$timestamp,
+                                     format = "%Y-%m-%d %H:%M:%S")
+tz = "EST"
+social_hourly$timestamp <- force_tz(social_hourly$timestamp, tzone = tz)
+
+
+#define market open times
+market_open_hour <- 9
+market_close_hour <- 16 #16th hour is closed
+
+#adjust timestamp for non-market hours
+social_hourly <- social_hourly %>%
+  mutate(
+    timestamp = with_tz(timestamp, tzone = tz),  # ensure correct tz
+    hour = hour(timestamp),
+    date = as.Date(timestamp),
+    is_market_hour = hour >= 9 & hour < 16,
+    adjusted_time = case_when(
+      is_market_hour ~ floor_date(timestamp, unit = "hour"),
+      TRUE ~ make_datetime(
+        year = year(timestamp),
+        month = month(timestamp),
+        day = day(timestamp) + ifelse(hour >= 16, 1, 0),
+        hour = 9, min = 0, sec = 0,
+        tz = tz)))
+
+
+#aggregate by adjusted time
+aggregated <- social_hourly %>%
+  group_by(adjusted_time) %>%
+  summarise(across(where(is.numeric), sum, .names = "{.col}"), .groups = "drop") %>%
+  rename(timestamp = adjusted_time)
+
+#reorder and clean columns
+social_hourly <- social_hourly %>%
+  select(
+    timestamp,
+    adjusted_time,
+    is_market_hour,
+    everything(), -date, -hour)
+
+```
 
 
 ## Adding 
