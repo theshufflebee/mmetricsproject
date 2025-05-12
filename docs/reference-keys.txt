@@ -4,9 +4,9 @@ eq:binom
 thm:tri
 about
 usage
-render-book
-preview-book
 abstract
+introduction
+literature-review
 cross
 chapters-and-sub-chapters
 captioned-figures-and-tables
