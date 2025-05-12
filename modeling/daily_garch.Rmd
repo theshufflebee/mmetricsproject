@@ -1,0 +1,29 @@
+---
+title: "daily_garch"
+output: html_document
+---
+
+```{r}
+require(rugarch)
+```
+
+
+
+```{r}
+garch_spec <- ugarchspec(
+  variance.model = list(model = "sGARCH", garchOrder = c(1, 1)),  # GARCH(1, 1)
+  mean.model = list(armaOrder = c(0, 0), external.regressors = as.matrix(analysis_norm_df$tweet_count)),  #tweet_count external regressor
+  distribution.model = "std"  # Use standardized t-distribution for returns
+)
+```
+
+
+```{r}
+# Fit the GARCH model
+garch_fit <- ugarchfit(spec = garch_spec, data = analysis_norm_df$sp_ret)
+
+# Check the summary of the model
+summary(garch_fit)
+```
+
+
