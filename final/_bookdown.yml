@@ -4,7 +4,7 @@ language:
     chapter_name: "Chapter "
 
 # The output directory where HTML files will be placed
-output_dir: "docs"
+output_dir: "../docs"
 
 # List the Rmd files in the correct order
 rmd_files:

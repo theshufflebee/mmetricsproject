@@ -30,6 +30,7 @@ require(tidytext) #text mining
 require(textstem) #lemmatization
 require(quanteda) #tokenization
 require(texreg) #arima tables
+require(tidyr)
 
 getwd()
 #setwd("...") -> set wd at base repo folder
@@ -167,6 +168,40 @@ SPY_volatility = filter(SPY_volatility_alltime,
 ```
 
 
+```{r}
+posts_selected <- filter(posts2,
+                  between(timestamp, 
+                          as.Date(start_date), 
+                          as.Date(end_date)))
+
+
+data_2 <- full_join(posts_selected, SPY_volatility, by = "timestamp")
+
+data_3 <- data_2 %>%
+  # Sort data from latest to oldest
+  arrange(desc(timestamp)) %>%
+  
+  mutate(
+    adjusted_timestamp = timestamp
+  ) %>%
+  
+  mutate(
+    adjusted_timestamp = ifelse(
+      is.na(r_vol_h),
+      # Use the previous adjusted timestamp (lag function) for rows with NA volatility
+      lag(adjusted_timestamp),
+      # Keep the original timestamp when volatility is not NA
+      timestamp
+    )
+  ) %>%
+  
+  # Restore the original order
+  arrange(timestamp)
+
+```
+
+
+
 
 
 
@@ -264,6 +299,12 @@ lag_selector(y=analysis_data_fin$r_vol_h, xreg=analysis_data_fin$tariff,
 ```{r}
 armax(analysis_data_fin$r_vol_h,xreg=analysis_data_fin$tariff,nb.lags=4,latex=F)
 
+```
+
+```{r}
+#auto.armax.r selects the lowest AIC checking all 3 p,q,r values
+res3 = auto.armax.r(analysis_data_fin$r_vol_h, x=analysis_data_fin$tariff, 
+                max_p = 7, max_q = 7, max_r = 3, criterion = "AIC", latex=T)
 ```
 
 
