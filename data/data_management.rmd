@@ -133,7 +133,7 @@ ASHR = raw_ASHR[-1]
 # Building Additional Variables
 
 ## Volatility By Hour
-```{r volatility, eval=FALSE}
+```{r volatility}
 
 SPY = r.vol_hourly(SPY,merge=T)
 VGK = r.vol_hourly(VGK,merge=T)
@@ -142,7 +142,7 @@ ASHR = r.vol_hourly(ASHR,merge=T)
 ```
 
 ## Social Media Post Count
-```{r count by hour, eval=FALSE}
+```{r count by hour}
 
 #convert to datatable
 social = as.data.table(social)
@@ -163,7 +163,7 @@ tweet_count = tweet_count[ order(tweet_count$timestamp , decreasing = F ),]
 ```
 
 ## Adding Dummy for Social Media Post
-```{r socialdummy by hour, eval=FALSE}
+```{r socialdummy by hour}
 
 #using post count we create dummy
 social_hourly = tweet_count %>% mutate(dummy = if_else(N > 0, 1, 0))
@@ -171,7 +171,7 @@ social_hourly = tweet_count %>% mutate(dummy = if_else(N > 0, 1, 0))
 ```
 
 ## Sentiment Analysis
-```{r sentiments, eval=FALSE}
+```{r sentiments}
 
 #sentiment analysis on post text
 nrc_scores <- get_nrc_sentiment(social$tweet_text)
@@ -224,7 +224,7 @@ social_hourly <- left_join(social_hourly, sent_hour, by="timestamp")
 ```
 
 ## Important Words 
-```{r tariffs, eval=FALSE}
+```{r tariffs}
 
 #create dummy for mention of tariff
 tariff = str_count(social$tweet_text,pattern = "tariff|tariffs")
@@ -242,7 +242,7 @@ social_hourly <- left_join(social_hourly, tariff_hour, by="timestamp")
 
 ```
 
-```{r trade war, eval=FALSE}
+```{r trade}
 
 #create dummy for mention of trade 
 trade = str_count(social$tweet_text,pattern = "trade")
@@ -257,6 +257,24 @@ trade_hour <- social %>%
   summarise(total_trade = sum(trade), .groups = "drop")
 trade_hour = as.data.frame(trade_hour)
 social_hourly <- left_join(social_hourly, trade_hour, by="timestamp")
+
+```
+
+```{r china}
+
+#create dummy for mention of trade 
+china = str_count(social$tweet_text,pattern = "china")
+China = str_count(social$tweet_text,pattern = "China")
+china = China + china
+social$china <- china
+
+#counts number of tweets mentioning tariffs per hour
+china_hour <- social %>%
+  mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
+  group_by(timestamp) %>%
+  summarise(total_china = sum(china), .groups = "drop")
+china_hour = as.data.frame(china_hour)
+social_hourly <- left_join(social_hourly, china_hour, by="timestamp")
 
 ```
 
