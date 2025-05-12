@@ -9,7 +9,7 @@ output_dir: "../docs"
 # List the Rmd files in the correct order
 rmd_files:
   - "index.Rmd"
-  - "01-intro.Rmd"
+  - "01-abstract.Rmd"
   - "02-cross-refs.Rmd"
   - "03-parts.Rmd"
   - "04-citations.Rmd"
