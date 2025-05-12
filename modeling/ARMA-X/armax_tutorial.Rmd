@@ -86,7 +86,14 @@ VGK$timestamp = as.POSIXct(VGK$timestamp,format = "%Y-%m-%d %H:%M:%S")
 ASHR$timestamp = as.POSIXct(ASHR$timestamp,format = "%Y-%m-%d %H:%M:%S")
 social$timestamp = as.POSIXct(social$timestamp,format = "%Y-%m-%d %H:%M:%S")
 social_hourly$timestamp = as.POSIXct(social_hourly$timestamp,format = "%Y-%m-%d %H:%M:%S")
-social_hourly$adjusted_time = as.POSIXct(social_hourly$timestamp,format = "%Y-%m-%d %H:%M:%S")
+social_hourly$adjusted_time = as.POSIXct(social_hourly$adjusted_time,format = "%Y-%m-%d %H:%M:%S")
+
+#select timeframe 
+SPY = filter(SPY,between(timestamp, as.Date('2025-01-01'), as.Date('2025-05-07')))
+VGK = filter(VGK,between(timestamp, as.Date('2025-01-01'), as.Date('2025-05-07')))
+ASHR = filter(ASHR,between(timestamp, as.Date('2025-01-01'), as.Date('2025-05-07')))
+social = filter(social,between(timestamp, as.Date('2025-01-01'), as.Date('2025-05-07')))
+social_hourly = filter(social_hourly,between(timestamp, as.Date('2025-01-01'), as.Date('2025-05-07')))
 
 ```
 
@@ -96,18 +103,12 @@ social_hourly$adjusted_time = as.POSIXct(social_hourly$timestamp,format = "%Y-%m
 ```{r SPY volatility}
 
 #find hourly volatility
-SPY_volatility_alltime = dplyr::select(SPY,timestamp,r_vol_h)
+SPY_volatility = dplyr::select(SPY,timestamp,r_vol_h)
 
 #aggregating per hour
-SPY_volatility_alltime = SPY_volatility_alltime %>%
+SPY_volatility = SPY_volatility %>%
           mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
           distinct(timestamp, .keep_all = TRUE) 
-   
-#select time period
-SPY_volatility = filter(SPY_volatility_alltime,
-                  between(timestamp, 
-                          as.Date('2018-01-01'), 
-                          as.Date('2025-05-07')))
 
 #plot
 hvol_plotter(SPY_volatility,breaks="3 month", 
@@ -117,36 +118,24 @@ hvol_plotter(SPY_volatility,breaks="3 month",
 ```{r VGK volatility}
 
 #find hourly volatility
-VGK_volatility_alltime = dplyr::select(VGK,timestamp,r_vol_h)
+VGK_volatility = dplyr::select(VGK,timestamp,r_vol_h)
 
 #aggregating per hour
-VGK_volatility_alltime = VGK_volatility_alltime %>%
+VGK_volatility = VGK_volatility %>%
           mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
           distinct(timestamp, .keep_all = TRUE) 
-   
-#select time period
-VGK_volatility = filter(VGK_volatility_alltime,
-                  between(timestamp, 
-                          as.Date('2018-01-01'), 
-                          as.Date('2025-05-07')))
 
 ```
 
 ```{r ASHR volatility}
 
 #find hourly volatility
-ASHR_volatility_alltime = dplyr::select(ASHR,timestamp,r_vol_h)
+ASHR_volatility = dplyr::select(ASHR,timestamp,r_vol_h)
 
 #aggregating per hour
-ASHR_volatility_alltime = ASHR_volatility_alltime %>%
+ASHR_volatility = ASHR_volatility %>%
           mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
           distinct(timestamp, .keep_all = TRUE) 
-   
-#select time period
-ASHR_volatility = filter(ASHR_volatility_alltime,
-                  between(timestamp, 
-                          as.Date('2018-01-01'), 
-                          as.Date('2025-05-07')))
 
 ```
 
@@ -154,13 +143,12 @@ ASHR_volatility = filter(ASHR_volatility_alltime,
 ```{r social media count}
 
 #find count
-tweetcount_alltime = dplyr::select(social_hourly,timestamp,adjusted_time,N)
+tweetcount = dplyr::select(social_hourly,timestamp,adjusted_time,N)
 
-#select time period
-tweetcount = filter(tweetcount_alltime,
-                  between(timestamp, 
-                          as.Date('2018-01-01'), 
-                          as.Date('2025-05-07')))
+#for taking count of closed market hours
+tweetcount2 <- tweetcount %>%
+  group_by(adjusted_time) %>%
+  summarise(N = sum(N)) 
 
 #plot
 ggplot(tweetcount, aes(x = timestamp, y = N)) +
@@ -178,13 +166,14 @@ ggplot(tweetcount, aes(x = timestamp, y = N)) +
 ```{r dummy}
 
 #find dummy
-tweetdummy_alltime = dplyr::select(social_hourly,timestamp,adjusted_time,dummy)
+tweetdummy = dplyr::select(social_hourly,timestamp,adjusted_time,dummy)
 
-#select time period
-tweetdummy = filter(tweetdummy_alltime,
-                  between(timestamp, 
-                          as.Date('2018-01-01'), 
-                          as.Date('2025-05-07')))
+#for taking count of closed market hours
+tweetdummy2 <- tweetdummy %>%
+  group_by(adjusted_time) %>%
+  summarise(dummy = sum(dummy)) 
+#peculiar interpretation for dummy: if dummy>1 it means that there were x
+#out-hours which had tweets in them
 
 ```
 
@@ -192,13 +181,12 @@ tweetdummy = filter(tweetdummy_alltime,
 ```{r tariff}
 
 #find count
-tariff_alltime = dplyr::select(social_hourly,timestamp,adjusted_time,total_tariff)
+tariff = dplyr::select(social_hourly,timestamp,adjusted_time,total_tariff)
 
-#select time period
-tariff = filter(tariff_alltime,
-                  between(timestamp, 
-                          as.Date('2018-01-01'), 
-                          as.Date('2025-05-07')))
+#for taking count of closed market hours
+tariff2 <- tariff %>%
+  group_by(adjusted_time) %>%
+  summarise(total_tariff = sum(total_tariff)) 
 
 ```
 
@@ -206,13 +194,13 @@ tariff = filter(tariff_alltime,
 ```{r trade}
 
 #find count
-trade_alltime = dplyr::select(social_hourly,timestamp,adjusted_time,total_trade)
+trade = dplyr::select(social_hourly,timestamp,adjusted_time,total_trade)
 
-#select time period
-trade = filter(trade_alltime,
-                  between(timestamp, 
-                          as.Date('2018-01-01'), 
-                          as.Date('2025-05-07')))
+#for taking count of closed market hours
+trade2 <- trade %>%
+  group_by(adjusted_time) %>%
+  summarise(total_trade = sum(total_trade)) 
+
 
 ```
 
@@ -220,13 +208,12 @@ trade = filter(trade_alltime,
 ```{r trade}
 
 #find count
-china_alltime = dplyr::select(social_hourly,timestamp,adjusted_time,total_china)
+china = dplyr::select(social_hourly,timestamp,adjusted_time,total_china)
 
-#select time period
-china = filter(china_alltime,
-                  between(timestamp, 
-                          as.Date('2018-01-01'), 
-                          as.Date('2025-05-07')))
+#for taking count of closed market hours
+china2 <- china %>%
+  group_by(adjusted_time) %>%
+  summarise(total_china = sum(total_china)) 
 
 ```
 
@@ -234,13 +221,9 @@ china = filter(china_alltime,
 ```{r positive}
 
 #find count
-positive_alltime = dplyr::select(social_hourly,timestamp,adjusted_time,prop_positive)
+positive = dplyr::select(social_hourly,timestamp,adjusted_time,prop_positive)
 
-#select time period
-positive = filter(positive_alltime,
-                  between(timestamp, 
-                          as.Date('2018-01-01'), 
-                          as.Date('2025-05-07')))
+#how to count outside hours? since proportion?
 
 ```
 
@@ -248,13 +231,7 @@ positive = filter(positive_alltime,
 ```{r negative}
 
 #find count
-negative_alltime = dplyr::select(social_hourly,timestamp,adjusted_time,prop_negative)
-
-#select time period
-negative = filter(negative_alltime,
-                  between(timestamp, 
-                          as.Date('2018-01-01'), 
-                          as.Date('2025-05-07')))
+negative = dplyr::select(social_hourly,timestamp,adjusted_time,prop_negative)
 
 ```
 
@@ -280,19 +257,15 @@ rm(armax_data)
 armax_data = left_join(SPY_volatility, VGK_volatility, by="timestamp")
 armax_data = left_join(armax_data, ASHR_volatility, by="timestamp")
 armax_data <- armax_data %>%
-  left_join(select(tweetdummy, -timestamp), by = c("timestamp" = "adjusted_time")) 
+  left_join(tweetdummy2, by = c("timestamp" = "adjusted_time")) 
 armax_data <- armax_data %>%
-  left_join(select(tweetcount, -timestamp), by = c("timestamp" = "adjusted_time")) 
+  left_join(tweetcount2, by = c("timestamp" = "adjusted_time")) 
 armax_data <- armax_data %>%
-  left_join(select(tariff, -timestamp), by = c("timestamp" = "adjusted_time")) 
+  left_join(tariff2, by = c("timestamp" = "adjusted_time")) 
 armax_data <- armax_data %>%
-  left_join(select(trade, -timestamp), by = c("timestamp" = "adjusted_time")) 
+  left_join(trade2, by = c("timestamp" = "adjusted_time")) 
 armax_data <- armax_data %>%
-  left_join(select(china, -timestamp), by = c("timestamp" = "adjusted_time")) 
-armax_data <- armax_data %>%
-  left_join(select(positive, -timestamp), by = c("timestamp" = "adjusted_time")) 
-armax_data <- armax_data %>%
-  left_join(select(negative, -timestamp), by = c("timestamp" = "adjusted_time")) 
+  left_join(china2, by = c("timestamp" = "adjusted_time")) 
 
 #rename volatility columns
 names(armax_data)[2] <- "SPY_vol"
@@ -305,8 +278,8 @@ armax_data$dummy[is.na(armax_data$dummy)] = 0
 armax_data$total_tariff[is.na(armax_data$total_tariff)] = 0
 armax_data$total_trade[is.na(armax_data$total_trade)] = 0
 armax_data$total_china[is.na(armax_data$total_china)] = 0
-armax_data$prop_positive[is.na(armax_data$prop_positive)] = 0
-armax_data$prop_negative[is.na(armax_data$prop_negative)] = 0
+#armax_data$prop_positive[is.na(armax_data$prop_positive)] = 0
+#armax_data$prop_negative[is.na(armax_data$prop_negative)] = 0
 
 ```
 
@@ -369,7 +342,7 @@ irf.plot(res3$model,nb.periods)
 
 #auto.armax selects the lowest AIC value given r (exogenous variable lags) 
 res1 = auto.armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=2,
-                latex=F,max.p = 7, max.q = 7, max.d=0)
+                latex=F,max.p = 6, max.q = 6, max.d=0)
 
 #armax enables a custom armax specification with p,q,r 
 res2 = armax(armax_data$SPY_vol, xreg=armax_data$total_tariff, nb.lags=2,
@@ -377,7 +350,7 @@ res2 = armax(armax_data$SPY_vol, xreg=armax_data$total_tariff, nb.lags=2,
 
 #auto.armax.r selects the lowest AIC checking all 3 p,q,r values
 res3 = auto.armax.r(armax_data$SPY_vol, x=armax_data$total_tariff, 
-                max_p = 7, max_q = 7, max_r = 7, criterion = "AIC", latex=F)
+                max_p = 6, max_q = 6, max_r = 6, criterion = "AIC", latex=F)
 
 #we want to plot the IRFs of these models
 nb.periods = 20
@@ -398,7 +371,7 @@ irf.plot(res3$model,nb.periods)
 # Interaction Terms
 
 ## Dummy * Tariff
-```{r dummytariff}
+```{r dummytariff, eval=FALSE}
 
 #create X matrix with both exogenous regressors
 X = cbind(armax_data$total_tariff,armax_data$N*armax_data$total_tariff)

@@ -35,6 +35,8 @@ require(tidytext) #text mining
 require(textstem) #lemmatization
 require(quanteda) #tokenization
 require(syuzhet) #sentiment analysis
+require(purrr) #map functions
+require(tidyr) #more data stuff
 require(alphavantager)
 data("stop_words")
 stop_words_list <- stop_words$word
@@ -296,35 +298,41 @@ social_hourly <- left_join(social_hourly, china_hour, by="timestamp")
 ```
 
 ## Non-Market Hours
-```{r non-market hours}
+```{r dynamic non-market hours}
+
+#find hourly volatility (to get open hours)
+SPY_volatility = dplyr::select(SPY,timestamp,r_vol_h)
+
+#aggregating per hour
+SPY_volatility = SPY_volatility %>%
+          mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
+          distinct(timestamp, .keep_all = TRUE) 
 
 #just to make sure (often causes problems)
+tz = "EST"
 social_hourly$timestamp = as.POSIXct(social_hourly$timestamp,
                                      format = "%Y-%m-%d %H:%M:%S")
-tz = "EST"
 social_hourly$timestamp <- force_tz(social_hourly$timestamp, tzone = tz)
+SPY_volatility$timestamp = as.POSIXct(SPY_volatility$timestamp,
+                                     format = "%Y-%m-%d %H:%M:%S")
+SPY_volatility$timestamp <- force_tz(SPY_volatility$timestamp, tzone = tz)
 
+#this searches for the times where there are tweets and no value for r.vol
+valid_market_hours <- sort(unique(SPY_volatility$timestamp))
 
-#define market open times
-market_open_hour <- 9
-market_close_hour <- 16 #16th hour is closed
+# Function to get next market hour for each timestamp
+find_next_market_hour <- function(ts) {
+  # Find the next market hour that is >= the current timestamp
+  next_valid <- valid_market_hours[valid_market_hours >= ts][1]
+  
+  # Convert it to POSIXct to maintain correct date-time format
+  return(as.POSIXct(next_valid, tz = "EST"))
+}
 
-#adjust timestamp for non-market hours
+# Use purrr::map to apply the function and ensure POSIXct output
 social_hourly <- social_hourly %>%
-  mutate(
-    timestamp = with_tz(timestamp, tzone = tz),  # ensure correct tz
-    hour = hour(timestamp),
-    date = as.Date(timestamp),
-    is_market_hour = hour >= 9 & hour < 16,
-    adjusted_time = case_when(
-      is_market_hour ~ floor_date(timestamp, unit = "hour"),
-      TRUE ~ make_datetime(
-        year = year(timestamp),
-        month = month(timestamp),
-        day = day(timestamp) + ifelse(hour >= 16, 1, 0),
-        hour = 9, min = 0, sec = 0,
-        tz = tz)))
-
+  mutate(adjusted_time = map(timestamp, find_next_market_hour)) %>%
+  unnest(adjusted_time)  # Unnest the list column created by map
 
 #aggregate by adjusted time
 aggregated <- social_hourly %>%
@@ -337,8 +345,7 @@ social_hourly <- social_hourly %>%
   select(
     timestamp,
     adjusted_time,
-    is_market_hour,
-    everything(), -date, -hour)
+    everything())
 
 ```
 
