@@ -1,0 +1,13 @@
+delete_merged_file: true
+language:
+  ui:
+    chapter_name: "Chapter "
+
+# The output directory where HTML files will be placed
+output_dir: "docs"
+
+# List the Rmd files in the correct order
+rmd_files:
+  - "index.Rmd"
+  - "01-intro.Rmd"
+  - "02-cross-refs.Rmd"
