@@ -341,19 +341,19 @@ irf.plot(res3$model,nb.periods)
 ```{r armax tariff, results="asis", warning=F, message=F}
 
 #auto.armax selects the lowest AIC value given r (exogenous variable lags) 
-res1 = auto.armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=2,
+res1 = auto.armax(log(armax_data$SPY_vol),xreg=armax_data$total_tariff,nb.lags=2,
                 latex=F,max.p = 6, max.q = 6, max.d=0)
 
 #armax enables a custom armax specification with p,q,r 
-res2 = armax(armax_data$SPY_vol, xreg=armax_data$total_tariff, nb.lags=2,
-                   p=6, q=0, d=0, latex=F)
+res2 = armax(log(armax_data$SPY_vol), xreg=armax_data$total_tariff, nb.lags=2,
+                   p=5, q=0, d=0, latex=F)
 
 #auto.armax.r selects the lowest AIC checking all 3 p,q,r values
-res3 = auto.armax.r(armax_data$SPY_vol, x=armax_data$total_tariff, 
+res3 = auto.armax.r(log(armax_data$SPY_vol), x=armax_data$total_tariff, 
                 max_p = 6, max_q = 6, max_r = 6, criterion = "AIC", latex=F)
 
 #we want to plot the IRFs of these models
-nb.periods = 20
+nb.periods = 21
 
 irf.plot(res1,nb.periods)
 irf.plot(res2,nb.periods)
