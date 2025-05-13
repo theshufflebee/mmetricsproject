@@ -345,7 +345,7 @@ res1 = auto.armax(armax_data$SPY_vol,xreg=armax_data$total_tariff,nb.lags=2,
                 latex=F,max.p = 6, max.q = 6, max.d=0)
 
 #armax enables a custom armax specification with p,q,r 
-res2 = armax(armax_data$SPY_vol, xreg=armax_data$total_tariff, nb.lags=2,
+res2 = armax(log(armax_data$SPY_vol), xreg=armax_data$total_tariff, nb.lags=2,
                    p=6, q=0, d=0, latex=F)
 
 #auto.armax.r selects the lowest AIC checking all 3 p,q,r values
