@@ -1,7 +1,7 @@
 
 
 
-truths_processer_2 <- function(raw_data) {
+truths_processer <- function(raw_data) {
   
   # Load the needed packages for the tokenization
   library(dplyr)
