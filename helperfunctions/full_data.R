@@ -187,8 +187,6 @@ armax_data = left_join(armax_data, select(trade, -adjusted_time), by="timestamp"
 armax_data = left_join(armax_data, select(china, -adjusted_time), by="timestamp")
 
 rm(armax_data)
-
-
 #case 2: push tweets made outside market hours to the next open hour
 armax_data = left_join(SPY_volatility, VGK_volatility, by="timestamp")
 armax_data = left_join(armax_data, ASHR_volatility, by="timestamp")
@@ -262,10 +260,8 @@ names(armax_data)[4] <- "ASHR_vol"
 #rename data for general analysis 
 data = armax_data
 
-#keep relevant data & remove everything else
-rm(list = setdiff(ls(), "data"))
-
-
+#keep relevant data & all other data without removing functions
+rm(list = setdiff(ls(), c("data", names(Filter(is.function, mget(ls()))))))
 
 
 

@@ -65,79 +65,78 @@ lag_selector <- function(y, xreg, nb.lags = 3, type = "text") {
 #-----------------                     3                        -----------------
 #--------------------------------------------------------------------------------
 
-# This function uses Information Criterions
-# to select number of lags (using loops)
-
-#--------------------------------------------------------------------------------
-
 auto.armax.r <- function(y, x, max_p = 3, max_q = 3, 
-                            max_r = 5, criterion = "AIC", latex = TRUE) {
+                         max_r = 5, criterion = "AIC", latex = TRUE) {
   
-  # get clean variable name
+  #setup parallel plan (adjust as needed)
+  future::plan(future::multisession, multicore=16) 
+  
+  #clean variable name
   x_name <- sub(".*\\$", "", deparse(substitute(x)))
   
-  create_lags <- function(x, r, x_name) {
-    if (is.null(dim(x))) {
-      x <- matrix(x, ncol = 1)
-    }
-    lagged_list <- lapply(1:ncol(x), function(j) {
-      col <- x[, j]
-      if (r == 0) {
-        col_matrix <- matrix(col, ncol = 1)
-        colnames(col_matrix) <- paste0(x_name, "_lag_0")
-        return(col_matrix)
-      }
-      embedded <- embed(col, r + 1)
-      colnames(embedded) <- paste0(x_name, "_lag_", 0:r)
-      return(embedded)
-    })
-    min_rows <- min(sapply(lagged_list, nrow))
-    lagged_list <- lapply(lagged_list, function(mat) tail(mat, min_rows))
-    do.call(cbind, lagged_list)
-  }
-  
-  #prepare results
   best_model <- NULL
   best_score <- Inf
   best_params <- list(p = NA, q = NA, r = NA)
-  scores_by_r <- data.frame(r = integer(), score = numeric())
+  scores_by_r <- numeric(length = max_r + 1)
   
   for (r in 0:max_r) {
-    x_lags <- create_lags(x, r, x_name)
+    x_lags <- lag_creator(x, nb.lags = r, varname = x_name)
     y_trimmed <- tail(y, nrow(x_lags))
-    best_r_score <- Inf
     
-    for (p in 0:max_p) {
-      for (q in 0:max_q) {
-        model <- tryCatch({
-          Arima(y_trimmed, order = c(p, 0, q), xreg = x_lags)
-        }, error = function(e) NULL)
-        
-        if (!is.null(model)) {
-          score <- if (criterion == "BIC") BIC(model) else AIC(model)
-          if (score < best_score) {
-            best_score <- score
-            best_model <- model
-            best_params <- list(p = p, q = q, r = r)
-          }
-          if (score < best_r_score) {
-            best_r_score <- score
-          }
-        }
-      }
+    if (length(y_trimmed) <= max_p + max_q + 1) {
+      scores_by_r[r + 1] <- NA
+      next
     }
-    scores_by_r <- rbind(scores_by_r, data.frame(r = r, score = best_r_score))
+    
+    # (p, q) combinations
+    pq_grid <- expand.grid(p = 0:max_p, q = 0:max_q)
+    
+    #do combinations in parallel
+    results <- future.apply::future_lapply(1:nrow(pq_grid), function(i) {
+      p <- pq_grid$p[i]
+      q <- pq_grid$q[i]
+      
+      model <- tryCatch({
+        Arima(y_trimmed, order = c(p, 0, q), xreg = x_lags)
+      }, error = function(e) NULL)
+      
+      if (!is.null(model)) {
+        score <- if (criterion == "BIC") BIC(model) else AIC(model)
+        list(model = model, score = score, p = p, q = q)
+      } else {
+        NULL
+      }
+    })
+    
+    #filter out failed models
+    results <- Filter(Negate(is.null), results)
+    
+    if (length(results) == 0) {
+      scores_by_r[r + 1] <- NA
+      next
+    }
+    
+    #best for this r
+    best_r <- results[[which.min(sapply(results, `[[`, "score"))]]
+    scores_by_r[r + 1] <- best_r$score
+    
+    if (best_r$score < best_score) {
+      best_model <- best_r$model
+      best_score <- best_r$score
+      best_params <- list(p = best_r$p, q = best_r$q, r = r)
+    }
   }
   
-  # plot
-  ICplot <- ggplot(scores_by_r, aes(x = r, y = score)) +
+  #plot AIC/BIC vs r
+  scores_df <- data.frame(r = 0:max_r, score = scores_by_r)
+  ICplot <- ggplot(scores_df, aes(x = r, y = score)) +
     geom_line(color = "steelblue", size = 1.2) +
     geom_point(color = "red", size = 2) +
     labs(title = paste(criterion, "vs Number of Exogenous Lags (r)"),
          x = "r (Number of Lags on Exogenous Variable)", y = criterion) +
     theme_minimal()
   
-  # print texreg or screenreg
+  #print 
   if (!is.null(best_model)) {
     if (latex) {
       print(texreg(best_model,
@@ -155,18 +154,8 @@ auto.armax.r <- function(y, x, max_p = 3, max_q = 3,
     params = best_params,
     score = best_score,
     criterion = criterion,
-    scores_by_r = scores_by_r,
-    ICplot = ICplot
-  ))
-}
-
-
-
-
-#e.g. result <- select_armax(armax_data$SPY_vol, armax_data$N, 
-#                       max_p = 3, max_q = 3, max_r = 5, criterion = "AIC")
-
-#summary(result$model) 
+    scores_by_r = scores_df,
+    ICplot = ICplot))}
 
 
 
