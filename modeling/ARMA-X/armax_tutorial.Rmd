@@ -36,6 +36,7 @@ require(textstem) #lemmatization
 require(quanteda) #tokenization
 require(texreg) #arima tables
 require(future.apply) #parallel computation (speed)
+require(aTSA) #adf test
 
 getwd()
 #setwd("...") -> set wd at base repo folder
@@ -67,6 +68,18 @@ data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07
 
 ```
 
+# Stationarity
+```{r adf tests, message=FALSE, warning=FALSE, results=FALSE}
+
+adf.test(data$SPY_vol)
+adf.test(data$VGK_vol)
+adf.test(data$ASHR_vol)
+
+adf.test(data$N)
+adf.test(data$tariff)
+adf.test(data$china)
+
+```
 
 
 
@@ -134,7 +147,8 @@ res1 = auto.armax(data$SPY_vol,xreg=data$tariff,nb.lags=2,
 res2 = armax(data$SPY_vol, xreg=data$tariff, nb.lags=2,
                    p=5, q=0, d=0, latex=F)
 
-#auto.armax.r selects the lowest AIC checking all 3 p,q,r values
+#auto.armax.r selects the lowest AIC checking al
+l 3 p,q,r values
 res3 = auto.armax.r(data$SPY_vol, x=data$tariff, 
                 max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=F)
 
