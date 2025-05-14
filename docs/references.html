@@ -30,7 +30,7 @@
   
   
 <link rel="prev" href="sharing-your-book.html"/>
-
+<link rel="next" href="cross.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -200,6 +200,11 @@ div.csl-indent {
 <li class="chapter" data-level="6.4" data-path="references.html"><a href="references.html#chapters-and-sub-chapters"><i class="fa fa-check"></i><b>6.4</b> Chapters and sub-chapters</a></li>
 <li class="chapter" data-level="6.5" data-path="references.html"><a href="references.html#captioned-figures-and-tables"><i class="fa fa-check"></i><b>6.5</b> Captioned figures and tables</a></li>
 </ul></li>
+<li class="chapter" data-level="7" data-path="cross.html"><a href="cross.html"><i class="fa fa-check"></i><b>7</b> Cross-references</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="cross.html"><a href="cross.html#chapters-and-sub-chapters-1"><i class="fa fa-check"></i><b>7.1</b> Chapters and sub-chapters</a></li>
+<li class="chapter" data-level="7.2" data-path="cross.html"><a href="cross.html#captioned-figures-and-tables-1"><i class="fa fa-check"></i><b>7.2</b> Captioned figures and tables</a></li>
+</ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -235,10 +240,10 @@ based on your heading title: for example, <code># Hello world</code> =
 <code># Hello world {-#nice-label}</code> or <code>{# Hello world .unnumbered}</code>.</li>
 </ul></li>
 <li>Next, reference the labeled heading anywhere in the text using
-<code>\@ref(nice-label)</code>; for example, please see Chapter <a href="#cross"><strong>??</strong></a>.
+<code>\@ref(nice-label)</code>; for example, please see Chapter <a href="cross.html#cross">7</a>.
 <ul>
 <li>If you prefer text as the link instead of a numbered reference
-use: <a href="#cross">any text you want can go here</a>.</li>
+use: <a href="cross.html#cross">any text you want can go here</a>.</li>
 </ul></li>
 </ol>
 </div>
@@ -247,22 +252,22 @@ use: <a href="#cross">any text you want can go here</a>.</li>
 <p>Figures and tables <em>with captions</em> can also be cross-referenced from
 elsewhere in your book using <code>\@ref(fig:chunk-label)</code> and
 <code>\@ref(tab:chunk-label)</code>, respectively.</p>
-<p>See Figure <a href="references.html#fig:nice-fig">6.1</a>.</p>
+<p>See Figure <a href="references.html#fig:nice-fig1">6.1</a>.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="references.html#cb4-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, .<span class="dv">1</span>, .<span class="dv">1</span>))</span>
 <span id="cb4-2"><a href="references.html#cb4-2" tabindex="-1"></a><span class="fu">plot</span>(pressure, <span class="at">type =</span> <span class="st">&#39;b&#39;</span>, <span class="at">pch =</span> <span class="dv">19</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:nice-fig"></span>
-<img src="_main_files/figure-html/nice-fig-1.png" alt="Plot with connected points showing that vapor pressure of mercury increases exponentially as temperature increases." width="80%" />
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:nice-fig1"></span>
+<img src="_main_files/figure-html/nice-fig1-1.png" alt="Plot with connected points showing that vapor pressure of mercury increases exponentially as temperature increases." width="80%" />
 <p class="caption">
 Figure 6.1: Here is a nice figure!
 </p>
 </div>
-<p>Don’t miss Table <a href="references.html#tab:nice-tab">6.1</a>.</p>
+<p>Don’t miss Table <a href="references.html#tab:nice-tab1">6.1</a>.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="references.html#cb5-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
 <span id="cb5-2"><a href="references.html#cb5-2" tabindex="-1"></a>  <span class="fu">head</span>(pressure, <span class="dv">10</span>), <span class="at">caption =</span> <span class="st">&#39;Here is a nice table!&#39;</span>,</span>
 <span id="cb5-3"><a href="references.html#cb5-3" tabindex="-1"></a>  <span class="at">booktabs =</span> <span class="cn">TRUE</span></span>
 <span id="cb5-4"><a href="references.html#cb5-4" tabindex="-1"></a>)</span></code></pre></div>
 <table>
-<caption><span id="tab:nice-tab">Table 6.1: </span>Here is a nice table!</caption>
+<caption><span id="tab:nice-tab1">Table 6.1: </span>Here is a nice table!</caption>
 <thead>
 <tr class="header">
 <th align="right">temperature</th>
@@ -313,43 +318,15 @@ Figure 6.1: Here is a nice figure!
 </tbody>
 </table>
 
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0" line-spacing="2">
-<div class="csl-entry">
-<em>Donald <span>Trump Tweets Dataset</span></em>. (n.d.). https://www.kaggle.com/datasets/codebreaker619/donald-trump-tweets-dataset.
-</div>
-<div class="csl-entry">
-Ederington, L. H., &amp; Lee, J. H. (1993). How <span>Markets Process Information</span>: <span>News Releases</span> and <span>Volatility</span>. <em>The Journal of Finance</em>, <em>48</em>(4), 1161–1191. <a href="https://doi.org/10.2307/2329034">https://doi.org/10.2307/2329034</a>
-</div>
-<div class="csl-entry">
-Fama, E. F., Fisher, L., Jensen, M. C., &amp; Roll, R. W. (2003). The <span>Adjustment</span> of <span>Stock Prices</span> to <span>New Information</span>. <em>SSRN Electronic Journal</em>. <a href="https://doi.org/10.2139/ssrn.321524">https://doi.org/10.2139/ssrn.321524</a>
-</div>
-<div class="csl-entry">
-Gjerstad, P., Meyn, P. F., Molnár, P., &amp; Næss, T. D. (2021). Do <span>President Trump</span>’s tweets affect financial markets? <em>Decision Support Systems</em>, <em>147</em>, 113577. <a href="https://doi.org/10.1016/j.dss.2021.113577">https://doi.org/10.1016/j.dss.2021.113577</a>
-</div>
-<div class="csl-entry">
-Nishimura, Y., &amp; Sun, B. (2025). Impacts of <span>Donald Trump</span>’s tweets on volatilities in the <span>European</span> stock markets. <em>Finance Research Letters</em>, <em>72</em>, 106491. <a href="https://doi.org/10.1016/j.frl.2024.106491">https://doi.org/10.1016/j.frl.2024.106491</a>
-</div>
-<div class="csl-entry">
-Schumaker, R. P., &amp; Chen, H. (2009). Textual analysis of stock market prediction using breaking financial news: <span>The AZFin</span> text system. <em>ACM Trans. Inf. Syst.</em>, <em>27</em>(2), 12:1–12:19. <a href="https://doi.org/10.1145/1462198.1462204">https://doi.org/10.1145/1462198.1462204</a>
 </div>
 </div>
-</div>
-</div>
-
-
-
-
-
-
-
-
             </section>
 
           </div>
         </div>
       </div>
-<a href="sharing-your-book.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="sharing-your-book.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="cross.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

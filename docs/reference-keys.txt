@@ -1,6 +1,8 @@
 fig:fig1
 eq:binom
 thm:tri
+fig:nice-fig1
+tab:nice-tab1
 fig:nice-fig
 tab:nice-tab
 introduction
@@ -23,3 +25,6 @@ pages
 metadata-for-sharing
 chapters-and-sub-chapters
 captioned-figures-and-tables
+cross
+chapters-and-sub-chapters-1
+captioned-figures-and-tables-1

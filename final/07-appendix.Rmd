@@ -23,16 +23,16 @@ Figures and tables *with captions* can also be cross-referenced from
 elsewhere in your book using `\@ref(fig:chunk-label)` and
 `\@ref(tab:chunk-label)`, respectively.
 
-See Figure \@ref(fig:nice-fig).
+See Figure \@ref(fig:nice-fig1).
 
-```{r nice-fig, fig.cap='Here is a nice figure!', out.width='80%', fig.asp=.75, fig.align='center', fig.alt='Plot with connected points showing that vapor pressure of mercury increases exponentially as temperature increases.'}
+```{r nice-fig1, fig.cap='Here is a nice figure!', out.width='80%', fig.asp=.75, fig.align='center', fig.alt='Plot with connected points showing that vapor pressure of mercury increases exponentially as temperature increases.'}
 par(mar = c(4, 4, .1, .1))
 plot(pressure, type = 'b', pch = 19)
 ```
 
-Don't miss Table \@ref(tab:nice-tab).
+Don't miss Table \@ref(tab:nice-tab1).
 
-```{r nice-tab, tidy=FALSE}
+```{r nice-tab1, tidy=FALSE}
 knitr::kable(
   head(pressure, 10), caption = 'Here is a nice table!',
   booktabs = TRUE
