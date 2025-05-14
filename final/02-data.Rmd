@@ -31,7 +31,7 @@ Appendix.
 
 Since we're using financial data that is constrained by trading hours,
 we decided to move posts after 16:00 to the next trading day's opening
-hour.[^1]
+hour.[^2]
 
 All tweets then get aggregated on the hour. We then extract a dummy if he posted
 in the hour, how many times he posted and how many times he mentioned certain words.
@@ -45,4 +45,4 @@ information and detailed process are in the appendix and online.
 Show here maybe??
 
 
-[^1]: So a Post on friday 18:00 would be moved to Monday 09:00
+[^2]: So a Post on friday 18:00 would be moved to Monday 09:00

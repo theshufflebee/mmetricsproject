@@ -142,5 +142,3 @@ beyond the U.S.. For example, @nishimuraImpactsDonaldTrumps2025 shows a
 positive relationship between volatility in European stock markets and
 tweeter activity of Trump, and this effect tends to intensify as public
 intention for his tweet grows (z).
-
-# References {-}
