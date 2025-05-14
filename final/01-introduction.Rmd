@@ -61,7 +61,7 @@ been discussed plenty. We investigate two research questions.
 2)  Have traders learned from past actions and are now more reactive
     than they were during his first term?
 
-```{r fig1, warning=FALSE, echo=FALSE}
+```{r fig1, warning=FALSE, echo=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)"}
  #Create the scatter plot
 ggplot(truths, aes(x = day, y = time_shifted)) +
   geom_point(alpha = 0.5, color = "blue", shape = ".") +  # Transparancy to create "heatmap"
