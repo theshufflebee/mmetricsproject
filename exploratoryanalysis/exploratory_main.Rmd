@@ -6,7 +6,7 @@ output:
 ---
 
 # Load the packages, data and functions
-```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE}
 rm(list=ls())
 require(here)
 require(stringr)
@@ -40,61 +40,59 @@ snp_raw <- read.csv(here("data/market_data", "SPY_24_25.csv"))
 source(here("helperfunctions/truths_cleaning_function.R"))
 ```
 
+
+
 # Process the data with the helperfunction
-```{r}
+
+First we process the truth social posts ("truths") using our custom function.
+```{r truthprocessor, results=FALSE, warning=FALSE, message=FALSE}
+
 truths <-truths_processer(truths_raw) # can take one or two minutes
-head(truths)
+#head(truths)
+
 ```
-This does multiple things. Mainly it turns the scrapped data that is a string per post, cleans it and tokenizes the post. It separates the date and prepares the date to make the plots below by creating many colums.
+
+This does multiple things. Mainly it turns the scrapped data that is a string per post, cleans it and tokenizes the post. It separates the date and prepares the date to make the plots below by creating many columns.
 
 The second part tokenizes the tweets and lemmatizes them. This means each word becomes an "obersvation and all observations are collected on the post level. Then the words are also lemmatized, meaning reduced to their basic form. For example is becomes be, runnin or ran become run ect.
 
 
+
 #Wordcloud
+
 We remove the Tweets that only contain links or nothing at all from the dataset
-```{r}
+```{r cloud, results=FALSE, warning=FALSE, message=FALSE}
+
 truths_main <- truths %>%
   filter(link != 1, media != 1)
-```
 
-
-
-
-```{r}
 all_tokens <- unlist(truths_main$tokens)
 
 word_freqs <- table(all_tokens)
-```
 
-```{r}
 count_token_occurrences <- function(data, word) {
   sum(sapply(data$tokens, function(token_list) {
-    sum(token_list == word)
-  }))
-}
-```
+    sum(token_list == word)}))}
 
-```{r}
 count_token_occurrences(truths_main, "https")
 
-```
-
-
-```{r}
 wordcloud(
   words = names(word_freqs),
   freq = as.numeric(word_freqs),
   min.freq = 300,  # adjust depending on how important it is
   max.words = 400,
   random.order = FALSE,
-  colors = brewer.pal(8, "Dark2")
-)
+  colors = brewer.pal(8, "Dark2"))
 
 ```
 
-From this wordcloud we can gather some of the most used words by trump. Now the question is: how much does he post during open markets? For that we can plot each post on a time plot:
+From this wordcloud we can gather some of the most used words by trump. Now the question is: how much does he post during open markets? 
 
-```{r}
+
+For that we can plot each post on a time plot:
+
+```{r prepare, results=FALSE, warning=FALSE, message=FALSE}
+
 weekday_names <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
 truths_main <- truths_main %>%
@@ -103,12 +101,12 @@ truths_main <- truths_main %>%
     is_market_hour = case_when(
       weekday %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") &
         time_shifted >= (-2.5) & time_shifted <= 4 ~ TRUE,
-      TRUE ~ FALSE
-    )
-  )
+      TRUE ~ FALSE))
+
 ```
 
-```{r}
+```{r plot, results=FALSE, warning=FALSE, message=FALSE}
+
 ggplot(truths_main, aes(x = day, y = time_shifted)) +
   geom_point(aes(color = is_market_hour), alpha = 0.5) +
   
@@ -137,19 +135,24 @@ ggplot(truths_main, aes(x = day, y = time_shifted)) +
     panel.grid.minor = element_blank(),
     panel.grid.major = element_line(linewidth = 0.5),
     axis.title = element_text(size = 12),
-    axis.text = element_text(size = 10)
-  )
+    axis.text = element_text(size = 10))
+
 ```
+
 
 Now lets get only those tweets
-```{r}
+
+```{r markettweets, results=FALSE, warning=FALSE, message=FALSE}
+
 truths_market <- truths_main %>%
   filter(is_market_hour != FALSE)
+
 ```
 
-now get the open and close
+Get the open and close
 
-```{r}
+```{r openclose, results=FALSE, warning=FALSE, message=FALSE}
+
 snp_data <- snp_raw %>%
   mutate(timestamp = dmy_hm(timestamp))
 
@@ -160,18 +163,16 @@ truths_market <- truths_market %>%
 # Join on exact datetime
 truths_market <- truths_market %>%
   left_join(snp_data, by = c("post_time" = "timestamp"))
-```
 
-
-```{r}
 truths_market <- truths_market %>%
   mutate(minute_return = Open - Close)
 
 truths_market <- truths_market %>%
   filter(!is.na(Open))
+
 ```
 
-```{r}
+```{r filtering, results=FALSE, warning=FALSE, message=FALSE}
 
 # First, ensure tokens are characters and unnest them
 truths_unnested <- truths_market %>%
@@ -196,18 +197,22 @@ token_wide_df <- truths_unnested %>%
 
 # Check the result
 print(token_wide_df)
+
 ```
 
 
-```{r}
+```{r clean, results=FALSE, warning=FALSE, message=FALSE}
+
 #Replace NA with 0
 token_wide_df[ , -1] <- token_wide_df[ , -1] %>% replace(is.na(.), 0) #due to problems to do it during change we only now convert the NA to 0s
 colnames(token_wide_df) <- make.names(colnames(token_wide_df))
 rfdf <- na.omit(token_wide_df)
+
 ```
 
 
-```{r}
+```{r machine learning, results=FALSE, warning=FALSE, message=FALSE}
+
 # Random Forest Model
 train_index <- sample(1:nrow(rfdf), size = 0.8 * nrow(rfdf))  # 80% training data
 train_data <- rfdf[train_index, ]
@@ -216,12 +221,13 @@ test_data <- rfdf[-train_index, ]
 rf_model <- randomForest(minute_return ~ ., data = train_data, importance = TRUE, ntree = 200)
 #importance(rf_model)
 varImpPlot(rf_model, n.var = 10)
+
 ```
 
 
 # Assign Sentiment Scores to tweets
+```{r sentiments, results=FALSE, warning=FALSE, message=FALSE}
 
-```{r}
 nrc_scores <- get_nrc_sentiment(truths_market$post)
 
 truths_sentiment <- bind_cols(truths_market, nrc_scores)
@@ -229,54 +235,38 @@ truths_sentiment <- bind_cols(truths_market, nrc_scores)
 ```
 
 
-
-
-
-
-
-
-
 # This is the Tweet wordcloud
+
 He was banned in 2021 after Jan 6 so this is when the tweets stop
 
-```{r}
+```{r tweets, results=FALSE, warning=FALSE, message=FALSE}
+
 tweets <- read.csv(here("data/political_data", "tweets.csv"))
 
 #Only keep original Tweets
 tweets <- tweets %>% filter(isRetweet != "t")
 tokens <- tokens(tweets$text)
 dfm <- dfm(tokens)
-```
 
-
-
-```{r}
 corpus_tweets <- corpus(tweets$text)
-```
 
-```{r}
 additional_words <- c("@realdonaldtrump")
 all_stopwords <- c(stopwords("en"), additional_words)
-```
 
-
-
-```{r}
 tokens_tweets <- tokens(corpus_tweets,  
                         remove_punct = TRUE, 
                         remove_numbers = TRUE)
 
 tokens_tweets <- tokens_remove(tokens_tweets, all_stopwords)  # Remove stopwords
-```
 
-
-```{r}
 dfm_tweets <- dfm(tokens_tweets)
+
+textplot_wordcloud(dfm_tweets, min_count = 400, color = RColorBrewer::brewer.pal(8, "Dark2"))
+
 ```
 
-```{r}
-textplot_wordcloud(dfm_tweets, min_count = 400, color = RColorBrewer::brewer.pal(8, "Dark2"))
-```
+
+
 
 
 

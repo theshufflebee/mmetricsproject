@@ -1,0 +1,200 @@
+---
+title: "ARMA-X Model"
+output:
+  pdf_document: 
+    toc: true
+    fig_caption: yes
+    latex_engine: lualatex
+header-includes:
+  - \usepackage{amsmath}
+---
+\newpage
+
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenization
+require(texreg) #arima tables
+require(future.apply) #parallel computation (speed)
+require(aTSA) #adf test
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/armax_functions.R"))
+
+```
+
+```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+
+#load final dataset
+source(here("helperfunctions/full_data.R"))
+
+#select timeframe 
+data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
+
+#first term
+#data = filter(data,between(timestamp, as.Date('2017-01-20'), as.Date('2021-01-20')))
+
+#second term
+#data = filter(data,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05-07')))
+
+```
+
+
+# S\&P500 Univariate ARMA-X Models
+Here we try various specifications with multiple variables to see what comes out.
+
+## Tweet Dummy as Exogenous
+```{r armax dummy, results="asis", warning=F, message=F}
+
+#auto.armax.r selects the lowest AIC checking all 3 p,q,r values
+res = auto.armax.r(data$SPY_vol, x=data$dummy, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 20
+
+irf.plot(res$model,nb.periods)
+
+```
+
+
+## Tweet Count as Exogenous
+```{r armax count, results="asis", warning=F, message=F}
+
+#auto.armax.r selects the lowest AIC checking all 3 p,q,r values
+res = auto.armax.r(data$SPY_vol, x=data$N, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 20
+
+irf.plot(res$model,nb.periods)
+
+```
+
+
+## Tariff as Exogenous
+```{r armax tariff, results="asis", warning=F, message=F}
+
+#auto.armax.r selects the lowest AIC checking all 3 p,q,r values
+res = auto.armax.r(data$SPY_vol, x=data$tariff, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 20
+
+irf.plot(res$model,nb.periods)
+
+```
+
+
+
+## Trade Mention as Exogenous
+```{r armax trade, results="asis", warning=F, message=F}
+
+#auto.armax.r selects the lowest AIC checking all 3 p,q,r values
+res = auto.armax.r(data$SPY_vol, x=data$trade, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 20
+
+irf.plot(res$model,nb.periods)
+
+```
+
+
+
+
+## China Mention as Exogenous
+```{r armax china, results="asis", warning=F, message=F}
+
+#auto.armax.r selects the lowest AIC checking all 3 p,q,r values
+res = auto.armax.r(data$SPY_vol, x=data$china, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 20
+
+irf.plot(res$model,nb.periods)
+
+```
+
+
+## Positive Vibe as Exogenous
+```{r armax positive, results="asis", warning=F, message=F}
+
+#auto.armax.r selects the lowest AIC checking all 3 p,q,r values
+res = auto.armax.r(data$SPY_vol, x=data$prop_positive, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 20
+
+irf.plot(res$model,nb.periods)
+
+```
+
+
+
+## Negative Vibe as Exogenous
+```{r armax negative, results="asis", warning=F, message=F}
+
+#auto.armax.r selects the lowest AIC checking all 3 p,q,r values
+res = auto.armax.r(data$SPY_vol, x=data$prop_negative, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 20
+
+irf.plot(res$model,nb.periods)
+
+```
+
+
+```{r vol plots}
+
+r_vol_h = data$SPY_vol
+
+data$r_vol_h = r_vol_h
+
+hvol_plotter(data, breaks="6 month", title="lol")
+
+```
+
+
+
+
+
+
+
+
