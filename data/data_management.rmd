@@ -10,7 +10,8 @@ header-includes:
 ---
 \newpage
 
-```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+# Setup
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 rm(list=ls())
 require(tinytex) #LaTeX
 require(ggplot2) #plots
@@ -56,9 +57,22 @@ source(here("helperfunctions/armax_functions.R"))
 ```
 
 
+\newpage
 
 # Raw Data
-```{r rawdata_setup, results=FALSE, warning=FALSE, message=FALSE}
+
+First, we load our raw data, found in the market_data and political_data folders.
+These are the uncleaned, unprepared, unedited original data files as downloaded
+originally. Note that we use a custom function to load the financial data since
+the files are separated by month due to restrictions while downloading. This 
+function also then merges every month and year. The sources of the financial
+data is the API for AlphaVantage (find instructions on how to use at the end
+of this document). For the Twitter posts, we downloaded it from Kaggle. For the
+TruthSocial posts, we had to go and scrape the data ourselves (see the
+scraper function for details). \
+Our data ends on the 7th of May 2025 and starts at 2009 for Twitter, and 2014 
+for the financial data.
+```{r rawdata_setup, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 # 1. Political 
 
@@ -83,11 +97,19 @@ data_loader(symbol="ASHR")
 
 ```
 
-
+\newpage
 
 # Cleanup
-```{r cleanup}
-#MAKE FUNCTIONS TO CLEANUP EASY
+
+We then begin the long process of cleaning this data. This is obviously heavier
+for the social media data, as we must remove retweets, media posts, etc. We
+use a custom function for the processing of the TruthSocial posts. We then merge
+these two datasets in order to get the full social data. Note that there are
+no observations for 2021 to 2022 as Trump was banned from Twitter and hadn't yet
+created TruthSocial. \
+As for the financial data, nothing really is needed as it comes from a more 
+traditional data source.
+```{r cleanup, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 # 1. Tweets 
 tweets = raw_tweets
@@ -126,7 +148,6 @@ social <- social[order(social$timestamp, decreasing=F), ]
 social <- social %>%
     mutate(
       tweet_clean = str_replace_all(tweet_text, "(http[s]?://|www\\.)\\S+", ""),  # Remove URLs
-      
       post_lower = str_to_lower(tweet_clean),  # New column with post converted to lowercase
       post_clean = str_replace_all(post_lower, "[^a-z\\s]", " "))
 social <- social %>%
@@ -147,12 +168,34 @@ ASHR = raw_ASHR[-1]
 
 ```
 
-
+\newpage
 
 # Building Additional Variables
 
+After having cleaned the data, we can build additional variables which will 
+be used in later analysis. 
+
 ## Volatility By Hour
-```{r volatility}
+
+First, we construct our main variable of observation: realised market volatility.
+We use a custom function that loops other custom functions in order to get the
+average hourly volatility for each open market hour. Note that the first hour
+is from 9:30 am to 10:00 am since the market open on a half-hour but closes at
+4:00 pm. The formula is the following: 
+$$
+\begin{aligned}
+  v_t &= \frac{1}{N}\sum_{i=1}^N(\Delta p_{t,i})^2 \\
+  &\text{where } \Delta p_t \text{ is the difference in price (open - close)} \\
+  &\text{and i represents every minute}
+\end{aligned}
+$$
+
+We do so for our three markets of interest: SPY represents the S\&P500, VGK
+represents a broad Europe market index (FTSE Developed Europe All Cap), and ASHR 
+does so for China as well (CSI 300 China). We store these volatilites alongside
+the original stock data where we have the timestamp, prices, volume, and now
+average hourly volatility.
+```{r volatility, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 SPY = r.vol_hourly(SPY,merge=T)
 VGK = r.vol_hourly(VGK,merge=T)
@@ -161,7 +204,8 @@ ASHR = r.vol_hourly(ASHR,merge=T)
 ```
 
 ## Social Media Post Count
-```{r count by hour}
+We construct a variable for the number of tweets per hour.
+```{r count by hour, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #convert to datatable
 social = as.data.table(social)
@@ -182,7 +226,9 @@ tweet_count = tweet_count[ order(tweet_count$timestamp , decreasing = F ),]
 ```
 
 ## Adding Dummy for Social Media Post
-```{r socialdummy by hour}
+This variable is a dummy for whether there has been a Trump tweet in a certain 
+hour.
+```{r socialdummy by hour, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #using post count we create dummy
 social_hourly = tweet_count %>% mutate(dummy = if_else(N > 0, 1, 0))
@@ -190,7 +236,10 @@ social_hourly = tweet_count %>% mutate(dummy = if_else(N > 0, 1, 0))
 ```
 
 ## Sentiment Analysis
-```{r sentiments}
+We use machine-learning tools with pre-built dictionaries in order to find
+sentiments for the actual content of the social media posts. We then aggregate
+them by hour.
+```{r sentiments, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #sentiment analysis on post text
 nrc_scores <- get_nrc_sentiment(social$tweet_text)
@@ -243,7 +292,11 @@ social_hourly <- left_join(social_hourly, sent_hour, by="timestamp")
 ```
 
 ## Important Words 
-```{r tariffs}
+We now build variables for certain key words. We also aggregate these at the hourly
+level, meaning we get how many times the mention of a word appears in posts of 
+that hour. \
+The first word is tariff, and its variants.
+```{r tariffs, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #create dummy for mention of tariff
 tariff = str_count(social$tweet_text,pattern = "tariff|tariffs")
@@ -261,7 +314,8 @@ social_hourly <- left_join(social_hourly, tariff_hour, by="timestamp")
 
 ```
 
-```{r trade}
+The second word is trade.
+```{r trade, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #create dummy for mention of trade 
 trade = str_count(social$tweet_text,pattern = "trade")
@@ -279,7 +333,8 @@ social_hourly <- left_join(social_hourly, trade_hour, by="timestamp")
 
 ```
 
-```{r china}
+The third is the mention of China.
+```{r china, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #create dummy for mention of trade 
 china = str_count(social$tweet_text,pattern = "china")
@@ -297,8 +352,30 @@ social_hourly <- left_join(social_hourly, china_hour, by="timestamp")
 
 ```
 
-## Non-Market Hours
-```{r dynamic non-market hours}
+\newpage
+
+# Non-Market Hours
+A big problem we had in our analysis was what to do with social media posts
+which appeared outside market hours. On weekends, holidays as well. We first 
+decided to simply ignore them, but it turned out to remove a lot of observations,
+leaving us with less than 100 mentions of tariffs against thousands of data
+points for market volatility. We finally decided to push all the social media
+information outside market hours to the next open hour. This comes as an assumption. 
+That is, if Trump tweets on Good Friday (market holiday), then the market will
+only react to this new information on Monday at 9:30 am. Given this, it is 
+possible that the first effect of our variables might be biased due to increased
+volatility in the morning (market reacts to all other information released
+during the weekend). See the analysis to check whether this happens. \
+
+In order implement this approach, we first search for hours that have social data 
+but that have no observations for financial data. Then, we dynamically search for 
+the next open hour. Finally, we add a new column with the adjusted time. \
+
+Note that this is still not the final step for our data. We then have to aggregate 
+these data points for each adjusted hour. We do so in the "full_data" script found 
+in our helper functions. This is done last in order to enable us to still do the 
+ignore method if required. 
+```{r dynamic non-market hours, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #find hourly volatility (to get open hours)
 SPY_volatility = dplyr::select(SPY,timestamp,r_vol_h)
@@ -349,10 +426,15 @@ social_hourly <- social_hourly %>%
 
 ```
 
-
+\newpage
 
 # Data Save
-```{r data save, eval=FALSE}
+
+We now save this data, in multple files as otherwise the file size is too large
+to be uploaded to GitHub. Keep in mind that this is not the final data set 
+used for analysis, and that there a few more transformations occurring in 
+our full_data script you can see below.
+```{r data save, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #financial
 write.csv(SPY, here("data/mothership/SPY.csv"), row.names=F)
@@ -365,11 +447,18 @@ write.csv(social_hourly, here("data/mothership/socialhourly.csv"), row.names=F)
 
 ```
 
+\newpage
 
-# Select Data Function (see helperfunctions)
+# Full Data Function (see helperfunctions)
+
+Here is a more readable version of the final full_data script we use to 
+load the actual final (beautiful) dataset. Note that there might be a few tiny
+differences, and if you want the actual script we use, please find it in the
+helperfunctions folder.
 
 ## Load Base Data
 
+We first load the close-to-final data.
 ```{r data_setup, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 # 1. Load Political Social Media
@@ -393,6 +482,7 @@ ASHR <- read.csv(here("data/mothership", "ASHR.CSV"))
 
 ```
 
+We make sure of the time format.
 ```{r data_time, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #make posixct
@@ -406,7 +496,9 @@ social_hourly$adjusted_time = as.POSIXct(social_hourly$adjusted_time,format = "%
 ```
 
 ## Volatility
-```{r SPY volatility, eval=FALSE}
+We then proceed to select the volatility values we found for each market. We
+can also plot them using our helpful custom hourly volatility plot functions!
+```{r SPY volatility, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #find hourly volatility
 SPY_volatility = dplyr::select(SPY,timestamp,r_vol_h)
@@ -421,7 +513,7 @@ hvol_plotter(SPY_volatility,breaks="3 month",
              title="Realised Volatility - SPY")
 ```
 
-```{r VGK volatility, eval=FALSE}
+```{r VGK volatility, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #find hourly volatility
 VGK_volatility = dplyr::select(VGK,timestamp,r_vol_h)
@@ -433,7 +525,7 @@ VGK_volatility = VGK_volatility %>%
 
 ```
 
-```{r ASHR volatility, eval=FALSE}
+```{r ASHR volatility, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #find hourly volatility
 ASHR_volatility = dplyr::select(ASHR,timestamp,r_vol_h)
@@ -446,7 +538,9 @@ ASHR_volatility = ASHR_volatility %>%
 ```
 
 ## Number of Posts 
-```{r social media count, eval=FALSE}
+We then load all our built social variables. We can also plot the number of times
+Mr. Trump posts on social media. It is quite a lot.
+```{r social media count, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #find count
 tweetcount = dplyr::select(social_hourly,timestamp,adjusted_time,N)
@@ -469,7 +563,7 @@ ggplot(tweetcount, aes(x = timestamp, y = N)) +
 ```
 
 ## Dummy for Social Media Post
-```{r dummy, eval=FALSE}
+```{r dummy, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #find dummy
 tweetdummy = dplyr::select(social_hourly,timestamp,adjusted_time,dummy)
@@ -484,7 +578,7 @@ tweetdummy2 <- tweetdummy %>%
 ```
 
 ## Number of Tweets Mentioning Tariffs 
-```{r tariff, eval=FALSE}
+```{r tariff, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #find count
 tariff = dplyr::select(social_hourly,timestamp,adjusted_time,total_tariff)
@@ -497,7 +591,7 @@ tariff2 <- tariff %>%
 ```
 
 ## Number of Tweets Mentioning Trade 
-```{r trade, eval=FALSE}
+```{r trade2, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #find count
 trade = dplyr::select(social_hourly,timestamp,adjusted_time,total_trade)
@@ -510,7 +604,7 @@ trade2 <- trade %>%
 ```
 
 ## Number of Tweets Mentioning China 
-```{r china, eval=FALSE}
+```{r china2, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #find count
 china = dplyr::select(social_hourly,timestamp,adjusted_time,total_china)
@@ -523,7 +617,7 @@ china2 <- china %>%
 ```
 
 ## Sentiments
-```{r sentiments, eval=FALSE}
+```{r sentiments2, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #find counts
 anger = dplyr::select(social_hourly,timestamp,adjusted_time,anger)
@@ -568,7 +662,7 @@ total_sentiment2 <- total_sentiment %>%
 
 
 ## Positive/Negative
-```{r positive/negative, eval=FALSE}
+```{r positive/negative, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #positive 
 positive = dplyr::select(social_hourly,timestamp,adjusted_time,positive)
@@ -594,7 +688,13 @@ total_posneg2 <- total_posneg %>%
 ```
 
 ## Merge
-```{r armadata merge, eval=FALSE}
+
+This part is a bit tough. The first few lines were used when we were using the 
+"ignore" method for the non-market hours. All the rest of the code chunk is our
+current method of pushing the data to the next open hour. It requires quite 
+a few adjustements, but this is the true final step in getting the data we 
+actually use in our analysis.
+```{r armadata merge, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 
 #merge our dependant and independant vars
 
@@ -690,10 +790,18 @@ rm(list = setdiff(ls(), "data"))
 
 
 
-
+\newpage
 
 # Using Alpha Vantage API
-```{r eval=FALSE}
+
+Here is some documentation for how to use the AlphaVantage API in order to get 
+the intraday minute-by-minute financial data we use in our project. Each call can
+download a maximum of a whole month of data. We had to create a loop function to 
+easily loop the calls in order to get a full year's worth of data in one go.
+Note that we had a limit for how many calls we could make a day (maximum 25 months of 
+data per day), so the "daily API call" briefly became part of our morning routines
+for a few weeks.
+```{r alphaV, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 library(alphavantager)
 
 av_api_key(Sys.getenv("ALPHAVANTAGE_API_KEY"))
@@ -714,7 +822,7 @@ write.csv(data2,"~/SPY-2025-04.csv", row.names = T)
 
 ```
 
-```{r loop, eval=FALSE}
+```{r alpha loop, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 library(alphavantager)
 
 av_api_key(Sys.getenv("ALPHAVANTAGE_API_KEY"))
@@ -735,10 +843,11 @@ write.csv(dataloop,filename)
 }
 ```
 
+\newpage
 
 # Tutorials
 
-Manual smp500: https://cafim.sssup.it/~giulio/other/alpha_vantage/index.html#orgaaf54ef
+Manual S\&P500: https://cafim.sssup.it/~giulio/other/alpha_vantage/index.html#orgaaf54ef
 
 AlphaVantageR Tutorial: https://github.com/business-science/alphavantager/blob/master/man/av_get.Rd
 
@@ -750,5 +859,5 @@ Intra-Day Analysis: https://arxiv.org/html/2406.17198v1
 - SMI = Swiss Market Index
 - VTHR = Russell 3000 (US)
 - VTI = CRSP US Total Market Index
-- VGK = Euro Stoxx 50
-- ASHR = basically china
+- VGK = FTSE Developed Europe All Cap Index
+- ASHR = CSI 300 China
