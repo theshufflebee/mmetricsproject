@@ -61,7 +61,7 @@ been discussed plenty. We investigate two research questions.
 2)  Have traders learned from past actions and are now more reactive
     than they were during his first term?
 
-```{r, warning=FALSE, echo=FALSE}
+```{r fig1, warning=FALSE, echo=FALSE}
  #Create the scatter plot
 ggplot(truths, aes(x = day, y = time_shifted)) +
   geom_point(alpha = 0.5, color = "blue", shape = ".") +  # Transparancy to create "heatmap"
@@ -95,6 +95,8 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
     axis.text = element_text(size = 10)
   )
 ```
+
+\@ref(tab:fig1)
 
 ## Literature Review
 
