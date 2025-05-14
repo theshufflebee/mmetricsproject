@@ -96,7 +96,7 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
   )
 ```
 
-\@ref(tab:fig1)
+\@ref(fig:fig1)
 
 ## Literature Review
 
