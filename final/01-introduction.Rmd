@@ -110,6 +110,7 @@ available information, adjusting immediately to any new data
 for information flow. In addition, the “Mixture of Distribution
 Hypothesis” states that the release of new information is closely linked
 to movements in both realized and implied volatility (1)(3)(7).
+
 Consequently, a large part of the literature had focused on the relation
 between announcements, news and market activity. For example,
 @schumakerTextualAnalysisStock2009 use various linguistic and textual
@@ -119,7 +120,9 @@ of macroeconomic news announcements on interest rate and foreign
 exchange futures markets, particularly in terms of price changes and
 volatility. Both studies, among others, find that prices— such as stock
 prices—react primarily within minutes after the release of new
-information. Recently, the world has witnessed the rise of the Internet
+information.
+
+Recently, the world has witnessed the rise of the Internet
 which revolutionized the dissemination and accessibility of information.
 Social media enable investors, analysts or politicians to instantly
 share their information, news or opinions. This led some studies to
@@ -127,13 +130,16 @@ focus on the communication dynamics of social platform to predict
 changes in the returns of financial assets (6)(8). In this context, the
 impact of Trump’s tweets on various financial and macroeconomic
 variables has been analysed by several studies, especially during his
-first mandate. Using high-frequency financial data,
+first mandate.
+
+Using high-frequency financial data,
 @gjerstadPresidentTrumpsTweets2021 found an increase in uncertainty and
 trading volume, along with a decline in the U.S. stock market—regardless
 of the tweet's content. However, the effect was stronger when Trump used
 confrontational words such as "tariff" or "trade war." Some of his
 announcements also influenced the U.S. dollar exchange rate (l) and
 certain market indices within minutes of the tweet being posted (r)(a).
+
 Other scholars have shown that negative Trump’s tweets about specific
 companies tended to reduce demand for their stocks (b)(g), whereas some
 other have shown that they also impact market volatility indices such as
