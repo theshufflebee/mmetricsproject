@@ -1,5 +1,5 @@
 ---
-title: "VGK Data Analysis"
+title: "VGK Data Descriptive Analysis"
 output:
   pdf_document: 
     toc: true
@@ -44,9 +44,10 @@ data_loader(symbol="VGK")
 ```
 
 # Price
+Here we provide some descriptive facts about our financial data on VGK prices.
 
 ## Plots
-```{r total market plots}
+```{r total market plots, warning=FALSE, message=FALSE}
 
 #All Time
 price_plotter(raw_VGK,"VGK Price Over Time")
@@ -71,7 +72,9 @@ price_plotter_day(VGK_2025_04_09,"VGK Price - 9th of April 2025")
 
 
 ## Time Series Analysis
-```{r time series}
+This is not at all related to our final analysis. It is just in order to see
+the financial data on its own and how it behaves as a time series.
+```{r time series, warning=FALSE, message=FALSE}
 
 acf(VGK_2025_04_09$close)
 pacf(VGK_2025_04_09$close)
@@ -107,7 +110,7 @@ huxtable::set_width(table2, 0.8)
 # Realised Volatility
 
 ## Computations
-```{r volatility compute}
+```{r volatility compute, warning=FALSE, message=FALSE}
 
 #avg per day for each month of any dataset
 vol_VGK_daily = r.vol_daily(raw_VGK,merge=F)
@@ -132,7 +135,7 @@ vol_24_11_04h = day_selector(vol_VGK_hourly,2024,11,04) #vector
 
 
 ## Plots
-```{r volatility plots}
+```{r volatility plots, warning=FALSE, message=FALSE}
 
 #avg per day volatility all time
 dvol_plotter(vol_VGK_daily,breaks="yearly",
