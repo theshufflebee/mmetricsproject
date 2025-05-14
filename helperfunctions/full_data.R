@@ -180,11 +180,11 @@ total_posneg2 <- total_posneg %>%
 #case 1: ignore tweets outside trading hours
 armax_data = left_join(SPY_volatility, VGK_volatility, by="timestamp")
 armax_data = left_join(armax_data, ASHR_volatility, by="timestamp")
-armax_data = left_join(armax_data, select(tweetdummy, -adjusted_time), by="timestamp")
-armax_data = left_join(armax_data, select(tweetcount, -adjusted_time), by="timestamp")
-armax_data = left_join(armax_data, select(tariff, -adjusted_time), by="timestamp")
-armax_data = left_join(armax_data, select(trade, -adjusted_time), by="timestamp")
-armax_data = left_join(armax_data, select(china, -adjusted_time), by="timestamp")
+armax_data = left_join(armax_data, dplyr::select(tweetdummy, -adjusted_time), by="timestamp")
+armax_data = left_join(armax_data, dplyr::select(tweetcount, -adjusted_time), by="timestamp")
+armax_data = left_join(armax_data, dplyr::select(tariff, -adjusted_time), by="timestamp")
+armax_data = left_join(armax_data, dplyr::select(trade, -adjusted_time), by="timestamp")
+armax_data = left_join(armax_data, dplyr::select(china, -adjusted_time), by="timestamp")
 
 rm(armax_data)
 #case 2: push tweets made outside market hours to the next open hour
@@ -249,7 +249,7 @@ armax_data[is.na(armax_data)] <- 0
 
 #remove non-proportion sentiments
 armax_data <- armax_data %>%
-  select(-anger, -anticipation, -disgust, -fear, -joy, -sadness, -surprise, -trust, 
+  dplyr::select(-anger, -anticipation, -disgust, -fear, -joy, -sadness, -surprise, -trust, 
          -total_sentiment, -positive, -negative, -total_posneg)
 
 #rename volatility columns
