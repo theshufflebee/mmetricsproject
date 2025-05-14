@@ -68,7 +68,7 @@ lag_selector <- function(y, xreg, nb.lags = 3, type = "text") {
 auto.armax.r <- function(y, x, max_p = 3, max_q = 3, 
                          max_r = 5, criterion = "AIC", latex = TRUE) {
   
-  #setup parallel plan (adjust as needed)
+  #setup parallel plan to speed up code
   future::plan(future::multisession, multicore=16) 
   
   #clean variable name
