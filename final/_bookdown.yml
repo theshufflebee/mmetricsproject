@@ -1,7 +1,7 @@
 delete_merged_file: true
 language:
   ui:
-    chapter_name: "Chapter "
+    chapter_name: "Part "
 
 # The output directory where HTML files will be placed
 output_dir: "../docs"

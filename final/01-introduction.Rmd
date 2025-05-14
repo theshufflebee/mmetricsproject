@@ -1,38 +1,140 @@
-# Introduction 
+---
+bibliography: macroeconometrics_citations.bib  #
+csl: apa.csl
+link-citations: true
+editor_options: 
+  markdown: 
+    wrap: 72
+---
 
-Write text here bla bla bla
+```{r, warning=FALSE, echo=FALSE}
+require("here")
+require("stringr")
+require("dplyr")
+require("ggplot2")
+require("lubridate")
+
+truths_raw <- read.csv(here("data/mothership", "social.csv"))
+
+truths <- truths_raw %>%
+  mutate(
+    # Use POSIX 'timestamp' directly
+    date_time_parsed = as.POSIXct(timestamp, format = "%Y-%m-%d %H:%M:%S"),
+    
+    # Extract date only for plot
+    day = as.Date(date_time_parsed),
+    
+    # Extract time only for plot
+    time = format(date_time_parsed, "%H:%M"),
+    
+    # Convert time to numeric hours & minutes as fractions
+    time_numeric = hour(date_time_parsed) + minute(date_time_parsed) / 60,
+    
+    # Shift time such that y = 0 corresponds to 12 PM
+    time_shifted = time_numeric - 12
+  )
+
+```
+
+# Introduction
+
+Over the past 15 years social media has become an important
+communications tool for politicians. One of the pioneers of this novel
+approach has been Donald Trump, the 45th and 47th Presiden of the United
+States. While he has been posting a lot online, he has increased posting
+enourmously since he was banned from twitter after the Jan 6th riots.
+This is on his own social media platform. As shown below he as been
+posting constantly. [^1]
+
+[^1]: Includes both Posts and Reposts
+
+Especially in his second term he has been active on Truth Social for
+long periods of time, often announcing or teasing important political
+decision on there. Especially his announcement of "Now is a good time to
+buy an hour before lifting reciprocal tariffs and him announcing his
+post important Truth Social Post before Posting about price controls
+lend to the fact that this has now become a major source of information.
+Therefore the question wether financial markets react to these posts has
+been discussed plenty. We investigate two research questions.
+
+1)  Do Donald Trumps Posts impact market Volatility?
+2)  Have traders learned from past actions and are now more reactive
+    than they were during his first term?
+
+```{r, warning=FALSE, echo=FALSE}
+ #Create the scatter plot
+ggplot(truths, aes(x = day, y = time_shifted)) +
+  geom_point(alpha = 0.5, color = "blue", shape = ".") +  # Transparancy to create "heatmap"
+  scale_y_continuous(
+    breaks = seq(-12, 12, by = 3),  # Custom Y scale
+    labels = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00", "24:00")  # 24-hour format labels
+  ) +
+  labs(title = "Terminally Online: Trumps Twitter & Truth Social Posts (EDT)",
+       x = "Date",
+       y = "Time of Day") +
+  theme_minimal() +
+  
+  
+  # Customize X Axis
+  scale_x_date(
+    date_labels = "%b %Y",  # Format labels to show month and year
+    date_breaks = "9 months"
+  ) +
+  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  
+  # Add vertical lines at 9:30 AM and 4:00 PM for stock market
+  geom_hline(yintercept = (9 + 30 / 60) - 12, linetype = "longdash", color = "red") + 
+  geom_hline(yintercept = 16 - 12, linetype = "dashed", color = "red") +   
+  
+  # theme adjustments
+  theme(
+    panel.grid.minor = element_blank(),  # Remove minor gridlines
+    panel.grid.major = element_line(linewidth = 0.5),  # Major gridlines
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10)
+  )
+```
 
 ## Literature Review
 
-Information is one of the most valuable assets in the financial market. Its importance
-lies at the core of the “Perfect Market Hypothesis” (PMH), which states that the prices 
-of assets fully reflect all available information, adjusting immediately to any new data 
-(2), and thereby creating a strong demand for information flow. In addition, the “Mixture 
-of Distribution Hypothesis” states that the release of new information is closely linked 
-to mouvements in both realized and implied volatility (1)(3)(7). Consequently, a large 
-part of the literature had focused on the relation between announcements, news and 
-market activity. For example, Schumaker and Shen (4) use various linguistic and 
-textual representations derived from financial news to predict stock market prices. 
-Similarly, Ederington and Lee (5) analyze the impact of macroeconomic news 
-announcements on interest rate and foreign exchange futures markets, particularly in 
-terms of price changes and volatility. Both studies, among others, find that prices—
- such as stock prices—react primarily within minutes after the release of new 
-information (4)(5). 
-Recently, the world has witnessed the rise of the Internet which revolutionized the 
-dissemination and accessibility of information. Social media enable investors, analysts 
-or politicians to instantly share their information, news or opinions. This led some 
-studies to focus on the communication dynamics of social platform to predict changes 
-in the returns of financial assets (6)(8). In this context, the impact of Trump’s tweets on 
-various financial and macroeconomic variables has been analysed by several studies, 
-especially during his first mandate. Using high-frequency financial data, Gjerstad et al. 
-(y) found an increase in uncertainty and trading volume, along with a decline in the 
-U.S. stock market—regardless of the tweet's content. However, the effect was stronger 
-when Trump used confrontational words such as "tariff" or "trade war." Some of his 
-announcements also influenced the U.S. dollar exchange rate (l) and certain market 
-indices within minutes of the tweet being posted (r)(a). Other scholars have shown that 
-negative Trump’s tweets about specific companies tended to reduce demand for their 
-stocks (b)(g), whereas some other have shown that they also impact market volatility 
-indices such as the VIX (w) or the Volfele(v). The effects of his tweets also extended 
-beyond the U.S.. For example, Sun and al. shows a positive relationship between 
-volatility in European stock markets and tweeter activity of Trump, and this effect tends 
-to intensify as public intention for his tweet grows (z).
+Information is one of the most valuable assets in the financial market.
+Its importance lies at the core of the “Perfect Market Hypothesis”
+(PMH), which states that the prices of assets fully reflect all
+available information, adjusting immediately to any new data
+@famaAdjustmentStockPrices2003 , and thereby creating a strong demand
+for information flow. In addition, the “Mixture of Distribution
+Hypothesis” states that the release of new information is closely linked
+to movements in both realized and implied volatility (1)(3)(7).
+Consequently, a large part of the literature had focused on the relation
+between announcements, news and market activity. For example,
+@schumakerTextualAnalysisStock2009 use various linguistic and textual
+representations derived from financial news to predict stock market
+prices. Similarly, @ederingtonHowMarketsProcess1993 analyze the impact
+of macroeconomic news announcements on interest rate and foreign
+exchange futures markets, particularly in terms of price changes and
+volatility. Both studies, among others, find that prices— such as stock
+prices—react primarily within minutes after the release of new
+information. Recently, the world has witnessed the rise of the Internet
+which revolutionized the dissemination and accessibility of information.
+Social media enable investors, analysts or politicians to instantly
+share their information, news or opinions. This led some studies to
+focus on the communication dynamics of social platform to predict
+changes in the returns of financial assets (6)(8). In this context, the
+impact of Trump’s tweets on various financial and macroeconomic
+variables has been analysed by several studies, especially during his
+first mandate. Using high-frequency financial data,
+@gjerstadPresidentTrumpsTweets2021 found an increase in uncertainty and
+trading volume, along with a decline in the U.S. stock market—regardless
+of the tweet's content. However, the effect was stronger when Trump used
+confrontational words such as "tariff" or "trade war." Some of his
+announcements also influenced the U.S. dollar exchange rate (l) and
+certain market indices within minutes of the tweet being posted (r)(a).
+Other scholars have shown that negative Trump’s tweets about specific
+companies tended to reduce demand for their stocks (b)(g), whereas some
+other have shown that they also impact market volatility indices such as
+the VIX (w) or the Volfele(v). The effects of his tweets also extended
+beyond the U.S.. For example, @nishimuraImpactsDonaldTrumps2025 shows a
+positive relationship between volatility in European stock markets and
+tweeter activity of Trump, and this effect tends to intensify as public
+intention for his tweet grows (z).

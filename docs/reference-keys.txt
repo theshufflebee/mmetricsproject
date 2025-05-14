@@ -1,15 +1,13 @@
-fig:nice-fig
-tab:nice-tab
 eq:binom
 thm:tri
-about
-usage
-abstract
+fig:nice-fig
+tab:nice-tab
 introduction
 literature-review
-cross
-chapters-and-sub-chapters
-captioned-figures-and-tables
+data
+stock-data
+political-data
+final-dataframe
 parts
 footnotes-and-citations
 footnotes
@@ -22,3 +20,5 @@ sharing-your-book
 publishing
 pages
 metadata-for-sharing
+chapters-and-sub-chapters
+captioned-figures-and-tables

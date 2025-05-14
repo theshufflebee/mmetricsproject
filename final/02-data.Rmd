@@ -1,34 +1,48 @@
-# Cross-references {#cross}
+---
+bibliography: macroeconometrics_citations.bib  #
+csl: apa.csl
+link-citations: true
+editor_options: 
+  markdown: 
+    wrap: 72
+---
 
-Cross-references make it easier for your readers to find and link to elements in your book.
+# Data
 
-## Chapters and sub-chapters
+## Stock Data
 
-There are two steps to cross-reference any heading:
+Since we do not have access to high frequency data on Stock Indices directly, we
+use ETF's that approximate these indices. We downloaded one-minute invervall data
+on multiple Indices, notably the S&P 500 ETF with the Ticker SPY from Alphavantage.
+Then we calculated hourly volatility for these indices. Since trading starts at
+09:30 the interval from 09:00 to 10:00 only includes half an hour of actual trading.
 
-1. Label the heading: `# Hello world {#nice-label}`. 
-    - Leave the label off if you like the automated heading generated based on your heading title: for example, `# Hello world` = `# Hello world {#hello-world}`.
-    - To label an un-numbered heading, use: `# Hello world {-#nice-label}` or `{# Hello world .unnumbered}`.
+The formula for hourly volatility is...
 
-1. Next, reference the labeled heading anywhere in the text using `\@ref(nice-label)`; for example, please see Chapter \@ref(cross). 
-    - If you prefer text as the link instead of a numbered reference use: [any text you want can go here](#cross).
+## Political Data
 
-## Captioned figures and tables
+We source Trumps Posts from two places. The Tweets are from Kaggle
+@DonaldTrumpTweets and go until the 8th of January 2021. Since he
+switched his primary Posting platform to Truth Social we use only that
+Data from 2021 onwards. All Truth Social Posts were scrapped from
+trumpstruth.org, a webpage that aims to conserve all his posts. You can
+find the dataset, and webscrapper, and Data cleaning process in the
+Appendix.
 
-Figures and tables *with captions* can also be cross-referenced from elsewhere in your book using `\@ref(fig:chunk-label)` and `\@ref(tab:chunk-label)`, respectively.
+Since we're using financial data that is constrained by trading hours,
+we decided to move posts after 16:00 to the next trading day's opening
+hour.[^1]
 
-See Figure \@ref(fig:nice-fig).
+All tweets then get aggregated on the hour. We then extract a dummy if he posted
+in the hour, how many times he posted and how many times he mentioned certain words.
 
-```{r nice-fig, fig.cap='Here is a nice figure!', out.width='80%', fig.asp=.75, fig.align='center', fig.alt='Plot with connected points showing that vapor pressure of mercury increases exponentially as temperature increases.'}
-par(mar = c(4, 4, .1, .1))
-plot(pressure, type = 'b', pch = 19)
-```
+Further we applied some simple sentiment analysis algorithms on the data to see
+if there are certain sentiments in his tweets that move the markets. More
+information and detailed process are in the appendix and online.
 
-Don't miss Table \@ref(tab:nice-tab).
+## Final Dataframe
 
-```{r nice-tab, tidy=FALSE}
-knitr::kable(
-  head(pressure, 10), caption = 'Here is a nice table!',
-  booktabs = TRUE
-)
-```
+Show here maybe??
+
+
+[^1]: So a Post on friday 18:00 would be moved to Monday 09:00
