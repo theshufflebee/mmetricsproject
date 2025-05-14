@@ -16,3 +16,4 @@ rmd_files:
   - "05-conclusion.Rmd"
   - "06-bibliography.Rmd"
   - "07-appendix.Rmd"
+  - "08-test.Rmd"
