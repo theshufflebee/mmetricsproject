@@ -4,7 +4,7 @@ author: "Marcos Constantinou, Ryan Fellarhi & Jonas Bruno"
 date: "Last edited: 12.05.2025"
 site: bookdown::bookdown_site
 documentclass: book
-bibliography: [book.bib, packages.bib, macroeconometrics_citations.bib] #name bib files
+bibliography: [packages.bib, macroeconometrics_citations.bib] #name bib files
 # url: your book url like https://bookdown.org/yihui/bookdown
 # cover-image: path to the social sharing image like images/cover.jpg -> Do Later
 description: |
