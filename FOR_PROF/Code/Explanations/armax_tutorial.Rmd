@@ -1,0 +1,172 @@
+---
+title: "ARMA-X Analysis Tutorial"
+output:
+  pdf_document: 
+    toc: true
+    fig_caption: yes
+    latex_engine: lualatex
+header-includes:
+  - \usepackage{amsmath}
+---
+\newpage
+
+# Setup
+
+## Load Libraries \& Functions
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenization
+require(texreg) #arima tables
+require(future.apply) #parallel computation (speed)
+require(aTSA) #adf test
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/armax_functions.R"))
+
+```
+
+
+## Load Data 
+
+Use the full_data script to load our final dataset. Then select the 
+timeframe.
+```{r datasetup, results=FALSE, warning=FALSE, message=FALSE}
+
+#load final dataset
+source(here("helperfunctions/full_data.R"))
+
+#select timeframe 
+data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
+
+#first term
+#data = filter(data,between(timestamp, as.Date('2017-01-20'), as.Date('2021-01-20')))
+
+#second term
+#data = filter(data,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05-07')))
+
+```
+
+
+# Stationarity
+Having a p.value of 0.01 for our main variables seems to indicate stationarity.
+```{r adf tests, message=FALSE, warning=FALSE, results=FALSE}
+
+adf.test(data$SPY_vol)
+adf.test(data$VGK_vol)
+adf.test(data$ASHR_vol)
+
+adf.test(data$N)
+adf.test(data$tariff)
+adf.test(data$china)
+
+```
+\newpage
+
+# Univariate ARMA-X Models
+
+## Custom ARMA-X Specification
+
+This first function allows to run a certain specification of an ARMA-X model.
+We needed to create this function due to the creation of the lags for the 
+exogenous regressor. 
+```{r armax function, results="asis", warning=F, message=F}
+#armax enables a custom armax specification with p,q,r 
+res2 = armax(data$SPY_vol, xreg=data$tariff, nb.lags=2,
+                   p=5, q=0, d=0, latex=T)
+```
+
+## Best ARMA-X Given r
+
+This second function uses the base auto.arima function in order to look for the
+best (lowest AIC) specification given a certain number of x lags. Once again
+it was necessary to create a custom function for this due to the creation of 
+the lags for the exogenous regressor.
+```{r autoarmax function, results="asis", warning=F, message=F}
+
+#auto.armax selects the lowest AIC value given r (exogenous variable lags) 
+res1 = auto.armax(data$SPY_vol,xreg=data$tariff,nb.lags=2,
+                latex=T,max.p = 6, max.q = 6, max.d=0)
+```
+
+
+## Best ARMA-X
+
+This third function is the most sophisticated. We've had to essentially custom
+code the auto.arima function in order to loop for p, q and r. It also
+provides many useful details such as a plot of the AIC value for the different 
+number of lags. Note that the output of this function is a list, so in order get 
+the model output, it is needed to specifically call it (see how the call works
+for this third model in the IRF section). The latex option in all functions 
+determines whether the output is console-friendly, or output-friendly.
+```{r autoarmax with r function, results="asis", warning=F, message=F}
+#auto.armax.r selects the lowest AIC checking all 3 p,q,r values
+res3 = auto.armax.r(data$SPY_vol, x=data$tariff, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+```
+
+
+## IRF
+
+Finally, we have our personal twist on the IRF plot function from the AEC package.
+It enables automatic extraction of the phi's and beta's of a fitted ARMA-X model.
+It then uses the provided sim.arma function where it inputs the beta's as theta's.
+Finally, it automatically plots it, using a fancy ggplot.
+```{r irf, results="asis", warning=F, message=F}
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 20
+irf.plot(res1,nb.periods)
+irf.plot(res2,nb.periods)
+irf.plot(res3$model,nb.periods)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

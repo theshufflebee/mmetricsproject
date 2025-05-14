@@ -60,7 +60,7 @@ source(here("helperfunctions/armax_functions.R"))
 
 Use the full_data script to load our final dataset. Then select the 
 timeframe.
-```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+```{r datasetup, results=FALSE, warning=FALSE, message=FALSE}
 
 #load final dataset
 source(here("helperfunctions/full_data.R"))
@@ -78,7 +78,7 @@ data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07
 
 
 # Stationarity
-
+Having a p.value of 0.01 for our main variables seems to indicate stationarity.
 ```{r adf tests, message=FALSE, warning=FALSE, results=FALSE}
 
 adf.test(data$SPY_vol)
@@ -90,7 +90,7 @@ adf.test(data$tariff)
 adf.test(data$china)
 
 ```
-
+\newpage
 
 # Univariate ARMA-X Models
 
@@ -101,8 +101,8 @@ We needed to create this function due to the creation of the lags for the
 exogenous regressor. 
 ```{r armax function, results="asis", warning=F, message=F}
 #armax enables a custom armax specification with p,q,r 
-res2 = armax(data$SPY_vol, xreg=data$dummy, nb.lags=2,
-                   p=5, q=0, d=0, latex=F)
+res2 = armax(data$SPY_vol, xreg=data$tariff, nb.lags=2,
+                   p=5, q=0, d=0, latex=T)
 ```
 
 ## Best ARMA-X Given r
@@ -114,8 +114,8 @@ the lags for the exogenous regressor.
 ```{r autoarmax function, results="asis", warning=F, message=F}
 
 #auto.armax selects the lowest AIC value given r (exogenous variable lags) 
-res1 = auto.armax(data$SPY_vol,xreg=data$dummy,nb.lags=2,
-                latex=F,max.p = 6, max.q = 6, max.d=0)
+res1 = auto.armax(data$SPY_vol,xreg=data$tariff,nb.lags=2,
+                latex=T,max.p = 6, max.q = 6, max.d=0)
 ```
 
 
@@ -130,8 +130,8 @@ for this third model in the IRF section). The latex option in all functions
 determines whether the output is console-friendly, or output-friendly.
 ```{r autoarmax with r function, results="asis", warning=F, message=F}
 #auto.armax.r selects the lowest AIC checking all 3 p,q,r values
-res3 = auto.armax.r(data$SPY_vol, x=data$dummy, 
-                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=F)
+res3 = auto.armax.r(data$SPY_vol, x=data$tariff, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
 ```
 
 
@@ -148,6 +148,7 @@ nb.periods = 7 * 20
 irf.plot(res1,nb.periods)
 irf.plot(res2,nb.periods)
 irf.plot(res3$model,nb.periods)
+
 ```
 
 

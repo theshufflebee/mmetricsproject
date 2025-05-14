@@ -68,21 +68,9 @@ data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07
 
 ```
 
-# Stationarity
-```{r adf tests, message=FALSE, warning=FALSE, results=FALSE}
-
-adf.test(data$SPY_vol)
-
-adf.test(data$N)
-adf.test(data$tariff)
-adf.test(data$china)
-
-```
-
-
-
 
 # S\&P500 Univariate ARMA-X Models
+Here we try various specifications with multiple variables to see what comes out.
 
 ## Tweet Dummy as Exogenous
 ```{r armax dummy, results="asis", warning=F, message=F}

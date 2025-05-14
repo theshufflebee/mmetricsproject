@@ -10,7 +10,10 @@ header-includes:
 ---
 \newpage
 
-```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+# Setup
+
+## We load the required libraries
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE}
 rm(list=ls())
 require(tinytex) #LaTeX
 require(ggplot2) #plots
@@ -37,9 +40,18 @@ source(here("helperfunctions/plotters.R"))
 source(here("helperfunctions/quick_arma.R"))
 source(here("helperfunctions/r.vol_calculators.R"))
 ```
+
+\newpage
+
 # Data
+Note that this document uses intermediate data to show how we produce the financial
+part of the final data. It also shows various functions we developed to 
+implement some quick analysis and plotting.
+
 
 ## Raw Data
+Use our custom data loading function as our financial data is fractured by month
+due to the downloading constraints.
 ```{r rawdata_setup, results=FALSE, warning=FALSE, message=FALSE}
 
 #market prices (loads and names them automatically)
@@ -50,19 +62,19 @@ data_loader(symbol="SPY")
 #STOXX50
 data_loader(symbol="VGK")
 
-
-
-
 #CSI 300 (China)
 data_loader(symbol="ASHR")
 
 ```
 
-
+\newpage
 
 # Quick Analysis
 
 ## SPY April 2nd 2025
+Here are some functions we developed in order to be able to easily select certain
+dates for our financial data. Comes in handy for our plotter functions as well 
+as later in the calculation of the realised volatility.
 ```{r helper tutorial, warning=FALSE, message=FALSE}
 
 #extract a particular day
@@ -85,10 +97,17 @@ SPY_24 = year_selector(raw_SPY,2024) #2024
 
 ```
 
+\newpage
+
 # Realised Volatility
 
 ## Computations
-```{r volatility compute}
+We have developed several functions for the computation of realised volatility.
+The only areas where they differ is in the timeframe of the input dataset, and 
+whether it calculates the daily average or the hourly average. Note that we
+use hourly data in our final analysis. \
+These functions can be found in the helperfunctions folder.
+```{r volatility compute, warning=FALSE, message=FALSE}
 
 #avg per day for each month of any dataset
 vol_SPY_daily = r.vol_daily(raw_SPY,merge=F)
@@ -113,7 +132,9 @@ vol_24_11_04h = day_selector(vol_SPY_hourly,2024,11,04) #vector
 
 
 ## Plots
-```{r volatility plots}
+We have developed two functions in order to easily plot our volatility data 
+in nice ggplots. One is for the daily average and the other for the hourly average.
+```{r volatility plots, warning=FALSE, message=FALSE}
 
 #avg per day volatility all time
 dvol_plotter(vol_SPY_daily,breaks="yearly",
