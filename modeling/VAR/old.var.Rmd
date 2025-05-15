@@ -38,6 +38,14 @@ require(texreg) #arima tables
 require(vars) #VAR models
 require(xts) #time series objects
 require(tseries) #includes adf test
+require(quantmod)
+require(TSA)
+require(aTSA)
+require(tibble)
+require(FinTS)
+require(kableExtra)
+require(writexl)
+require(purrr)
 
 getwd()
 #setwd("...") -> set wd at base repo folder
@@ -50,434 +58,164 @@ source(here("helperfunctions/quick_arma.R"))
 source(here("helperfunctions/r.vol_calculators.R"))
 source(here("helperfunctions/truths_cleaning_function.R"))
 source(here("helperfunctions/armax_functions.R"))
-```
-
-
-# Data 
-
-
-## Load Base Data
-
-```{r data_setup, results=FALSE, warning=FALSE, message=FALSE}
-
-# 1. Load Political Social Media
-
-#contains posts from Twitter & TruthSocial
-social <- read.csv(here("data/mothership", "social.csv"))
-
-social_hourly <- read.csv(here("data/mothership", "socialhourly.csv"))
-
-
-# 2. Load Financial
-
-#S&P500
-SPY <- read.csv(here("data/mothership", "SPY.csv"))
-
-#STOXX50
-VGK <- read.csv(here("data/mothership", "VGK.csv"))
-
-#CSI 300 (China)
-ASHR <- read.csv(here("data/mothership", "ASHR.CSV"))
 
 ```
 
-```{r data_time, results=FALSE, warning=FALSE, message=FALSE}
+```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
 
-#make posixct
-SPY$timestamp = as.POSIXct(SPY$timestamp,format = "%Y-%m-%d %H:%M:%S")
-VGK$timestamp = as.POSIXct(VGK$timestamp,format = "%Y-%m-%d %H:%M:%S")
-ASHR$timestamp = as.POSIXct(ASHR$timestamp,format = "%Y-%m-%d %H:%M:%S")
-social$timestamp = as.POSIXct(social$timestamp,format = "%Y-%m-%d %H:%M:%S")
-social_hourly$timestamp = as.POSIXct(social_hourly$timestamp,format = "%Y-%m-%d %H:%M:%S")
+#load final dataset
+source(here("helperfunctions/full_data.R"))
+
+#select timeframe 
+Vdata = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
 
 ```
 
 
+# VAR Models
 
-## Volatility
-```{r SPY volatility}
 
-#find hourly volatility
-#NOTE: this ignores tweets made outside trading hours!!
-SPY_volatility_alltime = dplyr::select(SPY,timestamp,r_vol_h)
 
-#aggregating per hour
-SPY_volatility_alltime = SPY_volatility_alltime %>%
-          mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
-          distinct(timestamp, .keep_all = TRUE) 
-   
-#select time period
-SPY_volatility = filter(SPY_volatility_alltime,
-                  between(timestamp, 
-                          as.Date('2014-01-01'), 
-                          as.Date('2025-04-10')))
+## Volatility & Tariff Mention
 
-```
-
-```{r VGK volatility}
-
-#find hourly volatility
-#NOTE: this ignores tweets made outside trading hours!!
-VGK_volatility_alltime = dplyr::select(VGK,timestamp,r_vol_h)
-
-#aggregating per hour
-VGK_volatility_alltime = VGK_volatility_alltime %>%
-          mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
-          distinct(timestamp, .keep_all = TRUE) 
-   
-#select time period
-VGK_volatility = filter(VGK_volatility_alltime,
-                  between(timestamp, 
-                          as.Date('2014-01-01'), 
-                          as.Date('2025-04-10')))
-
-```
-
-```{r ASHR volatility}
-
-#find hourly volatility
-#NOTE: this ignores tweets made outside trading hours!!
-ASHR_volatility_alltime = dplyr::select(ASHR,timestamp,r_vol_h)
-
-#aggregating per hour
-ASHR_volatility_alltime = ASHR_volatility_alltime %>%
-          mutate(timestamp = floor_date(timestamp, unit = "hour")) %>%
-          distinct(timestamp, .keep_all = TRUE) 
-   
-#select time period
-ASHR_volatility = filter(ASHR_volatility_alltime,
-                  between(timestamp, 
-                          as.Date('2014-01-01'), 
-                          as.Date('2025-04-10')))
-
-```
-
-## Number of Posts 
-```{r social media count}
-
-#find count
-tweetcount_alltime = dplyr::select(social_hourly,timestamp,N)
-
-#select time period
-tweetcount = filter(tweetcount_alltime,
-                  between(timestamp, 
-                          as.Date('2014-01-01'), 
-                          as.Date('2025-04-10')))
-
-```
-
-## Dummy for Social Media Post
-```{r dummy}
-
-#find dummy
-tweetdummy_alltime = dplyr::select(social_hourly,timestamp,dummy)
-
-#select time period
-tweetdummy = filter(tweetdummy_alltime,
-                  between(timestamp, 
-                          as.Date('2014-01-01'), 
-                          as.Date('2025-04-10')))
-
-```
-
-## Number of Tweets Mentioning Tariffs 
 ```{r tariff}
 
-#find count
-tariff_alltime = dplyr::select(social_hourly,timestamp,total_tariff)
+y3 = cbind(Vdata$tariff, Vdata$SPY_vol)
+colnames(y3)[1:2] <- c("tariff", "vol")
+est.VAR3 <- VAR(y3,p=6)
+table = summary(est.VAR3)
+Omega3 <- var(residuals(est.VAR3))
 
-#select time period
-tariff = filter(tariff_alltime,
-                  between(timestamp, 
-                          as.Date('2014-01-01'), 
-                          as.Date('2025-04-10')))
+
+screenreg(est.VAR3, digits = 6)
+
 
 ```
 
-## Number of Tweets Mentioning Trade 
-```{r trade}
+```{r B mat3}
 
-#find count
-trade_alltime = dplyr::select(social_hourly,timestamp,total_trade)
-
-#select time period
-trade = filter(trade_alltime,
-                  between(timestamp, 
-                          as.Date('2014-01-01'), 
-                          as.Date('2025-04-10')))
-
-```
-
-## Proportion of Positive 
-```{r positive}
-
-#find count
-positive_alltime = dplyr::select(social_hourly,timestamp,prop_positive)
-
-#select time period
-positive = filter(positive_alltime,
-                  between(timestamp, 
-                          as.Date('2014-01-01'), 
-                          as.Date('2025-04-10')))
-
-```
-
-## Proportion of Negative 
-```{r negative}
-
-#find count
-negative_alltime = dplyr::select(social_hourly,timestamp,prop_negative)
-
-#select time period
-negative = filter(negative_alltime,
-                  between(timestamp, 
-                          as.Date('2014-01-01'), 
-                          as.Date('2025-04-10')))
-
-```
-
-
-## Merge
-```{r vardata merge}
-
-#merge our dependant and independant vars
-var_data = left_join(SPY_volatility, VGK_volatility, by="timestamp")
-var_data = left_join(var_data, ASHR_volatility, by="timestamp")
-var_data = left_join(var_data, tweetdummy, by="timestamp")
-var_data = left_join(var_data, tweetcount, by="timestamp")
-var_data = left_join(var_data, tariff, by="timestamp")
-var_data = left_join(var_data, trade, by="timestamp")
-var_data = left_join(var_data, positive, by="timestamp")
-var_data = left_join(var_data, negative, by="timestamp")
-
-#rename volatility columns
-names(var_data)[2] <- "SPY_vol"
-names(var_data)[3] <- "VGK_vol"
-names(var_data)[4] <- "ASHR_vol"
-
-#convert NA to zeroes
-var_data$N[is.na(var_data$N)] = 0
-var_data$dummy[is.na(var_data$dummy)] = 0
-var_data$total_tariff[is.na(var_data$total_tariff)] = 0
-var_data$total_trade[is.na(var_data$total_trade)] = 0
-var_data$prop_positive[is.na(var_data$prop_positive)] = 0
-var_data$prop_negative[is.na(var_data$prop_negative)] = 0
-
-```
-\newpage
-
-
-# S\&P500 VAR Models
-
-## Tests
-Following: https://github.com/ritvikmath/Time-Series-Analysis/blob/master/VAR%20Model.ipynb
-
-```{r spytest1}
-
-acf(var_data$SPY_vol)
-pacf(var_data$SPY_vol)
-
-
-#Correlation between "heater" and lagged "ice cream"
-
-for (lag in 1:13) {
+#make the B matrix
+loss3 <- function(param3){
+  #Define the restriction
+  B3 <- matrix(c(param3[1], param3[2], 0, param3[3]), ncol = 2)
   
-  volatility_series <- var_data$SPY_vol[(lag+1):nrow(var_data)]
-  lagged_tweet_series <- var_data$total_tariff[1:(nrow(var_data)-lag)]
+  #Make BB' approximatively equal to omega
+  X3 <- Omega3 - B3 %*% t(B3)
   
-  # Print lag value
-  cat('Lag:', lag, '\n')
-  
-  # Calculate Pearson correlation
-  correlation <- cor.test(volatility_series, lagged_tweet_series, method="pearson")
-  cat("Correlation coefficient:", correlation$estimate, "\n")
-  cat("P-value:", correlation$p.value, "\n")
-  
-  # Separator line
-  cat('------\n')
+  #loss function
+  loss3 <- sum(X3^2)
+  return(loss3)
 }
 
-```
+res.opt3 <- optim(c(1, 0, 1), loss3, method = "BFGS")
+B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol = 2)
 
+print(cbind(Omega3,B.hat3 %*% t(B.hat3)))
 
-```{r spytest1 modelfit}
-
-#data
-variables <- c("SPY_vol", "total_tariff")
-
-ts_data <- xts(var_data[, variables], 
-               order.by = var_data$timestamp)
-
-
-
-#adf test
-# ADF stationary test for each column
-adf_test_results <- apply(ts_data, 2, function(x) adf.test(x)$p.value) #2 means columns
-
-# print p values (p<0.05 means stationary, p>0.05 means explosive)
-adf_test_results
-
-
-
-
-#lags
-# Determine optimal lag length using AIC
-lag_selection <- VARselect(ts_data, lag.max = 55, type = "const") 
-
-# View the lag length selection
-lag_selection$selection
-
-
-
-#fit
-# Fit the VAR model with the chosen lag length
-var_model <- VAR(ts_data, p = lag_selection$selection["AIC(n)"], type = "const")
-
-# Check the summary of the model
-summary(var_model)
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Find Number of Lags
-```{r SPY lags, results='asis'}
-
-```
-
-## Tweet Count on Volatility by hour
-```{r SPY VAR count hourly volatility, results='asis'}
-
-
+#shock by tariff
+B.hat3
 
 ```
 
 
-## Tweet Dummy on Volatility by hour
-```{r SPY VAR dummy hourly, results='asis'}
+
+```{r IRF tariff}
+
+#OLD
+#get back the coefficient of est.VAR
+phi3 <- Acoef(est.VAR3)
+PHI3 = make.PHI(phi3)
+
+#take the constant
+constant3 <- sapply(est.VAR3$varresult, function(eq) coef(eq)["const"])
+c3=as.matrix(constant3)
+
+#Simulate the IRF
+p3 <- length(phi3)
+n3 <- dim(phi3[[1]])[1]
+
+par(mfrow=c(2,2))
+Y3 <- simul.VAR(c=c3, Phi = phi3, B = B.hat3, nb.sim ,y0.star=rep(0, n3*p3),
+                indic.IRF = 1, u.shock = c(1,0))
+par(mfrow=c(1,1))  
+par(plt=c(0.1, 0.9, 0.1, 0.9))
+plot(Y3[,2],type="l",lwd=2,xlab="",ylab="",main="Effect of XXX on XXX")
 
 
+
+#NEW
+irf_res <- irf(est.VAR3, impulse = "tariff", response = "vol", 
+                  n.ahead = 7 * 5, boot = TRUE, ci = 0.95)
+
+plot(irf_result)
+
+single_varirf <- extract_varirf(irf_res)
+
+single_varirf %>% 
+  ggplot(aes(x=period, y=irf_tariff_vol, ymin=lower_tariff_vol, ymax=upper_tariff_vol)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_ribbon(fill="grey", alpha=0.2) +
+  geom_line() +
+  theme_light() +
+  ggtitle("Orthogonal impulse response, asylum - asylum")+
+  ylab("log(total asylum flow)")+
+  xlab("") +
+  theme_minimal()
+
+```
+
+```{r does vol granger cause tarrif}
+
+#does volatiltiy granger cause tariff mentions
+grangertest(y3[,c("vol","tariff")], order = 6)
+
+#does tariff mentions granger cause volatility
+grangertest(y3[,c("tariff", "vol")], order = 6)
 
 ```
 
 
-## Tariff Mention on Volatility by hour
-```{r SPY VAR tariff hourly, results='asis'}
-
-
-
+```{r}
+extract_varirf <- function(...){
+    
+    varirf_object <- list(...) #list one or more varirf input objects
+    
+    get_vec_length <- function(list_item){nrow(list_item[[1]][[1]])}
+    
+    if (!("varirf" %in% mapply(class, varirf_object))){
+        stop("this function only accepts 'varirf' class objects")
+    }
+    
+    if (length(unique(mapply(class, varirf_object)))!=1){
+        stop("all input items must be 'varirf' class objects")
+    }    
+    if (length(unique(mapply(get_vec_length, varirf_object)))!=1){
+        stop("all irf vectors must have the same length")   
+    }  
+    
+    period <- as.data.frame(0:(nrow(varirf_object[[1]][[1]][[1]])-1)) 
+    names(period) <- "period"
+    
+    for (l in 1:length(varirf_object)){
+        for (i in 1:3){
+            for (j in 1:dim(varirf_object[[l]][[i]][[1]])[2]){
+                for (k in 1:length(varirf_object[[l]][[1]])){
+                    temp_colname <- paste(names(varirf_object[[l]][i]), #vector type (irf, lower, or upper)
+                                          names(varirf_object[[l]][[i]])[k], #impulse name
+                                          colnames(varirf_object[[l]][[i]][[k]])[j], #response name
+                                          sep = "_")
+                    
+                    temp <- as.data.frame(varirf_object[[l]][[i]][[k]][, j]) #extracts the vector
+                    
+                    names(temp) <- temp_colname #add the column name (vectortype_impulse_reponse)
+                    period <- cbind(period, temp) 
+                }
+                
+            }
+        }
+    }
+    names(period) <- tolower(names(period))
+    return(period)
+}
 ```
-
-
-## Positive Vibe on Volatility by hour
-```{r SPY VAR positive hourly, results='asis'}
-
-
-
-```
-
-\newpage
-
-
-# European Market VAR Models
-
-## Find Number of Lags
-```{r VGK lags, results='asis'}
-
-
-
-```
-
-## Tweet Count on Volatility by hour
-```{r VGK VAR count hourly volatility, results='asis'}
-
-
-
-```
-
-
-## Tweet Dummy on Volatility by hour
-```{r VGK VAR dummy hourly, results='asis'}
-
-
-
-```
-
-
-## Tariff Mention on Volatility by hour
-```{r VGK VAR tariff hourly, results='asis'}
-
-
-
-```
-
-
-## Negative Vibe on Volatility by hour
-```{r VGK VAR negative hourly, results='asis'}
-
-
-
-```
-
-
-
-\newpage
-
-
-# Chinese Market VAR Models
-
-## Find Number of Lags
-```{r ASHR lags, results='asis'}
-
-
-
-```
-
-## Tweet Count on Volatility by hour
-```{r ASHR VAR count hourly volatility, results='asis'}
-
-
-
-```
-
-
-## Tweet Dummy on Volatility by hour
-```{r ASHR VAR dummy hourly, results='asis'}
-
-
-
-```
-
-
-## Tariff Mention on Volatility by hour
-```{r ASHR VAR tariff hourly, results='asis'}
-
-
-
-```
-
-
-## Positive Vibe on Volatility by hour
-```{r ASHR VAR positive hourly, results='asis'}
-
-
-
-```
-## Negative Vibe on Volatility by hour
-```{r ASHR VAR negative hourly, results='asis'}
-
-
-
-```
-
 
