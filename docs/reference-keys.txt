@@ -10,9 +10,9 @@ final-dataframe
 methodology
 arma-x
 var
-footnotes-and-citations
-footnotes
-citations
+discussion
+arma-x-results
+var-results
 conclusion
 bibliography
 appendix
