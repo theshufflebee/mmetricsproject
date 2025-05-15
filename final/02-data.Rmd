@@ -17,7 +17,7 @@ on multiple Indices, notably the S&P 500 ETF with the Ticker SPY from Alphavanta
 Then we calculated hourly volatility for these indices. Since trading starts at
 09:30 the interval from 09:00 to 10:00 only includes half an hour of actual trading.
 
-The formula for hourly volatility is...
+The formula for hourly volatility is... 2
 
 ## Political Data
 
