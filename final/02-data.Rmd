@@ -37,7 +37,7 @@ require(aTSA) #adf test
 require(bookdown)
 
 getwd()
-#setwd("X:/Onedrive/Desktop/Macroeconometrics/R stuff/Project/mmetricsproject/final) 
+#setwd("X:/Onedrive/Desktop/Macroeconometrics/R stuff/Project/mmetricsproject/final") 
 
 #load helper functions
 source(here("helperfunctions/data_loaders.R"))
@@ -82,18 +82,19 @@ We then had to transform this data to get our main variable of interest, realise
 market volatility. We did so with the following formula:
 $$
 \begin{aligned}
-  v_t &= \frac{1}{N}\sum_{i=1}^N(\Delta p_{t,i})^2 \\
-  &\text{where } \Delta p_t \text{ is the difference in price (open - close)} \\
-  &\text{and i represents every minute}
+  v_t = \frac{1}{N}&\sum_{i=1}^N(\Delta p_{t,i})^2 
 \end{aligned}
 $$
+Where $\Delta p_t$ is the difference in price (open - close) and $i$ represents
+every minute.
+
 We used a custom function in order to get the average hourly volatility for each 
 open market hour. Note that the first hour is from 9:30 am to 10:00 am since the 
 market open on a half-hour but closes at 4:00 pm. We can plot this data in
 <span style="color:red"> *figX* </span>.
 
 
-```{r fin plots, message=FALSE, warning=FALSE}
+```{r fin plots, message=FALSE, warning=FALSE, echo=FALSE}
 
 price_plotter(SPY, title = "SPY Prices")
 
@@ -121,7 +122,7 @@ A big problem we had in our analysis was what to do with social media posts
 which appeared outside market hours. We first decided to simply ignore them, but 
 it turned out to remove a lot of observations. We finally decided to push all the 
 social media information outside market hours to the next open hour. This comes 
-as an assumption.[^2] 
+as an assumption.^[2] 
 
 Since our financial data is hourly, we aggregate the social data by hour. We 
 then construct multiple variables from the social media data. These include
@@ -133,7 +134,7 @@ the appendix and online.
 
 <span style="color:red"> *insert wordcloud* </span>.
 
-```{r social plots, message=FALSE, warning=FALSE}
+```{r social plots, message=FALSE, warning=FALSE, echo=FALSE}
 
 #find count
 tweetcount_alltime = dplyr::select(data,timestamp,N)
@@ -158,13 +159,15 @@ plot.title = element_text(face = "bold", hjust = 0.5))
 
 ## Final Dataframe
 
-```{r data, message=FALSE, warning=FALSE}
+```{r data, message=FALSE, warning=FALSE, echo=FALSE}
 
-head(data[1:4])
+tail(data[1:4])
 
-head(data[5:9])
+tail(data[5:9])
 
-head(data[10:19])
+tail(data[10:14])
+
+tail(data[15:19])
 
 ```
 
@@ -173,5 +176,5 @@ head(data[10:19])
 
 
 ¨
-[^2]: For instance, if Trump tweets on Good Friday (market holiday), then the 
+^[2]: For instance, if Trump tweets on Good Friday (market holiday), then the 
 market will only react to this new information on Monday at 9:30 am. 

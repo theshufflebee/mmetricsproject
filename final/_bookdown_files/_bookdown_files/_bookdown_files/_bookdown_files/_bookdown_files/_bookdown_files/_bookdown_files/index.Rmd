@@ -1,0 +1,29 @@
+---
+title: "Read Me"
+author: "Marcos Constantinou, Ryan Fellarhi & Jonas Bruno"
+date: "Last edited: 12.05.2025"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [packages.bib, macroeconometrics_citations.bib] #name bib files
+# url: your book url like https://bookdown.org/yihui/bookdown
+# cover-image: path to the social sharing image like images/cover.jpg -> Do Later
+description: |
+  This is our website for a Universityproject. We put this together from a basic bookdown example so there might be some stuff in here from that.
+link-citations: true           # optional but helpful for clickable citations
+csl: apa.csl
+github-repo: theshufflebee/mmetricsproject
+---
+
+# Readme {.unnumbered}
+
+This is a Website for a class project from the 2025 Class Macroeconometrics at Université de Lausanne.
+
+IMPORTANT: set wd to root/final -\> then use: bookdown::render_book("index.Rmd") to render site
+
+## Usage {.unnumbered}
+
+You can find all sections on the left. There is the Main Report which we hand in. This serves as a complete collection of the whole project to make sure everything is available to readers.
+
+# Abstract {.unnumbered}
+
+This Project assesses to what extent Financial Markets react to information provided by Donald Trump on Twitter and Truth Social. We asses the impact of posts on hourly volatility using ARMA-X. We evaluate multimple tie horizons and independent variables, such as if Trump posts anything, specific words such as tariff and sentiments. We then calculate IRFs and show that there are significant impacts on volatility.
