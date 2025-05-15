@@ -125,5 +125,29 @@ texreg(
 ```
 
 
+## SPY IRFs
+```{r SPYirf, results="asis", warning=F, message=F}
 
+#we want to plot the IRFs of these models
+nb.periods = 7 * 15
+
+irf.plot(dummy_fit$model,nb.periods)
+irf.plot(count_fit$model,nb.periods)
+irf.plot(tariff_fit$model,nb.periods)
+irf.plot(trade_fit$model,nb.periods)
+irf.plot(china_fit$model,nb.periods)
+
+```
+
+
+## SPY Residuals
+```{r SPYresiduals, warning=F, message=F}
+
+res = checkresiduals(dummy_fit$model, plot = FALSE)
+res = checkresiduals(count_fit$model, plot = FALSE)
+res = checkresiduals(tariff_fit$model, plot = FALSE)
+res = checkresiduals(trade_fit$model, plot = FALSE)
+res = checkresiduals(china_fit$model, plot = FALSE)
+
+```
 
