@@ -2014,7 +2014,7 @@ margin-left: 2em;
 </ul></li>
 <li class="chapter" data-level="2" data-path="data.html"><a href="data.html"><i class="fa fa-check"></i><b>2</b> Data</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="data.html"><a href="data.html#stock-data"><i class="fa fa-check"></i><b>2.1</b> Stock Data</a></li>
+<li class="chapter" data-level="2.1" data-path="data.html"><a href="data.html#financial-data"><i class="fa fa-check"></i><b>2.1</b> Financial Data</a></li>
 <li class="chapter" data-level="2.2" data-path="data.html"><a href="data.html#political-data"><i class="fa fa-check"></i><b>2.2</b> Political Data</a></li>
 <li class="chapter" data-level="2.3" data-path="data.html"><a href="data.html#final-dataframe"><i class="fa fa-check"></i><b>2.3</b> Final Dataframe</a></li>
 </ul></li>
@@ -2061,14 +2061,34 @@ margin-left: 2em;
             <section class="normal" id="section-">
 <div id="data" class="section level1 hasAnchor" number="2">
 <h1><span class="header-section-number">Part 2</span> Data<a href="data.html#data" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<div id="stock-data" class="section level2 hasAnchor" number="2.1">
-<h2><span class="header-section-number">2.1</span> Stock Data<a href="data.html#stock-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="financial-data" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> Financial Data<a href="data.html#financial-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Since we do not have access to high frequency data on Stock Indices directly, we
 use ETF’s that approximate these indices. We downloaded one-minute invervall data
 on multiple Indices, notably the S&amp;P 500 ETF with the Ticker SPY from Alphavantage.
 Then we calculated hourly volatility for these indices. Since trading starts at
 09:30 the interval from 09:00 to 10:00 only includes half an hour of actual trading.</p>
 <p>The formula for hourly volatility is… 2</p>
+<p>For our financial data, we decided to try to find minute-by-minute prices for
+broad market indices. While the actual indices do not update their prices so often,
+we had to take proxies under the form of ETF’s that track them. Our 3 markets of
+analysis are: SPY to track the S&amp;P500, VGK to track the FTSE Developed Europe
+All Cap Index, and finally ASHR to track the CSI 300 China. We accessed this data
+through a free stock API, Alpha Vantage. Our timeframe is from the first
+of January 2014 to the 7th of May 2025.</p>
+<p>We then had to transform this data to get our main variable of interest, realised
+market volatility. We did so with the following formula:
+<span class="math display">\[
+\begin{aligned}
+  v_t &amp;= \frac{1}{N}\sum_{i=1}^N(\Delta p_{t,i})^2 \\
+  &amp;\text{where } \Delta p_t \text{ is the difference in price (open - close)} \\
+  &amp;\text{and i represents every minute}
+\end{aligned}
+\]</span>
+We used a custom function in order to get the average hourly volatility for each
+open market hour. Note that the first hour is from 9:30 am to 10:00 am since the
+market open on a half-hour but closes at 4:00 pm. We can plot this data in
+<span style="color:red"> <em>figX</em> </span>.</p>
 </div>
 <div id="political-data" class="section level2 hasAnchor" number="2.2">
 <h2><span class="header-section-number">2.2</span> Political Data<a href="data.html#political-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -3137,6 +3157,20 @@ gitbook.start({
 });
 </script>
 
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 </body>
 
 </html>

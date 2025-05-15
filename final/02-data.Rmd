@@ -7,9 +7,61 @@ editor_options:
     wrap: 72
 ---
 
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenization
+require(texreg) #arima tables
+require(future.apply) #parallel computation (speed)
+require(aTSA) #adf test
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/armax_functions.R"))
+
+```
+
+```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+
+#load final dataset
+source(here("helperfunctions/full_data.R"))
+
+#select timeframe 
+data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
+
+```
+
 # Data
 
-## Stock Data
+## Financial Data
 
 Since we do not have access to high frequency data on Stock Indices directly, we
 use ETF's that approximate these indices. We downloaded one-minute invervall data
@@ -18,6 +70,30 @@ Then we calculated hourly volatility for these indices. Since trading starts at
 09:30 the interval from 09:00 to 10:00 only includes half an hour of actual trading.
 
 The formula for hourly volatility is... 2
+
+
+For our financial data, we decided to try to find minute-by-minute prices for 
+broad market indices. While the actual indices do not update their prices so often,
+we had to take proxies under the form of ETF's that track them. Our 3 markets of
+analysis are: SPY to track the S&P500, VGK to track the FTSE Developed Europe 
+All Cap Index, and finally ASHR to track the CSI 300 China. We accessed this data
+through a free stock API, Alpha Vantage. Our timeframe is from the first 
+of January 2014 to the 7th of May 2025.
+
+
+We then had to transform this data to get our main variable of interest, realised 
+market volatility. We did so with the following formula:
+$$
+\begin{aligned}
+  v_t &= \frac{1}{N}\sum_{i=1}^N(\Delta p_{t,i})^2 \\
+  &\text{where } \Delta p_t \text{ is the difference in price (open - close)} \\
+  &\text{and i represents every minute}
+\end{aligned}
+$$
+We used a custom function in order to get the average hourly volatility for each 
+open market hour. Note that the first hour is from 9:30 am to 10:00 am since the 
+market open on a half-hour but closes at 4:00 pm. We can plot this data in
+<span style="color:red"> *figX* </span>.
 
 ## Political Data
 
