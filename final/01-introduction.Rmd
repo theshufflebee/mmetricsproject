@@ -39,23 +39,20 @@ truths <- truths_raw %>%
 # Introduction
 
 Over the past 15 years social media has become an important
-communications tool for politicians. One of the pioneers of this novel
-approach has been Donald Trump, the 45th and 47th Presiden of the United
-States. While he has been posting a lot online, he has increased posting
-enourmously since he was banned from twitter after the Jan 6th riots.
-This is on his own social media platform. As shown below he as been
-posting constantly. [^1]
+communication tool for politicians. One of the pioneers of this novel
+approach has been Donald Trump, the 45th and 47th President of the United
+States. Since his ban on Twitter after the January 6th riots, his quantity of
+social media posts has drastically increased. This is shown in the following
+figure. [^1]
 
 [^1]: Includes both Posts and Reposts
 
-Especially in his second term he has been active on Truth Social for
-long periods of time, often announcing or teasing important political
-decision on there. Especially his announcement of "Now is a good time to
-buy an hour before lifting reciprocal tariffs and him announcing his
-post important Truth Social Post before Posting about price controls
-lend to the fact that this has now become a major source of information.
-Therefore the question wether financial markets react to these posts has
-been discussed plenty. We investigate two research questions.
+The content of his posts can sometimes have announcements or teases of future
+political decisions. Note the recent infamous "THIS IS A GREAT TIME TO BUY!!! DJT"
+post sent just an hour before lifting his reciprocal tariffs. It is then not 
+improbable that agents in financial markets might take this information into 
+account in their decision making. This question has been asked before in the 
+literature, focusing rather on his first term. We explore two research questions:
 
 1)  Do Donald Trumps Posts impact market Volatility?
 2)  Have traders learned from past actions and are now more reactive
@@ -103,8 +100,8 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
 ## Literature Review
 
 Information is one of the most valuable assets in the financial market.
-Its importance lies at the core of the “Perfect Market Hypothesis”
-(PMH), which states that the prices of assets fully reflect all
+Its importance lies at the core of the "Efficient Market Hypothesis", 
+which states that the prices of assets fully reflect all
 available information, adjusting immediately to any new data
 @famaAdjustmentStockPrices2003 , and thereby creating a strong demand
 for information flow. In addition, the “Mixture of Distribution
@@ -140,7 +137,7 @@ confrontational words such as "tariff" or "trade war." Some of his
 announcements also influenced the U.S. dollar exchange rate (l) and
 certain market indices within minutes of the tweet being posted (r)(a).
 
-Other scholars have shown that negative Trump’s tweets about specific
+Other scholars have shown that negative Trump tweets about specific
 companies tended to reduce demand for their stocks (b)(g), whereas some
 other have shown that they also impact market volatility indices such as
 the VIX (w) or the Volfele(v). The effects of his tweets also extended
@@ -148,3 +145,5 @@ beyond the U.S.. For example, @nishimuraImpactsDonaldTrumps2025 shows a
 positive relationship between volatility in European stock markets and
 tweeter activity of Trump, and this effect tends to intensify as public
 intention for his tweet grows (z).
+
+Our paper is built as follows: 
