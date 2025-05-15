@@ -34,9 +34,10 @@ require(quanteda) #tokenization
 require(texreg) #arima tables
 require(future.apply) #parallel computation (speed)
 require(aTSA) #adf test
+require(bookdown)
 
 getwd()
-#setwd("...") -> set wd at base repo folder
+#setwd("X:/Onedrive/Desktop/Macroeconometrics/R stuff/Project/mmetricsproject/final) 
 
 #load helper functions
 source(here("helperfunctions/data_loaders.R"))
@@ -54,6 +55,11 @@ source(here("helperfunctions/armax_functions.R"))
 #load final dataset
 source(here("helperfunctions/full_data.R"))
 
+#load initial financial for plots
+SPY <- read.csv(here("data/mothership", "SPY.csv"))
+SPY$timestamp = as.POSIXct(SPY$timestamp,format = "%Y-%m-%d %H:%M:%S")
+SPY = filter(SPY,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
+
 #select timeframe 
 data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
 
@@ -62,15 +68,6 @@ data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07
 # Data
 
 ## Financial Data
-
-Since we do not have access to high frequency data on Stock Indices directly, we
-use ETF's that approximate these indices. We downloaded one-minute invervall data
-on multiple Indices, notably the S&P 500 ETF with the Ticker SPY from Alphavantage.
-Then we calculated hourly volatility for these indices. Since trading starts at
-09:30 the interval from 09:00 to 10:00 only includes half an hour of actual trading.
-
-The formula for hourly volatility is... 2
-
 
 For our financial data, we decided to try to find minute-by-minute prices for 
 broad market indices. While the actual indices do not update their prices so often,
@@ -95,9 +92,20 @@ open market hour. Note that the first hour is from 9:30 am to 10:00 am since the
 market open on a half-hour but closes at 4:00 pm. We can plot this data in
 <span style="color:red"> *figX* </span>.
 
+
+```{r fin plots, message=FALSE, warning=FALSE}
+
+price_plotter(SPY, title = "SPY Prices")
+
+hvol_plotter(SPY, breaks = "yearly", title = "SPY Realised Volatility")
+
+```
+
+
+
 ## Political Data
 
-We source Trumps Posts from two places. The Tweets are from Kaggle
+We have two sources for Trump's posts. The Tweets are from Kaggle
 @DonaldTrumpTweets and go until the 8th of January 2021. Since he
 switched his primary Posting platform to Truth Social we use only that
 Data from 2021 onwards. All Truth Social Posts were scrapped from
@@ -107,18 +115,63 @@ Appendix.
 
 Since we're using financial data that is constrained by trading hours,
 we decided to move posts after 16:00 to the next trading day's opening
-hour.[^2]
+hour.
 
-All tweets then get aggregated on the hour. We then extract a dummy if he posted
-in the hour, how many times he posted and how many times he mentioned certain words.
+A big problem we had in our analysis was what to do with social media posts
+which appeared outside market hours. We first decided to simply ignore them, but 
+it turned out to remove a lot of observations. We finally decided to push all the 
+social media information outside market hours to the next open hour. This comes 
+as an assumption.[^2] 
 
-Further we applied some simple sentiment analysis algorithms on the data to see
-if there are certain sentiments in his tweets that move the markets. More
-information and detailed process are in the appendix and online.
+Since our financial data is hourly, we aggregate the social data by hour. We 
+then construct multiple variables from the social media data. These include
+a dummy for whether there was a post, the number of posts an hour and counts
+for certain words ("tariffs","trade","china"). Further we applied some simple 
+sentiment analysis algorithms on the data to see if there are certain sentiments 
+in his tweets that move the markets. More information and detailed process are in 
+the appendix and online.
+
+<span style="color:red"> *insert wordcloud* </span>.
+
+```{r social plots, message=FALSE, warning=FALSE}
+
+#find count
+tweetcount_alltime = dplyr::select(data,timestamp,N)
+#select time period
+tweetcount = filter(tweetcount_alltime,
+between(timestamp,
+as.Date('2014-01-01'),
+as.Date('2025-04-10')))
+#plot
+ggplot(tweetcount_alltime, aes(x = timestamp, y = N)) +
+geom_point(color = "#253494", size = 1) +
+scale_x_datetime(date_labels = "%b %Y", date_breaks = "9 month") +
+labs(title = "Trump Social Media Count",
+x = NULL,
+y = "number of tweets/truths") +
+theme_minimal(base_size = 14) +
+theme(axis.text.x = element_text(angle = 45, hjust = 1),
+plot.title = element_text(face = "bold", hjust = 0.5))
+
+```
+
 
 ## Final Dataframe
 
-Show here maybe??
+```{r data, message=FALSE, warning=FALSE}
+
+head(data[1:4])
+
+head(data[5:9])
+
+head(data[10:19])
+
+```
 
 
-[^2]: So a Post on friday 18:00 would be moved to Monday 09:00
+
+
+
+¨
+[^2]: For instance, if Trump tweets on Good Friday (market holiday), then the 
+market will only react to this new information on Monday at 9:30 am. 

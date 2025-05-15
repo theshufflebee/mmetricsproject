@@ -108,8 +108,9 @@ price_plotter = function(data,title){
          x = "Time",
          y = "Close Price") +
     scale_x_datetime(date_labels = "%b %Y", date_breaks = "6 month") +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          plot.title = element_text(face = "bold", hjust = 0.5))
 }
 
 #example: price_plotter(raw_ONEQ,"ONEQ Price Over Time")
