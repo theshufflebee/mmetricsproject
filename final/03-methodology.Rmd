@@ -19,6 +19,17 @@ explained by our data being hourly. As such we decided to put a limit of 3 lags,
 which sees minimal AIC loss and simplifying our models considerably.
 
 
+Results:
+
+Big full timeframe table describe. Include IRF for trade only. Describe 2nd
+big two term table. Mention significance differences. Add China and Tariff IRFs
+if space for it. Finally, mention that for fulltime and 1stterm, the residuals
+all seem autocorrelated giving evidence model sucks. But mention that residuals
+for 2nd term estimation are not! Nice.
+
+Brief talk of other markets that nothing interesting.
+VGK: significant but small effect of tariff in full timeframe
+VGK & ASHR all other variables and all timeframes insignificant
 
 
 

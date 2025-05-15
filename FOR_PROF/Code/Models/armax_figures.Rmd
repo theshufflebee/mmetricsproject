@@ -164,6 +164,23 @@ res5 = checkresiduals(models[["Model 5"]], plot = FALSE)
 
 ```
 
+```{r SPYresiduals table, warning=F, message=F}
+
+resnames = c("Twitter Dummy", "Twitter Count", "Tariff", "Trade", "China")
+
+#extract p-values directly from checkresiduals results
+pvals <- data.frame(Model = resnames,
+                    `Ljung-Box p-value` = c(
+                      res1$p.value,
+                      res2$p.value,
+                      res3$p.value,
+                      res4$p.value,
+                      res5$p.value))
+
+#table
+knitr::kable(pvals, digits = 100, caption = "Full Timeframe Ljung-Box Test p-values")
+
+```
 
 
 
@@ -203,9 +220,16 @@ models[["First Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 ## SPY Residuals
 ```{r 1st SPYresiduals, warning=F, message=F, results=F}
 
-res = checkresiduals(models[["First Term (1)"]], plot = FALSE)
-res = checkresiduals(models[["First Term (2)"]], plot = FALSE)
-res = checkresiduals(models[["First Term (3)"]], plot = FALSE)
+res6 = checkresiduals(models[["First Term (1)"]], plot = FALSE)
+res7 = checkresiduals(models[["First Term (2)"]], plot = FALSE)
+res8 = checkresiduals(models[["First Term (3)"]], plot = FALSE)
+
+pvals_new1 <- data.frame(
+  Model = c("First Term Tariffs", "First Term Trade", "First Term China"),
+  `Ljung-Box p-value` = c(
+    res6$p.value,
+    res7$p.value,
+    res8$p.value))
 
 ```
 
@@ -257,9 +281,19 @@ irf.plot(models[["Second Term (3)"]],nb.periods,title="China Mention Shock")
 ## SPY Residuals
 ```{r 2nd SPYresiduals, results=F, warning=F, message=F}
 
-res = checkresiduals(models[["Second Term (1)"]], plot = FALSE)
-res = checkresiduals(models[["Second Term (2)"]], plot = FALSE)
-res = checkresiduals(models[["Second Term (3)"]], plot = FALSE)
+res9 = checkresiduals(models[["Second Term (1)"]], plot = FALSE)
+res10 = checkresiduals(models[["Second Term (2)"]], plot = FALSE)
+res11 = checkresiduals(models[["Second Term (3)"]], plot = FALSE)
+
+pvals_new2 <- data.frame(
+  Model = c("Second Term Tariffs", "Second Term Trade", "Second Term China"),
+  `Ljung-Box p-value` = c(
+    res9$p.value,
+    res10$p.value,
+    res11$p.value))
+
+#combine with other term
+pvals_combined <- rbind(pvals_new1, pvals_new2)
 
 ```
 
@@ -291,6 +325,14 @@ texreg(models,
        caption.above = TRUE,
        label = "tab:armax_term",
        digits = 4)
+
+```
+
+
+## SPY Residuals Table (both terms)
+```{r resterms table, message=FALSE, warning=FALSE}
+
+knitr::kable(pvals_combined, digits = 100, caption = "Separate Terms Ljung-Box Test p-values")
 
 ```
 
