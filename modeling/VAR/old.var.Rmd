@@ -122,36 +122,14 @@ B.hat3
 
 ```{r IRF tariff}
 
-#OLD
-#get back the coefficient of est.VAR
-phi3 <- Acoef(est.VAR3)
-PHI3 = make.PHI(phi3)
-
-#take the constant
-constant3 <- sapply(est.VAR3$varresult, function(eq) coef(eq)["const"])
-c3=as.matrix(constant3)
-
-#Simulate the IRF
-p3 <- length(phi3)
-n3 <- dim(phi3[[1]])[1]
-
-par(mfrow=c(2,2))
-Y3 <- simul.VAR(c=c3, Phi = phi3, B = B.hat3, nb.sim ,y0.star=rep(0, n3*p3),
-                indic.IRF = 1, u.shock = c(1,0))
-par(mfrow=c(1,1))  
-par(plt=c(0.1, 0.9, 0.1, 0.9))
-plot(Y3[,2],type="l",lwd=2,xlab="",ylab="",main="Effect of XXX on XXX")
-
-
-
-#NEW
+#irf creation
 irf_res <- irf(est.VAR3, impulse = "tariff", response = "vol", 
                   n.ahead = 7 * 5, boot = TRUE, ci = 0.95)
 
-plot(irf_result)
-
+#function to extract relevant objects for plotting
 single_varirf <- extract_varirf(irf_res)
 
+#the plot
 single_varirf %>% 
   ggplot(aes(x=period, y=irf_tariff_vol, ymin=lower_tariff_vol, ymax=upper_tariff_vol)) +
   geom_hline(yintercept = 0, color="red") +
