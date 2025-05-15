@@ -62,7 +62,9 @@ source(here("helperfunctions/var_irf.R"))
 
 ##Load Data
 
-We connect R to our GitHub folder where the data are stored. We then load the dataset and select the relevant time window for our analysis.
+We connect R to our GitHub folder where the data are stored. 
+We then load the dataset and select the relevant time window 
+for our analysis.
 
 ```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
 
@@ -78,7 +80,9 @@ Vdata = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-0
 
 #Stationarity 
 
-We begin by testing whether our variables are stationary over time. We use the Augmentented Dickey-Fuller test on the volatility of different markets and on variables derived from Trump post.
+We begin by testing whether our variables are stationary over time. 
+We use the Augmentented Dickey-Fuller test on the volatility of 
+different markets and on variables derived from Trump post.
 
 ```{r adf tests, warning=FALSE, message=FALSE}
 adf.test(data$SPY_vol)
@@ -95,7 +99,8 @@ adf.test(data$china)
 
 #Information Criteria
 
-we determine the optimal number of lags using  several Information Criteria (AIC, SC, HQ, FPE), below is an example using the AIC
+we determine the optimal number of lags using  several Information 
+Criteria (AIC, SC, HQ, FPE), below is an example using the AIC
 
 
 
@@ -130,8 +135,14 @@ ggplot (resultats1, aes(x=n, y= name)) +
 
 ## Volatility & Tariff Mention
 
-Here's an example of the impact of Trump's post on volatility using "Tariff" as a variable
-Here we study the impact of Trump's Post on the market volatility using the "Tariff" keyword as a proxy for his posts. We first extract and bind the relevant  variables, estimate a VAR model using the VAR function from vars packages, and then display the results in a table for the volatility equation. Our main interest is in the effect of tariff-related post on volatility (and not the inverse).
+Here's an example of the impact of Trump's post on volatility 
+using "Tariff" as a variable
+Here we study the impact of Trump's Post on the market volatility 
+using the "Tariff" keyword as a proxy for his posts. We first extract 
+and bind the relevant  variables, estimate a VAR model using the 
+VAR function from vars packages, and then display the results in 
+a table for the volatility equation. Our main interest is in the 
+effect of tariff-related post on volatility (and not the inverse).
 
 
 ```{r tariff}
@@ -146,8 +157,16 @@ screenreg(mod_vol, digits = 6)
 
 ## B matrix 
 
-In order to implement our SVAR framework with short run restriction, we need to reconstruct the Variance-Covariance Omega Matrix with our restriction. Here, as we have 2 outcome variables, and as the Omega Matrix is 2x2, we only need n(n-1)/2 restriction, which is one restriction. As mentioned, we assume Average Hour Volatility to not impact contemporaneously Trump post.
-For constructing our BB' matrix we define a matrix in a function and define the square distance between the True Omega matrix and the constructed BB matrix. We then use a optim function in order to find the element of B matrix (B.hat) that minimizes the distance with the true Variance-Covariance matrix.
+In order to implement our SVAR framework with short run restriction, 
+we need to reconstruct the Variance-Covariance Omega Matrix with our restriction. Here, as we have 2 outcome variables, and as the Omega 
+Matrix is 2x2, we only need n(n-1)/2 restriction, which is one 
+restriction. As mentioned, we assume Average Hour Volatility to not 
+impact contemporaneously Trump post.
+For constructing our BB' matrix we define a matrix in a function and 
+define the square distance between the True Omega matrix and the 
+constructed BB matrix. We then use a optim function in order to find 
+the element of B matrix (B.hat) that minimizes the distance with the 
+true Variance-Covariance matrix.
 
 
 ```{r B mat3}
@@ -180,7 +199,11 @@ B.hat3
 
 ##IRF 
 
-We then use the irf() function of vars packages in order to graph the effect of a choc of Trump post (here tariff mentions) on the market volatility using the coefficient of our est.VAR function and using the choc coefficient of our estimated B matrix with our restriction.
+We then use the irf() function of vars packages in order 
+to graph the effect of a choc of Trump post (here tariff mentions) 
+on the market volatility using the coefficient of our 
+est.VAR function and using the choc coefficient of our 
+estimated B matrix with our restriction.
 
 
 ```{r IRF tariff}
@@ -208,7 +231,10 @@ single_varirf %>%
 
 ##Granger test
 
-Finally, we use a Granger causality test to evalutate the robustness of the correlation we've found. We look for a Granger causalities in both direction : whether volatility Granger-causes tariff mentions and vice versa.
+Finally, we use a Granger causality test to evalutate 
+the robustness of the correlation we've found. We look 
+for a Granger causalities in both direction : whether 
+volatility Granger-causes tariff mentions and vice versa.
 
 ```{r does vol granger cause tarrif}
 
