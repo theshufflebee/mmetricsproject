@@ -1,5 +1,5 @@
 ---
-title: "SPY_SVAR"
+title: "VGK_SVAR"
 author: "pte"
 date: "2025-05-15"
 output: html_document
@@ -85,7 +85,7 @@ Vdata = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-0
 here we use a dummy variable which equal to one if Trump has made a post or 0 otherwise, taking into account the closed hour market posts.
 
 ```{r Estime dummy}
-y = cbind(Vdata$dummy, Vdata$SPY_vol)
+y = cbind(Vdata$dummy, Vdata$VGK_vol)
 colnames(y)[1:2] <- c("dummy", "vol")
 est.VAR <- VAR(y,p=6)
 mod_vol <- est.VAR$varresult$vol
@@ -158,7 +158,7 @@ grangertest(y[,c("dummy", "vol")], order = 6)
 ## Number of Post
 
 ```{r Estime N}
-y2 = cbind(Vdata$N , Vdata$SPY_vol)
+y2 = cbind(Vdata$N , Vdata$VGK_vol)
 colnames(y2)[1:2] <- c("N", "vol")
 est.VAR2 <- VAR(y2,p=6)
 mod_vol2 <- est.VAR2$varresult$vol
@@ -229,7 +229,7 @@ grangertest(y2[,c("N", "vol")], order = 6)
 ## Tariff
 
 ```{r Estime tariff}
-y3 = cbind(Vdata$tariff , Vdata$SPY_vol)
+y3 = cbind(Vdata$tariff , Vdata$VGK_vol)
 colnames(y3)[1:2] <- c("tariff", "vol")
 est.VAR3 <- VAR(y3,p=6)
 mod_vol3 <- est.VAR3$varresult$vol
@@ -299,7 +299,7 @@ grangertest(y3[,c("tariff", "vol")], order = 6)
 ## Trade
 
 ```{r Estime trade}
-y4 = cbind(Vdata$trade , Vdata$SPY_vol)
+y4 = cbind(Vdata$trade , Vdata$VGK_vol)
 colnames(y4)[1:2] <- c("trade", "vol")
 est.VAR4 <- VAR(y4,p=6)
 mod_vol4 <- est.VAR4$varresult$vol
@@ -369,7 +369,7 @@ grangertest(y4[,c("trade", "vol")], order = 6)
 # China
 
 ```{r Estime china}
-y5 = cbind(Vdata$china , Vdata$SPY_vol)
+y5 = cbind(Vdata$china , Vdata$VGK_vol)
 colnames(y5)[1:2] <- c("china", "vol")
 est.VAR5 <- VAR(y5,p=6)
 mod_vol5 <- est.VAR5$varresult$vol
@@ -448,7 +448,7 @@ here is an example of our interaction
 
 int1 = Vdata$tariff * Vdata$N
 
-y12 = cbind(int1, Vdata$SPY_vol)
+y12 = cbind(int1, Vdata$VGK_vol)
 colnames(y12)[1:2] <- c("interaction", "vol")
 est.VAR12 <- VAR(y12,p=6)
 mod_vol12 <- est.VAR12$varresult$vol
@@ -522,7 +522,7 @@ Vdata_s = filter(data,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05
 
 ```{r estime first mandate, warning=FALSE, message=FALSE}
 
-y_f_d = cbind(Vdata_f$tariff, Vdata_f$SPY_vol)
+y_f_d = cbind(Vdata_f$tariff, Vdata_f$VGK_vol)
 colnames(y_f_d)[1:2] <- c("tariff", "vol")
 est.VAR_f_d <- VAR(y_f_d,p=6)
 mod_vol_f_d <- est.VAR_f_d$varresult$vol
@@ -577,10 +577,10 @@ single_varirf_f_d %>%
 
 ```{r granger_f_d, warning=FALSE, message=FALSE}
 
-#does vol granger cause tariff
+#does vol granger cause tarif
 grangertest(y_f_d[,c("vol","tariff")], order = 6)
 
-#does tariff granger cause vol
+#does tarif granger cause vol
 grangertest(y_f_d[,c("tariff", "vol")], order = 6)
 ```
 
@@ -590,7 +590,7 @@ grangertest(y_f_d[,c("tariff", "vol")], order = 6)
 
 ```{r estime second mandate, warning=FALSE, message=FALSE}
 
-y_s_d = cbind(Vdata_s$tariff, Vdata_s$SPY_vol)
+y_s_d = cbind(Vdata_s$tariff, Vdata_s$VGK_vol)
 colnames(y_s_d)[1:2] <- c("tariff", "vol")
 est.VAR_s_d <- VAR(y_s_d,p=6)
 mod_vol_s_d <- est.VAR_s_d$varresult$vol
