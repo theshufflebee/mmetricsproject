@@ -401,6 +401,17 @@ Vdata$dummy[is.na(Vdata$dummy)] = 0
 Vdata$total_tariff[is.na(Vdata$total_tariff)] = 0
 Vdata$total_trade[is.na(Vdata$total_trade)] = 0
 Vdata$total_china[is.na(Vdata$total_china)] = 0
+
+
+
+#or 
+
+rm(Vdata)
+#load final dataset
+source(here("helperfunctions/full_data.R"))
+
+#select timeframe 
+Vdata = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
 ```
 
 ```{r series volatility}
