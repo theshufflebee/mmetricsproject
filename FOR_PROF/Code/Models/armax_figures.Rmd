@@ -73,7 +73,8 @@ data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07
 
 We choose the specification in the armax_models file. In this file, we will
 just run said specifications to produce nice tables and graphs to include in 
-our final paper.
+our final paper. This is also why there are specification differences in the 
+separate timeframes. We always use the best fit we found earlier.
 
 
 ```{r fitting models, results=F, warning=F, message=F}
