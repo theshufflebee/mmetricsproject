@@ -166,10 +166,10 @@ single_varirf %>%
 
 ```{r does vol granger cause tarrif}
 
-#does volatiltiy granger cause tariff mentions
+#does volatility Granger cause tariff mentions
 grangertest(y3[,c("vol","tariff")], order = 6)
 
-#does tariff mentions granger cause volatility
+#does tariff mentions Granger cause volatility
 grangertest(y3[,c("tariff", "vol")], order = 6)
 
 ```
