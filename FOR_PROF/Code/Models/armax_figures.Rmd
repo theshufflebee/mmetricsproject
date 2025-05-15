@@ -52,14 +52,16 @@ source(here("helperfunctions/armax_functions.R"))
 
 ```
 
-```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+
+# Full Timeframe (Jan 2024 to May 2025)
+
+```{r datasetup, results=FALSE, warning=FALSE, message=FALSE}
 
 #load final dataset
 source(here("helperfunctions/full_data.R"))
 
 #backup
 backup = data
-data = backup
 
 #select timeframe 
 data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
@@ -67,7 +69,7 @@ data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07
 ```
 
 
-# SPY Models
+## SPY Models
 
 We choose the specification in the armax_models file. In this file, we will
 just run said specifications to produce nice tables and graphs to include in 
@@ -100,54 +102,197 @@ models[["Model 5"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 
 ```
 
+## SPY Table
+
 ```{r creating table, results="asis", warning=F, message=F}
 
-names = c("AR(1)", "AR(2)", "AR(3)", 
-  "MA(1)", "MA(2)", "MA(3)", 
-  "Constant", 
-  "$TweetDummy_{t}$", "$TweetDummy_{t-1}$", 
-  "$TweetCount_{t}$", "$TweetCount_{t-1}$", 
-  "$Tariff_{t}$", "$Tariff_{t-1}$", "$Tariff_{t-2}$", "$Tariff_{t-3}$", 
-  "$Trade_{t}$", "$Trade_{t-1}$", 
-  "$China_{t}$")
+names = list( "ar1" = "AR(1)",
+              "ar2" = "AR(2)",
+              "ar3" = "AR(3)",
+              "ma1" = "MA(1)",
+              "ma2" = "MA(2)",
+              "ma3" = "MA(3)",
+              "(Intercept)" = "Constant",
+              "dummy_lag_0" = "$TweetDummy_{t}$",
+              "dummy_lag_1" = "$TweetDummy_{t-1}$",
+              "N_lag_0" = "$TweetCount_{t}$",
+              "N_lag_1" = "$TweetCount_{t-1}$",
+              "tariff_lag_0" = "$Tariff_{t}$",
+              "tariff_lag_1" = "$Tariff_{t-1}$",
+              "tariff_lag_2" = "$Tariff_{t-2}$",
+              "tariff_lag_3" = "$Tariff_{t-3}$",
+              "trade_lag_0" = "$Trade_{t}$",
+              "trade_lag_1" = "$Trade_{t-1}$",
+              "china_lag_0" = "$China_{t}$")
 
-texreg(
-  models,
-  custom.model.names = names(models), 
-  custom.coef.names = names,
-  caption = "Combined ARMAX Models",
-  label = "tab:combined_armax",
-  digits = 4
-)
-
-
+texreg(models,
+          custom.model.names = names(models), 
+          custom.coef.map = names,
+          caption = "ARMAX Models of Average Hourly Volatility",
+          caption.above = TRUE,
+          label = "tab:armax",
+          digits = 4)
 
 ```
 
 
 ## SPY IRFs
+
 ```{r SPYirf, results="asis", warning=F, message=F}
 
 #we want to plot the IRFs of these models
 nb.periods = 7 * 15
 
-irf.plot(dummy_fit$model,nb.periods)
-irf.plot(count_fit$model,nb.periods)
-irf.plot(tariff_fit$model,nb.periods)
-irf.plot(trade_fit$model,nb.periods)
-irf.plot(china_fit$model,nb.periods)
+irf.plot(models[["Model 1"]],nb.periods,title="Tweet Dummy Shock")
+irf.plot(models[["Model 2"]],nb.periods,title="Tweet Count Shock")
+irf.plot(models[["Model 3"]],nb.periods,title="Tariff Mention Shock")
+irf.plot(models[["Model 4"]],nb.periods,title="Trade Mention Shock")
+irf.plot(models[["Model 5"]],nb.periods,title="China Mention Shock")
 
 ```
 
 
 ## SPY Residuals
-```{r SPYresiduals, warning=F, message=F}
+```{r SPYresiduals, warning=F, message=F, results=F}
 
-res = checkresiduals(dummy_fit$model, plot = FALSE)
-res = checkresiduals(count_fit$model, plot = FALSE)
-res = checkresiduals(tariff_fit$model, plot = FALSE)
-res = checkresiduals(trade_fit$model, plot = FALSE)
-res = checkresiduals(china_fit$model, plot = FALSE)
+res1 = checkresiduals(models[["Model 1"]], plot = FALSE)
+res2 = checkresiduals(models[["Model 2"]], plot = FALSE)
+res3 = checkresiduals(models[["Model 3"]], plot = FALSE)
+res4 = checkresiduals(models[["Model 4"]], plot = FALSE)
+res5 = checkresiduals(models[["Model 5"]], plot = FALSE)
 
 ```
+
+
+
+
+# First Term
+
+```{r datasetup first, results=FALSE, warning=FALSE, message=FALSE}
+
+#load final dataset
+data = backup
+
+#first term
+data = filter(data,between(timestamp, as.Date('2017-01-20'), as.Date('2021-01-20')))
+
+```
+
+## SPY Models
+
+```{r 1st term models, results=F, warning=F, message=F}
+
+models <- list()
+
+# ARMA-X(3,3,0) with Tariff Mentions as Exogenous
+models[["First Term (1)"]] <- armax(data$SPY_vol, xreg = data$tariff, latex = F,
+                             nb.lags = 0, p = 3, q = 3) 
+
+# ARMA-X(3,3,0) with Trade Mentions as Exogenous
+models[["First Term (2)"]] <- armax(data$SPY_vol, xreg = data$trade, latex = F,
+                             nb.lags = 0, p = 3, q = 3)
+
+# ARMA-X(3,3,0) with Trade Mentions as Exogenous
+models[["First Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
+                             nb.lags = 0, p = 3, q = 3) 
+
+```
+
+
+## SPY Residuals
+```{r 1st SPYresiduals, warning=F, message=F, results=F}
+
+res = checkresiduals(models[["First Term (1)"]], plot = FALSE)
+res = checkresiduals(models[["First Term (2)"]], plot = FALSE)
+res = checkresiduals(models[["First Term (3)"]], plot = FALSE)
+
+```
+
+
+
+# Second Term
+
+```{r datasetup second, results=FALSE, warning=FALSE, message=FALSE}
+
+#load final dataset
+data = backup
+
+#second term
+data = filter(data,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05-07')))
+
+```
+
+## SPY Models
+
+```{r 2nd term models, results=F, warning=F, message=F}
+
+# ARMA-X(3,2,3) with Tariff Mentions as Exogenous
+models[["Second Term (1)"]] <- armax(data$SPY_vol, xreg = data$tariff, latex = F,
+                             nb.lags = 2, p = 1, q = 2) 
+
+# ARMA-X(3,2,1) with Trade Mentions as Exogenous
+models[["Second Term (2)"]] <- armax(data$SPY_vol, xreg = data$trade, latex = F,
+                             nb.lags = 0, p = 1, q = 2) 
+
+# ARMA-X(3,2,0) with China Mentions as Exogenous
+models[["Second Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
+                             nb.lags = 2, p = 1, q = 2) 
+
+```
+
+
+## SPY IRFs
+```{r 2nd SPYirf, warning=F, message=F}
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 15
+
+irf.plot(models[["Second Term (1)"]],nb.periods,title="Tariff Mention Shock")
+irf.plot(models[["Second Term (3)"]],nb.periods,title="China Mention Shock")
+
+```
+
+
+## SPY Residuals
+```{r 2nd SPYresiduals, results=F, warning=F, message=F}
+
+res = checkresiduals(models[["Second Term (1)"]], plot = FALSE)
+res = checkresiduals(models[["Second Term (2)"]], plot = FALSE)
+res = checkresiduals(models[["Second Term (3)"]], plot = FALSE)
+
+```
+
+
+## SPY Table (both terms)
+
+\centering
+```{r table with separate terms, results="asis", warning=F, message=F}
+
+xnames = list("ar1" = "AR(1)",
+              "ar2" = "AR(2)",
+              "ar3" = "AR(3)",
+              "ma1" = "MA(1)",
+              "ma2" = "MA(2)",
+              "ma3" = "MA(3)",
+              "(Intercept)" = "Constant",
+              "tariff_lag_0" = "$Tariff_{t}$",
+              "tariff_lag_1" = "$Tariff_{t-1}$",
+              "tariff_lag_2" = "$Tariff_{t-2}$",
+              "trade_lag_0" = "$Trade_{t}$",
+              "china_lag_0" = "$China_{t}$",
+              "china_lag_1" = "$China_{t-1}$",
+              "china_lag_2" = "$China_{t-2}$")
+
+texreg(models,
+       custom.model.names = names(models), 
+       custom.coef.map = xnames,
+       caption = "Split-Term ARMAX Models of Average Hourly Volatility",
+       caption.above = TRUE,
+       label = "tab:armax_term",
+       digits = 4)
+
+```
+
+
+
 
