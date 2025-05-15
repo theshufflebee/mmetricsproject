@@ -332,7 +332,7 @@ autoplot(pro_t_dummy)
 ##with dummy
 y = cbind(Vdata$dummy, Vdata$SPY_vol)
 
-y_lag = VARselect(y, lag.max = 150)
+y_lag = VARselect(y, lag.max = 70)
 y_list = list(y_lag)
 
 
@@ -349,7 +349,7 @@ resultats1 = resultats1 %>%
 
 ggplot (resultats1, aes(x=n, y= name)) +
   geom_line(color = "steelblue") +
-  labs(title = "hourly Returns AIC",x="n" , y = "AIC") +
+  labs(title = "hourly Returns AIC",x="dummy" , y = "AIC") +
   theme_minimal()
 
 
@@ -366,7 +366,7 @@ resultats2 = resultats2 %>%
 
 ggplot (resultats2, aes(x=n, y= name)) +
   geom_line(color = "steelblue") +
-  labs(title = "hourly Returns HQ",x="dum" , y = "HQ") +
+  labs(title = "hourly Returns HQ",x="dummy" , y = "HQ") +
   theme_minimal()
 
 
@@ -423,8 +423,8 @@ pacf(Vdata$dummy)
 
 ####adf test (for stationarity of the outcome data) 
 ####p-value test H0, the probability that the process is not stationary
-adf.test(Vdata$SPY_vol, k = 7)
-adf.test(Vdata$dummy, k = 7)
+adf.test(Vdata$SPY_vol, k = 6)
+adf.test(Vdata$dummy, k = 6)
 
 ##serial correlation
 serial = serial.test(est.VAR, lags.pt = 20, type = "PT.asymptotic")
@@ -466,7 +466,7 @@ plot(stru2)
 #---------------------------------------------------------------------------------------------
 y = cbind(Vdata$dummy, Vdata$SPY_vol)
 colnames(y)[1:2] <- c("dum", "vol")
-est.VAR <- VAR(y,p=16)
+est.VAR <- VAR(y,p=17)
 summary(est.VAR)
 Omega <- var(residuals(est.VAR))
 
@@ -501,7 +501,7 @@ c=as.matrix(constant)
 #Simulate the IRF
 p <- length(phi)
 n <- dim(phi[[1]])[1]
-nb.sim <- 7*7
+nb.sim <- 7*9
 par(mfrow=c(2,2))
 
 Y <- simul.VAR(c=c, Phi = phi, B = B.hat, nb.sim ,y0.star=rep(0, n*p),
@@ -521,10 +521,10 @@ plot(cumsum(Y[,2]),type="l",lwd=2,xlab="",ylab="",main="Effect of XXX on XXX")
 #granger causality
 #we want the smaller p-value => h0 test if there is no causality
 #does vol granger cause dum
-grangertest(y[,c("vol","dum")], order = 7)
+grangertest(y[,c("vol","dum")], order = 17)
 
 #does dum granger cause vol
-grangertest(y[,c("dum", "vol")], order = 7)
+grangertest(y[,c("dum", "vol")], order = 17)
 
 #Variane decomposition
 vd = fevd(Y, n.ahead = 20)
@@ -538,7 +538,7 @@ plot(vd)
 
 y2 = cbind(Vdata$N, Vdata$SPY_vol)
 colnames(y2)[1:2] <- c("N", "vol")
-est.VAR2 <- VAR(y2,p=7)
+est.VAR2 <- VAR(y2,p=17)
 summary(est.VAR2)
 Omega2 <- var(residuals(est.VAR2))
 
@@ -588,10 +588,10 @@ plot(cumsum(Y2[,2]),type="l",lwd=2,xlab="",ylab="",main="Effect of XXX on XXX")
 
 
 #does N granger cause vol
-grangertest(y2[,c("N", "vol")], order = 7)
+grangertest(y2[,c("N", "vol")], order = 17)
 
 #does dum granger cause vol
-grangertest(y2[,c("vol", "N")], order = 7)
+grangertest(y2[,c("vol", "N")], order = 17)
 
 
 
@@ -606,7 +606,7 @@ grangertest(y2[,c("vol", "N")], order = 7)
 #tarrif
 y3 =cbind(Vdata$total_tariff, Vdata$SPY_vol)
 colnames(y3)[1:2] <- c("tariff", "vol")
-est.VAR3 <- VAR(y3,p=7)
+est.VAR3 <- VAR(y3,p=17)
 summary(est.VAR3)
 Omega3 <- var(residuals(est.VAR3))
 
@@ -657,10 +657,10 @@ plot(cumsum(Y3[,2]),type="l",lwd=2,xlab="",ylab="",main="Effect of XXX on XXX")
 
 
 #does vol granger cause tarrif
-grangertest(y3[,c("vol","tariff")], order = 7)
+grangertest(y3[,c("vol","tariff")], order = 17)
 
 #does tarrif granger cause vol
-grangertest(y3[,c("tariff", "vol")], order = 7)
+grangertest(y3[,c("tariff", "vol")], order = 17)
 
 
 
@@ -1932,8 +1932,10 @@ Vdata_s = filter(data,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05
 rm(Vdata_f)
 rm(Vdata_s)
 
-#or without tweet outside market hour
+#or 
 
+
+#without tweet outside market hour
 
 #Data for first mandate
 SPY_f = filter(SPY,between(timestamp, as.Date('2017-01-20'), as.Date('2021-01-20')))
@@ -1952,6 +1954,8 @@ Vdata_f = left_join(SPY_volatility_f, dplyr::select(tweetdummy, -adjusted_time),
 Vdata_f = left_join(Vdata_f, dplyr::select(tweetcount, -adjusted_time), by="timestamp")
 Vdata_f = left_join(Vdata_f, dplyr::select(tariff, -adjusted_time), by="timestamp")
 Vdata_f = left_join(Vdata_f, dplyr::select(trade, -adjusted_time), by="timestamp")
+Vdata_f = left_join(Vdata_f, dplyr::select(china, -adjusted_time), by="timestamp")
+
 
 #rename volatility columns
 names(Vdata_f)[2] <- "SPY_vol"
@@ -1961,7 +1965,7 @@ Vdata_f$N[is.na(Vdata_f$N)] = 0
 Vdata_f$dummy[is.na(Vdata_f$dummy)] = 0
 Vdata_f$total_trade[is.na(Vdata_f$total_trade)] = 0
 Vdata_f$total_tariff[is.na(Vdata_f$total_tariff)] = 0
-
+Vdata_f$total_china[is.na(Vdata_f$total_china)] = 0
 
 
 #Data for Second mandate
@@ -1982,6 +1986,8 @@ Vdata_s = left_join(SPY_volatility_s, dplyr::select(tweetdummy, -adjusted_time),
 Vdata_s = left_join(Vdata_s, dplyr::select(tweetcount, -adjusted_time), by="timestamp")
 Vdata_s = left_join(Vdata_s, dplyr::select(tariff, -adjusted_time), by="timestamp")
 Vdata_s = left_join(Vdata_s, dplyr::select(trade, -adjusted_time), by="timestamp")
+Vdata_s = left_join(Vdata_s, dplyr::select(china, -adjusted_time), by="timestamp")
+
 
 #rename volatility columns
 names(Vdata_s)[2] <- "SPY_vol"
@@ -1991,12 +1997,19 @@ Vdata_s$N[is.na(Vdata_s$N)] = 0
 Vdata_s$dummy[is.na(Vdata_s$dummy)] = 0
 Vdata_s$total_tariff[is.na(Vdata_s$total_tariff)] = 0
 Vdata_s$total_trade[is.na(Vdata_s$total_trade)] = 0
+Vdata_s$total_china[is.na(Vdata_s$total_china)] = 0
+
 
 
 
 
 
 #dummy
+y_test = cbind(Vdata_s$dummy, Vdata_s$SPY_vol)
+
+y_lag = VARselect(y_test, lag.max = 70)
+
+
 adf.test(Vdata_f$SPY_vol, k = 6)
 
 adf.test(Vdata_s$SPY_vol, k = 6)
@@ -2006,9 +2019,8 @@ adf.test(Vdata_s$SPY_vol, k = 6)
 
 
 
-
 #First mandate with dummy
-y_f_d = cbind(Vdata_f$dummy, Vdata_f$SPY_vol)
+y_f_d = cbind(Vdata_f$total_china, Vdata_f$SPY_vol)
 colnames(y_f_d)[1:2] <- c("dummy", "vol")
 est.VAR_f_d <- VAR(y_f_d,p=6)
 summary(est.VAR_f_d)
@@ -2066,7 +2078,7 @@ grangertest(y_f_d[,c("dummy", "vol")], order = 6)
 
 #Second with dummy
 
-y_s_d = cbind(Vdata_s$dummy, Vdata_s$SPY_vol)
+y_s_d = cbind(Vdata_s$total_china, Vdata_s$SPY_vol)
 colnames(y_s_d)[1:2] <- c("dummy", "vol")
 est.VAR_s_d <- VAR(y_s_d,p=6)
 summary(est.VAR_s_d)
@@ -2197,7 +2209,7 @@ plot(cumsum(Y...[,2]),type="l",lwd=2,xlab="",ylab="",main="Effect of XXX on XXX"
 #5) closed hour data
 
 
-
+#regarder variance du marché sans trump (est ce que ca monte et descend bcp)
 
 
 
