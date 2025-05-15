@@ -66,6 +66,9 @@ backup = data
 #select timeframe 
 data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
 
+#for interpretation
+mean1 = mean(data$SPY_vol)
+
 ```
 
 
@@ -144,11 +147,11 @@ texreg(models,
 #we want to plot the IRFs of these models
 nb.periods = 7 * 15
 
-irf.plot(models[["Model 1"]],nb.periods,title="Tweet Dummy Shock")
-irf.plot(models[["Model 2"]],nb.periods,title="Tweet Count Shock")
+#irf.plot(models[["Model 1"]],nb.periods,title="Tweet Dummy Shock")
+#irf.plot(models[["Model 2"]],nb.periods,title="Tweet Count Shock")
 irf.plot(models[["Model 3"]],nb.periods,title="Tariff Mention Shock")
-irf.plot(models[["Model 4"]],nb.periods,title="Trade Mention Shock")
-irf.plot(models[["Model 5"]],nb.periods,title="China Mention Shock")
+#irf.plot(models[["Model 4"]],nb.periods,title="Trade Mention Shock")
+#irf.plot(models[["Model 5"]],nb.periods,title="China Mention Shock")
 
 ```
 
@@ -193,6 +196,9 @@ data = backup
 
 #first term
 data = filter(data,between(timestamp, as.Date('2017-01-20'), as.Date('2021-01-20')))
+
+#for interpretation
+mean2 = mean(data$SPY_vol)
 
 ```
 
@@ -244,6 +250,9 @@ data = backup
 
 #second term
 data = filter(data,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05-07')))
+
+#for interpretation
+mean3 = mean(data$SPY_vol)
 
 ```
 
@@ -335,6 +344,25 @@ texreg(models,
 knitr::kable(pvals_combined, digits = 100, caption = "Separate Terms Ljung-Box Test p-values")
 
 ```
+
+
+# Descriptive Stats
+
+```{r means, message=F, warning=F}
+
+means <- data.frame(
+  Model = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
+  `SPY Volatility Mean` = c(
+    mean1,
+    mean2,
+    mean3))
+
+knitr::kable(means, digits = 6, caption = "Summary Statistics of SPY Volatility")
+
+```
+
+
+
 
 
 
