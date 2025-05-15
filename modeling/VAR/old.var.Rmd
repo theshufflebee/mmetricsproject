@@ -124,7 +124,7 @@ B.hat3
 
 #irf creation
 irf_res <- irf(est.VAR3, impulse = "tariff", response = "vol", 
-                  n.ahead = 7 * 5, boot = TRUE, ci = 0.95)
+                  bmat=b.hat3, n.ahead = 7 * 5, boot = TRUE, ci = 0.95)
 
 #function to extract relevant objects for plotting
 single_varirf <- extract_varirf(irf_res)
