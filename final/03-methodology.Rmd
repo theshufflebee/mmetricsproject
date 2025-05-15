@@ -2,7 +2,7 @@
 
 
 
-# ARMA-X
+## ARMA-X
 
 ## Methodology
 
