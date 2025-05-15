@@ -26,4 +26,4 @@ You can find all sections on the left. There is the Main Report which we hand in
 
 # Abstract {.unnumbered}
 
-This Project assesses to what extent Financial Markets react to information provided by Donald Trump on Twitter and Truth Social. We asses the impact of posts on hourly volatility using ARMA-X. We evaluate multimple tie horizons and independent variables, such as if Trump posts anything, specific words such as tariff and sentiments. We then calculate IRFs and show that there are significant impacts on volatility.
+This Project assesses to what extent Financial Markets react to information provided by Donald Trump on Twitter and Truth Social. We asses the impact of posts on hourly volatility using ARMA-X. We evaluate multiple time horizons and independent variables, such as if Trump posts anything, specific words such as tariff and sentiments. We then calculate IRFs and show that there are significant impacts on volatility.
