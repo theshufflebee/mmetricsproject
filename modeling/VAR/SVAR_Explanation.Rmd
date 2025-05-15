@@ -1,0 +1,219 @@
+---
+title: "VAR_Explanation"
+author: "pte"
+date: "2025-05-15"
+output: html_document
+---
+#Setup
+
+##Load packages & functions
+
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwhich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenization
+require(texreg) #arima tables
+require(vars) #VAR models
+require(xts) #time series objects
+require(tseries) #includes adf test
+require(quantmod)
+require(TSA)
+require(aTSA)
+require(tibble)
+require(FinTS)
+require(kableExtra)
+require(writexl)
+require(purrr)
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/armax_functions.R"))
+source(here("helperfunctions/var_irf.R"))
+
+```
+
+##Load Data
+
+We connect R to our GitHub folder where the data are stored. We then load the dataset and select the relevant time window for our analysis.
+
+```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+
+#load final dataset
+source(here("helperfunctions/full_data.R"))
+
+#select timeframe 
+Vdata = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
+
+```
+
+
+
+#Stationarity 
+
+We begin by testing whether our variables are stationary over time. We use the Augmentented Dickey-Fuller test on the volatility of different markets and on variables derived from Trump post.
+
+```{r adf tests, warning=FALSE, message=FALSE}
+adf.test(data$SPY_vol)
+adf.test(data$VGK_vol)
+adf.test(data$ASHR_vol)
+
+adf.test(data$dummy)
+adf.test(data$N)
+adf.test(data$tariff)
+adf.test(data$china)
+```
+
+
+
+#Information Criteria
+
+we determine the optimal number of lags using  several Information Criteria (AIC, SC, HQ, FPE), below is an example using the AIC
+
+
+
+```{r AIC, warning=FALSE, message=FALSE}
+
+##with dummy
+y = cbind(Vdata$dummy, Vdata$SPY_vol)
+
+y_lag = VARselect(y, lag.max = 80)
+y_list = list(y_lag)
+
+
+##AIC
+resultats1 <- lapply(y_list, function(x) x$criteria["AIC(n)", ])
+
+resultats1 = as.data.frame(resultats1)
+
+resultats1 = resultats1 %>%
+  rename(name = 1) %>%
+  mutate(
+    n = c(1:length(name))
+  )
+
+ggplot (resultats1, aes(x=n, y= name)) +
+  geom_line(color = "steelblue") +
+  labs(title = "hourly Returns AIC",x="dummy" , y = "AIC") +
+  theme_minimal()
+```
+
+
+# VAR Models
+
+## Volatility & Tariff Mention
+
+Here's an example of the impact of Trump's post on volatility using "Tariff" as a variable
+Here we study the impact of Trump's Post on the market volatility using the "Tariff" keyword as a proxy for his posts. We first extract and bind the relevant  variables, estimate a VAR model using the VAR function from vars packages, and then display the results in a table for the volatility equation. Our main interest is in the effect of tariff-related post on volatility (and not the inverse).
+
+
+```{r tariff}
+
+y3 = cbind(Vdata$tariff, Vdata$SPY_vol)
+colnames(y3)[1:2] <- c("tariff", "vol")
+est.VAR3 <- VAR(y3,p=6)
+mod_vol <- est.VAR3$varresult$vol
+screenreg(mod_vol, digits = 6)
+```
+# SVAR Model
+
+## B matrix 
+
+In order to implement our SVAR framework with short run restriction, we need to reconstruct the Variance-Covariance Omega Matrix with our restriction. Here, as we have 2 outcome variables, and as the Omega Matrix is 2x2, we only need n(n-1)/2 restriction, which is one restriction. As mentioned, we assume Average Hour Volatility to not impact contemporaneously Trump post.
+For constructing our BB' matrix we define a matrix in a function and define the square distance between the True Omega matrix and the constructed BB matrix. We then use a optim function in order to find the element of B matrix (B.hat) that minimizes the distance with the true Variance-Covariance matrix.
+
+
+```{r B mat3}
+
+Omega3 <- var(residuals(est.VAR3))
+
+#make the B matrix
+loss3 <- function(param3){
+  #Define the restriction
+  B3 <- matrix(c(param3[1], param3[2], 0, param3[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X3 <- Omega3 - B3 %*% t(B3)
+  
+  #loss function
+  loss3 <- sum(X3^2)
+  return(loss3)
+}
+
+res.opt3 <- optim(c(1, 0, 1), loss3, method = "BFGS")
+B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol = 2)
+
+print(cbind(Omega3,B.hat3 %*% t(B.hat3)))
+
+#shock by tariff
+B.hat3
+
+```
+
+
+##IRF 
+
+We then use the irf() function of vars packages in order to graph the effect of a choc of Trump post (here tariff mentions) on the market volatility using the coefficient of our est.VAR function and using the choc coefficient of our estimated B matrix with our restriction.
+
+
+```{r IRF tariff}
+
+#irf creation
+irf_res <- irf(est.VAR3, impulse = "tariff", response = "vol", 
+                  bmat=b.hat3, n.ahead = 7 * 5, boot = TRUE, ci = 0.95)
+
+#function to extract relevant objects for plotting
+single_varirf <- extract_varirf(irf_res)
+
+#the plot
+single_varirf %>% 
+  ggplot(aes(x=period, y=irf_tariff_vol, ymin=lower_tariff_vol, ymax=upper_tariff_vol)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_ribbon(fill="grey", alpha=0.2) +
+  geom_line() +
+  theme_light() +
+  ggtitle("Orthogonal impulse response, asylum - asylum")+
+  ylab("log(total asylum flow)")+
+  xlab("") +
+  theme_minimal()
+
+```
+
+##Granger test
+
+Finally, we use a Granger causality test to evalutate the robustness of the correlation we've found. We look for a Granger causalities in both direction : whether volatility Granger-causes tariff mentions and vice versa.
+
+```{r does vol granger cause tarrif}
+
+#does volatility Granger cause tariff mentions
+grangertest(y3[,c("vol","tariff")], order = 6)
+
+#does tariff mentions Granger cause volatility
+grangertest(y3[,c("tariff", "vol")], order = 6)
