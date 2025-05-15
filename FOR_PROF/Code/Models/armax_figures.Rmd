@@ -1,0 +1,129 @@
+---
+title: "ARMA-X Figures"
+output:
+  pdf_document: 
+    toc: true
+    fig_caption: yes
+    latex_engine: lualatex
+header-includes:
+  - \usepackage{amsmath}
+---
+\newpage
+
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenization
+require(texreg) #arima tables
+require(future.apply) #parallel computation (speed)
+require(aTSA) #adf test
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/armax_functions.R"))
+
+```
+
+```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+
+#load final dataset
+source(here("helperfunctions/full_data.R"))
+
+#backup
+backup = data
+data = backup
+
+#select timeframe 
+data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
+
+```
+
+
+# SPY Models
+
+We choose the specification in the armax_models file. In this file, we will
+just run said specifications to produce nice tables and graphs to include in 
+our final paper.
+
+
+```{r fitting models, results=F, warning=F, message=F}
+
+models <- list()
+
+# ARMA-X(3,3,1) with Tweet Dummy as Exogenous
+models[["Model 1"]] <- armax(data$SPY_vol, xreg = data$dummy, latex = F,
+                             nb.lags = 1, p = 3, q = 3) 
+
+# ARMA-X(3,3,1) with Tweet Count as Exogenous
+models[["Model 2"]] <- armax(data$SPY_vol, xreg = data$N, latex = F,
+                             nb.lags = 1, p = 3, q = 3) 
+
+# ARMA-X(3,2,3) with Tariff Mentions as Exogenous
+models[["Model 3"]] <- armax(data$SPY_vol, xreg = data$tariff, latex = F,
+                             nb.lags = 3, p = 3, q = 2) 
+
+# ARMA-X(3,2,1) with Trade Mentions as Exogenous
+models[["Model 4"]] <- armax(data$SPY_vol, xreg = data$trade, latex = F,
+                             nb.lags = 1, p = 3, q = 2) 
+
+# ARMA-X(3,2,0) with China Mentions as Exogenous
+models[["Model 5"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
+                             nb.lags = 0, p = 3, q = 2) 
+
+```
+
+```{r creating table, results="asis", warning=F, message=F}
+
+names = c("AR(1)", "AR(2)", "AR(3)", 
+  "MA(1)", "MA(2)", "MA(3)", 
+  "Constant", 
+  "$TweetDummy_{t}$", "$TweetDummy_{t-1}$", 
+  "$TweetCount_{t}$", "$TweetCount_{t-1}$", 
+  "$Tariff_{t}$", "$Tariff_{t-1}$", "$Tariff_{t-2}$", "$Tariff_{t-3}$", 
+  "$Trade_{t}$", "$Trade_{t-1}$", 
+  "$China_{t}$")
+
+texreg(
+  models,
+  custom.model.names = names(models), 
+  custom.coef.names = names,
+  caption = "Combined ARMAX Models",
+  label = "tab:combined_armax",
+  digits = 4
+)
+
+
+
+```
+
+
+
+

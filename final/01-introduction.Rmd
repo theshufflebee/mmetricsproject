@@ -52,11 +52,10 @@ political decisions. Note the recent infamous "THIS IS A GREAT TIME TO BUY!!! DJ
 post sent just an hour before lifting his reciprocal tariffs. It is then not 
 improbable that agents in financial markets might take this information into 
 account in their decision making. This question has been asked before in the 
-literature, focusing rather on his first term. We explore two research questions:
+literature, focusing rather on his first term. 
 
-1)  Do Donald Trumps Posts impact market Volatility?
-2)  Have traders learned from past actions and are now more reactive
-    than they were during his first term?
+This brings us to our research question:  Do Donald Trumps Posts impact market Volatility?
+
     
 \@ref(fig:fig1)
 

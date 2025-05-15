@@ -4,6 +4,46 @@
 
 ## ARMA-X
 
+Once we have our final dataframe, we could then finally start on some analysis.
+We first thought of a simple ARMA-X type specification, taking the AHV as our
+"y variable" and taking any of the social media variables as the exogenous
+regressors. The assumption here is that, while the market reacts to Trump posts,
+Trump's posts are chaotic, nonsensical, and random enough to be considered 
+exogenous. 
+
+We of course first start by checking stationarity of our variables (ADF), where we find
+p-values of 0.01 suggesting that the processes are not explosive. Then, we use 
+a custom function in order to choose the number of lags based on the AIC criterion.
+This however, while often choose a very high number of lags, which could be 
+explained by our data being hourly. As such we decided to put a limit of 3 lags,
+which sees minimal AIC loss and simplifying our models considerably.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## VAR
 

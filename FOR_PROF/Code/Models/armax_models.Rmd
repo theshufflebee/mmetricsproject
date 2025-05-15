@@ -1,0 +1,720 @@
+---
+title: "ARMA-X Models"
+output:
+  pdf_document: 
+    toc: true
+    fig_caption: yes
+    latex_engine: lualatex
+header-includes:
+  - \usepackage{amsmath}
+---
+
+\newpage
+
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenization
+require(texreg) #arima tables
+require(future.apply) #parallel computation (speed)
+require(aTSA) #adf test
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/armax_functions.R"))
+
+```
+
+```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+
+#load final dataset
+source(here("helperfunctions/full_data.R"))
+
+#backup
+backup = data
+data = backup
+
+#select timeframe 
+data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
+
+```
+
+
+# Full Timeframe
+
+## SPY Models
+```{r SPYarmax, results="asis", warning=F, message=F}
+
+#dummy
+dummy_fit = auto.armax.r(data$SPY_vol, x=data$dummy, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#count
+count_fit = auto.armax.r(data$SPY_vol, x=data$N, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#tariffs 
+tariff_fit = auto.armax.r(data$SPY_vol, x=data$tariff, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#trade
+trade_fit = auto.armax.r(data$SPY_vol, x=data$trade, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#china
+china_fit = auto.armax.r(data$SPY_vol, x=data$china, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of positive
+positive_fit = auto.armax.r(data$SPY_vol, x=data$prop_positive, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of negative
+negative_fit = auto.armax.r(data$SPY_vol, x=data$prop_negative, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+```
+
+
+
+## SPY IRFs
+```{r SPYirf, results="asis", warning=F, message=F}
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 15
+
+irf.plot(dummy_fit$model,nb.periods)
+irf.plot(count_fit$model,nb.periods)
+irf.plot(tariff_fit$model,nb.periods)
+irf.plot(trade_fit$model,nb.periods)
+irf.plot(china_fit$model,nb.periods)
+irf.plot(positive_fit$model,nb.periods)
+irf.plot(negative_fit$model,nb.periods)
+
+```
+
+
+## SPY Residuals
+```{r SPYresiduals, warning=F, message=F}
+
+res = checkresiduals(dummy_fit$model, plot = FALSE)
+res = checkresiduals(count_fit$model, plot = FALSE)
+res = checkresiduals(tariff_fit$model, plot = FALSE)
+res = checkresiduals(trade_fit$model, plot = FALSE)
+res = checkresiduals(china_fit$model, plot = FALSE)
+res = checkresiduals(positive_fit$model, plot = FALSE)
+res = checkresiduals(negative_fit$model, plot = FALSE)
+
+
+```
+
+\newpage
+
+## VGK Models
+```{r VGKarmax, results="asis", warning=F, message=F}
+
+#dummy
+dummy_fit = auto.armax.r(data$VGK_vol, x=data$dummy, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#count
+count_fit = auto.armax.r(data$VGK_vol, x=data$N, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#tariffs 
+tariff_fit = auto.armax.r(data$VGK_vol, x=data$tariff, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#trade
+trade_fit = auto.armax.r(data$VGK_vol, x=data$trade, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#china
+china_fit = auto.armax.r(data$VGK_vol, x=data$china, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of positive
+positive_fit = auto.armax.r(data$VGK_vol, x=data$prop_positive, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of negative
+negative_fit = auto.armax.r(data$VGK_vol, x=data$prop_negative, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+```
+
+
+## VGK IRFs
+```{r VGKirf, results="asis", warning=F, message=F}
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 15
+
+irf.plot(dummy_fit$model,nb.periods)
+irf.plot(count_fit$model,nb.periods)
+irf.plot(tariff_fit$model,nb.periods)
+irf.plot(trade_fit$model,nb.periods)
+irf.plot(china_fit$model,nb.periods)
+irf.plot(positive_fit$model,nb.periods)
+irf.plot(negative_fit$model,nb.periods)
+
+```
+
+## VGK Residuals
+```{r VGKresiduals, warning=F, message=F}
+
+res = checkresiduals(dummy_fit$model, plot = FALSE)
+res = checkresiduals(count_fit$model, plot = FALSE)
+res = checkresiduals(tariff_fit$model, plot = FALSE)
+res = checkresiduals(trade_fit$model, plot = FALSE)
+res = checkresiduals(china_fit$model, plot = FALSE)
+res = checkresiduals(positive_fit$model, plot = FALSE)
+res = checkresiduals(negative_fit$model, plot = FALSE)
+
+
+```
+
+\newpage
+
+## ASHR Models
+```{r ASHRarmax, results="asis", warning=F, message=F}
+
+#dummy
+dummy_fit = auto.armax.r(data$ASHR_vol, x=data$dummy, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#count
+count_fit = auto.armax.r(data$ASHR_vol, x=data$N, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#tariffs 
+tariff_fit = auto.armax.r(data$ASHR_vol, x=data$tariff, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#trade
+trade_fit = auto.armax.r(data$ASHR_vol, x=data$trade, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#china
+china_fit = auto.armax.r(data$ASHR_vol, x=data$china, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of positive
+positive_fit = auto.armax.r(data$ASHR_vol, x=data$prop_positive, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of negative
+negative_fit = auto.armax.r(data$ASHR_vol, x=data$prop_negative, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+```
+
+## ASHR IRFs
+```{r ASHRirfs, results="asis", warning=F, message=F}
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 15
+
+irf.plot(dummy_fit$model,nb.periods)
+irf.plot(count_fit$model,nb.periods)
+irf.plot(tariff_fit$model,nb.periods)
+irf.plot(trade_fit$model,nb.periods)
+irf.plot(china_fit$model,nb.periods)
+irf.plot(positive_fit$model,nb.periods)
+irf.plot(negative_fit$model,nb.periods)
+
+```
+
+## ASHR Residuals
+```{r ASHRresiduals, warning=F, message=F}
+
+res = checkresiduals(dummy_fit$model, plot = FALSE)
+res = checkresiduals(count_fit$model, plot = FALSE)
+res = checkresiduals(tariff_fit$model, plot = FALSE)
+res = checkresiduals(trade_fit$model, plot = FALSE)
+res = checkresiduals(china_fit$model, plot = FALSE)
+res = checkresiduals(positive_fit$model, plot = FALSE)
+res = checkresiduals(negative_fit$model, plot = FALSE)
+
+
+```
+
+\newpage
+
+# First Term
+
+```{r datasetup first, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+
+#load final dataset
+data = backup
+
+#first term
+data = filter(data,between(timestamp, as.Date('2017-01-20'), as.Date('2021-01-20')))
+
+```
+
+
+## SPY Models
+```{r SPYarmax first, results="asis", warning=F, message=F}
+
+#dummy
+dummy_fit = auto.armax.r(data$SPY_vol, x=data$dummy, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#count
+count_fit = auto.armax.r(data$SPY_vol, x=data$N, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#tariffs 
+tariff_fit = auto.armax.r(data$SPY_vol, x=data$tariff, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#trade
+trade_fit = auto.armax.r(data$SPY_vol, x=data$trade, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#china
+china_fit = auto.armax.r(data$SPY_vol, x=data$china, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of positive
+positive_fit = auto.armax.r(data$SPY_vol, x=data$prop_positive, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of negative
+negative_fit = auto.armax.r(data$SPY_vol, x=data$prop_negative, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+```
+
+## SPY IRFs
+```{r SPYirf first, results="asis", warning=F, message=F}
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 15
+
+irf.plot(dummy_fit$model,nb.periods)
+irf.plot(count_fit$model,nb.periods)
+irf.plot(tariff_fit$model,nb.periods)
+irf.plot(trade_fit$model,nb.periods)
+irf.plot(china_fit$model,nb.periods)
+irf.plot(positive_fit$model,nb.periods)
+irf.plot(negative_fit$model,nb.periods)
+
+```
+
+## SPY Residuals
+```{r SPYresiduals first, warning=F, message=F}
+
+res = checkresiduals(dummy_fit$model, plot = FALSE)
+res = checkresiduals(count_fit$model, plot = FALSE)
+res = checkresiduals(tariff_fit$model, plot = FALSE)
+res = checkresiduals(trade_fit$model, plot = FALSE)
+res = checkresiduals(china_fit$model, plot = FALSE)
+res = checkresiduals(positive_fit$model, plot = FALSE)
+res = checkresiduals(negative_fit$model, plot = FALSE)
+
+
+```
+
+\newpage
+
+## VGK Models
+```{r VGKarmax first, results="asis", warning=F, message=F}
+
+#dummy
+dummy_fit = auto.armax.r(data$VGK_vol, x=data$dummy, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#count
+count_fit = auto.armax.r(data$VGK_vol, x=data$N, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#tariffs 
+tariff_fit = auto.armax.r(data$VGK_vol, x=data$tariff, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#trade
+trade_fit = auto.armax.r(data$VGK_vol, x=data$trade, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#china
+china_fit = auto.armax.r(data$VGK_vol, x=data$china, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of positive
+positive_fit = auto.armax.r(data$VGK_vol, x=data$prop_positive, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of negative
+negative_fit = auto.armax.r(data$VGK_vol, x=data$prop_negative, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+```
+
+## VGK IRFs
+```{r VGKirf first, results="asis", warning=F, message=F}
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 15
+
+irf.plot(dummy_fit$model,nb.periods)
+irf.plot(count_fit$model,nb.periods)
+irf.plot(tariff_fit$model,nb.periods)
+irf.plot(trade_fit$model,nb.periods)
+irf.plot(china_fit$model,nb.periods)
+irf.plot(positive_fit$model,nb.periods)
+irf.plot(negative_fit$model,nb.periods)
+
+```
+
+## VGK Residuals
+```{r VGKresiduals first, warning=F, message=F}
+
+res = checkresiduals(dummy_fit$model, plot = FALSE)
+res = checkresiduals(count_fit$model, plot = FALSE)
+res = checkresiduals(tariff_fit$model, plot = FALSE)
+res = checkresiduals(trade_fit$model, plot = FALSE)
+res = checkresiduals(china_fit$model, plot = FALSE)
+res = checkresiduals(positive_fit$model, plot = FALSE)
+res = checkresiduals(negative_fit$model, plot = FALSE)
+
+
+```
+
+\newpage
+
+## ASHR Models
+```{r ASHRarmax first, results="asis", warning=F, message=F}
+
+#dummy
+dummy_fit = auto.armax.r(data$ASHR_vol, x=data$dummy, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#count
+count_fit = auto.armax.r(data$ASHR_vol, x=data$N, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#tariffs 
+tariff_fit = auto.armax.r(data$ASHR_vol, x=data$tariff, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#trade
+trade_fit = auto.armax.r(data$ASHR_vol, x=data$trade, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#china
+china_fit = auto.armax.r(data$ASHR_vol, x=data$china, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of positive
+positive_fit = auto.armax.r(data$ASHR_vol, x=data$prop_positive, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of negative
+negative_fit = auto.armax.r(data$ASHR_vol, x=data$prop_negative, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+```
+
+## ASHR IRFs
+```{r ASHRirfs first, results="asis", warning=F, message=F}
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 15
+
+irf.plot(dummy_fit$model,nb.periods)
+irf.plot(count_fit$model,nb.periods)
+irf.plot(tariff_fit$model,nb.periods)
+irf.plot(trade_fit$model,nb.periods)
+irf.plot(china_fit$model,nb.periods)
+irf.plot(positive_fit$model,nb.periods)
+irf.plot(negative_fit$model,nb.periods)
+
+```
+
+## ASHR Residuals
+```{r ASHRresiduals first, warning=F, message=F}
+
+res = checkresiduals(dummy_fit$model, plot = FALSE)
+res = checkresiduals(count_fit$model, plot = FALSE)
+res = checkresiduals(tariff_fit$model, plot = FALSE)
+res = checkresiduals(trade_fit$model, plot = FALSE)
+res = checkresiduals(china_fit$model, plot = FALSE)
+res = checkresiduals(positive_fit$model, plot = FALSE)
+res = checkresiduals(negative_fit$model, plot = FALSE)
+
+
+```
+
+\newpage
+
+# Second Term
+
+```{r datasetup second, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+
+#load final dataset
+data = backup
+
+#second term
+data = filter(data,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05-07')))
+
+```
+
+
+
+## SPY Models
+```{r SPYarmax second, results="asis", warning=F, message=F}
+
+#dummy
+dummy_fit = auto.armax.r(data$SPY_vol, x=data$dummy, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#count
+count_fit = auto.armax.r(data$SPY_vol, x=data$N, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#tariffs 
+tariff_fit = auto.armax.r(data$SPY_vol, x=data$tariff, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#trade
+trade_fit = auto.armax.r(data$SPY_vol, x=data$trade, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#china
+china_fit = auto.armax.r(data$SPY_vol, x=data$china, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of positive
+positive_fit = auto.armax.r(data$SPY_vol, x=data$prop_positive, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of negative
+negative_fit = auto.armax.r(data$SPY_vol, x=data$prop_negative, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+```
+
+## SPY IRFs
+```{r SPYirf second, results="asis", warning=F, message=F}
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 15
+
+irf.plot(dummy_fit$model,nb.periods)
+irf.plot(count_fit$model,nb.periods)
+irf.plot(tariff_fit$model,nb.periods)
+irf.plot(trade_fit$model,nb.periods)
+irf.plot(china_fit$model,nb.periods)
+irf.plot(positive_fit$model,nb.periods)
+irf.plot(negative_fit$model,nb.periods)
+
+```
+
+## SPY Residuals
+```{r SPYresiduals second, warning=F, message=F}
+
+res = checkresiduals(dummy_fit$model, plot = FALSE)
+res = checkresiduals(count_fit$model, plot = FALSE)
+res = checkresiduals(tariff_fit$model, plot = FALSE)
+res = checkresiduals(trade_fit$model, plot = FALSE)
+res = checkresiduals(china_fit$model, plot = FALSE)
+res = checkresiduals(positive_fit$model, plot = FALSE)
+res = checkresiduals(negative_fit$model, plot = FALSE)
+
+
+```
+
+\newpage
+
+## VGK Models
+```{r VGKarmax second, results="asis", warning=F, message=F}
+
+#dummy
+dummy_fit = auto.armax.r(data$VGK_vol, x=data$dummy, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#count
+count_fit = auto.armax.r(data$VGK_vol, x=data$N, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#tariffs 
+tariff_fit = auto.armax.r(data$VGK_vol, x=data$tariff, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#trade
+trade_fit = auto.armax.r(data$VGK_vol, x=data$trade, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#china
+china_fit = auto.armax.r(data$VGK_vol, x=data$china, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of positive
+positive_fit = auto.armax.r(data$VGK_vol, x=data$prop_positive, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of negative
+negative_fit = auto.armax.r(data$VGK_vol, x=data$prop_negative, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+```
+
+## VGK IRFs
+```{r VGKirf second, results="asis", warning=F, message=F}
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 15
+
+irf.plot(dummy_fit$model,nb.periods)
+irf.plot(count_fit$model,nb.periods)
+irf.plot(tariff_fit$model,nb.periods)
+irf.plot(trade_fit$model,nb.periods)
+irf.plot(china_fit$model,nb.periods)
+irf.plot(positive_fit$model,nb.periods)
+irf.plot(negative_fit$model,nb.periods)
+
+```
+
+## VGK Residuals
+```{r VGKresiduals second, warning=F, message=F}
+
+res = checkresiduals(dummy_fit$model, plot = FALSE)
+res = checkresiduals(count_fit$model, plot = FALSE)
+res = checkresiduals(tariff_fit$model, plot = FALSE)
+res = checkresiduals(trade_fit$model, plot = FALSE)
+res = checkresiduals(china_fit$model, plot = FALSE)
+res = checkresiduals(positive_fit$model, plot = FALSE)
+res = checkresiduals(negative_fit$model, plot = FALSE)
+
+
+```
+
+\newpage
+
+## ASHR Models
+```{r ASHRarmax second, results="asis", warning=F, message=F}
+
+#dummy
+dummy_fit = auto.armax.r(data$ASHR_vol, x=data$dummy, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#count
+count_fit = auto.armax.r(data$ASHR_vol, x=data$N, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#tariffs 
+tariff_fit = auto.armax.r(data$ASHR_vol, x=data$tariff, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#trade
+trade_fit = auto.armax.r(data$ASHR_vol, x=data$trade, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#china
+china_fit = auto.armax.r(data$ASHR_vol, x=data$china, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of positive
+positive_fit = auto.armax.r(data$ASHR_vol, x=data$prop_positive, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+#proportion of negative
+negative_fit = auto.armax.r(data$ASHR_vol, x=data$prop_negative, 
+                max_p = 3, max_q = 3, max_r = 3, criterion = "AIC", latex=T)
+
+```
+
+## ASHR IRFs
+```{r ASHRirfs second, results="asis", warning=F, message=F}
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 15
+
+irf.plot(dummy_fit$model,nb.periods)
+irf.plot(count_fit$model,nb.periods)
+irf.plot(tariff_fit$model,nb.periods)
+irf.plot(trade_fit$model,nb.periods)
+irf.plot(china_fit$model,nb.periods)
+irf.plot(positive_fit$model,nb.periods)
+irf.plot(negative_fit$model,nb.periods)
+
+```
+
+## ASHR Residuals
+```{r ASHRresiduals second, warning=F, message=F}
+
+res = checkresiduals(dummy_fit$model, plot = FALSE)
+res = checkresiduals(count_fit$model, plot = FALSE)
+res = checkresiduals(tariff_fit$model, plot = FALSE)
+res = checkresiduals(trade_fit$model, plot = FALSE)
+res = checkresiduals(china_fit$model, plot = FALSE)
+res = checkresiduals(positive_fit$model, plot = FALSE)
+res = checkresiduals(negative_fit$model, plot = FALSE)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

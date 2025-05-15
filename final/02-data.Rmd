@@ -78,8 +78,9 @@ through a free stock API, Alpha Vantage. Our timeframe is from the first
 of January 2014 to the 7th of May 2025.
 
 
-We then had to transform this data to get our main variable of interest, realised 
-market volatility. We did so with the following formula:
+We then had to transform this data to get our main variable of interest, Average
+Hourly Volatility (AHV). Note that this is realised market volatility. We did so 
+with the following formula:
 $$
 \begin{aligned}
   v_t = \frac{1}{N}&\sum_{i=1}^N(\Delta p_{t,i})^2 
@@ -88,8 +89,8 @@ $$
 Where $\Delta p_t$ is the difference in price (open - close) and $i$ represents
 every minute.
 
-We used a custom function in order to get the average hourly volatility for each 
-open market hour. Note that the first hour is from 9:30 am to 10:00 am since the 
+We used a custom function in order to get the AHV for each open market hour. Note 
+that the first hour is from 9:30 am to 10:00 am since the 
 market open on a half-hour but closes at 4:00 pm. We can plot this data in
 <span style="color:red"> *figX* </span>.
 
