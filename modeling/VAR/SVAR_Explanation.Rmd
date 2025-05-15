@@ -4,11 +4,13 @@ author: "pte"
 date: "2025-05-15"
 output: html_document
 ---
-#Setup
+\newpage
 
-##Load packages & functions
+# Setup
 
-```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+## Load packages & functions
+
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE}
 rm(list=ls())
 require(tinytex) #LaTeX
 require(ggplot2) #plots
@@ -60,13 +62,14 @@ source(here("helperfunctions/var_irf.R"))
 
 ```
 
-##Load Data
+
+## Load Data
 
 We connect R to our GitHub folder where the data are stored. 
 We then load the dataset and select the relevant time window 
 for our analysis.
 
-```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+```{r datasetup, results=FALSE, warning=FALSE, message=FALSE}
 
 #load final dataset
 source(here("helperfunctions/full_data.R"))
@@ -78,13 +81,14 @@ Vdata = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-0
 
 
 
-#Stationarity 
+# Stationarity 
 
 We begin by testing whether our variables are stationary over time. 
-We use the Augmentented Dickey-Fuller test on the volatility of 
+We use the Augmented Dickey-Fuller test on the volatility of 
 different markets and on variables derived from Trump post.
 
 ```{r adf tests, warning=FALSE, message=FALSE}
+
 adf.test(data$SPY_vol)
 adf.test(data$VGK_vol)
 adf.test(data$ASHR_vol)
@@ -93,16 +97,17 @@ adf.test(data$dummy)
 adf.test(data$N)
 adf.test(data$tariff)
 adf.test(data$china)
+
 ```
 
 
 
-#Information Criteria
+# Information Criteria
 
 we determine the optimal number of lags using  several Information 
-Criteria (AIC, SC, HQ, FPE), below is an example using the AIC
+Criteria (AIC, SC, HQ, FPE). \
 
-
+Here is an example using the AIC
 
 ```{r AIC, warning=FALSE, message=FALSE}
 
@@ -128,6 +133,7 @@ ggplot (resultats1, aes(x=n, y= name)) +
   geom_line(color = "steelblue") +
   labs(title = "hourly Returns AIC",x="dummy" , y = "AIC") +
   theme_minimal()
+
 ```
 
 
@@ -135,50 +141,48 @@ ggplot (resultats1, aes(x=n, y= name)) +
 
 ## Volatility & Tariff Mention
 
-Here's an example of the impact of Trump's post on volatility 
-using "Tariff" as a variable
-Here we study the impact of Trump's Post on the market volatility 
-using the "Tariff" keyword as a proxy for his posts. We first extract 
-and bind the relevant  variables, estimate a VAR model using the 
-VAR function from vars packages, and then display the results in 
-a table for the volatility equation. Our main interest is in the 
-effect of tariff-related post on volatility (and not the inverse).
+We first extract and bind the relevant variables, estimate a VAR model using the 
+VAR function, and then display the results in a table for the volatility equation. 
+Our main interest is in the effect of tariff mentions on volatility (and not the inverse).
 
 
-```{r tariff}
+```{r tariff, warning=FALSE, message=FALSE}
 
 y3 = cbind(Vdata$tariff, Vdata$SPY_vol)
 colnames(y3)[1:2] <- c("tariff", "vol")
 est.VAR3 <- VAR(y3,p=6)
 mod_vol <- est.VAR3$varresult$vol
 screenreg(mod_vol, digits = 6)
+
 ```
+
 # SVAR Model
 
 ## B matrix 
 
-In order to implement our SVAR framework with short run restriction, 
-we need to reconstruct the Variance-Covariance Omega Matrix with our restriction. Here, as we have 2 outcome variables, and as the Omega 
-Matrix is 2x2, we only need n(n-1)/2 restriction, which is one 
-restriction. As mentioned, we assume Average Hour Volatility to not 
-impact contemporaneously Trump post.
+In order to implement our SVAR framework with a short run restriction, 
+we need to reconstruct the Variance-Covariance Omega Matrix with said restriction. 
+Here, as we have 2 outcome variables, and as the Omega 
+Matrix is 2x2, we only need n(n-1)/2 restrictions, which is one 
+restriction. Our assumption is that while the market reacts instantly to Trump
+posts, Trump does not react contemporaneously with changes in market volatility.
 For constructing our BB' matrix we define a matrix in a function and 
-define the square distance between the True Omega matrix and the 
-constructed BB matrix. We then use a optim function in order to find 
-the element of B matrix (B.hat) that minimizes the distance with the 
+find the square distance between the True Omega matrix and the 
+constructed BB matrix. We then use a optimization function in order to find 
+the elements of B matrix (B.hat) that minimize the distance with the 
 true Variance-Covariance matrix.
 
 
-```{r B mat3}
+```{r B mat3, warning=FALSE, message=FALSE}
 
 Omega3 <- var(residuals(est.VAR3))
 
-#make the B matrix
+#create the B matrix
 loss3 <- function(param3){
-  #Define the restriction
+  #define the restriction
   B3 <- matrix(c(param3[1], param3[2], 0, param3[3]), ncol = 2)
   
-  #Make BB' approximatively equal to omega
+  #make BB' approximatively equal to omega
   X3 <- Omega3 - B3 %*% t(B3)
   
   #loss function
@@ -197,16 +201,16 @@ B.hat3
 ```
 
 
-##IRF 
+## IRF 
 
-We then use the irf() function of vars packages in order 
+We then use the irf() function of the vars packages in order 
 to graph the effect of a choc of Trump post (here tariff mentions) 
-on the market volatility using the coefficient of our 
+on market volatility using the coefficient of our 
 est.VAR function and using the choc coefficient of our 
 estimated B matrix with our restriction.
 
 
-```{r IRF tariff}
+```{r IRF tariff, warning=FALSE, message=FALSE}
 
 #irf creation
 irf_res <- irf(est.VAR3, impulse = "tariff", response = "vol", 
@@ -229,17 +233,20 @@ single_varirf %>%
 
 ```
 
-##Granger test
+## Granger test
 
 Finally, we use a Granger causality test to evalutate 
 the robustness of the correlation we've found. We look 
-for a Granger causalities in both direction : whether 
+for Granger causalities in both directions, i.e. whether 
 volatility Granger-causes tariff mentions and vice versa.
 
-```{r does vol granger cause tarrif}
+```{r granger, warning=FALSE, message=FALSE}
 
 #does volatility Granger cause tariff mentions
 grangertest(y3[,c("vol","tariff")], order = 6)
 
 #does tariff mentions Granger cause volatility
 grangertest(y3[,c("tariff", "vol")], order = 6)
+
+```
+
