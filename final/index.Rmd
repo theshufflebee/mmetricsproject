@@ -1,5 +1,5 @@
 ---
-title: "Read Me"
+title: "Terminally Online: Does Donald Trump impact Financial Markets"
 author: "Marcos Constantinou, Ryan Fellarhi & Jonas Bruno"
 date: "Last edited: 12.05.2025"
 site: bookdown::bookdown_site
