@@ -14,7 +14,6 @@ results
 full-timeframe
 split-samples
 var
-methodology-1
 results-1
 full-timeframe-1
 split-samples-1

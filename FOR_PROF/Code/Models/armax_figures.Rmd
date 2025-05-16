@@ -129,13 +129,16 @@ names = list( "ar1" = "AR(1)",
               "trade_lag_1" = "$Trade_{t-1}$",
               "china_lag_0" = "$China_{t}$")
 
-texreg(models,
+table1 = texreg(models,
           custom.model.names = names(models), 
           custom.coef.map = names,
           caption = "ARMAX Models of Average Hourly Volatility",
           caption.above = TRUE,
           label = "tab:armax",
           digits = 4)
+table1
+
+write(table1, file = "armax_table1.tex")
 
 ```
 
@@ -327,13 +330,16 @@ xnames = list("ar1" = "AR(1)",
               "china_lag_1" = "$China_{t-1}$",
               "china_lag_2" = "$China_{t-2}$")
 
-texreg(models,
+table2 = texreg(models,
        custom.model.names = names(models), 
        custom.coef.map = xnames,
        caption = "Split-Term ARMAX Models of Average Hourly Volatility",
        caption.above = TRUE,
        label = "tab:armax_term",
        digits = 4)
+table2
+
+write(table2, file = "armax_table2.tex")
 
 ```
 
@@ -341,7 +347,11 @@ texreg(models,
 ## SPY Residuals Table (both terms)
 ```{r resterms table, message=FALSE, warning=FALSE}
 
-knitr::kable(pvals_combined, digits = 100, caption = "Separate Terms Ljung-Box Test p-values")
+table3 = knitr::kable(pvals_combined, digits = 100, format="latex",
+             caption = "Separate Terms Ljung-Box Test p-values")
+table3
+
+write(table3, file = "armax_table2.tex")
 
 ```
 
