@@ -14,9 +14,10 @@ results
 full-timeframe
 split-samples
 var
-var-1
-arma-x-results
-var-results
+methodology-1
+results-1
+full-timeframe-1
+split-samples-1
 conclusion
 bibliography
 appendix

@@ -1,7 +1,14 @@
 # VAR 
 
-## ARMA-X Results
+## Methodology
+
+
+## Results
 
 
 
-## VAR Results
+### Full Timeframe
+
+
+
+### Split Samples
