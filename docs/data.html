@@ -30,7 +30,7 @@
   
   
 <link rel="prev" href="introduction.html"/>
-<link rel="next" href="methodology.html"/>
+<link rel="next" href="arma-x.html"/>
 
 
 
@@ -2018,21 +2018,23 @@ margin-left: 2em;
 <li class="chapter" data-level="2.2" data-path="data.html"><a href="data.html#political-data"><i class="fa fa-check"></i><b>2.2</b> Political Data</a></li>
 <li class="chapter" data-level="2.3" data-path="data.html"><a href="data.html#final-dataframe"><i class="fa fa-check"></i><b>2.3</b> Final Dataframe</a></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="methodology.html"><a href="methodology.html"><i class="fa fa-check"></i><b>3</b> Methodology</a>
+<li class="chapter" data-level="3" data-path="arma-x.html"><a href="arma-x.html"><i class="fa fa-check"></i><b>3</b> ARMA-X</a>
 <ul>
-<li class="chapter" data-level="3.1" data-path="methodology.html"><a href="methodology.html#arma-x"><i class="fa fa-check"></i><b>3.1</b> ARMA-X</a></li>
-<li class="chapter" data-level="3.2" data-path="methodology.html"><a href="methodology.html#methodology-1"><i class="fa fa-check"></i><b>3.2</b> Methodology</a></li>
-<li class="chapter" data-level="3.3" data-path="methodology.html"><a href="methodology.html#results"><i class="fa fa-check"></i><b>3.3</b> Results</a>
+<li class="chapter" data-level="3.1" data-path="arma-x.html"><a href="arma-x.html#methodology"><i class="fa fa-check"></i><b>3.1</b> Methodology</a></li>
+<li class="chapter" data-level="3.2" data-path="arma-x.html"><a href="arma-x.html#results"><i class="fa fa-check"></i><b>3.2</b> Results</a>
 <ul>
-<li class="chapter" data-level="3.3.1" data-path="methodology.html"><a href="methodology.html#full-timeframe"><i class="fa fa-check"></i><b>3.3.1</b> Full Timeframe</a></li>
-<li class="chapter" data-level="3.3.2" data-path="methodology.html"><a href="methodology.html#split-samples"><i class="fa fa-check"></i><b>3.3.2</b> Split Samples</a></li>
+<li class="chapter" data-level="3.2.1" data-path="arma-x.html"><a href="arma-x.html#full-timeframe"><i class="fa fa-check"></i><b>3.2.1</b> Full Timeframe</a></li>
+<li class="chapter" data-level="3.2.2" data-path="arma-x.html"><a href="arma-x.html#split-samples"><i class="fa fa-check"></i><b>3.2.2</b> Split Samples</a></li>
 </ul></li>
-<li class="chapter" data-level="3.4" data-path="methodology.html"><a href="methodology.html#var"><i class="fa fa-check"></i><b>3.4</b> VAR</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="discussion.html"><a href="discussion.html"><i class="fa fa-check"></i><b>4</b> Discussion</a>
+<li class="chapter" data-level="4" data-path="var.html"><a href="var.html"><i class="fa fa-check"></i><b>4</b> VAR</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="discussion.html"><a href="discussion.html#arma-x-results"><i class="fa fa-check"></i><b>4.1</b> ARMA-X Results</a></li>
-<li class="chapter" data-level="4.2" data-path="discussion.html"><a href="discussion.html#var-results"><i class="fa fa-check"></i><b>4.2</b> VAR Results</a></li>
+<li class="chapter" data-level="4.1" data-path="var.html"><a href="var.html#methodology-1"><i class="fa fa-check"></i><b>4.1</b> Methodology</a></li>
+<li class="chapter" data-level="4.2" data-path="var.html"><a href="var.html#results-1"><i class="fa fa-check"></i><b>4.2</b> Results</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="var.html"><a href="var.html#full-timeframe-1"><i class="fa fa-check"></i><b>4.2.1</b> Full Timeframe</a></li>
+<li class="chapter" data-level="4.2.2" data-path="var.html"><a href="var.html#split-samples-1"><i class="fa fa-check"></i><b>4.2.2</b> Split Samples</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>5</b> Conclusion</a></li>
 <li class="chapter" data-level="6" data-path="bibliography.html"><a href="bibliography.html"><i class="fa fa-check"></i><b>6</b> Bibliography</a>
@@ -2095,7 +2097,7 @@ market open on a half-hour but closes at 4:00 pm. We can plot this data in
 <div id="political-data" class="section level2 hasAnchor" number="2.2">
 <h2><span class="header-section-number">2.2</span> Political Data<a href="data.html#political-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We have two sources for Trump’s posts. The Tweets are from Kaggle
-<span class="citation"><em>Donald <span>Trump Tweets Dataset</span></em> (<a href="#ref-DonaldTrumpTweets">n.d.</a>)</span> and go until the 8th of January 2021. Since he
+<span class="citation">(<a href="#ref-DonaldTrumpTweets"><strong>DonaldTrumpTweets?</strong></a>)</span> and go until the 8th of January 2021. Since he
 switched his primary Posting platform to Truth Social we use only that
 Data from 2021 onwards. All Truth Social Posts were scrapped from
 trumpstruth.org, a webpage that aims to conserve all his posts. You can
@@ -2195,12 +2197,6 @@ market will only react to this new information on Monday at 9:30 am.</p>
 
 </div>
 </div>
-<h3>References</h3>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0" line-spacing="2">
-<div id="ref-DonaldTrumpTweets" class="csl-entry">
-<em>Donald <span>Trump Tweets Dataset</span></em>. (n.d.). https://www.kaggle.com/datasets/codebreaker619/donald-trump-tweets-dataset.
-</div>
-</div>
 <div class="footnotes">
 <hr />
 <ol start="2">
@@ -2214,7 +2210,7 @@ market will only react to this new information on Monday at 9:30 am.</p>
         </div>
       </div>
 <a href="introduction.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="methodology.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="arma-x.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script>/*! jQuery v3.6.0 | (c) OpenJS Foundation and other contributors | jquery.org/license */
