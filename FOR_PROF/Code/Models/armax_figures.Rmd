@@ -152,9 +152,13 @@ nb.periods = 7 * 15
 
 #irf.plot(models[["Model 1"]],nb.periods,title="Tweet Dummy Shock")
 #irf.plot(models[["Model 2"]],nb.periods,title="Tweet Count Shock")
-irf.plot(models[["Model 3"]],nb.periods,title="Tariff Mention Shock")
+plot1 = irf.plot(models[["Model 3"]],nb.periods,
+                 title="Tariff Mention Shock - Full Timeframe")
+plot1
 #irf.plot(models[["Model 4"]],nb.periods,title="Trade Mention Shock")
 #irf.plot(models[["Model 5"]],nb.periods,title="China Mention Shock")
+
+ggsave("armax_plot1.png",plot=plot1,bg="white")
 
 ```
 
@@ -284,8 +288,17 @@ models[["Second Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 #we want to plot the IRFs of these models
 nb.periods = 7 * 15
 
-irf.plot(models[["Second Term (1)"]],nb.periods,title="Tariff Mention Shock")
-irf.plot(models[["Second Term (3)"]],nb.periods,title="China Mention Shock")
+plot2 = irf.plot(models[["Second Term (1)"]],nb.periods,
+                 title="Tariff Mention Shock - Second Term")
+plot2
+
+ggsave("armax_plot2.png",plot=plot2,bg="white")
+
+plot3 = irf.plot(models[["Second Term (3)"]],nb.periods,
+                 title="China Mention Shock - Second Term")
+plot3
+
+ggsave("armax_plot3.png",plot=plot3,bg="white")
 
 ```
 
@@ -345,7 +358,7 @@ write(table2, file = "armax_table2.tex")
 
 
 ## SPY Residuals Table (both terms)
-```{r resterms table, message=FALSE, warning=FALSE}
+```{r resterms table, message=FALSE, warning=FALSE, results="asis"}
 
 table3 = knitr::kable(pvals_combined, digits = 100, format="latex",
              caption = "Separate Terms Ljung-Box Test p-values")
@@ -358,7 +371,7 @@ write(table3, file = "armax_table3.tex")
 
 # Descriptive Stats
 
-```{r means, message=F, warning=F}
+```{r means, message=F, warning=F, results="asis"}
 
 means <- data.frame(
   Model = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
@@ -367,7 +380,12 @@ means <- data.frame(
     mean2,
     mean3))
 
-knitr::kable(means, digits = 6, caption = "Summary Statistics of SPY Volatility")
+table4 = knitr::kable(means, digits = 6, format="latex",
+             caption = "Summary Statistics of SPY Volatility")
+
+table4
+
+write(table4, file = "armax_table4.tex")
 
 ```
 
