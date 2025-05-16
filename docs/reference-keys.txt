@@ -8,14 +8,13 @@ data
 financial-data
 political-data
 final-dataframe
-methodology
 arma-x
-methodology-1
+methodology
 results
 full-timeframe
 split-samples
 var
-discussion
+var-1
 arma-x-results
 var-results
 conclusion
