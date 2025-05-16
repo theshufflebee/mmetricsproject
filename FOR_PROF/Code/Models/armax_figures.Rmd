@@ -351,7 +351,7 @@ table3 = knitr::kable(pvals_combined, digits = 100, format="latex",
              caption = "Separate Terms Ljung-Box Test p-values")
 table3
 
-write(table3, file = "armax_table2.tex")
+write(table3, file = "armax_table3.tex")
 
 ```
 
