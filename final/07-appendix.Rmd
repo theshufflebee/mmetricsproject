@@ -314,37 +314,35 @@ pvals_combined <- rbind(pvals_new1, pvals_new2)
 
 \centering
 
-```{r armax1, results="asis", warning=F, message=F, cache=FALSE}
+```{r armax1, results="asis", warning=F, message=F}
 
-library(modelsummary)
+library(texreg)
 
-xnames <- c(
-  "ar1" = "AR(1)",
-  "ar2" = "AR(2)",
-  "ar3" = "AR(3)",
-  "ma1" = "MA(1)",
-  "ma2" = "MA(2)",
-  "ma3" = "MA(3)",
-  "(Intercept)" = "Constant",
-  "tariff_lag_0" = "$Tariff_{t}$",
-  "tariff_lag_1" = "$Tariff_{t-1}$",
-  "tariff_lag_2" = "$Tariff_{t-2}$",
-  "trade_lag_0" = "$Trade_{t}$",
-  "china_lag_0" = "$China_{t}$",
-  "china_lag_1" = "$China_{t-1}$",
-  "china_lag_2" = "$China_{t-2}$"
+# Change model names (not sure if needed anymore)
+#model_names <- c(
+# "First Term (1)", "First Term (2)", "First Term (3)",
+# "Second Term (1)", "Second Term (2)", "Second Term (3)"
+#)
+#names(models) <- model_names
+
+# Flattened coefficient names in the correct order — CHECK this matches your model structure!
+xnames_ordered <- c(
+  "AR(1)", "AR(2)", "AR(3)",
+  "MA(1)", "MA(2)", "MA(3)",
+  "Constant",
+  "Tariff<sub>t</sub>", "Tariff<sub>t-1</sub>", "Tariff<sub>t-2</sub>",
+  "Trade<sub>t</sub>",
+  "China<sub>t</sub>", "China<sub>t-1</sub>", "China<sub>t-2</sub>"
 )
 
-output_format <- ifelse(knitr::is_html_output(), "gt", "kableExtra")
-
-msummary(models,
-         coef_map = xnames,
-         stars = c('*' = 0.05, '**' = 0.01, '***' = 0.001),
-         output = output_format,   # or "latex" for PDF, or "html" for HTML output
-         title = "Split-Term ARMAX Models of Average Hourly Volatility",
-         fmt = 4,
-         estimate = "{estimate}{stars}",
-         gof_omit = "IC|Log|Num. obs."
+# Render table in Bookdown HTML
+htmlreg(
+  models,
+  custom.coef.names = xnames_ordered,
+  custom.model.names = model_names,
+  caption = "Split-Term ARMAX Models of Average Hourly Volatility",
+  stars = c(0.001, 0.01, 0.05),
+  doctype = FALSE
 )
 
 ```

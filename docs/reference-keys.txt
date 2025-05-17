@@ -1,6 +1,5 @@
 fig:fig1
 tab:data
-tab:armax1
 fig:nice-fig
 tab:nice-tab
 introduction
