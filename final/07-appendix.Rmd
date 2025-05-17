@@ -1,10 +1,394 @@
 # Appendix
 
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenization
+require(texreg) #arima tables
+require(future.apply) #parallel computation (speed)
+require(aTSA) #adf test
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/armax_functions.R"))
+
+```
+
+
+# Full Timeframe (Jan 2024 to May 2025)
+
+```{r datasetup, results=FALSE, warning=FALSE, message=FALSE}
+
+#load final dataset
+source(here("helperfunctions/full_data.R"))
+
+#backup
+backup = data
+
+#select timeframe 
+data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
+
+#for interpretation
+mean1 = mean(data$SPY_vol)
+
+```
+
+
+## SPY Models
+
+We choose the specification in the armax_models file. In this file, we will
+just run said specifications to produce nice tables and graphs to include in 
+our final paper. This is also why there are specification differences in the 
+separate timeframes. We always use the best fit we found earlier.
+
+
+```{r fitting models, results=F, warning=F, message=F}
+
+models <- list()
+
+# ARMA-X(3,3,1) with Tweet Dummy as Exogenous
+models[["Model 1"]] <- armax(data$SPY_vol, xreg = data$dummy, latex = F,
+                             nb.lags = 1, p = 3, q = 3) 
+
+# ARMA-X(3,3,1) with Tweet Count as Exogenous
+models[["Model 2"]] <- armax(data$SPY_vol, xreg = data$N, latex = F,
+                             nb.lags = 1, p = 3, q = 3) 
+
+# ARMA-X(3,2,3) with Tariff Mentions as Exogenous
+models[["Model 3"]] <- armax(data$SPY_vol, xreg = data$tariff, latex = F,
+                             nb.lags = 3, p = 3, q = 2) 
+
+# ARMA-X(3,2,1) with Trade Mentions as Exogenous
+models[["Model 4"]] <- armax(data$SPY_vol, xreg = data$trade, latex = F,
+                             nb.lags = 1, p = 3, q = 2) 
+
+# ARMA-X(3,2,0) with China Mentions as Exogenous
+models[["Model 5"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
+                             nb.lags = 0, p = 3, q = 2) 
+
+```
+
+## SPY Table
+
+```{r creating table, results="asis", warning=F, message=F}
+
+names = list( "ar1" = "AR(1)",
+              "ar2" = "AR(2)",
+              "ar3" = "AR(3)",
+              "ma1" = "MA(1)",
+              "ma2" = "MA(2)",
+              "ma3" = "MA(3)",
+              "(Intercept)" = "Constant",
+              "dummy_lag_0" = "$TweetDummy_{t}$",
+              "dummy_lag_1" = "$TweetDummy_{t-1}$",
+              "N_lag_0" = "$TweetCount_{t}$",
+              "N_lag_1" = "$TweetCount_{t-1}$",
+              "tariff_lag_0" = "$Tariff_{t}$",
+              "tariff_lag_1" = "$Tariff_{t-1}$",
+              "tariff_lag_2" = "$Tariff_{t-2}$",
+              "tariff_lag_3" = "$Tariff_{t-3}$",
+              "trade_lag_0" = "$Trade_{t}$",
+              "trade_lag_1" = "$Trade_{t-1}$",
+              "china_lag_0" = "$China_{t}$")
+
+table1 = texreg(models,
+          custom.model.names = names(models), 
+          custom.coef.map = names,
+          caption = "ARMAX Models of Average Hourly Volatility",
+          caption.above = TRUE,
+          label = "tab:armax",
+          digits = 4)
+table1
+
+write(table1, file = "armax_table1.tex")
+
+```
+
+
+## SPY IRFs
+
+```{r SPYirf, results="asis", warning=F, message=F}
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 15
+
+#irf.plot(models[["Model 1"]],nb.periods,title="Tweet Dummy Shock")
+#irf.plot(models[["Model 2"]],nb.periods,title="Tweet Count Shock")
+plot1 = irf.plot(models[["Model 3"]],nb.periods,
+                 title="Tariff Mention Shock - Full Timeframe")
+plot1
+#irf.plot(models[["Model 4"]],nb.periods,title="Trade Mention Shock")
+#irf.plot(models[["Model 5"]],nb.periods,title="China Mention Shock")
+
+ggsave("armax_plot1.png",plot=plot1,bg="white")
+
+```
+
+
+## SPY Residuals
+```{r SPYresiduals, warning=F, message=F, results=F}
+
+res1 = checkresiduals(models[["Model 1"]], plot = FALSE)
+res2 = checkresiduals(models[["Model 2"]], plot = FALSE)
+res3 = checkresiduals(models[["Model 3"]], plot = FALSE)
+res4 = checkresiduals(models[["Model 4"]], plot = FALSE)
+res5 = checkresiduals(models[["Model 5"]], plot = FALSE)
+
+```
+
+```{r SPYresiduals table, warning=F, message=F}
+
+resnames = c("Twitter Dummy", "Twitter Count", "Tariff", "Trade", "China")
+
+#extract p-values directly from checkresiduals results
+pvals <- data.frame(Model = resnames,
+                    `Ljung-Box p-value` = c(
+                      res1$p.value,
+                      res2$p.value,
+                      res3$p.value,
+                      res4$p.value,
+                      res5$p.value))
+
+#table
+knitr::kable(pvals, digits = 100, caption = "Full Timeframe Ljung-Box Test p-values")
+
+```
+
+
+
+# First Term
+
+```{r datasetup first, results=FALSE, warning=FALSE, message=FALSE}
+
+#load final dataset
+data = backup
+
+#first term
+data = filter(data,between(timestamp, as.Date('2017-01-20'), as.Date('2021-01-20')))
+
+#for interpretation
+mean2 = mean(data$SPY_vol)
+
+```
+
+## SPY Models
+
+```{r 1st term models, results=F, warning=F, message=F}
+
+models <- list()
+
+# ARMA-X(3,3,0) with Tariff Mentions as Exogenous
+models[["First Term (1)"]] <- armax(data$SPY_vol, xreg = data$tariff, latex = F,
+                             nb.lags = 0, p = 3, q = 3) 
+
+# ARMA-X(3,3,0) with Trade Mentions as Exogenous
+models[["First Term (2)"]] <- armax(data$SPY_vol, xreg = data$trade, latex = F,
+                             nb.lags = 0, p = 3, q = 3)
+
+# ARMA-X(3,3,0) with Trade Mentions as Exogenous
+models[["First Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
+                             nb.lags = 0, p = 3, q = 3) 
+
+```
+
+
+## SPY Residuals
+```{r 1st SPYresiduals, warning=F, message=F, results=F}
+
+res6 = checkresiduals(models[["First Term (1)"]], plot = FALSE)
+res7 = checkresiduals(models[["First Term (2)"]], plot = FALSE)
+res8 = checkresiduals(models[["First Term (3)"]], plot = FALSE)
+
+pvals_new1 <- data.frame(
+  Model = c("First Term Tariffs", "First Term Trade", "First Term China"),
+  `Ljung-Box p-value` = c(
+    res6$p.value,
+    res7$p.value,
+    res8$p.value))
+
+```
+
+
+
+# Second Term
+
+```{r datasetup second, results=FALSE, warning=FALSE, message=FALSE}
+
+#load final dataset
+data = backup
+
+#second term
+data = filter(data,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05-07')))
+
+#for interpretation
+mean3 = mean(data$SPY_vol)
+
+```
+
+## SPY Models
+
+```{r 2nd term models, results=F, warning=F, message=F}
+
+# ARMA-X(3,2,3) with Tariff Mentions as Exogenous
+models[["Second Term (1)"]] <- armax(data$SPY_vol, xreg = data$tariff, latex = F,
+                             nb.lags = 2, p = 1, q = 2) 
+
+# ARMA-X(3,2,1) with Trade Mentions as Exogenous
+models[["Second Term (2)"]] <- armax(data$SPY_vol, xreg = data$trade, latex = F,
+                             nb.lags = 0, p = 1, q = 2) 
+
+# ARMA-X(3,2,0) with China Mentions as Exogenous
+models[["Second Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
+                             nb.lags = 2, p = 1, q = 2) 
+
+```
+
+
+## SPY IRFs
+```{r 2nd SPYirf, warning=F, message=F}
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 15
+
+plot2 = irf.plot(models[["Second Term (1)"]],nb.periods,
+                 title="Tariff Mention Shock - Second Term")
+plot2
+
+ggsave("armax_plot2.png",plot=plot2,bg="white")
+
+plot3 = irf.plot(models[["Second Term (3)"]],nb.periods,
+                 title="China Mention Shock - Second Term")
+plot3
+
+ggsave("armax_plot3.png",plot=plot3,bg="white")
+
+```
+
+
+## SPY Residuals
+```{r 2nd SPYresiduals, results=F, warning=F, message=F}
+
+res9 = checkresiduals(models[["Second Term (1)"]], plot = FALSE)
+res10 = checkresiduals(models[["Second Term (2)"]], plot = FALSE)
+res11 = checkresiduals(models[["Second Term (3)"]], plot = FALSE)
+
+pvals_new2 <- data.frame(
+  Model = c("Second Term Tariffs", "Second Term Trade", "Second Term China"),
+  `Ljung-Box p-value` = c(
+    res9$p.value,
+    res10$p.value,
+    res11$p.value))
+
+#combine with other term
+pvals_combined <- rbind(pvals_new1, pvals_new2)
+
+```
+
+
+## SPY Table (both terms)
+
+\centering
+```{r table with separate terms, results="asis", warning=F, message=F}
+
+xnames = list("ar1" = "AR(1)",
+              "ar2" = "AR(2)",
+              "ar3" = "AR(3)",
+              "ma1" = "MA(1)",
+              "ma2" = "MA(2)",
+              "ma3" = "MA(3)",
+              "(Intercept)" = "Constant",
+              "tariff_lag_0" = "$Tariff_{t}$",
+              "tariff_lag_1" = "$Tariff_{t-1}$",
+              "tariff_lag_2" = "$Tariff_{t-2}$",
+              "trade_lag_0" = "$Trade_{t}$",
+              "china_lag_0" = "$China_{t}$",
+              "china_lag_1" = "$China_{t-1}$",
+              "china_lag_2" = "$China_{t-2}$")
+
+table2 = texreg(models,
+       custom.model.names = names(models), 
+       custom.coef.map = xnames,
+       caption = "Split-Term ARMAX Models of Average Hourly Volatility",
+       caption.above = TRUE,
+       label = "tab:armax_term",
+       digits = 4)
+table2
+
+write(table2, file = "armax_table2.tex")
+
+```
+
+
+## SPY Residuals Table (both terms)
+```{r resterms table, message=FALSE, warning=FALSE, results="asis"}
+
+table3 = knitr::kable(pvals_combined, digits = 100, format="latex",
+             caption = "Separate Terms Ljung-Box Test p-values")
+table3
+
+write(table3, file = "armax_table3.tex")
+
+```
+
+
+# Descriptive Stats
+
+```{r means, message=F, warning=F, results="asis"}
+
+means <- data.frame(
+  Model = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
+  `SPY Volatility Mean` = c(
+    mean1,
+    mean2,
+    mean3))
+
+table4 = knitr::kable(means, digits = 6, format="latex",
+             caption = "Summary Statistics of SPY Volatility")
+
+table4
+
+write(table4, file = "armax_table4.tex")
+
+```
+
+
+
+
+
 
 
 ## Table 1
- 
- 
+
+
+```{=latex}
 \begin{table}
 \caption{ARMAX Models of Average Hourly Volatility}
 \begin{center}
@@ -58,12 +442,9 @@ Num. obs.          & $19970$         & $19970$         & $19968$         & $1997
 \label{tab:armax}
 \end{center}
 \end{table}
+```
 
-
-
-
-## Table 2  
-
+## Table 2
 
 \begin{table}
 \caption{Split-Term ARMAX Models of Average Hourly Volatility}
@@ -111,9 +492,6 @@ Num. obs.      & $7042$          & $7042$          & $7042$          & $516$    
 \end{center}
 \end{table}
 
-
-
-
 ## Table 3
 
 \begin{table}
@@ -138,8 +516,3 @@ Second Term China & 0.5122385\\
 \hline
 \end{tabular}
 \end{table}
-
-
-
-
-
