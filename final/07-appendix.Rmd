@@ -314,7 +314,7 @@ pvals_combined <- rbind(pvals_new1, pvals_new2)
 
 \centering
 
-```{r armax1, results="asis", warning=F, message=F, cache=TRUE}
+```{r armax1, results="asis", warning=F, message=F, cache=FALSE}
 
 library(modelsummary)
 
@@ -335,7 +335,7 @@ xnames <- c(
   "china_lag_2" = "$China_{t-2}$"
 )
 
-output_format <- ifelse(knitr::is_latex_output(), "latex", "markdown")
+output_format <- ifelse(knitr::is_html_output(), "gt", "kableExtra")
 
 msummary(models,
          coef_map = xnames,
