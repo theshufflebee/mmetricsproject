@@ -235,8 +235,9 @@ res7 = checkresiduals(models[["First Term (2)"]], plot = FALSE)
 res8 = checkresiduals(models[["First Term (3)"]], plot = FALSE)
 
 pvals_new1 <- data.frame(
-  Model = c("First Term Tariffs", "First Term Trade", "First Term China"),
-  `Ljung-Box p-value` = c(
+  "First-Term" = c(
+    NA,
+    NA,
     res6$p.value,
     res7$p.value,
     res8$p.value))
@@ -306,14 +307,16 @@ res10 = checkresiduals(models[["Second Term (2)"]], plot = FALSE)
 res11 = checkresiduals(models[["Second Term (3)"]], plot = FALSE)
 
 pvals_new2 <- data.frame(
-  Model = c("Second Term Tariffs", "Second Term Trade", "Second Term China"),
-  `Ljung-Box p-value` = c(
+  "Second-Term" = c(
+    NA,
+    NA,
     res9$p.value,
     res10$p.value,
     res11$p.value))
 
 #combine with other term
-pvals_combined <- rbind(pvals_new1, pvals_new2)
+pvals_combined <- cbind(pvals,pvals_new1)
+pvals_combined <- cbind(pvals_combined, pvals_new2)
 
 ```
 
@@ -360,17 +363,10 @@ htmlreg(
 
 ```{r means, message=F, warning=F, results="asis", echo=FALSE, cache=TRUE}
 
-means <- data.frame(
-  Model = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
-  `SPY Volatility Mean` = c(
-    mean1,
-    mean2,
-    mean3))
-
-
-
-kable(means, format = "html", digits = 6, caption = "Full Timeframe Ljung-Box Test p-values") %>%
+kable(pvals_combined, digits = 6, format="html", caption = "Ljung-Box Test p-values for Residuals") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, position = "center")
+
+
 
 ```
 
