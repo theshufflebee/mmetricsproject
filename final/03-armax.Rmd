@@ -18,7 +18,7 @@ which sees minimal AIC loss and simplifying our models considerably.
 
 ## Results
 
-\@ref(tab:armax1)
+\@ref(sec:spy-table)
 
 ### Full Timeframe
 We run models with the following exogenous regressors: $TweetDummy$, $TweetCount$,

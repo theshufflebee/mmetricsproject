@@ -310,7 +310,7 @@ pvals_combined <- rbind(pvals_new1, pvals_new2)
 ```
 
 
-## SPY Table (both terms)
+## SPY Table (both terms) {#sec:spy-table}
 
 \centering
 Table: (\#tab:armax1) Split-Term ARMAX Models of Average Hourly Volatility

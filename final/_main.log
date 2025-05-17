@@ -1003,4 +1003,84 @@ LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(1)/m/n' will be
 (Font)              scaled to size 7.0pt on input line 184.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(1)/m/n' will be
 (Font)              scaled to size 5.0pt on input line 184.
-LaTeX Font I
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
+(Font)              scaled to size 10.00092pt on input line 184.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
+(Font)              scaled to size 7.00064pt on input line 184.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
+(Font)              scaled to size 5.00046pt on input line 184.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
+(Font)              scaled to size 9.99893pt on input line 184.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
+(Font)              scaled to size 6.99925pt on input line 184.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
+(Font)              scaled to size 4.99947pt on input line 184.
+
+LaTeX Warning: Reference `fig:fig1' on page 9 undefined on input line 195.
+
+File: _main_files/figure-latex/fig1-1.pdf Graphic file (type pdf)
+<use _main_files/figure-latex/fig1-1.pdf>
+
+Package natbib Warning: Citation `famaAdjustmentStockPrices2003' on page 9 undefined on input line 209.
+
+
+Package natbib Warning: Citation `schumakerTextualAnalysisStock2009' on page 9 undefined on input line 216.
+
+
+Package natbib Warning: Citation `ederingtonHowMarketsProcess1993' on page 9 undefined on input line 218.
+
+
+
+[9]
+
+Package natbib Warning: Citation `gjerstadPresidentTrumpsTweets2021' on page 10 undefined on input line 236.
+
+
+
+[10]
+
+Package natbib Warning: Citation `nishimuraImpactsDonaldTrumps2025' on page 11 undefined on input line 247.
+
+
+
+[11]
+
+[12
+
+]
+Chapter 2.
+File: _main_files/figure-latex/fin plots-1.pdf Graphic file (type pdf)
+<use _main_files/figure-latex/fin plots-1.pdf>
+File: _main_files/figure-latex/fin plots-2.pdf Graphic file (type pdf)
+<use _main_files/figure-latex/fin plots-2.pdf>
+
+Underfull \hbox (badness 10000) in paragraph at lines 282--283
+[][]
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+
+[13]
+
+Package natbib Warning: Citation `DonaldTrumpTweets' on page 14 undefined on input line 287.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+
+[14]
+File: _main_files/figure-latex/social plots-1.pdf Graphic file (type pdf)
+<use _main_files/figure-latex/social plots-1.pdf>
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+
+[15]
+
+[16
+! ^Cxelatex.exe: fwrite: Broken pipe
