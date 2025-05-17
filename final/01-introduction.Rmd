@@ -7,7 +7,7 @@ editor_options:
     wrap: 72
 ---
 
-```{r, warning=FALSE, echo=FALSE}
+```{r, warning=FALSE, echo=FALSE, cache=TRUE}
 require("here")
 require("stringr")
 require("dplyr")
@@ -59,7 +59,7 @@ This brings us to our research question:  Do Donald Trumps Posts impact market V
     
 \@ref(fig:fig1)
 
-```{r fig1, warning=FALSE, echo=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)"}
+```{r fig1, warning=FALSE, echo=FALSE, cache=TRUE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)"}
  #Create the scatter plot
 ggplot(truths, aes(x = day, y = time_shifted)) +
   geom_point(alpha = 0.5, color = "blue", shape = ".") +  # Transparancy to create "heatmap"

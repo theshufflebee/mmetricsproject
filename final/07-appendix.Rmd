@@ -1,5 +1,6 @@
 # Appendix
 
+
 ```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
 rm(list=ls())
 require(tinytex) #LaTeX
@@ -70,7 +71,7 @@ our final paper. This is also why there are specification differences in the
 separate timeframes. We always use the best fit we found earlier.
 
 
-```{r fitting models, results=F, warning=F, message=F}
+```{r fitting models, results=F, warning=F, message=F, cache=TRUE}
 
 models <- list()
 
@@ -98,7 +99,7 @@ models[["Model 5"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 
 ## SPY Table
 
-```{r creating table, results="asis", warning=F, message=F}
+```{r creating table, results="asis", warning=F, message=F, cache=TRUE}
 
 names = list( "ar1" = "AR(1)",
               "ar2" = "AR(2)",
@@ -128,14 +129,12 @@ table1 = texreg(models,
           digits = 4)
 table1
 
-write(table1, file = "armax_table1.tex")
-
 ```
 
 
 ## SPY IRFs
 
-```{r SPYirf, results="asis", warning=F, message=F}
+```{r SPYirf, results="asis", warning=F, message=F, cache=TRUE}
 
 #we want to plot the IRFs of these models
 nb.periods = 7 * 15
@@ -154,7 +153,7 @@ ggsave("armax_plot1.png",plot=plot1,bg="white")
 
 
 ## SPY Residuals
-```{r SPYresiduals, warning=F, message=F, results=F}
+```{r SPYresiduals, warning=F, message=F, results=F, cache=TRUE}
 
 res1 = checkresiduals(models[["Model 1"]], plot = FALSE)
 res2 = checkresiduals(models[["Model 2"]], plot = FALSE)
@@ -164,7 +163,7 @@ res5 = checkresiduals(models[["Model 5"]], plot = FALSE)
 
 ```
 
-```{r SPYresiduals table, warning=F, message=F}
+```{r SPYresiduals table, warning=F, message=F, cache=TRUE}
 
 resnames = c("Twitter Dummy", "Twitter Count", "Tariff", "Trade", "China")
 
@@ -186,7 +185,7 @@ knitr::kable(pvals, digits = 100, caption = "Full Timeframe Ljung-Box Test p-val
 
 # First Term
 
-```{r datasetup first, results=FALSE, warning=FALSE, message=FALSE}
+```{r datasetup first, results=FALSE, warning=FALSE, message=FALSE, cache=TRUE}
 
 #load final dataset
 data = backup
@@ -201,7 +200,7 @@ mean2 = mean(data$SPY_vol)
 
 ## SPY Models
 
-```{r 1st term models, results=F, warning=F, message=F}
+```{r 1st term models, results=F, warning=F, message=F, cache=TRUE}
 
 models <- list()
 
@@ -221,7 +220,7 @@ models[["First Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 
 
 ## SPY Residuals
-```{r 1st SPYresiduals, warning=F, message=F, results=F}
+```{r 1st SPYresiduals, warning=F, message=F, results=F, cache=TRUE}
 
 res6 = checkresiduals(models[["First Term (1)"]], plot = FALSE)
 res7 = checkresiduals(models[["First Term (2)"]], plot = FALSE)
@@ -240,7 +239,7 @@ pvals_new1 <- data.frame(
 
 # Second Term
 
-```{r datasetup second, results=FALSE, warning=FALSE, message=FALSE}
+```{r datasetup second, results=FALSE, warning=FALSE, message=FALSE, cache=TRUE}
 
 #load final dataset
 data = backup
@@ -255,7 +254,7 @@ mean3 = mean(data$SPY_vol)
 
 ## SPY Models
 
-```{r 2nd term models, results=F, warning=F, message=F}
+```{r 2nd term models, results=F, warning=F, message=F, cache=TRUE}
 
 # ARMA-X(3,2,3) with Tariff Mentions as Exogenous
 models[["Second Term (1)"]] <- armax(data$SPY_vol, xreg = data$tariff, latex = F,
@@ -273,7 +272,7 @@ models[["Second Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 
 
 ## SPY IRFs
-```{r 2nd SPYirf, warning=F, message=F}
+```{r 2nd SPYirf, warning=F, message=F, cache=TRUE}
 
 #we want to plot the IRFs of these models
 nb.periods = 7 * 15
@@ -288,13 +287,11 @@ plot3 = irf.plot(models[["Second Term (3)"]],nb.periods,
                  title="China Mention Shock - Second Term")
 plot3
 
-ggsave("armax_plot3.png",plot=plot3,bg="white")
-
 ```
 
 
 ## SPY Residuals
-```{r 2nd SPYresiduals, results=F, warning=F, message=F}
+```{r 2nd SPYresiduals, results=F, warning=F, message=F, cache=TRUE}
 
 res9 = checkresiduals(models[["Second Term (1)"]], plot = FALSE)
 res10 = checkresiduals(models[["Second Term (2)"]], plot = FALSE)
@@ -316,52 +313,45 @@ pvals_combined <- rbind(pvals_new1, pvals_new2)
 ## SPY Table (both terms)
 
 \centering
-```{r table with separate terms, results="asis", warning=F, message=F}
+Table: (\#tab:armax1) Split-Term ARMAX Models of Average Hourly Volatility
 
-xnames = list("ar1" = "AR(1)",
-              "ar2" = "AR(2)",
-              "ar3" = "AR(3)",
-              "ma1" = "MA(1)",
-              "ma2" = "MA(2)",
-              "ma3" = "MA(3)",
-              "(Intercept)" = "Constant",
-              "tariff_lag_0" = "$Tariff_{t}$",
-              "tariff_lag_1" = "$Tariff_{t-1}$",
-              "tariff_lag_2" = "$Tariff_{t-2}$",
-              "trade_lag_0" = "$Trade_{t}$",
-              "china_lag_0" = "$China_{t}$",
-              "china_lag_1" = "$China_{t-1}$",
-              "china_lag_2" = "$China_{t-2}$")
+```{r armax1, results="asis", warning=F, message=F, cache=TRUE}
 
-table2 = texreg(models,
-       custom.model.names = names(models), 
-       custom.coef.map = xnames,
-       caption = "Split-Term ARMAX Models of Average Hourly Volatility",
-       caption.above = TRUE,
-       label = "tab:armax_term",
-       digits = 4)
-table2
+library(modelsummary)
 
-write(table2, file = "armax_table2.tex")
+xnames <- c(
+  "ar1" = "AR(1)",
+  "ar2" = "AR(2)",
+  "ar3" = "AR(3)",
+  "ma1" = "MA(1)",
+  "ma2" = "MA(2)",
+  "ma3" = "MA(3)",
+  "(Intercept)" = "Constant",
+  "tariff_lag_0" = "$Tariff_{t}$",
+  "tariff_lag_1" = "$Tariff_{t-1}$",
+  "tariff_lag_2" = "$Tariff_{t-2}$",
+  "trade_lag_0" = "$Trade_{t}$",
+  "china_lag_0" = "$China_{t}$",
+  "china_lag_1" = "$China_{t-1}$",
+  "china_lag_2" = "$China_{t-2}$"
+)
 
-```
-
-
-## SPY Residuals Table (both terms)
-```{r resterms table, message=FALSE, warning=FALSE, results="asis"}
-
-table3 = knitr::kable(pvals_combined, digits = 100, format="latex",
-             caption = "Separate Terms Ljung-Box Test p-values")
-table3
-
-write(table3, file = "armax_table3.tex")
+msummary(models,
+         coef_map = xnames,
+         stars = c('*' = 0.05, '**' = 0.01, '***' = 0.001),
+         output = "markdown",   # or "latex" for PDF, or "html" for HTML output
+         title = "Split-Term ARMAX Models of Average Hourly Volatility",
+         fmt = 4,
+         estimate = "{estimate}{stars}",
+         gof_omit = "IC|Log|Num. obs."
+)
 
 ```
 
 
 # Descriptive Stats
 
-```{r means, message=F, warning=F, results="asis"}
+```{r means, message=F, warning=F, results="asis", cache=TRUE}
 
 means <- data.frame(
   Model = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
@@ -375,144 +365,5 @@ table4 = knitr::kable(means, digits = 6, format="latex",
 
 table4
 
-write(table4, file = "armax_table4.tex")
-
 ```
 
-
-
-
-
-
-
-## Table 1
-
-
-```{=latex}
-\begin{table}
-\caption{ARMAX Models of Average Hourly Volatility}
-\begin{center}
-\begin{tabular}{l c c c c c}
-\hline
- & Model 1 & Model 2 & Model 3 & Model 4 & Model 5 \\
-\hline
-AR(1)              & $0.0300$        & $0.0278$        & $0.2200^{***}$  & $2.1903^{***}$  & $0.2209^{***}$  \\
-                   & $(0.0510)$      & $(0.0510)$      & $(0.0084)$      & $(0.0096)$      & $(0.0084)$      \\
-AR(2)              & $0.7229^{***}$  & $0.7210^{***}$  & $0.9388^{***}$  & $-1.4727^{***}$ & $0.9382^{***}$  \\
-                   & $(0.0397)$      & $(0.0399)$      & $(0.0037)$      & $(0.0173)$      & $(0.0037)$      \\
-AR(3)              & $0.2110^{***}$  & $0.2148^{***}$  & $-0.1837^{***}$ & $0.2784^{***}$  & $-0.1837^{***}$ \\
-                   & $(0.0287)$      & $(0.0284)$      & $(0.0079)$      & $(0.0082)$      & $(0.0079)$      \\
-MA(1)              & $0.2751^{***}$  & $0.2779^{***}$  & $0.0870^{***}$  & $-1.8955^{***}$ & $0.0878^{***}$  \\
-                   & $(0.0496)$      & $(0.0496)$      & $(0.0042)$      & $(0.0062)$      & $(0.0042)$      \\
-MA(2)              & $-0.6445^{***}$ & $-0.6430^{***}$ & $-0.8960^{***}$ & $0.9165^{***}$  & $-0.8950^{***}$ \\
-                   & $(0.0284)$      & $(0.0285)$      & $(0.0042)$      & $(0.0063)$      & $(0.0042)$      \\
-MA(3)              & $-0.3527^{***}$ & $-0.3563^{***}$ &                 &                 &                 \\
-                   & $(0.0256)$      & $(0.0253)$      &                 &                 &                 \\
-$TweetDummy_{t}$   & $0.0014^{***}$  &                 &                 &                 &                 \\
-                   & $(0.0002)$      &                 &                 &                 &                 \\
-$TweetDummy_{t-1}$ & $0.0008^{***}$  &                 &                 &                 &                 \\
-                   & $(0.0002)$      &                 &                 &                 &                 \\
-$TweetCount_{t}$   &                 & $0.0004^{***}$  &                 &                 &                 \\
-                   &                 & $(0.0001)$      &                 &                 &                 \\
-$TweetCount_{t-1}$ &                 & $0.0002^{**}$   &                 &                 &                 \\
-                   &                 & $(0.0001)$      &                 &                 &                 \\
-$Tariff_{t}$       &                 &                 & $0.0035^{*}$    &                 &                 \\
-                   &                 &                 & $(0.0014)$      &                 &                 \\
-$Tariff_{t-1}$     &                 &                 & $0.0191^{***}$  &                 &                 \\
-                   &                 &                 & $(0.0015)$      &                 &                 \\
-$Tariff_{t-2}$     &                 &                 & $0.0103^{***}$  &                 &                 \\
-                   &                 &                 & $(0.0015)$      &                 &                 \\
-$Tariff_{t-3}$     &                 &                 & $-0.0045^{**}$  &                 &                 \\
-                   &                 &                 & $(0.0014)$      &                 &                 \\
-$Trade_{t}$        &                 &                 &                 & $0.0032$        &                 \\
-                   &                 &                 &                 & $(0.0018)$      &                 \\
-$Trade_{t-1}$      &                 &                 &                 & $0.0016$        &                 \\
-                   &                 &                 &                 & $(0.0018)$      &                 \\
-$China_{t}$        &                 &                 &                 &                 & $0.0026^{*}$    \\
-                   &                 &                 &                 &                 & $(0.0012)$      \\
-\hline
-AIC                & $-45761.2161$   & $-45737.6695$   & $-46020.9547$   & $-45816.1540$   & $-45840.5349$   \\
-AICc               & $-45761.2051$   & $-45737.6585$   & $-46020.9415$   & $-45816.1449$   & $-45840.5277$   \\
-BIC                & $-45682.1963$   & $-45658.6497$   & $-45934.0340$   & $-45745.0361$   & $-45777.3186$   \\
-Log Likelihood     & $22890.6081$    & $22878.8348$    & $23021.4774$    & $22917.0770$    & $22928.2675$    \\
-Num. obs.          & $19970$         & $19970$         & $19968$         & $19970$         & $19971$         \\
-\hline
-\multicolumn{6}{l}{\scriptsize{$^{***}p<0.001$; $^{**}p<0.01$; $^{*}p<0.05$}}
-\end{tabular}
-\label{tab:armax}
-\end{center}
-\end{table}
-```
-
-## Table 2
-
-\begin{table}
-\caption{Split-Term ARMAX Models of Average Hourly Volatility}
-\begin{center}
-\begin{tabular}{l c c c c c c}
-\hline
- & First Term (1) & First Term (2) & First Term (3) & Second Term (1) & Second Term (2) & Second Term (3) \\
-\hline
-AR(1)          & $0.2953^{***}$  & $0.2943^{***}$  & $0.2927^{***}$  & $0.9686^{***}$  & $0.9683^{***}$  & $0.9693^{***}$  \\
-               & $(0.0225)$      & $(0.0224)$      & $(0.0224)$      & $(0.0163)$      & $(0.0163)$      & $(0.0161)$      \\
-AR(2)          & $0.1434^{***}$  & $0.1439^{***}$  & $0.1438^{***}$  &                 &                 &                 \\
-               & $(0.0220)$      & $(0.0220)$      & $(0.0219)$      &                 &                 &                 \\
-AR(3)          & $0.5456^{***}$  & $0.5462^{***}$  & $0.5480^{***}$  &                 &                 &                 \\
-               & $(0.0223)$      & $(0.0222)$      & $(0.0222)$      &                 &                 &                 \\
-MA(1)          & $0.1854^{***}$  & $0.1863^{***}$  & $0.1866^{***}$  & $-0.6965^{***}$ & $-0.6905^{***}$ & $-0.7207^{***}$ \\
-               & $(0.0180)$      & $(0.0179)$      & $(0.0179)$      & $(0.0469)$      & $(0.0469)$      & $(0.0467)$      \\
-MA(2)          & $-0.1707^{***}$ & $-0.1706^{***}$ & $-0.1695^{***}$ & $-0.1732^{***}$ & $-0.1755^{***}$ & $-0.1609^{***}$ \\
-               & $(0.0169)$      & $(0.0169)$      & $(0.0168)$      & $(0.0437)$      & $(0.0438)$      & $(0.0434)$      \\
-MA(3)          & $-0.6557^{***}$ & $-0.6564^{***}$ & $-0.6575^{***}$ &                 &                 &                 \\
-               & $(0.0162)$      & $(0.0161)$      & $(0.0161)$      &                 &                 &                 \\
-$Tariff_{t}$   & $0.0011$        &                 &                 & $0.0048$        &                 &                 \\
-               & $(0.0010)$      &                 &                 & $(0.0099)$      &                 &                 \\
-$Tariff_{t-1}$ &                 &                 &                 & $0.0278^{**}$   &                 &                 \\
-               &                 &                 &                 & $(0.0102)$      &                 &                 \\
-$Tariff_{t-2}$ &                 &                 &                 & $0.0168$        &                 &                 \\
-               &                 &                 &                 & $(0.0099)$      &                 &                 \\
-$Trade_{t}$    &                 & $0.0023^{**}$   &                 &                 & $-0.0074$       &                 \\
-               &                 & $(0.0009)$      &                 &                 & $(0.0297)$      &                 \\
-$China_{t}$    &                 &                 & $0.0018^{**}$   &                 &                 & $0.0173$        \\
-               &                 &                 & $(0.0006)$      &                 &                 & $(0.0319)$      \\
-$China_{t-1}$  &                 &                 &                 &                 &                 & $0.1515^{***}$  \\
-               &                 &                 &                 &                 &                 & $(0.0324)$      \\
-$China_{t-2}$  &                 &                 &                 &                 &                 & $0.1309^{***}$  \\
-               &                 &                 &                 &                 &                 & $(0.0319)$      \\
-\hline
-AIC            & $-28604.6559$   & $-28610.2269$   & $-28613.1693$   & $633.4836$      & $638.2093$      & $610.2140$      \\
-AICc           & $-28604.6303$   & $-28610.2013$   & $-28613.1437$   & $633.7676$      & $638.3737$      & $610.4980$      \\
-BIC            & $-28542.9191$   & $-28548.4901$   & $-28551.4325$   & $667.4525$      & $663.7092$      & $644.1829$      \\
-Log Likelihood & $14311.3279$    & $14314.1134$    & $14315.5847$    & $-308.7418$     & $-313.1047$     & $-297.1070$     \\
-Num. obs.      & $7042$          & $7042$          & $7042$          & $516$           & $518$           & $516$           \\
-\hline
-\multicolumn{7}{l}{\scriptsize{$^{***}p<0.001$; $^{**}p<0.01$; $^{*}p<0.05$}}
-\end{tabular}
-\label{tab:armax_term}
-\end{center}
-\end{table}
-
-## Table 3
-
-\begin{table}
-
-\caption{Separate Terms Ljung-Box Test p-values}
-\centering
-\begin{tabular}[t]{l|r}
-\hline
-Model & Ljung.Box.p.value\\
-\hline
-First Term Tariffs & 0.0000000\\
-\hline
-First Term Trade & 0.0000000\\
-\hline
-First Term China & 0.0000000\\
-\hline
-Second Term Tariffs & 0.8489828\\
-\hline
-Second Term Trade & 0.8322070\\
-\hline
-Second Term China & 0.5122385\\
-\hline
-\end{tabular}
-\end{table}
