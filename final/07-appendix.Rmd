@@ -46,7 +46,7 @@ source(here("helperfunctions/armax_functions.R"))
 
 # Full Timeframe (Jan 2024 to May 2025)
 
-```{r datasetup_appendix, results=FALSE, warning=FALSE, message=FALSE}
+```{r datasetup_appendix, results=FALSE, warning=FALSE, message=FALSE, cache=TRUE}
 
 #load final dataset
 source(here("helperfunctions/full_data.R"))

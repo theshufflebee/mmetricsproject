@@ -17,3 +17,9 @@ rmd_files:
   - "06-bibliography.Rmd"
   - "07-appendix.Rmd"
   - "08-test.Rmd"
+  
+output:
+  bookdown::html_document2:
+    number_sections: true
+  bookdown::pdf_document2:
+    number_sections: true
