@@ -20,6 +20,8 @@ which sees minimal AIC loss and simplifying our models considerably.
 
 \@ref(sec:spy-table)
 
+\@ref(tab:armax1)
+
 ### Full Timeframe
 We run models with the following exogenous regressors: $TweetDummy$, $TweetCount$,
 and the mentions of words $Tariff$, $Trade$, and $China$. We first note on 

@@ -44,7 +44,7 @@ source(here("helperfunctions/armax_functions.R"))
 ```
 
 
-# Full Timeframe (Jan 2024 to May 2025)
+## Full Timeframe (Jan 2024 to May 2025)
 
 ```{r datasetup_appendix, results=FALSE, warning=FALSE, message=FALSE, cache=TRUE}
 
@@ -63,7 +63,7 @@ mean1 = mean(data$SPY_vol)
 ```
 
 
-## SPY Models
+### SPY Models
 
 We choose the specification in the armax_models file. In this file, we will
 just run said specifications to produce nice tables and graphs to include in 
@@ -97,7 +97,7 @@ models[["Model 5"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 
 ```
 
-## SPY Table
+### SPY Table
 
 ```{r creating table, results="asis", warning=F, message=F, cache=TRUE}
 
@@ -132,7 +132,7 @@ table1
 ```
 
 
-## SPY IRFs
+### SPY IRFs
 
 ```{r SPYirf, results="asis", warning=F, message=F, cache=TRUE}
 
@@ -152,7 +152,7 @@ ggsave("armax_plot1.png",plot=plot1,bg="white")
 ```
 
 
-## SPY Residuals
+### SPY Residuals
 ```{r SPYresiduals, warning=F, message=F, results=F, cache=TRUE}
 
 res1 = checkresiduals(models[["Model 1"]], plot = FALSE)
@@ -183,7 +183,7 @@ knitr::kable(pvals, digits = 100, caption = "Full Timeframe Ljung-Box Test p-val
 
 
 
-# First Term
+## First Term
 
 ```{r datasetup first, results=FALSE, warning=FALSE, message=FALSE, cache=TRUE}
 
@@ -198,7 +198,7 @@ mean2 = mean(data$SPY_vol)
 
 ```
 
-## SPY Models
+### SPY Models
 
 ```{r 1st term models, results=F, warning=F, message=F, cache=TRUE}
 
@@ -219,7 +219,7 @@ models[["First Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 ```
 
 
-## SPY Residuals
+### SPY Residuals
 ```{r 1st SPYresiduals, warning=F, message=F, results=F, cache=TRUE}
 
 res6 = checkresiduals(models[["First Term (1)"]], plot = FALSE)
@@ -237,7 +237,7 @@ pvals_new1 <- data.frame(
 
 
 
-# Second Term
+## Second Term
 
 ```{r datasetup second, results=FALSE, warning=FALSE, message=FALSE, cache=TRUE}
 
@@ -252,7 +252,7 @@ mean3 = mean(data$SPY_vol)
 
 ```
 
-## SPY Models
+### SPY Models
 
 ```{r 2nd term models, results=F, warning=F, message=F, cache=TRUE}
 
@@ -271,7 +271,7 @@ models[["Second Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 ```
 
 
-## SPY IRFs
+### SPY IRFs
 ```{r 2nd SPYirf, warning=F, message=F, cache=TRUE}
 
 #we want to plot the IRFs of these models
@@ -290,7 +290,7 @@ plot3
 ```
 
 
-## SPY Residuals
+### SPY Residuals
 ```{r 2nd SPYresiduals, results=F, warning=F, message=F, cache=TRUE}
 
 res9 = checkresiduals(models[["Second Term (1)"]], plot = FALSE)
@@ -310,7 +310,7 @@ pvals_combined <- rbind(pvals_new1, pvals_new2)
 ```
 
 
-## SPY Table (both terms) {#sec:spy-table}
+### SPY Table (both terms) {#sec:spy-table}
 
 \centering
 
@@ -348,7 +348,7 @@ htmlreg(
 ```
 
 
-# Descriptive Stats
+## Descriptive Stats
 
 ```{r means, message=F, warning=F, results="asis", cache=TRUE}
 
