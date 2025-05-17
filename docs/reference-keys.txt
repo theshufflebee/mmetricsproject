@@ -23,7 +23,7 @@ bibliography
 appendix
 full-timeframe-jan-2024-to-may-2025
 spy-models
-spy-table
+sec:spy-table
 spy-irfs
 spy-residuals
 first-term
@@ -33,7 +33,7 @@ second-term
 spy-models-2
 spy-irfs-1
 spy-residuals-2
-sec:spy-table
+sec:spy-table-terms
 descriptive-stats
 cross
 chapters-and-sub-chapters

@@ -97,7 +97,7 @@ models[["Model 5"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 
 ```
 
-### SPY Table
+### SPY Table {#sec:spy-table}
 ```{r armaxfull, results="asis", warning=FALSE, message=FALSE}
 library(texreg)
 
@@ -316,7 +316,7 @@ pvals_combined <- rbind(pvals_new1, pvals_new2)
 ```
 
 
-### SPY Table (both terms) {#sec:spy-table}
+### SPY Table (both terms) {#sec:spy-table-terms}
 
 \centering
 
