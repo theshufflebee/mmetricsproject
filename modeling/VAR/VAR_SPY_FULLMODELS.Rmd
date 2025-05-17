@@ -1,0 +1,4358 @@
+---
+title: "VAR_SPY_FULL"
+author: "pte"
+date: "2025-05-15"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+# SPY Analysis
+
+```{r load packages, error=FALSE, warning=FALSE, echoes = FALSE}
+library("quantmod")
+library("TSA")
+library("aTSA")
+library("rugarch")
+library("rmgarch")
+library("ggplot2")
+library("tibble")
+library("dplyr")
+library("lubridate")
+library(tibble)
+library(tidyverse)
+library(knitr)
+library("fGarch")
+library(FinTS)
+library(kableExtra)
+library(writexl)
+library("purrr")
+library("forecast")
+library("texreg")
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwhich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenizationc vfv 
+require(vars)
+
+
+
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwhich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenization
+require(syuzhet) #sentiment analysis
+require(alphavantager)
+require(tseries)
+
+rm(list=ls())
+
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/armax_functions.R"))
+```
+
+
+
+```{r load data}
+rm(Vdata)
+#load final dataset
+source(here("helperfunctions/full_data.R"))
+
+#select timeframe 
+Vdata = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
+```
+
+```{r series volatility}
+#Nombre of lag
+
+#series
+pro_v = ts(Vdata$SPY_vol)
+autoplot(pro_v)
+
+```
+
+```{r AIC}
+##with dummy
+y = cbind(Vdata$dummy, Vdata$SPY_vol)
+
+y_lag = VARselect(y, lag.max = 100)
+y_list = list(y_lag)
+
+
+##AIC
+resultats1 <- lapply(y_list, function(x) x$criteria["AIC(n)", ])
+
+resultats1 = as.data.frame(resultats1)
+
+resultats1 = resultats1 %>%
+  rename(name = 1) %>%
+  mutate(
+    n = c(1:length(name))
+  )
+
+ggplot (resultats1, aes(x=n, y= name)) +
+  geom_line(color = "steelblue") +
+  labs(title = "hourly Returns AIC",x="n" , y = "AIC") +
+  theme_minimal()
+
+
+```
+
+```{r HQ}
+##HQ
+resultats2 <- lapply(y_list, function(x) x$criteria["HQ(n)", ])
+
+resultats2 = as.data.frame(resultats2)
+
+resultats2 = resultats2 %>%
+  rename(name = 1) %>%
+  mutate(
+    n = c(1:length(name))
+  )
+
+ggplot (resultats2, aes(x=n, y= name)) +
+  geom_line(color = "steelblue") +
+  labs(title = "hourly Returns HQ",x="dum" , y = "HQ") +
+  theme_minimal()
+
+
+
+```
+
+```{r SC}
+##SC
+resultats3 <- lapply(y_list, function(x) x$criteria["SC(n)", ])
+
+resultats3 = as.data.frame(resultats3)
+
+resultats3 = resultats3 %>%
+  rename(name = 1) %>%
+  mutate(
+    n = c(1:length(name))
+  )
+
+ggplot (resultats3, aes(x=n, y= name)) +
+  geom_line(color = "steelblue") +
+  labs(title = "hourly Returns SC",x="dum" , y = "SC") +
+  theme_minimal()
+
+
+
+
+```
+
+```{r FPE}
+##FPE
+resultats4 <- lapply(y_list, function(x) x$criteria["FPE(n)", ])
+
+resultats4 = as.data.frame(resultats4)
+
+resultats4 = resultats4 %>%
+  rename(name = 1) %>%
+  mutate(
+    n = c(1:length(name))
+  )
+
+ggplot (resultats4, aes(x=n, y= name)) +
+  geom_line(color = "steelblue") +
+  labs(title = "hourly Returns FPE",x="dum" , y = "FPE") +
+  theme_minimal()
+
+
+```
+
+# Bunch of Test
+
+```{r acf}
+
+y = cbind(Vdata$dummy, Vdata$SPY_vol)
+colnames(y)[1:2] <- c("dum", "vol")
+est.VAR <- VAR(y,p=6)
+
+acf(Vdata$SPY_vol)
+
+
+```
+
+```{r pacf}
+pacf(Vdata$SPY_vol)
+
+
+```
+
+```{r adf test for volatility}
+adf.test(Vdata$SPY_vol, k = 6)
+
+
+```
+
+```{r adf test for dummy}
+adf.test(Vdata$dummy, k = 6)
+
+
+```
+
+```{r serial correlation}
+serial = serial.test(est.VAR, lags.pt = 6, type = "PT.asymptotic")
+###H0 test if there is no serial correlation
+###we observe serial correlation
+serial
+
+
+```
+
+```{r plot serial corr}
+plot(serial, names = "y1")
+
+
+
+```
+
+```{r heteroscedasticity}
+hete = arch.test(est.VAR, lags.multi = 80, multivariate.only = TRUE)
+hete
+
+
+```
+
+```{r Does residuals have normal dist.}
+norm = normality.test(est.VAR, multivariate.only = TRUE)
+norm
+
+
+```
+
+```{r structural breaks}
+stru2 = stability(est.VAR, type ="OLS-CUSUM") #OLS-CUSUM or Rec-CUSUM
+plot(stru2)
+
+
+```
+
+# Main Variables
+
+## Dummy
+
+```{r Estime dummy}
+y = cbind(Vdata$dummy, Vdata$SPY_vol)
+colnames(y)[1:2] <- c("dummy", "vol")
+est.VAR <- VAR(y,p=6)
+
+#extract results
+mod_vol = est.VAR$varresult$vol
+f = formula(mod_vol)
+d = model.frame(mod_vol)
+lm_clean = lm(f, data= d)
+
+#apply Newey-West
+nw_vcov = NeweyWest(lm_clean, lag=6)
+nw_se = sqrt(diag(nw_vcov))
+
+#t-stats
+coef = coef(lm_clean)
+t_stat = coef/nw_se
+
+#recalculate p-values
+robust = 2*(1-pt(abs(t_stat), df = df.residual(lm_clean)))
+
+#table
+screenreg(lm_clean, override.se = nw_se, override.pvalues = robust, digits = 6)
+
+
+```
+
+```{r effect of Vol on dummy}
+#extract results
+mod_post = est.VAR$varresult$dummy
+ff = formula(mod_post)
+dd = model.frame(mod_post)
+lm_clean_post = lm(ff, data= dd)
+
+#apply Newey-West
+nw_vcov_post = NeweyWest(lm_clean_post, lag=6)
+nw_se_post = sqrt(diag(nw_vcov_post))
+
+#t-stats
+coef_post = coef(lm_clean_post)
+t_stat_post = coef_post/nw_se_post
+
+#recalculate p-values
+robust_post = 2*(1-pt(abs(t_stat_post), df = df.residual(lm_clean_post)))
+
+#table
+screenreg(lm_clean_post, override.se = nw_se_post, override.pvalues = robust_post, digits = 6)
+
+
+```
+
+
+```{r B mat}
+
+#Recreate a Robust Omega Matrix
+U = residuals(est.VAR)
+T = nrow(U)
+L = 6 #number of lag
+Omega = matrix(0, ncol(U), ncol(U))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_ = t(U[(l+1):T, , drop=FALSE]) %*% U[1:(T-l), , drop=FALSE] /T
+  if (l == 0){
+    Omega = Omega + Gamma_l_
+  } else {
+    Omega = Omega + weight*(Gamma_l_ + t(Gamma_l_))
+  }
+}
+
+
+#make the B matrix
+loss <- function(param){
+  #Define the restriction
+  B <- matrix(c(param[1], param[2], 0, param[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X <- Omega - B %*% t(B)
+  
+  #loss function
+  loss <- sum(X^2)
+  return(loss)
+}
+
+res.opt <- optim(c(1, 0, 1), loss, method = "BFGS")
+B.hat <- matrix(c(res.opt$par[1], res.opt$par[2], 0, res.opt$par[3]), ncol = 2)
+
+print(cbind(Omega,B.hat %*% t(B.hat)))
+
+
+```
+
+```{r error of dum impact}
+B.hat
+
+```
+
+```{r IRF 1dummy}
+nb.sim = 7*7
+#get back the coefficient of est.VAR
+phi <- Acoef(est.VAR)
+PHI = make.PHI(phi)
+
+#take the constant
+constant <- sapply(est.VAR$varresult, function(eq) coef(eq)["const"])
+c=as.matrix(constant)
+
+#Simulate the IRF
+p <- length(phi)
+n <- dim(phi[[1]])[1]
+
+
+Y <- simul.VAR(c=c, Phi = phi, B = B.hat, nb.sim ,y0.star=rep(0, n*p),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+
+Yd = data.frame(
+  period = 1:nrow(Y),
+  response = Y[,2])
+
+ggplot(Yd,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Dummy on Volatility")+
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+
+```
+
+```{r IRF 2Dummy}
+ggplot(Yd,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Dummy on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+
+
+
+
+## N
+
+```{r estimate with N}
+y2 = cbind(Vdata$N, Vdata$SPY_vol)
+colnames(y2)[1:2] <- c("N", "vol")
+est.VAR2 <- VAR(y2,p=6)
+
+#extract results
+mod_vol2 = est.VAR2$varresult$vol
+f2 = formula(mod_vol2)
+d2 = model.frame(mod_vol2)
+lm_clean2 = lm(f2, data= d2)
+
+#apply Newey-West
+nw_vcov2 = NeweyWest(lm_clean2, lag=6)
+nw_se2 = sqrt(diag(nw_vcov2))
+
+#t-stats
+coef2 = coef(lm_clean2)
+t_stat2 = coef2/nw_se2
+
+#recalculate p-values
+robust2 = 2*(1-pt(abs(t_stat2), df = df.residual(lm_clean2)))
+
+#table
+screenreg(lm_clean2, override.se = nw_se2, override.pvalues = robust2, digits = 6)
+```
+
+```{r effect of Vol on N}
+#extract results
+mod_post2 = est.VAR2$varresult$N
+ff2 = formula(mod_post2)
+dd2 = model.frame(mod_post2)
+lm_clean_post2 = lm(ff2, data= dd2)
+
+#apply Newey-West
+nw_vcov_post2 = NeweyWest(lm_clean_post2, lag=6)
+nw_se_post2 = sqrt(diag(nw_vcov_post2))
+
+#t-stats
+coef_post2 = coef(lm_clean_post2)
+t_stat_post2 = coef_post2/nw_se_post2
+
+#recalculate p-values
+robust_post2 = 2*(1-pt(abs(t_stat_post2), df = df.residual(lm_clean_post2)))
+
+#table
+screenreg(lm_clean_post2, override.se = nw_se_post2, override.pvalues = robust_post2, digits = 6)
+
+
+```
+
+```{r B mat2}
+#Recreate a Robust Omega Matrix
+U2 = residuals(est.VAR2)
+T2 = nrow(U2)
+Omega2 = matrix(0, ncol(U2), ncol(U2))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_2 = t(U2[(l+1):T2, , drop=FALSE]) %*% U2[1:(T2-l), , drop=FALSE] /T2
+  if (l == 0){
+    Omega2 = Omega2 + Gamma_l_2
+  } else {
+    Omega2 = Omega2 + weight*(Gamma_l_2 + t(Gamma_l_2))
+  }
+}
+
+#make the B matrix
+loss2 <- function(param2){
+  #Define the restriction
+  B2 <- matrix(c(param2[1], param2[2], 0, param2[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X2 <- Omega2 - B2 %*% t(B2)
+  
+  #loss function
+  loss2 <- sum(X2^2)
+  return(loss2)
+}
+
+res.opt2 <- optim(c(1, 0, 1), loss2, method = "BFGS")
+B.hat2 <- matrix(c(res.opt2$par[1], res.opt2$par[2], 0, res.opt2$par[3]), ncol = 2)
+
+print(cbind(Omega2,B.hat2 %*% t(B.hat2)))
+
+
+```
+
+```{r shock by N}
+B.hat2
+
+```
+
+```{r IRF 1N}
+#get back the coefficient of est.VAR
+phi2 <- Acoef(est.VAR2)
+PHI2 = make.PHI(phi2)
+
+#take the constant
+constant2 <- sapply(est.VAR2$varresult, function(eq) coef(eq)["const"])
+c2=as.matrix(constant2)
+
+#Simulate the IRF
+p2 <- length(phi2)
+n2 <- dim(phi2[[1]])[1]
+
+Y2 <- simul.VAR(c=c2, Phi = phi2, B = B.hat2, nb.sim ,y0.star=rep(0, n2*p2),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd2 = data.frame(
+  period = 1:nrow(Y2),
+  response = Y2[,2])
+
+ggplot(Yd2,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of N on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF N5}
+ggplot(Yd2,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of N on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r does N granger cause vol}
+grangertest(y2[,c("N", "vol")], order = 6)
+
+```
+
+```{r does vol granger cause N}
+grangertest(y2[,c("vol", "N")], order = 6)
+
+```
+
+## Tariff
+
+```{r estime tariff}
+y3 = cbind(Vdata$tariff, Vdata$SPY_vol)
+colnames(y3)[1:2] <- c("tariff", "vol")
+est.VAR3 <- VAR(y3,p=6)
+
+#extract results
+mod_vol3 = est.VAR3$varresult$vol
+f3 = formula(mod_vol3)
+d3 = model.frame(mod_vol3)
+lm_clean3 = lm(f3, data= d3)
+
+#apply Newey-West
+nw_vcov3 = NeweyWest(lm_clean3, lag=6)
+nw_se3 = sqrt(diag(nw_vcov3))
+
+#t-stats
+coef3 = coef(lm_clean3)
+t_stat3 = coef3/nw_se3
+
+#recalculate p-values
+robust3 = 2*(1-pt(abs(t_stat3), df = df.residual(lm_clean3)))
+
+#table
+screenreg(lm_clean3, override.se = nw_se3, override.pvalues = robust3, digits = 6)
+```
+
+```{r effect of Vol on tariff}
+#Table for the effect of volatility on posts for variable tariff
+#extract results
+mod_post3 = est.VAR3$varresult$tariff
+ff3 = formula(mod_post3)
+dd3 = model.frame(mod_post3)
+lm_clean_post3 = lm(ff3, data= dd3)
+
+#apply Newey-West
+nw_vcov_post3 = NeweyWest(lm_clean_post3, lag=6)
+nw_se_post3 = sqrt(diag(nw_vcov_post3))
+
+#t-stats
+coef_post3 = coef(lm_clean_post3)
+t_stat_post3 = coef_post3/nw_se_post3
+
+#recalculate p-values
+robust_post3 = 2*(1-pt(abs(t_stat_post3), df = df.residual(lm_clean_post3)))
+
+#table
+screenreg(lm_clean_post3, override.se = nw_se_post3, override.pvalues = robust_post3, digits = 6)
+
+
+```
+
+```{r B mat3}
+#Recreate a Robust Omega Matrix
+U3 = residuals(est.VAR3)
+T3 = nrow(U3)
+Omega3 = matrix(0, ncol(U3), ncol(U3))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_3 = t(U3[(l+1):T3, , drop=FALSE]) %*% U3[1:(T3-l), , drop=FALSE] /T3
+  if (l == 0){
+    Omega3 = Omega3 + Gamma_l_3
+  } else {
+    Omega3 = Omega3 + weight*(Gamma_l_3 + t(Gamma_l_3))
+  }
+}
+
+
+#make the B matrix
+loss3 <- function(param3){
+  #Define the restriction
+  B3 <- matrix(c(param3[1], param3[2], 0, param3[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X3 <- Omega3 - B3 %*% t(B3)
+  
+  #loss function
+  loss3 <- sum(X3^2)
+  return(loss3)
+}
+
+res.opt3 <- optim(c(1, 0, 1), loss3, method = "BFGS")
+B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol = 2)
+
+print(cbind(Omega3,B.hat3 %*% t(B.hat3)))
+
+
+```
+
+```{r shock by tarrif}
+B.hat3
+
+
+```
+
+```{r IRF tariffff}
+#get back the coefficient of est.VAR
+phi3 <- Acoef(est.VAR3)
+PHI3 = make.PHI(phi3)
+
+#take the constant
+constant3 <- sapply(est.VAR3$varresult, function(eq) coef(eq)["const"])
+c3=as.matrix(constant3)
+
+#Simulate the IRF
+p3 <- length(phi3)
+n3 <- dim(phi3[[1]])[1]
+
+Y3 <- simul.VAR(c=c3, Phi = phi3, B = B.hat3, nb.sim ,y0.star=rep(0, n3*p3),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd3 = data.frame(
+  period = 1:nrow(Y3),
+  response = Y3[,2])
+
+ggplot(Yd3,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r does vol granger cause tarrif}
+grangertest(y3[,c("vol","tariff")], order = 6)
+
+```
+
+```{r does tarrif granger cause vol}
+grangertest(y3[,c("tariff", "vol")], order = 6)
+
+```
+
+```{r IRF tariff}
+ggplot(Yd3,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+## Trade
+
+```{r estimate trade}
+y4 = cbind(Vdata$trade, Vdata$SPY_vol)
+colnames(y4)[1:2] <- c("trade", "vol")
+est.VAR4 <- VAR(y4,p=6)
+
+#extract results
+mod_vol4 = est.VAR4$varresult$vol
+f4 = formula(mod_vol4)
+d4 = model.frame(mod_vol4)
+lm_clean4 = lm(f4, data= d4)
+
+#apply Newey-West
+nw_vcov4 = NeweyWest(lm_clean4, lag=6)
+nw_se4 = sqrt(diag(nw_vcov4))
+
+#t-stats
+coef4 = coef(lm_clean4)
+t_stat4 = coef4/nw_se4
+
+#recalculate p-values
+robust4 = 2*(1-pt(abs(t_stat4), df = df.residual(lm_clean4)))
+
+#table
+screenreg(lm_clean4, override.se = nw_se4, override.pvalues = robust4, digits = 6)
+```
+
+```{r effect of Vol on trade}
+#Table for the effect of volatility on posts for variable trade
+#extract results
+mod_post4 = est.VAR4$varresult$trade
+ff4 = formula(mod_post4)
+dd4 = model.frame(mod_post4)
+lm_clean_post4 = lm(ff4, data= dd4)
+
+#apply Newey-West
+nw_vcov_post4 = NeweyWest(lm_clean_post4, lag=6)
+nw_se_post4 = sqrt(diag(nw_vcov_post4))
+
+#t-stats
+coef_post4 = coef(lm_clean_post4)
+t_stat_post4 = coef_post4/nw_se_post4
+
+#recalculate p-values
+robust_post4 = 2*(1-pt(abs(t_stat_post4), df = df.residual(lm_clean_post4)))
+
+#table
+screenreg(lm_clean_post4, override.se = nw_se_post4, override.pvalues = robust_post4, digits = 6)
+
+
+```
+
+```{r B mat4}
+#Recreate a Robust Omega Matrix
+U4 = residuals(est.VAR4)
+T4 = nrow(U4)
+Omega4 = matrix(0, ncol(U4), ncol(U4))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_4 = t(U4[(l+1):T4, , drop=FALSE]) %*% U4[1:(T4-l), , drop=FALSE] /T4
+  if (l == 0){
+    Omega4 = Omega4 + Gamma_l_4
+  } else {
+    Omega4 = Omega4 + weight*(Gamma_l_4 + t(Gamma_l_4))
+  }
+}
+
+
+#make the B matrix
+loss4 <- function(param4){
+  #Define the restriction
+  B4 <- matrix(c(param4[1], param4[2], 0, param4[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X4 <- Omega4 - B4 %*% t(B4)
+  
+  #loss function
+  loss4 <- sum(X4^2)
+  return(loss4)
+}
+
+res.opt4 <- optim(c(1, 0, 1), loss4, method = "BFGS")
+B.hat4 <- matrix(c(res.opt4$par[1], res.opt4$par[2], 0, res.opt4$par[3]), ncol = 2)
+
+print(cbind(Omega4,B.hat4 %*% t(B.hat4)))
+
+
+
+```
+
+```{r shock by trade}
+B.hat4
+
+
+```
+
+```{r IRF tradeeee}
+#get back the coefficient of est.VAR
+phi4 <- Acoef(est.VAR4)
+PHI4 = make.PHI(phi4)
+
+#take the constant
+constant4 <- sapply(est.VAR4$varresult, function(eq) coef(eq)["const"])
+c4=as.matrix(constant4)
+
+#Simulate the IRF
+p4 <- length(phi4)
+n4 <- dim(phi4[[1]])[1]
+
+Y4 <- simul.VAR(c=c4, Phi = phi4, B = B.hat4, nb.sim ,y0.star=rep(0, n4*p4),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd4 = data.frame(
+  period = 1:nrow(Y4),
+  response = Y4[,2])
+
+ggplot(Yd4,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Trade on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r does vol granger cause trade}
+
+grangertest(y4[,c("vol","trade")], order = 6)
+
+
+
+```
+
+```{r does trade granger cause vol}
+
+grangertest(y4[,c("trade", "vol")], order = 6)
+
+
+```
+
+```{r IRF trade}
+ggplot(Yd4,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of trade on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+## China
+
+```{r estime China}
+
+ychina = cbind(Vdata$china, Vdata$SPY_vol)
+colnames(ychina)[1:2] <- c("china", "vol")
+est.VARchina <- VAR(ychina,p=6)
+
+#extract results
+mod_volchina = est.VARchina$varresult$vol
+fchina = formula(mod_volchina)
+dchina = model.frame(mod_volchina)
+lm_cleanchina = lm(fchina, data= dchina)
+
+#apply Newey-West
+nw_vcovchina = NeweyWest(lm_cleanchina, lag=6)
+nw_sechina = sqrt(diag(nw_vcovchina))
+
+#t-stats
+coefchina = coef(lm_cleanchina)
+t_statchina = coefchina/nw_sechina
+
+#recalculate p-values
+robustchina = 2*(1-pt(abs(t_statchina), df = df.residual(lm_cleanchina)))
+
+#table
+screenreg(lm_cleanchina, override.se = nw_sechina, override.pvalues = robustchina, digits = 6)
+```
+
+```{r effect of Vol on china}
+#Table for the effect of volatility on posts for variable china
+#extract results
+mod_postchina = est.VARchina$varresult$china
+ffchina = formula(mod_postchina)
+ddchina = model.frame(mod_postchina)
+lm_clean_postchina = lm(ffchina, data= ddchina)
+
+#apply Newey-West
+nw_vcov_postchina = NeweyWest(lm_clean_postchina, lag=6)
+nw_se_postchina = sqrt(diag(nw_vcov_postchina))
+
+#t-stats
+coef_postchina = coef(lm_clean_postchina)
+t_stat_postchina = coef_postchina/nw_se_postchina
+
+#recalculate p-values
+robust_postchina = 2*(1-pt(abs(t_stat_postchina), df = df.residual(lm_clean_postchina)))
+
+#table
+screenreg(lm_clean_postchina, override.se = nw_se_postchina, override.pvalues = robust_postchina, digits = 6)
+
+
+```
+
+```{r B mat china}
+#Recreate a Robust Omega Matrix
+Uchina = residuals(est.VARchina)
+Tchina = nrow(Uchina)
+Omegachina = matrix(0, ncol(Uchina), ncol(Uchina))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_china = t(Uchina[(l+1):Tchina, , drop=FALSE]) %*% Uchina[1:(Tchina-l), , drop=FALSE] /Tchina
+  if (l == 0){
+    Omegachina = Omegachina + Gamma_l_china
+  } else {
+    Omegachina = Omegachina + weight*(Gamma_l_china + t(Gamma_l_china))
+  }
+}
+
+
+#make the B matrix
+losschina <- function(paramchina){
+  #Define the restriction
+  Bchina <- matrix(c(paramchina[1], paramchina[2], 0, paramchina[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  Xchina <- Omegachina - Bchina %*% t(Bchina)
+  
+  #loss function
+  losschina <- sum(Xchina^2)
+  return(losschina)
+}
+
+res.optchina <- optim(c(1, 0, 1), losschina, method = "BFGS")
+B.hatchina <- matrix(c(res.optchina$par[1], res.optchina$par[2], 0, res.optchina$par[3]), ncol = 2)
+
+print(cbind(Omegachina,B.hatchina %*% t(B.hatchina)))
+
+
+
+```
+
+```{r shock by china}
+B.hatchina
+
+
+```
+
+```{r IRF china1}
+#get back the coefficient of est.VAR
+phichina <- Acoef(est.VARchina)
+PHIchina = make.PHI(phichina)
+
+#take the constant
+constantchina <- sapply(est.VARchina$varresult, function(eq) coef(eq)["const"])
+cchina=as.matrix(constantchina)
+
+#Simulate the IRF
+pchina <- length(phichina)
+nchina <- dim(phichina[[1]])[1]
+
+Ychina <- simul.VAR(c=cchina, Phi = phichina, B = B.hatchina, nb.sim ,y0.star=rep(0, nchina*pchina),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Ydchina = data.frame(
+  period = 1:nrow(Ychina),
+  response = Ychina[,2])
+
+ggplot(Ydchina,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of China on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF China}
+ggplot(Ydchina,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of China on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r does vol granger cause china}
+
+grangertest(ychina[,c("vol", "china")], order = 6)
+
+
+
+```
+
+```{r does china granger cause vol}
+
+grangertest(ychina[,c("china", "vol")], order = 6)
+
+
+```
+
+# Sentiment Analysis
+
+## Positive
+
+```{r estime positive }
+y5 = cbind(Vdata$prop_positive, Vdata$SPY_vol)
+colnames(y5)[1:2] <- c("positive", "vol")
+est.VAR5 <- VAR(y5,p=6)
+
+#extract results
+mod_vol5 = est.VAR5$varresult$vol
+f5 = formula(mod_vol5)
+d5 = model.frame(mod_vol5)
+lm_clean5 = lm(f5, data= d5)
+
+#apply Newey-West
+nw_vcov5 = NeweyWest(lm_clean5, lag=6)
+nw_se5 = sqrt(diag(nw_vcov5))
+
+#t-stats
+coef5 = coef(lm_clean5)
+t_stat5 = coef5/nw_se5
+
+#recalculate p-values
+robust5 = 2*(1-pt(abs(t_stat5), df = df.residual(lm_clean5)))
+
+#table
+screenreg(lm_clean5, override.se = nw_se5, override.pvalues = robust5, digits = 6)
+```
+
+```{r effect of Vol on positive}
+#Table for the effect of volatility on posts for variable positive
+#extract results
+mod_post5 = est.VAR5$varresult$positive
+ff5 = formula(mod_post5)
+dd5 = model.frame(mod_post5)
+lm_clean_post5 = lm(ff5, data= dd5)
+
+#apply Newey-West
+nw_vcov_post5 = NeweyWest(lm_clean_post5, lag=6)
+nw_se_post5 = sqrt(diag(nw_vcov_post5))
+
+#t-stats
+coef_post5 = coef(lm_clean_post5)
+t_stat_post5 = coef_post5/nw_se_post5
+
+#recalculate p-values
+robust_post5 = 2*(1-pt(abs(t_stat_post5), df = df.residual(lm_clean_post5)))
+
+#table
+screenreg(lm_clean_post5, override.se = nw_se_post5, override.pvalues = robust_post5, digits = 6)
+
+
+```
+
+```{r B mat5}
+
+U5 = residuals(est.VAR5)
+T5 = nrow(U5)
+Omega5 = matrix(0, ncol(U5), ncol(U5))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_5 = t(U5[(l+1):T5, , drop=FALSE]) %*% U5[1:(T5-l), , drop=FALSE] /T5
+  if (l == 0){
+    Omega5 = Omega5 + Gamma_l_5
+  } else {
+    Omega5 = Omega5 + weight*(Gamma_l_5 + t(Gamma_l_5))
+  }
+}
+
+#make the B matrix
+loss5 <- function(param5){
+  #Define the restriction
+  B5 <- matrix(c(param5[1], param5[2], 0, param5[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X5 <- Omega5 - B5 %*% t(B5)
+  
+  #loss function
+  loss5 <- sum(X5^2)
+  return(loss5)
+}
+
+res.opt5 <- optim(c(1, 0, 1), loss5, method = "BFGS")
+B.hat5 <- matrix(c(res.opt5$par[1], res.opt5$par[2], 0, res.opt5$par[3]), ncol = 2)
+
+print(cbind(Omega5,B.hat5 %*% t(B.hat5)))
+
+
+
+```
+
+```{r shock by positive}
+B.hat5
+
+
+```
+
+```{r IRF positiveeee}
+#get back the coefficient of est.VAR
+phi5 <- Acoef(est.VAR5)
+PHI5 = make.PHI(phi5)
+
+#take the constant
+constant5 <- sapply(est.VAR5$varresult, function(eq) coef(eq)["const"])
+c5=as.matrix(constant5)
+
+#Simulate the IRF
+p5 <- length(phi5)
+n5 <- dim(phi5[[1]])[1]
+
+Y5 <- simul.VAR(c=c5, Phi = phi5, B = B.hat5, nb.sim ,y0.star=rep(0, n5*p5),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd5 = data.frame(
+  period = 1:nrow(Y5),
+  response = Y5[,2])
+
+ggplot(Yd5,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Positive on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF Positive}
+ggplot(Yd5,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Positive on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r does vol granger cause positive}
+grangertest(y5[,c("vol","positive")], order = 6)
+
+
+
+```
+
+```{r does positive granger cause vol}
+grangertest(y5[,c("positive", "vol")], order = 6)
+
+
+```
+
+## Negative
+
+```{r estimate negative}
+y6 = cbind(Vdata$prop_negative, Vdata$SPY_vol)
+colnames(y6)[1:2] <- c("negative", "vol")
+est.VAR6 <- VAR(y6,p=6)
+
+#extract results
+mod_vol6 = est.VAR6$varresult$vol
+f6 = formula(mod_vol6)
+d6 = model.frame(mod_vol6)
+lm_clean6 = lm(f6, data= d6)
+
+#apply Newey-West
+nw_vcov6 = NeweyWest(lm_clean6, lag=6)
+nw_se6 = sqrt(diag(nw_vcov6))
+
+#t-stats
+coef6 = coef(lm_clean6)
+t_stat6 = coef6/nw_se6
+
+#recalculate p-values
+robust6 = 2*(1-pt(abs(t_stat6), df = df.residual(lm_clean6)))
+
+#table
+screenreg(lm_clean6, override.se = nw_se6, override.pvalues = robust6, digits = 6)
+```
+
+```{r effect of Vol on negative}
+#Table for the effect of volatility on posts for variable negative
+#extract results
+mod_post6 = est.VAR6$varresult$negative
+ff6 = formula(mod_post6)
+dd6 = model.frame(mod_post6)
+lm_clean_post6 = lm(ff6, data= dd6)
+
+#apply Newey-West
+nw_vcov_post6 = NeweyWest(lm_clean_post6, lag=6)
+nw_se_post6 = sqrt(diag(nw_vcov_post6))
+
+#t-stats
+coef_post6 = coef(lm_clean_post6)
+t_stat_post6 = coef_post6/nw_se_post6
+
+#recalculate p-values
+robust_post6 = 2*(1-pt(abs(t_stat_post6), df = df.residual(lm_clean_post6)))
+
+#table
+screenreg(lm_clean_post6, override.se = nw_se_post6, override.pvalues = robust_post6, digits = 6)
+
+
+```
+
+```{r B mat6}
+#Construct the Robust Omega Matrix
+U6 = residuals(est.VAR6)
+T6 = nrow(U6)
+Omega6 = matrix(0, ncol(U6), ncol(U6))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_6 = t(U6[(l+1):T6, , drop=FALSE]) %*% U6[1:(T6-l), , drop=FALSE] /T6
+  if (l == 0){
+    Omega6 = Omega6 + Gamma_l_6
+  } else {
+    Omega6 = Omega6 + weight*(Gamma_l_6 + t(Gamma_l_6))
+  }
+}
+
+
+#make the B matrix
+loss6 <- function(param6){
+  #Define the restriction
+  B6 <- matrix(c(param6[1], param6[2], 0, param6[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X6 <- Omega6 - B6 %*% t(B6)
+  
+  #loss function
+  loss6 <- sum(X6^2)
+  return(loss6)
+}
+
+res.opt6 <- optim(c(1, 0, 1), loss6, method = "BFGS")
+B.hat6 <- matrix(c(res.opt6$par[1], res.opt6$par[2], 0, res.opt6$par[3]), ncol = 2)
+
+print(cbind(Omega6,B.hat6 %*% t(B.hat6)))
+
+
+```
+
+```{r shock by negative}
+B.hat6
+
+
+```
+
+```{r IRF negativeeee}
+#get back the coefficient of est.VAR
+phi6 <- Acoef(est.VAR6)
+PHI6 = make.PHI(phi6)
+
+#take the constant
+constant6 <- sapply(est.VAR6$varresult, function(eq) coef(eq)["const"])
+c6=as.matrix(constant6)
+
+#Simulate the IRF
+p6 <- length(phi6)
+n6 <- dim(phi6[[1]])[1]
+
+Y6 <- simul.VAR(c=c6, Phi = phi6, B = B.hat6, nb.sim ,y0.star=rep(0, n6*p6),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd6 = data.frame(
+  period = 1:nrow(Y6),
+  response = Y6[,2])
+
+ggplot(Yd6,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Negative on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF Negative}
+ggplot(Yd6,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Negative on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r does Negative granger cause vol}
+grangertest(y6[,c("negative", "vol")], order = 6)
+
+```
+
+```{r does vol granger cause neg}
+grangertest(y6[,c("vol", "negative")], order = 6)
+
+```
+
+## Trust
+
+```{r estimate truste}
+y7 = cbind(Vdata$prop_trust, Vdata$SPY_vol)
+colnames(y7)[1:2] <- c("trust", "vol")
+est.VAR7 <- VAR(y7,p=6)
+
+#extract results
+mod_vol7 = est.VAR7$varresult$vol
+f7 = formula(mod_vol7)
+d7 = model.frame(mod_vol7)
+lm_clean7 = lm(f7, data= d7)
+
+#apply Newey-West
+nw_vcov7 = NeweyWest(lm_clean7, lag=6)
+nw_se7 = sqrt(diag(nw_vcov7))
+
+#t-stats
+coef7 = coef(lm_clean7)
+t_stat7 = coef7/nw_se7
+
+#recalculate p-values
+robust7 = 2*(1-pt(abs(t_stat7), df = df.residual(lm_clean7)))
+
+#table
+screenreg(lm_clean7, override.se = nw_se7, override.pvalues = robust7, digits = 6)
+```
+
+```{r B mat7}
+#Construct the Robust Omega Matrix
+U7 = residuals(est.VAR7)
+T7 = nrow(U7)
+Omega7 = matrix(0, ncol(U7), ncol(U7))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_7 = t(U7[(l+1):T7, , drop=FALSE]) %*% U7[1:(T7-l), , drop=FALSE] /T7
+  if (l == 0){
+    Omega7 = Omega7 + Gamma_l_7
+  } else {
+    Omega7 = Omega7 + weight*(Gamma_l_7 + t(Gamma_l_7))
+  }
+}
+
+#make the B matrix
+loss7 <- function(param7){
+  #Define the restriction
+  B7 <- matrix(c(param7[1], param7[2], 0, param7[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X7 <- Omega7 - B7 %*% t(B7)
+  
+  #loss function
+  loss7 <- sum(X7^2)
+  return(loss7)
+}
+
+res.opt7 <- optim(c(1, 0, 1), loss7, method = "BFGS")
+B.hat7 <- matrix(c(res.opt7$par[1], res.opt7$par[2], 0, res.opt7$par[3]), ncol = 2)
+
+print(cbind(Omega7,B.hat7 %*% t(B.hat7)))
+
+
+
+```
+
+```{r shock by trust}
+B.hat7
+
+
+```
+
+```{r IRF trustttt}
+#get back the coefficient of est.VAR
+phi7 <- Acoef(est.VAR7)
+PHI7 = make.PHI(phi7)
+
+#take the constant
+constant7 <- sapply(est.VAR7$varresult, function(eq) coef(eq)["const"])
+c7=as.matrix(constant7)
+
+#Simulate the IRF
+p7 <- length(phi7)
+n7 <- dim(phi7[[1]])[1]
+
+Y7 <- simul.VAR(c=c7, Phi = phi7, B = B.hat7, nb.sim ,y0.star=rep(0, n7*p7),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd7 = data.frame(
+  period = 1:nrow(Y7),
+  response = Y7[,2])
+
+ggplot(Yd7,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Trust on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF Trust}
+ggplot(Yd7,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Trust on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r does Trust granger cause vol}
+grangertest(y7[,c("trust", "vol")], order = 6)
+
+```
+
+```{r does vol granger cause Trust}
+grangertest(y7[,c("vol", "trust")], order = 6)
+
+```
+
+## Surprise
+
+```{r estimate surprise}
+y8 = cbind(Vdata$prop_surprise, Vdata$SPY_vol)
+colnames(y8)[1:2] <- c("surprise", "vol")
+est.VAR8 <- VAR(y8,p=6)
+
+#extract results
+mod_vol8 = est.VAR8$varresult$vol
+f8 = formula(mod_vol8)
+d8 = model.frame(mod_vol8)
+lm_clean8 = lm(f8, data= d8)
+
+#apply Newey-West
+nw_vcov8 = NeweyWest(lm_clean8, lag=6)
+nw_se8 = sqrt(diag(nw_vcov8))
+
+#t-stats
+coef8 = coef(lm_clean8)
+t_stat8 = coef8/nw_se8
+
+#recalculate p-values
+robust8 = 2*(1-pt(abs(t_stat8), df = df.residual(lm_clean8)))
+
+#table
+screenreg(lm_clean8, override.se = nw_se8, override.pvalues = robust8, digits = 6)
+```
+
+```{r Bmat8}
+#Construct the Robust Omega Matrix
+U8 = residuals(est.VAR8)
+T8 = nrow(U8)
+Omega8 = matrix(0, ncol(U8), ncol(U8))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_8 = t(U8[(l+1):T8, , drop=FALSE]) %*% U8[1:(T8-l), , drop=FALSE] /T8
+  if (l == 0){
+    Omega8 = Omega8 + Gamma_l_8
+  } else {
+    Omega8 = Omega8 + weight*(Gamma_l_8 + t(Gamma_l_8))
+  }
+}
+
+
+#make the B matrix
+loss8 <- function(param8){
+  #Define the restriction
+  B8 <- matrix(c(param8[1], param8[2], 0, param8[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X8 <- Omega8 - B8 %*% t(B8)
+  
+  #loss function
+  loss8 <- sum(X8^2)
+  return(loss8)
+}
+
+res.opt8 <- optim(c(1, 0, 1), loss8, method = "BFGS")
+B.hat8 <- matrix(c(res.opt8$par[1], res.opt8$par[2], 0, res.opt8$par[3]), ncol = 2)
+
+print(cbind(Omega8,B.hat8 %*% t(B.hat8)))
+
+```
+
+```{r IRF surpriseeee}
+#get back the coefficient of est.VAR
+phi8 <- Acoef(est.VAR8)
+PHI8 = make.PHI(phi8)
+
+#take the constant
+constant8 <- sapply(est.VAR8$varresult, function(eq) coef(eq)["const"])
+c8=as.matrix(constant8)
+
+#Simulate the IRF
+p8 <- length(phi8)
+n8 <- dim(phi8[[1]])[1]
+
+Y8 <- simul.VAR(c=c8, Phi = phi8, B = B.hat8, nb.sim ,y0.star=rep(0, n8*p8),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd8 = data.frame(
+  period = 1:nrow(Y8),
+  response = Y8[,2])
+
+ggplot(Yd8,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Surprise on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF Surprise}
+ggplot(Yd8,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Surprise on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r does Surprise granger cause vol}
+grangertest(y8[,c("surprise", "vol")], order = 6)
+
+```
+
+```{r does vol granger cause Suprise}
+grangertest(y8[,c("vol", "surprise")], order = 6)
+
+```
+
+## Sadness
+
+```{r estimate sadness}
+y9 = cbind(Vdata$prop_sadness, Vdata$SPY_vol)
+colnames(y9)[1:2] <- c("sadness", "vol")
+est.VAR9 <- VAR(y9,p=6)
+
+#extract results
+mod_vol9 = est.VAR9$varresult$vol
+f9 = formula(mod_vol9)
+d9 = model.frame(mod_vol9)
+lm_clean9 = lm(f9, data= d9)
+
+#apply Newey-West
+nw_vcov9 = NeweyWest(lm_clean9, lag=6)
+nw_se9 = sqrt(diag(nw_vcov9))
+
+#t-stats
+coef9 = coef(lm_clean9)
+t_stat9 = coef9/nw_se9
+
+#recalculate p-values
+robust9 = 2*(1-pt(abs(t_stat9), df = df.residual(lm_clean9)))
+
+#table
+screenreg(lm_clean9, override.se = nw_se9, override.pvalues = robust9, digits = 6)
+```
+
+```{r b mat lutin}
+#Construct the Robust Omega Matrix
+U9 = residuals(est.VAR9)
+T9 = nrow(U9)
+Omega9 = matrix(0, ncol(U9), ncol(U9))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_9 = t(U9[(l+1):T9, , drop=FALSE]) %*% U9[1:(T9-l), , drop=FALSE] /T9
+  if (l == 0){
+    Omega9 = Omega9 + Gamma_l_9
+  } else {
+    Omega9 = Omega9 + weight*(Gamma_l_9 + t(Gamma_l_9))
+  }
+}
+
+
+#make the B matrix
+loss9 <- function(param9){
+  #Define the restriction
+  B9 <- matrix(c(param9[1], param9[2], 0, param9[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X9 <- Omega9 - B9 %*% t(B9)
+  
+  #loss function
+  loss9 <- sum(X9^2)
+  return(loss9)
+}
+
+res.opt9 <- optim(c(1, 0, 1), loss9, method = "BFGS")
+B.hat9 <- matrix(c(res.opt9$par[1], res.opt9$par[2], 0, res.opt9$par[3]), ncol = 2)
+
+print(cbind(Omega9,B.hat9 %*% t(B.hat9)))
+
+
+```
+
+```{r shock by sadnes ;(}
+
+B.hat9
+
+```
+
+```{r IRF sadnesssss}
+#get back the coefficient of est.VAR
+phi9 <- Acoef(est.VAR9)
+PHI9 = make.PHI(phi9)
+
+#take the constant
+constant9 <- sapply(est.VAR9$varresult, function(eq) coef(eq)["const"])
+c9=as.matrix(constant9)
+
+#Simulate the IRF
+p9 <- length(phi9)
+n9 <- dim(phi9[[1]])[1]
+
+Y9 <- simul.VAR(c=c9, Phi = phi9, B = B.hat9, nb.sim ,y0.star=rep(0, n9*p9),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd9 = data.frame(
+  period = 1:nrow(Y9),
+  response = Y9[,2])
+
+ggplot(Yd9,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Sadness on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF Sadness}
+ggplot(Yd9,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Sadness on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r does Sadness granger cause vol}
+grangertest(y9[,c("sadness", "vol")], order = 6)
+
+```
+
+```{r does vol granger cause Sadness}
+grangertest(y9[,c("vol", "sadness")], order = 6)
+
+```
+
+## Joy
+
+```{r estimate joy}
+y10 = cbind(Vdata$prop_joy, Vdata$SPY_vol)
+colnames(y10)[1:2] <- c("joy", "vol")
+est.VAR10 <- VAR(y10,p=6)
+
+#extract results
+mod_vol10 = est.VAR10$varresult$vol
+f10 = formula(mod_vol10)
+d10 = model.frame(mod_vol10)
+lm_clean10 = lm(f10, data= d10)
+
+#apply Newey-West
+nw_vcov10 = NeweyWest(lm_clean10, lag=6)
+nw_se10 = sqrt(diag(nw_vcov10))
+
+#t-stats
+coef10 = coef(lm_clean10)
+t_stat10 = coef10/nw_se10
+
+#recalculate p-values
+robust10 = 2*(1-pt(abs(t_stat10), df = df.residual(lm_clean10)))
+
+#table
+screenreg(lm_clean10, override.se = nw_se10, override.pvalues = robust10, digits = 6)
+```
+
+```{r Bmat joy}
+#Construct the Robust Omega Matrix
+U10 = residuals(est.VAR10)
+T10 = nrow(U10)
+Omega10 = matrix(0, ncol(U10), ncol(U10))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_10 = t(U10[(l+1):T10, , drop=FALSE]) %*% U10[1:(T10-l), , drop=FALSE] /T10
+  if (l == 0){
+    Omega10 = Omega10 + Gamma_l_10
+  } else {
+    Omega10 = Omega10 + weight*(Gamma_l_10 + t(Gamma_l_10))
+  }
+}
+
+
+#make the B matrix
+loss10 <- function(param10){
+  #Define the restriction
+  B10 <- matrix(c(param10[1], param10[2], 0, param10[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X10 <- Omega10 - B10 %*% t(B10)
+  
+  #loss function
+  loss10 <- sum(X10^2)
+  return(loss10)
+}
+
+res.opt10 <- optim(c(1, 0, 1), loss10, method = "BFGS")
+B.hat10 <- matrix(c(res.opt10$par[1], res.opt10$par[2], 0, res.opt10$par[3]), ncol = 2)
+
+print(cbind(Omega10,B.hat10 %*% t(B.hat10)))
+
+
+```
+
+```{r shock by joy}
+
+B.hat10
+
+```
+
+```{r IRF joyyy}
+#get back the coefficient of est.VAR
+phi10 <- Acoef(est.VAR10)
+PHI10 = make.PHI(phi10)
+
+#take the constant
+constant10 <- sapply(est.VAR10$varresult, function(eq) coef(eq)["const"])
+c10=as.matrix(constant10)
+
+#Simulate the IRF
+p10 <- length(phi10)
+n10 <- dim(phi10[[1]])[1]
+
+Y10 <- simul.VAR(c=c10, Phi = phi10, B = B.hat10, nb.sim ,y0.star=rep(0, n10*p10),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd10 = data.frame(
+  period = 1:nrow(Y10),
+  response = Y10[,2])
+
+ggplot(Yd10,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Joy on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF Joy}
+ggplot(Yd10,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Joy on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r does Joy granger cause vol}
+grangertest(y10[,c("joy", "vol")], order = 6)
+
+```
+
+```{r does vol granger cause Joy}
+grangertest(y10[,c("vol", "joy")], order = 6)
+
+```
+
+## Fear
+
+```{r estimate fear}
+y32 = cbind(Vdata$prop_fear, Vdata$SPY_vol)
+colnames(y32)[1:2] <- c("fear", "vol")
+est.VAR32 <- VAR(y32,p=6)
+
+#extract results
+mod_vol32 = est.VAR32$varresult$vol
+f32 = formula(mod_vol32)
+d32 = model.frame(mod_vol32)
+lm_clean32 = lm(f32, data= d32)
+
+#apply Newey-West
+nw_vcov32 = NeweyWest(lm_clean32, lag=6)
+nw_se32 = sqrt(diag(nw_vcov32))
+
+#t-stats
+coef32 = coef(lm_clean32)
+t_stat32 = coef32/nw_se32
+
+#recalculate p-values
+robust32 = 2*(1-pt(abs(t_stat32), df = df.residual(lm_clean32)))
+
+#table
+screenreg(lm_clean32, override.se = nw_se32, override.pvalues = robust32, digits = 6)
+```
+
+```{r bmat fear}
+#Construct the Robust Omega Matrix
+U32 = residuals(est.VAR32)
+T32 = nrow(U32)
+Omega32 = matrix(0, ncol(U32), ncol(U32))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_32 = t(U32[(l+1):T32, , drop=FALSE]) %*% U32[1:(T32-l), , drop=FALSE] /T32
+  if (l == 0){
+    Omega32 = Omega32 + Gamma_l_32
+  } else {
+    Omega32 = Omega32 + weight*(Gamma_l_32 + t(Gamma_l_32))
+  }
+}
+
+
+#make the B matrix
+loss32 <- function(param32){
+  #Define the restriction
+  B32 <- matrix(c(param32[1], param32[2], 0, param32[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X32 <- Omega32 - B32 %*% t(B32)
+  
+  #loss function
+  loss32 <- sum(X32^2)
+  return(loss32)
+}
+
+res.opt32 <- optim(c(1, 0, 1), loss32, method = "BFGS")
+B.hat32 <- matrix(c(res.opt32$par[1], res.opt32$par[2], 0, res.opt32$par[3]), ncol = 2)
+
+print(cbind(Omega32,B.hat32 %*% t(B.hat32)))
+
+
+```
+
+```{r shock by fear}
+B.hat32
+
+
+```
+
+```{r IRF fearrrr}
+#get back the coefficient of est.VAR
+phi32 <- Acoef(est.VAR32)
+PHI32 = make.PHI(phi32)
+
+#take the constant
+constant32 <- sapply(est.VAR32$varresult, function(eq) coef(eq)["const"])
+c32=as.matrix(constant32)
+
+#Simulate the IRF
+p32 <- length(phi32)
+n32 <- dim(phi32[[1]])[1]
+
+Y32 <- simul.VAR(c=c32, Phi = phi32, B = B.hat32, nb.sim ,y0.star=rep(0, n32*p32),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd32 = data.frame(
+  period = 1:nrow(Y32),
+  response = Y32[,2])
+
+ggplot(Yd32,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Fear on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF Fear}
+ggplot(Yd32,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Fear on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r does Fear granger cause vol}
+grangertest(y32[,c("fear", "vol")], order = 6)
+
+```
+
+```{r does vol granger cause Fear}
+grangertest(y32[,c("vol", "fear")], order = 6)
+
+```
+
+## Disgust
+
+```{r estimate disgust}
+y11 = cbind(Vdata$prop_disgust, Vdata$SPY_vol)
+colnames(y11)[1:2] <- c("disgust", "vol")
+est.VAR11 <- VAR(y11,p=6)
+
+#extract results
+mod_vol11 = est.VAR11$varresult$vol
+f11 = formula(mod_vol11)
+d11 = model.frame(mod_vol11)
+lm_clean11 = lm(f11, data= d11)
+
+#apply Newey-West
+nw_vcov11 = NeweyWest(lm_clean11, lag=6)
+nw_se11 = sqrt(diag(nw_vcov11))
+
+#t-stats
+coef11 = coef(lm_clean11)
+t_stat11 = coef11/nw_se11
+
+#recalculate p-values
+robust11 = 2*(1-pt(abs(t_stat11), df = df.residual(lm_clean11)))
+
+#table
+screenreg(lm_clean11, override.se = nw_se11, override.pvalues = robust11, digits = 6)
+```
+
+```{r bmat disgust}
+#Construct the Robust Omega Matrix
+U11 = residuals(est.VAR11)
+T11 = nrow(U11)
+Omega11 = matrix(0, ncol(U11), ncol(U11))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_11 = t(U11[(l+1):T11, , drop=FALSE]) %*% U11[1:(T11-l), , drop=FALSE] /T11
+  if (l == 0){
+    Omega11 = Omega11 + Gamma_l_11
+  } else {
+    Omega11 = Omega11 + weight*(Gamma_l_11 + t(Gamma_l_11))
+  }
+}
+
+
+#make the B matrix
+loss11 <- function(param11){
+  #Define the restriction
+  B11 <- matrix(c(param11[1], param11[2], 0, param11[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X11 <- Omega11 - B11 %*% t(B11)
+  
+  #loss function
+  loss11 <- sum(X11^2)
+  return(loss11)
+}
+
+res.opt11 <- optim(c(1, 0, 1), loss11, method = "BFGS")
+B.hat11 <- matrix(c(res.opt11$par[1], res.opt11$par[2], 0, res.opt11$par[3]), ncol = 2)
+
+print(cbind(Omega11,B.hat11 %*% t(B.hat11)))
+
+
+```
+
+```{r shock by disgust}
+B.hat11
+
+
+```
+
+```{r IRF disgustttt}
+#get back the coefficient of est.VAR
+phi11 <- Acoef(est.VAR11)
+PHI11 = make.PHI(phi11)
+
+#take the constant
+constant11 <- sapply(est.VAR11$varresult, function(eq) coef(eq)["const"])
+c11=as.matrix(constant11)
+
+#Simulate the IRF
+p11 <- length(phi11)
+n11 <- dim(phi11[[1]])[1]
+
+Y11 <- simul.VAR(c=c11, Phi = phi11, B = B.hat11, nb.sim ,y0.star=rep(0, n11*p11),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd11 = data.frame(
+  period = 1:nrow(Y11),
+  response = Y11[,2])
+
+ggplot(Yd11,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Disgust on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF Disgusttttttt}
+ggplot(Yd11,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Disgust on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r does Disgust granger cause vol}
+grangertest(y11[,c("disgust", "vol")], order = 6)
+
+```
+
+```{r does vol granger cause Disgust}
+grangertest(y11[,c("vol", "disgust")], order = 6)
+
+```
+
+## Anticipation
+
+```{r estimate anticipation}
+
+y15 = cbind(Vdata$prop_anticipation, Vdata$SPY_vol)
+colnames(y15)[1:2] <- c("anticipation", "vol")
+est.VAR15 <- VAR(y15,p=6)
+
+#extract results
+mod_vol15 = est.VAR15$varresult$vol
+f15 = formula(mod_vol15)
+d15 = model.frame(mod_vol15)
+lm_clean15 = lm(f15, data= d15)
+
+#apply Newey-West
+nw_vcov15 = NeweyWest(lm_clean15, lag=6)
+nw_se15 = sqrt(diag(nw_vcov15))
+
+#t-stats
+coef15 = coef(lm_clean15)
+t_stat15 = coef15/nw_se15
+
+#recalculate p-values
+robust15 = 2*(1-pt(abs(t_stat15), df = df.residual(lm_clean15)))
+
+#table
+screenreg(lm_clean15, override.se = nw_se15, override.pvalues = robust15, digits = 6)
+```
+
+```{r bmat15}
+#Construct the Robust Omega Matrix
+U15 = residuals(est.VAR15)
+T15 = nrow(U15)
+Omega15 = matrix(0, ncol(U15), ncol(U15))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_15 = t(U15[(l+1):T15, , drop=FALSE]) %*% U15[1:(T15-l), , drop=FALSE] /T15
+  if (l == 0){
+    Omega15 = Omega15 + Gamma_l_15
+  } else {
+    Omega15 = Omega15 + weight*(Gamma_l_15 + t(Gamma_l_15))
+  }
+}
+
+
+#make the B matrix
+loss15 <- function(param15){
+  #Define the restriction
+  B15 <- matrix(c(param15[1], param15[2], 0, param15[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X15 <- Omega15 - B15 %*% t(B15)
+  
+  #loss function
+  loss15 <- sum(X15^2)
+  return(loss15)
+}
+
+res.opt15 <- optim(c(1, 0, 1), loss15, method = "BFGS")
+B.hat15 <- matrix(c(res.opt15$par[1], res.opt15$par[2], 0, res.opt15$par[3]), ncol = 2)
+
+print(cbind(Omega15,B.hat15 %*% t(B.hat15)))
+
+
+
+```
+
+```{r IRF anticipationnnn}
+#get back the coefficient of est.VAR
+phi15 <- Acoef(est.VAR15)
+PHI15 = make.PHI(phi15)
+
+#take the constant
+constant15 <- sapply(est.VAR15$varresult, function(eq) coef(eq)["const"])
+c15=as.matrix(constant15)
+
+#Simulate the IRF
+p15 <- length(phi15)
+n15 <- dim(phi15[[1]])[1]
+
+Y15 <- simul.VAR(c=c15, Phi = phi15, B = B.hat15, nb.sim ,y0.star=rep(0, n15*p15),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd15 = data.frame(
+  period = 1:nrow(Y15),
+  response = Y15[,2])
+
+ggplot(Yd15,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Anticipation on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF Anticipation}
+ggplot(Yd15,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Anticipation on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r does Anticipation granger cause vol}
+grangertest(y15[,c("anticipation", "vol")], order =6)
+
+```
+
+```{r does vol granger cause Anticipation}
+grangertest(y15[,c("vol", "anticipation")], order =6)
+
+```
+
+## Anger
+
+```{r estimate anger}
+y16 = cbind(Vdata$prop_anger, Vdata$SPY_vol)
+colnames(y16)[1:2] <- c("anger", "vol")
+est.VAR16 <- VAR(y16,p=6)
+
+#extract results
+mod_vol16 = est.VAR16$varresult$vol
+f16 = formula(mod_vol16)
+d16 = model.frame(mod_vol16)
+lm_clean16 = lm(f16, data= d16)
+
+#apply Newey-West
+nw_vcov16 = NeweyWest(lm_clean16, lag=6)
+nw_se16 = sqrt(diag(nw_vcov16))
+
+#t-stats
+coef16 = coef(lm_clean16)
+t_stat16 = coef16/nw_se16
+
+#recalculate p-values
+robust16 = 2*(1-pt(abs(t_stat16), df = df.residual(lm_clean16)))
+
+#table
+screenreg(lm_clean16, override.se = nw_se16, override.pvalues = robust16, digits = 6)
+```
+
+```{r bmat16}
+#Construct the Robust Omega Matrix
+U16 = residuals(est.VAR16)
+T16 = nrow(U16)
+Omega16 = matrix(0, ncol(U16), ncol(U16))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_16 = t(U16[(l+1):T16, , drop=FALSE]) %*% U16[1:(T16-l), , drop=FALSE] /T16
+  if (l == 0){
+    Omega16 = Omega16 + Gamma_l_16
+  } else {
+    Omega16 = Omega16 + weight*(Gamma_l_16 + t(Gamma_l_16))
+  }
+}
+
+
+#make the B matrix
+loss16 <- function(param16){
+  #Define the restriction
+  B16 <- matrix(c(param16[1], param16[2], 0, param16[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X16 <- Omega16 - B16 %*% t(B16)
+  
+  #loss function
+  loss16 <- sum(X16^2)
+  return(loss16)
+}
+
+res.opt16 <- optim(c(1, 0, 1), loss16, method = "BFGS")
+B.hat16 <- matrix(c(res.opt16$par[1], res.opt16$par[2], 0, res.opt16$par[3]), ncol = 2)
+
+print(cbind(Omega16,B.hat16 %*% t(B.hat16)))
+
+```
+
+```{r shock by anger}
+B.hat16
+
+
+```
+
+```{r IRF angerrr}
+#get back the coefficient of est.VAR
+phi16 <- Acoef(est.VAR16)
+PHI16 = make.PHI(phi16)
+
+#take the constant
+constant16 <- sapply(est.VAR16$varresult, function(eq) coef(eq)["const"])
+c16=as.matrix(constant16)
+
+#Simulate the IRF
+p16 <- length(phi16)
+n16 <- dim(phi16[[1]])[1]
+
+Y16 <- simul.VAR(c=c16, Phi = phi16, B = B.hat16, nb.sim ,y0.star=rep(0, n16*p16),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd16 = data.frame(
+  period = 1:nrow(Y16),
+  response = Y16[,2])
+
+ggplot(Yd16,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Anger on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF Anger}
+ggplot(Yd16,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Anger on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r does Anger granger cause vol}
+grangertest(y16[,c("anger", "vol")], order =6)
+
+```
+
+```{r does vol granger cause Anger}
+grangertest(y16[,c("vol", "anger")], order =6)
+
+```
+
+# Interaction
+
+## N and tariff, 2 variables
+
+```{r estimate int N tariff}
+int1 = Vdata$tariff * Vdata$N
+y12 = cbind(int1, Vdata$SPY_vol)
+colnames(y12)[1:2] <- c("interaction", "vol")
+est.VAR12 <- VAR(y12,p=6)
+
+#extract results
+mod_vol12 = est.VAR12$varresult$vol
+f12 = formula(mod_vol12)
+d12 = model.frame(mod_vol12)
+lm_clean12 = lm(f12, data= d12)
+
+#apply Newey-West
+nw_vcov12 = NeweyWest(lm_clean12, lag=6)
+nw_se12 = sqrt(diag(nw_vcov12))
+
+#t-stats
+coef12 = coef(lm_clean12)
+t_stat12 = coef12/nw_se12
+
+#recalculate p-values
+robust12 = 2*(1-pt(abs(t_stat12), df = df.residual(lm_clean12)))
+
+#table
+screenreg(lm_clean12, override.se = nw_se12, override.pvalues = robust12, digits = 6)
+```
+
+```{r bhat12}
+#Construct the Robust Omega Matrix
+U12 = residuals(est.VAR12)
+T12 = nrow(U12)
+Omega12 = matrix(0, ncol(U12), ncol(U12))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_12 = t(U12[(l+1):T12, , drop=FALSE]) %*% U12[1:(T12-l), , drop=FALSE] /T12
+  if (l == 0){
+    Omega12 = Omega12 + Gamma_l_12
+  } else {
+    Omega12 = Omega12 + weight*(Gamma_l_12 + t(Gamma_l_12))
+  }
+}
+
+
+#make the B matrix
+loss12 <- function(param12){
+  #Define the restriction
+  B12 <- matrix(c(param12[1], param12[2], 0, param12[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X12 <- Omega12 - B12 %*% t(B12)
+  
+  #loss function
+  loss12 <- sum(X12^2)
+  return(loss12)
+}
+
+res.opt12 <- optim(c(1, 0, 1), loss12, method = "BFGS")
+B.hat12 <- matrix(c(res.opt12$par[1], res.opt12$par[2], 0, res.opt12$par[3]), ncol = 2)
+
+print(cbind(Omega12,B.hat12 %*% t(B.hat12)))
+```
+
+```{r shock by int of N and tariff}
+B.hat12
+
+
+```
+
+```{r IRF Ntariffff}
+#get back the coefficient of est.VAR
+phi12 <- Acoef(est.VAR12)
+PHI12 = make.PHI(phi12)
+
+#take the constant
+constant12 <- sapply(est.VAR12$varresult, function(eq) coef(eq)["const"])
+c12=as.matrix(constant12)
+
+#Simulate the IRF
+p12 <- length(phi12)
+n12 <- dim(phi12[[1]])[1]
+
+Y12 <- simul.VAR(c=c12, Phi = phi12, B = B.hat12, nb.sim ,y0.star=rep(0, n12*p12),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd12 = data.frame(
+  period = 1:nrow(Y12),
+  response = Y12[,2])
+
+ggplot(Yd12,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of N*Tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF N x tariff}
+ggplot(Yd12,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of N*tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+## N and tariff, 3 variables
+
+```{r estimate int Ntariff with N}
+
+y12.2 = cbind(Vdata$tariff, int1)
+y12.2 = cbind(y12.2, Vdata$SPY_vol)
+colnames(y12.2)[1:3] <- c("tariff", "interaction", "vol")
+est.VAR12.2 <- VAR(y12.2,p=6)
+
+#extract results
+mod_vol12.2 = est.VAR12.2$varresult$vol
+f12.2 = formula(mod_vol12.2)
+d12.2 = model.frame(mod_vol12.2)
+lm_clean12.2 = lm(f12.2, data= d12.2)
+
+#apply Newey-West
+nw_vcov12.2 = NeweyWest(lm_clean12.2, lag=6)
+nw_se12.2 = sqrt(diag(nw_vcov12.2))
+
+#t-stats
+coef12.2 = coef(lm_clean12.2)
+t_stat12.2 = coef12.2/nw_se12.2
+
+#recalculate p-values
+robust12.2 = 2*(1-pt(abs(t_stat12.2), df = df.residual(lm_clean12.2)))
+
+#table
+screenreg(lm_clean12.2, override.se = nw_se12.2, override.pvalues = robust12.2, digits = 6)
+```
+
+```{r bmat12.2}
+#Construct the Robust Omega Matrix
+U12.2 = residuals(est.VAR12.2)
+T12.2 = nrow(U12.2)
+Omega12.2 = matrix(0, ncol(U12.2), ncol(U12.2))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_12.2 = t(U12.2[(l+1):T12.2, , drop=FALSE]) %*% U12.2[1:(T12.2-l), , drop=FALSE] /T12.2
+  if (l == 0){
+    Omega12.2 = Omega12.2 + Gamma_l_12.2
+  } else {
+    Omega12.2 = Omega12.2 + weight*(Gamma_l_12.2 + t(Gamma_l_12.2))
+  }
+}
+
+#make the B matrix
+loss12.2 <- function(param12.2){
+  #Define the restriction
+  B12.2 <- matrix(c(param12.2[1], param12.2[2], param12.2[3], 0, param12.2[4],param12.2[5], 0, 0,param12.2[6]), ncol = 3)
+  
+  #Make BB' approximatively equal to omega
+  X12.2 <- Omega12.2 - B12.2 %*% t(B12.2)
+  
+  #loss function
+  loss12.2 <- sum(X12.2^2)
+  return(loss12.2)
+}
+
+
+b12.2 = replicate(10, {
+  fct12.2 = runif(6, -2, 2)
+  optim(fct12.2, loss12.2, method = "BFGS")
+}, simplify = FALSE)
+
+optim12.2 = b12.2[[which.min(sapply(b12.2, function(x) x$value))]]
+
+
+B.hat12.2 <- matrix(c(optim12.2$par[1], optim12.2$par[2], optim12.2$par[3], 0, optim12.2$par[4], optim12.2$par[5], 0, 0, optim12.2$par[6]), ncol = 3)
+
+print(cbind(Omega12.2,B.hat12.2 %*% t(B.hat12.2)))
+
+
+```
+
+```{r shock by N and Ntariff}
+B.hat12.2
+
+
+```
+
+```{r IRFs int1 and vol for Ntariff}
+#get back the coefficient of est.VAR
+phi12.2 <- Acoef(est.VAR12.2)
+PHI12.2 = make.PHI(phi12.2)
+
+#take the constant
+constant12.2 <- sapply(est.VAR12.2$varresult, function(eq) coef(eq)["const"])
+c12.2=as.matrix(constant12.2)
+
+#Simulate the IRF
+p12.2 <- length(phi12.2)
+n12.2 <- dim(phi12.2[[1]])[1]
+
+Y12.2.1 <- simul.VAR(c=c12.2, Phi = phi12.2, B = B.hat12.2, nb.sim ,y0.star=rep(0, n12.2*p12.2),
+                  indic.IRF = 1, u.shock = c(0,1,0))
+
+
+#Plot the IRF
+Yd12.2.1 = data.frame(
+  period = 1:nrow(Y12.2.1),
+  response = Y12.2.1[,3])
+
+ggplot(Yd12.2.1,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of N*Tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF N x tarifffffffffffff}
+ggplot(Yd12.2.1,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of N*tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRFs tariff and vol for Ntariffffff}
+
+
+Y12.2.2 <- simul.VAR(c=c12.2, Phi = phi12.2, B = B.hat12.2, nb.sim ,y0.star=rep(0, n12.2*p12.2),
+                  indic.IRF = 1, u.shock = c(1,0,0))
+
+
+#Plot the IRF
+Yd12.2.2 = data.frame(
+  period = 1:nrow(Y12.2.2),
+  response = Y12.2.2[,3])
+
+ggplot(Yd12.2.2,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF N x tariff2}
+ggplot(Yd12.2.2,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+## N and trade, 2 variables
+
+```{r estimate Ntrade}
+int5 = Vdata$trade * Vdata$N
+
+y14 = cbind(int5, Vdata$SPY_vol)
+colnames(y14)[1:2] <- c("interaction", "vol")
+est.VAR14 <- VAR(y14,p=6)
+
+#extract results
+mod_vol14 = est.VAR14$varresult$vol
+f14 = formula(mod_vol14)
+d14 = model.frame(mod_vol14)
+lm_clean14 = lm(f14, data= d14)
+
+#apply Newey-West
+nw_vcov14 = NeweyWest(lm_clean14, lag=6)
+nw_se14 = sqrt(diag(nw_vcov14))
+
+#t-stats
+coef14 = coef(lm_clean14)
+t_stat14 = coef14/nw_se14
+
+#recalculate p-values
+robust14 = 2*(1-pt(abs(t_stat14), df = df.residual(lm_clean14)))
+
+#table
+screenreg(lm_clean14, override.se = nw_se14, override.pvalues = robust14, digits = 6)
+```
+
+```{r bmat14}
+#Construct the Robust Omega Matrix
+U14 = residuals(est.VAR14)
+T14 = nrow(U14)
+Omega14 = matrix(0, ncol(U14), ncol(U14))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_14 = t(U14[(l+1):T14, , drop=FALSE]) %*% U14[1:(T14-l), , drop=FALSE] /T14
+  if (l == 0){
+    Omega14 = Omega14 + Gamma_l_14
+  } else {
+    Omega14 = Omega14 + weight*(Gamma_l_14 + t(Gamma_l_14))
+  }
+}
+
+
+#make the B matrix
+loss14 <- function(param14){
+  #Define the restriction
+  B14 <- matrix(c(param14[1], param14[2], 0, param14[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X14 <- Omega14 - B14 %*% t(B14)
+  
+  #loss function
+  loss14 <- sum(X14^2)
+  return(loss14)
+}
+
+res.opt14 <- optim(c(1, 0, 1), loss14, method = "BFGS")
+B.hat14 <- matrix(c(res.opt14$par[1], res.opt14$par[2], 0, res.opt14$par[3]), ncol = 2)
+
+print(cbind(Omega14,B.hat14 %*% t(B.hat14)))
+
+
+
+```
+
+```{r IRF Ntradeeee}
+#get back the coefficient of est.VAR
+phi14 <- Acoef(est.VAR14)
+PHI14 = make.PHI(phi14)
+
+#take the constant
+constant14 <- sapply(est.VAR14$varresult, function(eq) coef(eq)["const"])
+c14=as.matrix(constant14)
+
+#Simulate the IRF
+p14 <- length(phi14)
+n14 <- dim(phi14[[1]])[1]
+
+Y14 <- simul.VAR(c=c14, Phi = phi14, B = B.hat14, nb.sim ,y0.star=rep(0, n14*p14),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd14 = data.frame(
+  period = 1:nrow(Y14),
+  response = Y14[,2])
+
+ggplot(Yd14,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of N*Trade on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF N x Trade1}
+ggplot(Yd14,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of N*Trade on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+## N and tariff, 3 variables
+
+```{r Estimate Ntrade with trade}
+
+y14.2 = cbind(Vdata$trade, int5)
+y14.2 = cbind(y14.2, Vdata$SPY_vol)
+colnames(y14.2)[1:3] <- c("trade", "interaction", "vol")
+est.VAR14.2 <- VAR(y14.2,p=6)
+
+#extract results
+mod_vol14.2 = est.VAR14.2$varresult$vol
+f14.2 = formula(mod_vol14.2)
+d14.2 = model.frame(mod_vol14.2)
+lm_clean14.2 = lm(f14.2, data= d14.2)
+
+#apply Newey-West
+nw_vcov14.2 = NeweyWest(lm_clean14.2, lag=6)
+nw_se14.2 = sqrt(diag(nw_vcov14.2))
+
+#t-stats
+coef14.2 = coef(lm_clean14.2)
+t_stat14.2 = coef14.2/nw_se14.2
+
+#recalculate p-values
+robust14.2 = 2*(1-pt(abs(t_stat14.2), df = df.residual(lm_clean14.2)))
+
+#table
+screenreg(lm_clean14.2, override.se = nw_se14.2, override.pvalues = robust14.2, digits = 6)
+```
+
+```{r Bmat14.2}
+#Construct the Robust Omega Matrix
+U14.2 = residuals(est.VAR14.2)
+T14.2 = nrow(U14.2)
+Omega14.2 = matrix(0, ncol(U14.2), ncol(U14.2))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_14.2 = t(U14.2[(l+1):T14.2, , drop=FALSE]) %*% U14.2[1:(T14.2-l), , drop=FALSE] /T14.2
+  if (l == 0){
+    Omega14.2 = Omega14.2 + Gamma_l_14.2
+  } else {
+    Omega14.2 = Omega14.2 + weight*(Gamma_l_14.2 + t(Gamma_l_14.2))
+  }
+}
+
+
+#make the B matrix
+loss14.2 <- function(param14.2){
+  #Define the restriction
+  B14.2 <- matrix(c(param14.2[1], param14.2[2], param14.2[3], 0, param14.2[4],param14.2[5], 0, 0,param14.2[6]), ncol = 3)
+  
+  #Make BB' approximatively equal to omega
+  X14.2 <- Omega14.2 - B14.2 %*% t(B14.2)
+  
+  #loss function
+  loss14.2 <- sum(X14.2^2)
+  return(loss14.2)
+}
+
+res.opt14.2 <- optim(c(1, 0, 0, 1, 0, 1), loss14.2, method = "BFGS")
+B.hat14.2 <- matrix(c(res.opt14.2$par[1], res.opt14.2$par[2], res.opt14.2$par[3], 0, res.opt14.2$par[4], res.opt14.2$par[5], 0, 0, res.opt14.2$par[6]), ncol = 3)
+
+b14.2 = replicate(10, {
+  fct14.2 = runif(6, -2, 2)
+  optim(fct14.2, loss14.2, method = "BFGS")
+}, simplify = FALSE)
+
+optim14.2 = b14.2[[which.min(sapply(b14.2, function(x) x$value))]]
+
+
+B.hat14.2 <- matrix(c(optim14.2$par[1], optim14.2$par[2], optim14.2$par[3], 0, optim14.2$par[4], optim14.2$par[5], 0, 0, optim14.2$par[6]), ncol = 3)
+
+
+print(cbind(Omega14.2,B.hat14.2 %*% t(B.hat14.2)))
+
+
+
+```
+
+```{r shock by Ntrade and trade}
+
+B.hat14.2
+
+```
+
+```{r IRFs int and vol for Ntradeeee}
+
+#get back the coefficient of est.VAR
+phi14.2 <- Acoef(est.VAR14.2)
+PHI14.2 = make.PHI(phi14.2)
+
+#take the constant
+constant14.2 <- sapply(est.VAR14.2$varresult, function(eq) coef(eq)["const"])
+c14.2 =as.matrix(constant14.2)
+
+#Simulate the IRF
+p14.2  <- length(phi14.2)
+n14.2 <- dim(phi14.2[[1]])[1]
+
+Y14.2.1 <- simul.VAR(c=c14.2, Phi = phi14.2, B = B.hat14.2, nb.sim ,y0.star=rep(0, n14.2*p14.2),
+                  indic.IRF = 1, u.shock = c(0,1,0))
+
+
+#Plot the IRF
+Yd14.2.1 = data.frame(
+  period = 1:nrow(Y14.2.1),
+  response = Y14.2.1[,3])
+
+ggplot(Yd14.2.1,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of N*Trade on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+
+```
+
+```{r IRF N x Trade2}
+ggplot(Yd14.2.1,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of N*Trade on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRFs trade and vol for Ntrade}
+
+Y14.2.2 <- simul.VAR(c=c14.2, Phi = phi14.2, B = B.hat14.2, nb.sim ,y0.star=rep(0, n14.2*p14.2),
+                  indic.IRF = 1, u.shock = c(1,0,0))
+
+
+#Plot the IRF
+Yd14.2.2 = data.frame(
+  period = 1:nrow(Y14.2.2),
+  response = Y14.2.2[,3])
+
+ggplot(Yd14.2.2,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Trade on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF N x Trade3}
+ggplot(Yd14.2.2,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Trade on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+# Terms
+
+## Load Data
+
+```{r datasetup2, results=FALSE, warning=FALSE, message=FALSE}
+
+# First and Second Mandate
+
+#first term
+Vdata_f = filter(data,between(timestamp, as.Date('2017-01-20'), as.Date('2021-01-20')))
+
+#second term
+Vdata_s = filter(data,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05-07')))
+
+```
+
+## First Term
+
+### Dummy
+
+```{r first mandate dum, warning=FALSE, message=FALSE, results="asis"}
+y_f_d = cbind(Vdata_f$dummy, Vdata_f$SPY_vol)
+colnames(y_f_d)[1:2] <- c("dummy", "vol")
+est.VAR_f_d <- VAR(y_f_d,p=6)
+
+#extract results
+mod_vol_f_d = est.VAR_f_d$varresult$vol
+f_f_d = formula(mod_vol_f_d)
+d_f_d = model.frame(mod_vol_f_d)
+lm_clean_f_d = lm(f_f_d, data= d_f_d)
+
+#apply Newey-West
+nw_vcov_f_d = NeweyWest(lm_clean_f_d, lag=6)
+nw_se_f_d = sqrt(diag(nw_vcov_f_d))
+
+#t-stats
+coef_f_d = coef(lm_clean_f_d)
+t_stat_f_d = coef_f_d/nw_se_f_d
+
+#recalculate p-values
+robust_f_d = 2*(1-pt(abs(t_stat_f_d), df = df.residual(lm_clean_f_d)))
+
+#table
+screenreg(lm_clean_f_d, override.se = nw_se_f_d, override.pvalues = robust_f_d, digits = 6)
+```
+
+```{r effect of Vol on dummy first}
+#Table for the effect of volatility on posts for variable dummy
+#extract results
+mod_post_f_d = est.VAR_f_d$varresult$dummy
+ff_f_d = formula(mod_post_f_d)
+dd_f_d = model.frame(mod_post_f_d)
+lm_clean_post_f_d = lm(ff_f_d, data= dd_f_d)
+
+#apply Newey-West
+nw_vcov_post_f_d = NeweyWest(lm_clean_post_f_d, lag=6)
+nw_se_post_f_d = sqrt(diag(nw_vcov_post_f_d))
+
+#t-stats
+coef_post_f_d = coef(lm_clean_post_f_d)
+t_stat_post_f_d = coef_post_f_d/nw_se_post_f_d
+
+#recalculate p-values
+robust_post_f_d = 2*(1-pt(abs(t_stat_post_f_d), df = df.residual(lm_clean_post_f_d)))
+
+#table
+screenreg(lm_clean_post_f_d, override.se = nw_se_post_f_d, override.pvalues = robust_post_f_d, digits = 6)
+
+
+```
+
+```{r B mat first mandate dum, warning=FALSE, message=FALSE}
+#Construct the Robust Omega Matrix
+U_f_d = residuals(est.VAR_f_d)
+T_f_d = nrow(U_f_d)
+Omega_f_d = matrix(0, ncol(U_f_d), ncol(U_f_d))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l__f_d = t(U_f_d[(l+1):T_f_d, , drop=FALSE]) %*% U_f_d[1:(T_f_d-l), , drop=FALSE] /T_f_d
+  if (l == 0){
+    Omega_f_d = Omega_f_d + Gamma_l__f_d
+  } else {
+    Omega_f_d = Omega_f_d + weight*(Gamma_l__f_d + t(Gamma_l__f_d))
+  }
+}
+
+
+#make the B matrix
+loss_f_d <- function(param_f_d){
+  #Define the restriction
+  B_f_d <- matrix(c(param_f_d[1], param_f_d[2], 0, param_f_d[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X_f_d <- Omega_f_d - B_f_d %*% t(B_f_d)
+  
+  #loss function
+  loss_f_d <- sum(X_f_d^2)
+  return(loss_f_d)
+}
+
+res.opt_f_d <- optim(c(1, 0, 1), loss_f_d, method = "BFGS")
+B.hat_f_d <- matrix(c(res.opt_f_d$par[1], res.opt_f_d$par[2], 0, res.opt_f_d$par[3]), ncol = 2)
+
+print(cbind(Omega_f_d,B.hat_f_d %*% t(B.hat_f_d)))
+
+```
+
+```{r IRF first dum, warning=FALSE, message=FALSE}
+#get back the coefficient of est.VAR
+phi_f_d <- Acoef(est.VAR_f_d)
+PHI_f_d = make.PHI(phi_f_d)
+
+#take the constant
+constant_f_d <- sapply(est.VAR_f_d$varresult, function(eq) coef(eq)["const"])
+c_f_d=as.matrix(constant_f_d)
+
+#Simulate the IRF
+p_f_d <- length(phi_f_d)
+n_f_d <- dim(phi_f_d[[1]])[1]
+
+Y_f_d <- simul.VAR(c=c_f_d, Phi = phi_f_d, B = B.hat_f_d, nb.sim ,y0.star=rep(0, n_f_d*p_f_d),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd_f_d = data.frame(
+  period = 1:nrow(Y_f_d),
+  response = Y_f_d[,2])
+
+ggplot(Yd_f_d,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of First Term Dummy on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF First Mandate Dummy}
+ggplot(Yd_f_d,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of First Mandate Dummy on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r granger_f_d, warning=FALSE, message=FALSE}
+
+#does vol granger cause dummy
+grangertest(y_f_d[,c("vol","dummy")], order =6)
+
+#does dummy granger cause vol
+grangertest(y_f_d[,c("dummy", "vol")], order =6)
+
+```
+
+### N
+
+```{r first mandate N, warning=FALSE, message=FALSE, results="asis"}
+
+y_f_n = cbind(Vdata_f$N, Vdata_f$SPY_vol)
+colnames(y_f_n)[1:2] <- c("N", "vol")
+est.VAR_f_n <- VAR(y_f_n,p=6)
+
+#extract results
+mod_vol_f_n = est.VAR_f_n$varresult$vol
+f_f_n = formula(mod_vol_f_n)
+d_f_n = model.frame(mod_vol_f_n)
+lm_clean_f_n = lm(f_f_n, data= d_f_n)
+
+#apply Newey-West
+nw_vcov_f_n = NeweyWest(lm_clean_f_n, lag=6)
+nw_se_f_n = sqrt(diag(nw_vcov_f_n))
+
+#t-stats
+coef_f_n = coef(lm_clean_f_n)
+t_stat_f_n = coef_f_n/nw_se_f_n
+
+#recalculate p-values
+robust_f_n = 2*(1-pt(abs(t_stat_f_n), df = df.residual(lm_clean_f_n)))
+
+#table
+screenreg(lm_clean_f_n, override.se = nw_se_f_n, override.pvalues = robust_f_n, digits = 6)
+```
+
+```{r effect of Vol on N first}
+#Table for the effect of volatility on posts for variable N
+#extract results
+mod_post_f_n = est.VAR_f_n$varresult$N
+ff_f_n = formula(mod_post_f_n)
+dd_f_n = model.frame(mod_post_f_n)
+lm_clean_post_f_n = lm(ff_f_n, data= dd_f_n)
+
+#apply Newey-West
+nw_vcov_post_f_n = NeweyWest(lm_clean_post_f_n, lag=6)
+nw_se_post_f_n = sqrt(diag(nw_vcov_post_f_n))
+
+#t-stats
+coef_post_f_n = coef(lm_clean_post_f_n)
+t_stat_post_f_n = coef_post_f_n/nw_se_post_f_n
+
+#recalculate p-values
+robust_post_f_n = 2*(1-pt(abs(t_stat_post_f_n), df = df.residual(lm_clean_post_f_n)))
+
+#table
+screenreg(lm_clean_post_f_n, override.se = nw_se_post_f_n, override.pvalues = robust_post_f_n, digits = 6)
+
+
+```
+
+```{r B mat first mandate N, warning=FALSE, message=FALSE}
+#Construct the Robust Omega Matrix
+U_f_n = residuals(est.VAR_f_n)
+T_f_n = nrow(U_f_n)
+Omega_f_n = matrix(0, ncol(U_f_n), ncol(U_f_n))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l__f_n = t(U_f_n[(l+1):T_f_n, , drop=FALSE]) %*% U_f_n[1:(T_f_n-l), , drop=FALSE] /T_f_n
+  if (l == 0){
+    Omega_f_n = Omega_f_n + Gamma_l__f_n
+  } else {
+    Omega_f_n = Omega_f_n + weight*(Gamma_l__f_n + t(Gamma_l__f_n))
+  }
+}
+
+
+#make the B matrix
+loss_f_n <- function(param_f_n){
+  #Define the restriction
+  B_f_n <- matrix(c(param_f_n[1], param_f_n[2], 0, param_f_n[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X_f_n <- Omega_f_n - B_f_n %*% t(B_f_n)
+  
+  #loss function
+  loss_f_n <- sum(X_f_n^2)
+  return(loss_f_n)
+}
+
+res.opt_f_n <- optim(c(1, 0, 1), loss_f_n, method = "BFGS")
+B.hat_f_n <- matrix(c(res.opt_f_n$par[1], res.opt_f_n$par[2], 0, res.opt_f_n$par[3]), ncol = 2)
+
+print(cbind(Omega_f_n,B.hat_f_n %*% t(B.hat_f_n)))
+
+```
+
+```{r IRF first N, warning=FALSE, message=FALSE}
+#get back the coefficient of est.VAR
+phi_f_n <- Acoef(est.VAR_f_n)
+PHI_f_n = make.PHI(phi_f_n)
+
+#take the constant
+constant_f_n <- sapply(est.VAR_f_n$varresult, function(eq) coef(eq)["const"])
+c_f_n=as.matrix(constant_f_n)
+
+#Simulate the IRF
+p_f_n <- length(phi_f_n)
+n_f_n <- dim(phi_f_n[[1]])[1]
+
+Y_f_n <- simul.VAR(c=c_f_n, Phi = phi_f_n, B = B.hat_f_n, nb.sim ,y0.star=rep(0, n_f_n*p_f_n),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd_f_n = data.frame(
+  period = 1:nrow(Y_f_n),
+  response = Y_f_n[,2])
+
+ggplot(Yd_f_n,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of First Term N on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF First Mandate N}
+ggplot(Yd_f_n,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of First Mandate N on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r granger_f_n, warning=FALSE, message=FALSE}
+
+#does vol granger cause N
+grangertest(y_f_n[,c("vol","N")], order =6)
+
+#does N granger cause vol
+grangertest(y_f_n[,c("N", "vol")], order =6)
+
+```
+
+### Tariff
+
+```{r first mandate tariff, warning=FALSE, message=FALSE, results="asis"}
+
+y_f_ta = cbind(Vdata_f$tariff, Vdata_f$SPY_vol)
+colnames(y_f_ta)[1:2] <- c("tariff", "vol")
+est.VAR_f_ta <- VAR(y_f_ta,p=6)
+
+#extract results
+mod_vol_f_ta = est.VAR_f_ta$varresult$vol
+f_f_ta = formula(mod_vol_f_ta)
+d_f_ta = model.frame(mod_vol_f_ta)
+lm_clean_f_ta = lm(f_f_ta, data= d_f_ta)
+
+#apply Newey-West
+nw_vcov_f_ta = NeweyWest(lm_clean_f_ta, lag=6)
+nw_se_f_ta = sqrt(diag(nw_vcov_f_ta))
+
+#t-stats
+coef_f_ta = coef(lm_clean_f_ta)
+t_stat_f_ta = coef_f_ta/nw_se_f_ta
+
+#recalculate p-values
+robust_f_ta = 2*(1-pt(abs(t_stat_f_ta), df = df.residual(lm_clean_f_ta)))
+
+#table
+screenreg(lm_clean_f_ta, override.se = nw_se_f_ta, override.pvalues = robust_f_ta, digits = 6)
+```
+
+```{r effect of Vol on tariff first}
+#Table for the effect of volatility on posts for variable tariff
+#extract results
+mod_post_f_ta = est.VAR_f_ta$varresult$tariff
+ff_f_ta = formula(mod_post_f_ta)
+dd_f_ta = model.frame(mod_post_f_ta)
+lm_clean_post_f_ta = lm(ff_f_ta, data= dd_f_ta)
+
+#apply Newey-West
+nw_vcov_post_f_ta = NeweyWest(lm_clean_post_f_ta, lag=6)
+nw_se_post_f_ta = sqrt(diag(nw_vcov_post_f_ta))
+
+#t-stats
+coef_post_f_ta = coef(lm_clean_post_f_ta)
+t_stat_post_f_ta = coef_post_f_ta/nw_se_post_f_ta
+
+#recalculate p-values
+robust_post_f_ta = 2*(1-pt(abs(t_stat_post_f_ta), df = df.residual(lm_clean_post_f_ta)))
+
+#table
+screenreg(lm_clean_post_f_ta, override.se = nw_se_post_f_ta, override.pvalues = robust_post_f_ta, digits = 6)
+
+
+```
+
+```{r B mat first mandate tariff, warning=FALSE, message=FALSE}
+#Construct the Robust Omega Matrix
+U_f_ta = residuals(est.VAR_f_ta)
+T_f_ta = nrow(U_f_ta)
+Omega_f_ta = matrix(0, ncol(U_f_ta), ncol(U_f_ta))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l__f_ta = t(U_f_ta[(l+1):T_f_ta, , drop=FALSE]) %*% U_f_ta[1:(T_f_ta-l), , drop=FALSE] /T_f_ta
+  if (l == 0){
+    Omega_f_ta = Omega_f_ta + Gamma_l__f_ta
+  } else {
+    Omega_f_ta = Omega_f_ta + weight*(Gamma_l__f_ta + t(Gamma_l__f_ta))
+  }
+}
+
+
+#make the B matrix
+loss_f_ta <- function(param_f_ta){
+  #Define the restriction
+  B_f_ta <- matrix(c(param_f_ta[1], param_f_ta[2], 0, param_f_ta[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X_f_ta <- Omega_f_ta - B_f_ta %*% t(B_f_ta)
+  
+  #loss function
+  loss_f_ta <- sum(X_f_ta^2)
+  return(loss_f_ta)
+}
+
+res.opt_f_ta <- optim(c(1, 0, 1), loss_f_ta, method = "BFGS")
+B.hat_f_ta <- matrix(c(res.opt_f_ta$par[1], res.opt_f_ta$par[2], 0, res.opt_f_ta$par[3]), ncol = 2)
+
+print(cbind(Omega_f_ta,B.hat_f_ta %*% t(B.hat_f_ta)))
+
+```
+
+```{r IRF first tariff, warning=FALSE, message=FALSE}
+#get back the coefficient of est.VAR
+phi_f_ta <- Acoef(est.VAR_f_ta)
+PHI_f_ta = make.PHI(phi_f_ta)
+
+#take the constant
+constant_f_ta <- sapply(est.VAR_f_ta$varresult, function(eq) coef(eq)["const"])
+c_f_ta=as.matrix(constant_f_ta)
+
+#Simulate the IRF
+p_f_ta <- length(phi_f_ta)
+n_f_ta <- dim(phi_f_ta[[1]])[1]
+
+Y_f_ta <- simul.VAR(c=c_f_ta, Phi = phi_f_ta, B = B.hat_f_ta, nb.sim ,y0.star=rep(0, n_f_ta*p_f_ta),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd_f_ta = data.frame(
+  period = 1:nrow(Y_f_ta),
+  response = Y_f_ta[,2])
+
+ggplot(Yd_f_ta,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of First Term Tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF First Mandate Tariff}
+ggplot(Yd_f_ta,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of First Mandate Tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r granger_f_ta, warning=FALSE, message=FALSE}
+
+#does vol granger cause tariff
+grangertest(y_f_ta[,c("vol","tariff")], order =6)
+
+#does tariff granger cause vol
+grangertest(y_f_ta[,c("tariff", "vol")], order =6)
+
+```
+
+### Trade
+
+```{r first mandate trade, warning=FALSE, message=FALSE, results="asis"}
+
+y_f_tr = cbind(Vdata_f$trade, Vdata_f$SPY_vol)
+colnames(y_f_tr)[1:2] <- c("trade", "vol")
+est.VAR_f_tr <- VAR(y_f_tr,p=6)
+
+#extract results
+mod_vol_f_tr = est.VAR_f_tr$varresult$vol
+f_f_tr = formula(mod_vol_f_tr)
+d_f_tr = model.frame(mod_vol_f_tr)
+lm_clean_f_tr = lm(f_f_tr, data= d_f_tr)
+
+#apply Newey-West
+nw_vcov_f_tr = NeweyWest(lm_clean_f_tr, lag=6)
+nw_se_f_tr = sqrt(diag(nw_vcov_f_tr))
+
+#t-stats
+coef_f_tr = coef(lm_clean_f_tr)
+t_stat_f_tr = coef_f_tr/nw_se_f_tr
+
+#recalculate p-values
+robust_f_tr = 2*(1-pt(abs(t_stat_f_tr), df = df.residual(lm_clean_f_tr)))
+
+#table
+screenreg(lm_clean_f_tr, override.se = nw_se_f_tr, override.pvalues = robust_f_tr, digits = 6)
+```
+
+```{r effect of Vol on trade first}
+#Table for the effect of volatility on posts for variable trade
+#extract results
+mod_post_f_tr = est.VAR_f_tr$varresult$trade
+ff_f_tr = formula(mod_post_f_tr)
+dd_f_tr = model.frame(mod_post_f_tr)
+lm_clean_post_f_tr = lm(ff_f_tr, data= dd_f_tr)
+
+#apply Newey-West
+nw_vcov_post_f_tr = NeweyWest(lm_clean_post_f_tr, lag=6)
+nw_se_post_f_tr = sqrt(diag(nw_vcov_post_f_tr))
+
+#t-stats
+coef_post_f_tr = coef(lm_clean_post_f_tr)
+t_stat_post_f_tr = coef_post_f_tr/nw_se_post_f_tr
+
+#recalculate p-values
+robust_post_f_tr = 2*(1-pt(abs(t_stat_post_f_tr), df = df.residual(lm_clean_post_f_tr)))
+
+#table
+screenreg(lm_clean_post_f_tr, override.se = nw_se_post_f_tr, override.pvalues = robust_post_f_tr, digits = 6)
+
+
+```
+
+```{r B mat first mandate trade, warning=FALSE, message=FALSE}
+#Construct the Robust Omega Matrix
+U_f_tr = residuals(est.VAR_f_tr)
+T_f_tr = nrow(U_f_tr)
+Omega_f_tr = matrix(0, ncol(U_f_tr), ncol(U_f_tr))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l__f_tr = t(U_f_tr[(l+1):T_f_tr, , drop=FALSE]) %*% U_f_tr[1:(T_f_tr-l), , drop=FALSE] /T_f_tr
+  if (l == 0){
+    Omega_f_tr = Omega_f_tr + Gamma_l__f_tr
+  } else {
+    Omega_f_tr = Omega_f_tr + weight*(Gamma_l__f_tr + t(Gamma_l__f_tr))
+  }
+}
+
+
+#make the B matrix
+loss_f_tr <- function(param_f_tr){
+  #Define the restriction
+  B_f_tr <- matrix(c(param_f_tr[1], param_f_tr[2], 0, param_f_tr[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X_f_tr <- Omega_f_tr - B_f_tr %*% t(B_f_tr)
+  
+  #loss function
+  loss_f_tr <- sum(X_f_tr^2)
+  return(loss_f_tr)
+}
+
+res.opt_f_tr <- optim(c(1, 0, 1), loss_f_tr, method = "BFGS")
+B.hat_f_tr <- matrix(c(res.opt_f_tr$par[1], res.opt_f_tr$par[2], 0, res.opt_f_tr$par[3]), ncol = 2)
+
+print(cbind(Omega_f_tr,B.hat_f_tr %*% t(B.hat_f_tr)))
+
+```
+
+```{r IRF first trade, warning=FALSE, message=FALSE}
+#get back the coefficient of est.VAR
+phi_f_tr <- Acoef(est.VAR_f_tr)
+PHI_f_tr = make.PHI(phi_f_tr)
+
+#take the constant
+constant_f_tr <- sapply(est.VAR_f_tr$varresult, function(eq) coef(eq)["const"])
+c_f_tr=as.matrix(constant_f_tr)
+
+#Simulate the IRF
+p_f_tr <- length(phi_f_tr)
+n_f_tr <- dim(phi_f_tr[[1]])[1]
+
+Y_f_tr <- simul.VAR(c=c_f_tr, Phi = phi_f_tr, B = B.hat_f_tr, nb.sim ,y0.star=rep(0, n_f_tr*p_f_tr),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd_f_tr = data.frame(
+  period = 1:nrow(Y_f_tr),
+  response = Y_f_tr[,2])
+
+ggplot(Yd_f_tr,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of First Term Trade on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF First Mandate Trade}
+ggplot(Yd_f_tr,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of First Mandate Trade on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r granger_f_tr, warning=FALSE, message=FALSE}
+
+#does vol granger cause trade
+grangertest(y_f_tr[,c("vol","trade")], order =6)
+
+#does trade granger cause vol
+grangertest(y_f_tr[,c("trade", "vol")], order =6)
+
+```
+
+### China
+
+```{r first mandate china, warning=FALSE, message=FALSE, results="asis"}
+
+y_f_ch = cbind(Vdata_f$china, Vdata_f$SPY_vol)
+colnames(y_f_ch)[1:2] <- c("china", "vol")
+est.VAR_f_ch <- VAR(y_f_ch,p=6)
+
+#extract results
+mod_vol_f_ch = est.VAR_f_ch$varresult$vol
+f_f_ch = formula(mod_vol_f_ch)
+d_f_ch = model.frame(mod_vol_f_ch)
+lm_clean_f_ch = lm(f_f_ch, data= d_f_ch)
+
+#apply Newey-West
+nw_vcov_f_ch = NeweyWest(lm_clean_f_ch, lag=6)
+nw_se_f_ch = sqrt(diag(nw_vcov_f_ch))
+
+#t-stats
+coef_f_ch = coef(lm_clean_f_ch)
+t_stat_f_ch = coef_f_ch/nw_se_f_ch
+
+#recalculate p-values
+robust_f_ch = 2*(1-pt(abs(t_stat_f_ch), df = df.residual(lm_clean_f_ch)))
+
+#table
+screenreg(lm_clean_f_ch, override.se = nw_se_f_ch, override.pvalues = robust_f_ch, digits = 6)
+```
+
+```{r effect of Vol on china first}
+#Table for the effect of volatility on posts for variable china
+#extract results
+mod_post_f_ch = est.VAR_f_ch$varresult$china
+ff_f_ch = formula(mod_post_f_ch)
+dd_f_ch = model.frame(mod_post_f_ch)
+lm_clean_post_f_ch = lm(ff_f_ch, data= dd_f_ch)
+
+#apply Newey-West
+nw_vcov_post_f_ch = NeweyWest(lm_clean_post_f_ch, lag=6)
+nw_se_post_f_ch = sqrt(diag(nw_vcov_post_f_ch))
+
+#t-stats
+coef_post_f_ch = coef(lm_clean_post_f_ch)
+t_stat_post_f_ch = coef_post_f_ch/nw_se_post_f_ch
+
+#recalculate p-values
+robust_post_f_ch = 2*(1-pt(abs(t_stat_post_f_ch), df = df.residual(lm_clean_post_f_ch)))
+
+#table
+screenreg(lm_clean_post_f_ch, override.se = nw_se_post_f_ch, override.pvalues = robust_post_f_ch, digits = 6)
+
+
+```
+
+```{r B mat first mandate china, warning=FALSE, message=FALSE}
+#Construct the Robust Omega Matrix
+U_f_ch = residuals(est.VAR_f_ch)
+T_f_ch = nrow(U_f_ch)
+Omega_f_ch = matrix(0, ncol(U_f_ch), ncol(U_f_ch))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l__f_ch = t(U_f_ch[(l+1):T_f_ch, , drop=FALSE]) %*% U_f_ch[1:(T_f_ch-l), , drop=FALSE] /T_f_ch
+  if (l == 0){
+    Omega_f_ch = Omega_f_ch + Gamma_l__f_ch
+  } else {
+    Omega_f_ch = Omega_f_ch + weight*(Gamma_l__f_ch + t(Gamma_l__f_ch))
+  }
+}
+
+
+#make the B matrix
+loss_f_ch <- function(param_f_ch){
+  #Define the restriction
+  B_f_ch <- matrix(c(param_f_ch[1], param_f_ch[2], 0, param_f_ch[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X_f_ch <- Omega_f_ch - B_f_ch %*% t(B_f_ch)
+  
+  #loss function
+  loss_f_ch <- sum(X_f_ch^2)
+  return(loss_f_ch)
+}
+
+res.opt_f_ch <- optim(c(1, 0, 1), loss_f_ch, method = "BFGS")
+B.hat_f_ch <- matrix(c(res.opt_f_ch$par[1], res.opt_f_ch$par[2], 0, res.opt_f_ch$par[3]), ncol = 2)
+
+print(cbind(Omega_f_ch,B.hat_f_ch %*% t(B.hat_f_ch)))
+
+```
+
+```{r IRF first china, warning=FALSE, message=FALSE}
+#get back the coefficient of est.VAR
+phi_f_ch <- Acoef(est.VAR_f_ch)
+PHI_f_ch = make.PHI(phi_f_ch)
+
+#take the constant
+constant_f_ch <- sapply(est.VAR_f_ch$varresult, function(eq) coef(eq)["const"])
+c_f_ch=as.matrix(constant_f_ch)
+
+#Simulate the IRF
+p_f_ch <- length(phi_f_ch)
+n_f_ch <- dim(phi_f_ch[[1]])[1]
+
+Y_f_ch <- simul.VAR(c=c_f_ch, Phi = phi_f_ch, B = B.hat_f_ch, nb.sim ,y0.star=rep(0, n_f_ch*p_f_ch),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd_f_ch = data.frame(
+  period = 1:nrow(Y_f_ch),
+  response = Y_f_ch[,2])
+
+ggplot(Yd_f_ch,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of First Term China on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF First Mandate China}
+ggplot(Yd_f_ch,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of First Mandate China on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r granger_f_ch, warning=FALSE, message=FALSE}
+
+#does vol granger cause china
+grangertest(y_f_ch[,c("vol","china")], order =6)
+
+#does china granger cause vol
+grangertest(y_f_ch[,c("china", "vol")], order =6)
+
+```
+
+## Second Mandate
+
+### Dummy
+
+```{r second mandate dum, warning=FALSE, message=FALSE, results="asis"}
+
+y_s_d = cbind(Vdata_s$dummy, Vdata_s$SPY_vol)
+colnames(y_s_d)[1:2] <- c("dummy", "vol")
+est.VAR_s_d <- VAR(y_s_d,p=6)
+
+#extract results
+mod_vol_s_d = est.VAR_s_d$varresult$vol
+f_s_d = formula(mod_vol_s_d)
+d_s_d = model.frame(mod_vol_s_d)
+lm_clean_s_d = lm(f_s_d, data= d_s_d)
+
+#apply Newey-West
+nw_vcov_s_d = NeweyWest(lm_clean_s_d, lag=6)
+nw_se_s_d = sqrt(diag(nw_vcov_s_d))
+
+#t-stats
+coef_s_d = coef(lm_clean_s_d)
+t_stat_s_d = coef_s_d/nw_se_s_d
+
+#recalculate p-values
+robust_s_d = 2*(1-pt(abs(t_stat_s_d), df = df.residual(lm_clean_s_d)))
+
+#table
+screenreg(lm_clean_s_d, override.se = nw_se_s_d, override.pvalues = robust_s_d, digits = 6)
+```
+
+```{r effect of Vol on dummy second}
+#Table for the effect of volatility on posts for variable dummy
+#extract results
+mod_post_s_d = est.VAR_s_d$varresult$dummy
+ff_s_d = formula(mod_post_s_d)
+dd_s_d = model.frame(mod_post_s_d)
+lm_clean_post_s_d = lm(ff_s_d, data= dd_s_d)
+
+#apply Newey-West
+nw_vcov_post_s_d = NeweyWest(lm_clean_post_s_d, lag=6)
+nw_se_post_s_d = sqrt(diag(nw_vcov_post_s_d))
+
+#t-stats
+coef_post_s_d = coef(lm_clean_post_s_d)
+t_stat_post_s_d = coef_post_s_d/nw_se_post_s_d
+
+#recalculate p-values
+robust_post_s_d = 2*(1-pt(abs(t_stat_post_s_d), df = df.residual(lm_clean_post_s_d)))
+
+#table
+screenreg(lm_clean_post_s_d, override.se = nw_se_post_s_d, override.pvalues = robust_post_s_d, digits = 6)
+
+
+```
+
+```{r B mat second mandate dum, warning=FALSE, message=FALSE}
+#Construct the Robust Omega Matrix
+U_s_d = residuals(est.VAR_s_d)
+T_s_d = nrow(U_s_d)
+Omega_s_d = matrix(0, ncol(U_s_d), ncol(U_s_d))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l__s_d = t(U_s_d[(l+1):T_s_d, , drop=FALSE]) %*% U_s_d[1:(T_s_d-l), , drop=FALSE] /T_s_d
+  if (l == 0){
+    Omega_s_d = Omega_s_d + Gamma_l__s_d
+  } else {
+    Omega_s_d = Omega_s_d + weight*(Gamma_l__s_d + t(Gamma_l__s_d))
+  }
+}
+
+
+#make the B matrix
+loss_s_d <- function(param_s_d){
+  #Define the restriction
+  B_s_d <- matrix(c(param_s_d[1], param_s_d[2], 0, param_s_d[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X_s_d <- Omega_s_d - B_s_d %*% t(B_s_d)
+  
+  #loss function
+  loss_s_d <- sum(X_s_d^2)
+  return(loss_s_d)
+}
+
+res.opt_s_d <- optim(c(1, 0, 1), loss_s_d, method = "BFGS")
+B.hat_s_d <- matrix(c(res.opt_s_d$par[1], res.opt_s_d$par[2], 0, res.opt_s_d$par[3]), ncol = 2)
+
+print(cbind(Omega_s_d,B.hat_s_d %*% t(B.hat_s_d)))
+
+```
+
+```{r IRF second dum, warning=FALSE, message=FALSE}
+#get back the coefficient of est.VAR
+phi_s_d <- Acoef(est.VAR_s_d)
+PHI_s_d = make.PHI(phi_s_d)
+
+#take the constant
+constant_s_d <- sapply(est.VAR_s_d$varresult, function(eq) coef(eq)["const"])
+c_s_d=as.matrix(constant_s_d)
+
+#Simulate the IRF
+p_s_d <- length(phi_s_d)
+n_s_d <- dim(phi_s_d[[1]])[1]
+
+Y_s_d <- simul.VAR(c=c_s_d, Phi = phi_s_d, B = B.hat_s_d, nb.sim ,y0.star=rep(0, n_s_d*p_s_d),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd_s_d = data.frame(
+  period = 1:nrow(Y_s_d),
+  response = Y_s_d[,2])
+
+ggplot(Yd_s_d,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Second Term Dummy on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF Second Mandate Dummy}
+ggplot(Yd_s_d,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Second Mandate Dummy on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r granger_s_d, warning=FALSE, message=FALSE}
+
+#does vol granger cause dummy
+grangertest(y_s_d[,c("vol","dummy")], order =6)
+
+#does dummy granger cause vol
+grangertest(y_s_d[,c("dummy", "vol")], order =6)
+
+```
+
+### N
+
+```{r second mandate N, warning=FALSE, message=FALSE, results="asis"}
+
+y_s_n = cbind(Vdata_s$N, Vdata_s$SPY_vol)
+colnames(y_s_n)[1:2] <- c("N", "vol")
+est.VAR_s_n <- VAR(y_s_n,p=6)
+
+#extract results
+mod_vol_s_n = est.VAR_s_n$varresult$vol
+f_s_n = formula(mod_vol_s_n)
+d_s_n = model.frame(mod_vol_s_n)
+lm_clean_s_n = lm(f_s_n, data= d_s_n)
+
+#apply Newey-West
+nw_vcov_s_n = NeweyWest(lm_clean_s_n, lag=6)
+nw_se_s_n = sqrt(diag(nw_vcov_s_n))
+
+#t-stats
+coef_s_n = coef(lm_clean_s_n)
+t_stat_s_n = coef_s_n/nw_se_s_n
+
+#recalculate p-values
+robust_s_n = 2*(1-pt(abs(t_stat_s_n), df = df.residual(lm_clean_s_n)))
+
+#table
+screenreg(lm_clean_s_n, override.se = nw_se_s_n, override.pvalues = robust_s_n, digits = 6)
+```
+
+```{r effect of Vol on N second}
+#Table for the effect of volatility on posts for variable N
+#extract results
+mod_post_s_n = est.VAR_s_n$varresult$N
+ff_s_n = formula(mod_post_s_n)
+dd_s_n = model.frame(mod_post_s_n)
+lm_clean_post_s_n = lm(ff_s_n, data= dd_s_n)
+
+#apply Newey-West
+nw_vcov_post_s_n = NeweyWest(lm_clean_post_s_n, lag=6)
+nw_se_post_s_n = sqrt(diag(nw_vcov_post_s_n))
+
+#t-stats
+coef_post_s_n = coef(lm_clean_post_s_n)
+t_stat_post_s_n = coef_post_s_n/nw_se_post_s_n
+
+#recalculate p-values
+robust_post_s_n = 2*(1-pt(abs(t_stat_post_s_n), df = df.residual(lm_clean_post_s_n)))
+
+#table
+screenreg(lm_clean_post_s_n, override.se = nw_se_post_s_n, override.pvalues = robust_post_s_n, digits = 6)
+
+
+```
+
+```{r B mat second mandate N, warning=FALSE, message=FALSE}
+#Construct the Robust Omega Matrix
+U_s_n = residuals(est.VAR_s_n)
+T_s_n = nrow(U_s_n)
+Omega_s_n = matrix(0, ncol(U_s_n), ncol(U_s_n))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l__s_n = t(U_s_n[(l+1):T_s_n, , drop=FALSE]) %*% U_s_n[1:(T_s_n-l), , drop=FALSE] /T_s_n
+  if (l == 0){
+    Omega_s_n = Omega_s_n + Gamma_l__s_n
+  } else {
+    Omega_s_n = Omega_s_n + weight*(Gamma_l__s_n + t(Gamma_l__s_n))
+  }
+}
+
+
+#make the B matrix
+loss_s_n <- function(param_s_n){
+  #Define the restriction
+  B_s_n <- matrix(c(param_s_n[1], param_s_n[2], 0, param_s_n[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X_s_n <- Omega_s_n - B_s_n %*% t(B_s_n)
+  
+  #loss function
+  loss_s_n <- sum(X_s_n^2)
+  return(loss_s_n)
+}
+
+res.opt_s_n <- optim(c(1, 0, 1), loss_s_n, method = "BFGS")
+B.hat_s_n <- matrix(c(res.opt_s_n$par[1], res.opt_s_n$par[2], 0, res.opt_s_n$par[3]), ncol = 2)
+
+print(cbind(Omega_s_n,B.hat_s_n %*% t(B.hat_s_n)))
+
+```
+
+```{r IRF second N, warning=FALSE, message=FALSE}
+#get back the coefficient of est.VAR
+phi_s_n <- Acoef(est.VAR_s_n)
+PHI_s_n = make.PHI(phi_s_n)
+
+#take the constant
+constant_s_n <- sapply(est.VAR_s_n$varresult, function(eq) coef(eq)["const"])
+c_s_n=as.matrix(constant_s_n)
+
+#Simulate the IRF
+p_s_n <- length(phi_s_n)
+n_s_n <- dim(phi_s_n[[1]])[1]
+
+Y_s_n <- simul.VAR(c=c_s_n, Phi = phi_s_n, B = B.hat_s_n, nb.sim ,y0.star=rep(0, n_s_n*p_s_n),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd_s_n = data.frame(
+  period = 1:nrow(Y_s_n),
+  response = Y_s_n[,2])
+
+ggplot(Yd_s_n,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Second Term N on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF Second Mandate N}
+ggplot(Yd_s_n,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Second Mandate N on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r granger_s_n, warning=FALSE, message=FALSE}
+
+#does vol granger cause N
+grangertest(y_s_n[,c("vol","N")], order =6)
+
+#does N granger cause vol
+grangertest(y_s_n[,c("N", "vol")], order =6)
+
+```
+
+### Tariff
+
+```{r second mandate tariff, warning=FALSE, message=FALSE, results="asis"}
+
+y_s_ta = cbind(Vdata_s$tariff, Vdata_s$SPY_vol)
+colnames(y_s_ta)[1:2] <- c("tariff", "vol")
+est.VAR_s_ta <- VAR(y_s_ta,p=6)
+
+#extract results
+mod_vol_s_ta = est.VAR_s_ta$varresult$vol
+f_s_ta = formula(mod_vol_s_ta)
+d_s_ta = model.frame(mod_vol_s_ta)
+lm_clean_s_ta = lm(f_s_ta, data= d_s_ta)
+
+#apply Newey-West
+nw_vcov_s_ta = NeweyWest(lm_clean_s_ta, lag=6)
+nw_se_s_ta = sqrt(diag(nw_vcov_s_ta))
+
+#t-stats
+coef_s_ta = coef(lm_clean_s_ta)
+t_stat_s_ta = coef_s_ta/nw_se_s_ta
+
+#recalculate p-values
+robust_s_ta = 2*(1-pt(abs(t_stat_s_ta), df = df.residual(lm_clean_s_ta)))
+
+#table
+screenreg(lm_clean_s_ta, override.se = nw_se_s_ta, override.pvalues = robust_s_ta, digits = 6)
+```
+
+```{r effect of Vol on tariff second}
+#Table for the effect of volatility on posts for variable tariff
+#extract results
+mod_post_s_ta = est.VAR_s_ta$varresult$tariff
+ff_s_ta = formula(mod_post_s_ta)
+dd_s_ta = model.frame(mod_post_s_ta)
+lm_clean_post_s_ta = lm(ff_s_ta, data= dd_s_ta)
+
+#apply Newey-West
+nw_vcov_post_s_ta = NeweyWest(lm_clean_post_s_ta, lag=6)
+nw_se_post_s_ta = sqrt(diag(nw_vcov_post_s_ta))
+
+#t-stats
+coef_post_s_ta = coef(lm_clean_post_s_ta)
+t_stat_post_s_ta = coef_post_s_ta/nw_se_post_s_ta
+
+#recalculate p-values
+robust_post_s_ta = 2*(1-pt(abs(t_stat_post_s_ta), df = df.residual(lm_clean_post_s_ta)))
+
+#table
+screenreg(lm_clean_post_s_ta, override.se = nw_se_post_s_ta, override.pvalues = robust_post_s_ta, digits = 6)
+
+
+```
+
+```{r B mat second mandate tariff, warning=FALSE, message=FALSE}
+#Construct the Robust Omega Matrix
+U_s_ta = residuals(est.VAR_s_ta)
+T_s_ta = nrow(U_s_ta)
+Omega_s_ta = matrix(0, ncol(U_s_ta), ncol(U_s_ta))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l__s_ta = t(U_s_ta[(l+1):T_s_ta, , drop=FALSE]) %*% U_s_ta[1:(T_s_ta-l), , drop=FALSE] /T_s_ta
+  if (l == 0){
+    Omega_s_ta = Omega_s_ta + Gamma_l__s_ta
+  } else {
+    Omega_s_ta = Omega_s_ta + weight*(Gamma_l__s_ta + t(Gamma_l__s_ta))
+  }
+}
+
+
+#make the B matrix
+loss_s_ta <- function(param_s_ta){
+  #Define the restriction
+  B_s_ta <- matrix(c(param_s_ta[1], param_s_ta[2], 0, param_s_ta[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X_s_ta <- Omega_s_ta - B_s_ta %*% t(B_s_ta)
+  
+  #loss function
+  loss_s_ta <- sum(X_s_ta^2)
+  return(loss_s_ta)
+}
+
+res.opt_s_ta <- optim(c(1, 0, 1), loss_s_ta, method = "BFGS")
+B.hat_s_ta <- matrix(c(res.opt_s_ta$par[1], res.opt_s_ta$par[2], 0, res.opt_s_ta$par[3]), ncol = 2)
+
+print(cbind(Omega_s_ta,B.hat_s_ta %*% t(B.hat_s_ta)))
+
+```
+
+```{r IRF second tariff, warning=FALSE, message=FALSE}
+#get back the coefficient of est.VAR
+phi_s_ta <- Acoef(est.VAR_s_ta)
+PHI_s_ta = make.PHI(phi_s_ta)
+
+#take the constant
+constant_s_ta <- sapply(est.VAR_s_ta$varresult, function(eq) coef(eq)["const"])
+c_s_ta=as.matrix(constant_s_ta)
+
+#Simulate the IRF
+p_s_ta <- length(phi_s_ta)
+n_s_ta <- dim(phi_s_ta[[1]])[1]
+
+Y_s_ta <- simul.VAR(c=c_s_ta, Phi = phi_s_ta, B = B.hat_s_ta, nb.sim ,y0.star=rep(0, n_s_ta*p_s_ta),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd_s_ta = data.frame(
+  period = 1:nrow(Y_s_ta),
+  response = Y_s_ta[,2])
+
+ggplot(Yd_s_ta,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Second Term Tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF Second Mandate Tariff}
+ggplot(Yd_s_ta,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Second Mandate Tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r granger_s_ta, warning=FALSE, message=FALSE}
+
+#does vol granger cause tariff
+grangertest(y_s_ta[,c("vol","tariff")], order =6)
+
+#does tariff granger cause vol
+grangertest(y_s_ta[,c("tariff", "vol")], order =6)
+
+```
+
+### Trade
+
+```{r second mandate trade, warning=FALSE, message=FALSE, results="asis"}
+
+y_s_tr = cbind(Vdata_s$trade, Vdata_s$SPY_vol)
+colnames(y_s_tr)[1:2] <- c("trade", "vol")
+est.VAR_s_tr <- VAR(y_s_tr,p=6)
+
+#extract results
+mod_vol_s_tr = est.VAR_s_tr$varresult$vol
+f_s_tr = formula(mod_vol_s_tr)
+d_s_tr = model.frame(mod_vol_s_tr)
+lm_clean_s_tr = lm(f_s_tr, data= d_s_tr)
+
+#apply Newey-West
+nw_vcov_s_tr = NeweyWest(lm_clean_s_tr, lag=6)
+nw_se_s_tr = sqrt(diag(nw_vcov_s_tr))
+
+#t-stats
+coef_s_tr = coef(lm_clean_s_tr)
+t_stat_s_tr = coef_s_tr/nw_se_s_tr
+
+#recalculate p-values
+robust_s_tr = 2*(1-pt(abs(t_stat_s_tr), df = df.residual(lm_clean_s_tr)))
+
+#table
+screenreg(lm_clean_s_tr, override.se = nw_se_s_tr, override.pvalues = robust_s_tr, digits = 6)
+```
+
+```{r effect of Vol on trade second}
+#Table for the effect of volatility on posts for variable trade
+#extract results
+mod_post_s_tr = est.VAR_s_tr$varresult$trade
+ff_s_tr = formula(mod_post_s_tr)
+dd_s_tr = model.frame(mod_post_s_tr)
+lm_clean_post_s_tr = lm(ff_s_tr, data= dd_s_tr)
+
+#apply Newey-West
+nw_vcov_post_s_tr = NeweyWest(lm_clean_post_s_tr, lag=6)
+nw_se_post_s_tr = sqrt(diag(nw_vcov_post_s_tr))
+
+#t-stats
+coef_post_s_tr = coef(lm_clean_post_s_tr)
+t_stat_post_s_tr = coef_post_s_tr/nw_se_post_s_tr
+
+#recalculate p-values
+robust_post_s_tr = 2*(1-pt(abs(t_stat_post_s_tr), df = df.residual(lm_clean_post_s_tr)))
+
+#table
+screenreg(lm_clean_post_s_tr, override.se = nw_se_post_s_tr, override.pvalues = robust_post_s_tr, digits = 6)
+
+
+```
+
+```{r B mat second mandate trade, warning=FALSE, message=FALSE}
+#Construct the Robust Omega Matrix
+U_s_tr = residuals(est.VAR_s_tr)
+T_s_tr = nrow(U_s_tr)
+Omega_s_tr = matrix(0, ncol(U_s_tr), ncol(U_s_tr))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l__s_tr = t(U_s_tr[(l+1):T_s_tr, , drop=FALSE]) %*% U_s_tr[1:(T_s_tr-l), , drop=FALSE] /T_s_tr
+  if (l == 0){
+    Omega_s_tr = Omega_s_tr + Gamma_l__s_tr
+  } else {
+    Omega_s_tr = Omega_s_tr + weight*(Gamma_l__s_tr + t(Gamma_l__s_tr))
+  }
+}
+
+
+#make the B matrix
+loss_s_tr <- function(param_s_tr){
+  #Define the restriction
+  B_s_tr <- matrix(c(param_s_tr[1], param_s_tr[2], 0, param_s_tr[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X_s_tr <- Omega_s_tr - B_s_tr %*% t(B_s_tr)
+  
+  #loss function
+  loss_s_tr <- sum(X_s_tr^2)
+  return(loss_s_tr)
+}
+
+res.opt_s_tr <- optim(c(1, 0, 1), loss_s_tr, method = "BFGS")
+B.hat_s_tr <- matrix(c(res.opt_s_tr$par[1], res.opt_s_tr$par[2], 0, res.opt_s_tr$par[3]), ncol = 2)
+
+print(cbind(Omega_s_tr,B.hat_s_tr %*% t(B.hat_s_tr)))
+
+```
+
+```{r IRF second trade, warning=FALSE, message=FALSE}
+#get back the coefficient of est.VAR
+phi_s_tr <- Acoef(est.VAR_s_tr)
+PHI_s_tr = make.PHI(phi_s_tr)
+
+#take the constant
+constant_s_tr <- sapply(est.VAR_s_tr$varresult, function(eq) coef(eq)["const"])
+c_s_tr=as.matrix(constant_s_tr)
+
+#Simulate the IRF
+p_s_tr <- length(phi_s_tr)
+n_s_tr <- dim(phi_s_tr[[1]])[1]
+
+Y_s_tr <- simul.VAR(c=c_s_tr, Phi = phi_s_tr, B = B.hat_s_tr, nb.sim ,y0.star=rep(0, n_s_tr*p_s_tr),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd_s_tr = data.frame(
+  period = 1:nrow(Y_s_tr),
+  response = Y_s_tr[,2])
+
+ggplot(Yd_s_tr,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Second Term Trade on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF Second Mandate Trade}
+ggplot(Yd_s_tr,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Second Mandate Trade on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r granger_s_tr, warning=FALSE, message=FALSE}
+
+#does vol granger cause trade
+grangertest(y_s_tr[,c("vol","trade")], order =6)
+
+#does trade granger cause vol
+grangertest(y_s_tr[,c("trade", "vol")], order =6)
+
+```
+
+### China
+
+```{r second mandate china, warning=FALSE, message=FALSE, results="asis"}
+
+y_s_ch = cbind(Vdata_s$china, Vdata_s$SPY_vol)
+colnames(y_s_ch)[1:2] <- c("china", "vol")
+est.VAR_s_ch <- VAR(y_s_ch,p=6)
+
+#extract results
+mod_vol_s_ch = est.VAR_s_ch$varresult$vol
+f_s_ch = formula(mod_vol_s_ch)
+d_s_ch = model.frame(mod_vol_s_ch)
+lm_clean_s_ch = lm(f_s_ch, data= d_s_ch)
+
+#apply Newey-West
+nw_vcov_s_ch = NeweyWest(lm_clean_s_ch, lag=6)
+nw_se_s_ch = sqrt(diag(nw_vcov_s_ch))
+
+#t-stats
+coef_s_ch = coef(lm_clean_s_ch)
+t_stat_s_ch = coef_s_ch/nw_se_s_ch
+
+#recalculate p-values
+robust_s_ch = 2*(1-pt(abs(t_stat_s_ch), df = df.residual(lm_clean_s_ch)))
+
+#table
+screenreg(lm_clean_s_ch, override.se = nw_se_s_ch, override.pvalues = robust_s_ch, digits = 6)
+```
+
+```{r effect of Vol on china second}
+#Table for the effect of volatility on posts for variable china
+#extract results
+mod_post_s_ch = est.VAR_s_ch$varresult$china
+ff_s_ch = formula(mod_post_s_ch)
+dd_s_ch = model.frame(mod_post_s_ch)
+lm_clean_post_s_ch = lm(ff_s_ch, data= dd_s_ch)
+
+#apply Newey-West
+nw_vcov_post_s_ch = NeweyWest(lm_clean_post_s_ch, lag=6)
+nw_se_post_s_ch = sqrt(diag(nw_vcov_post_s_ch))
+
+#t-stats
+coef_post_s_ch = coef(lm_clean_post_s_ch)
+t_stat_post_s_ch = coef_post_s_ch/nw_se_post_s_ch
+
+#recalculate p-values
+robust_post_s_ch = 2*(1-pt(abs(t_stat_post_s_ch), df = df.residual(lm_clean_post_s_ch)))
+
+#table
+screenreg(lm_clean_post_s_ch, override.se = nw_se_post_s_ch, override.pvalues = robust_post_s_ch, digits = 6)
+
+
+```
+
+```{r B mat second mandate china, warning=FALSE, message=FALSE}
+#Construct the Robust Omega Matrix
+U_s_ch = residuals(est.VAR_s_ch)
+T_s_ch = nrow(U_s_ch)
+Omega_s_ch = matrix(0, ncol(U_s_ch), ncol(U_s_ch))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l__s_ch = t(U_s_ch[(l+1):T_s_ch, , drop=FALSE]) %*% U_s_ch[1:(T_s_ch-l), , drop=FALSE] /T_s_ch
+  if (l == 0){
+    Omega_s_ch = Omega_s_ch + Gamma_l__s_ch
+  } else {
+    Omega_s_ch = Omega_s_ch + weight*(Gamma_l__s_ch + t(Gamma_l__s_ch))
+  }
+}
+
+
+#make the B matrix
+loss_s_ch <- function(param_s_ch){
+  #Define the restriction
+  B_s_ch <- matrix(c(param_s_ch[1], param_s_ch[2], 0, param_s_ch[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X_s_ch <- Omega_s_ch - B_s_ch %*% t(B_s_ch)
+  
+  #loss function
+  loss_s_ch <- sum(X_s_ch^2)
+  return(loss_s_ch)
+}
+
+res.opt_s_ch <- optim(c(1, 0, 1), loss_s_ch, method = "BFGS")
+B.hat_s_ch <- matrix(c(res.opt_s_ch$par[1], res.opt_s_ch$par[2], 0, res.opt_s_ch$par[3]), ncol = 2)
+
+print(cbind(Omega_s_ch,B.hat_s_ch %*% t(B.hat_s_ch)))
+
+```
+
+```{r IRF second china, warning=FALSE, message=FALSE}
+#get back the coefficient of est.VAR
+phi_s_ch <- Acoef(est.VAR_s_ch)
+PHI_s_ch = make.PHI(phi_s_ch)
+
+#take the constant
+constant_s_ch <- sapply(est.VAR_s_ch$varresult, function(eq) coef(eq)["const"])
+c_s_ch=as.matrix(constant_s_ch)
+
+#Simulate the IRF
+p_s_ch <- length(phi_s_ch)
+n_s_ch <- dim(phi_s_ch[[1]])[1]
+
+Y_s_ch <- simul.VAR(c=c_s_ch, Phi = phi_s_ch, B = B.hat_s_ch, nb.sim ,y0.star=rep(0, n_s_ch*p_s_ch),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd_s_ch = data.frame(
+  period = 1:nrow(Y_s_ch),
+  response = Y_s_ch[,2])
+
+ggplot(Yd_s_ch,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("IRF of Second Term China on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF _s_ch}
+ggplot(Yd_s_ch,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumumalitve IRF of Second Term China on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r granger_s_ch, warning=FALSE, message=FALSE}
+
+#does vol granger cause china
+grangertest(y_s_ch[,c("vol","china")], order =6)
+
+#does china granger cause vol
+grangertest(y_s_ch[,c("china", "vol")], order =6)
+
+```
+
+# Test of Serial Correlation
+
+```{r serial correlation bunch of test}
+#bunch of example of test
+
+serial2 = serial.test(est.VAR2, lags.pt =6, type = "PT.asymptotic")
+serial2
+
+serial3 = serial.test(est.VAR3, lags.pt =6, type = "PT.asymptotic")
+serial3
+
+serial4 = serial.test(est.VAR4, lags.pt =6, type = "PT.asymptotic")
+serial4
+
+serialchina = serial.test(est.VARchina, lags.pt =6, type = "PT.asymptotic")
+serialchina
+
+serial7 = serial.test(est.VAR7, lags.pt =6, type = "PT.asymptotic")
+serial7
+
+serial_s_d = serial.test(est.VAR_s_d, lags.pt =6, type = "PT.asymptotic")
+serial_s_d
+
+serial_s_ta = serial.test(est.VAR_s_ta, lags.pt =6, type = "PT.asymptotic")
+serial_s_ta
+
+serial_s_ch = serial.test(est.VAR_s_ch, lags.pt =6, type = "PT.asymptotic")
+serial_s_ch
+
+serial_f_tr = serial.test(est.VAR_f_tr, lags.pt =6, type = "PT.asymptotic")
+serial_f_tr
+
+serial_f_n = serial.test(est.VAR_f_n, lags.pt =6, type = "PT.asymptotic")
+serial_f_n
+
+serial8 = serial.test(est.VAR8, lags.pt =6, type = "PT.asymptotic")
+serial8
+
+serial10 = serial.test(est.VAR10, lags.pt =6, type = "PT.asymptotic")
+serial10
+
+serial12 = serial.test(est.VAR12, lags.pt =6, type = "PT.asymptotic")
+serial12
+
+serial12.2 = serial.test(est.VAR12.2, lags.pt =6, type = "PT.asymptotic")
+serial12.2
+
+serial14.2 = serial.test(est.VAR14.2, lags.pt =6, type = "PT.asymptotic")
+serial14.2
+
+```
