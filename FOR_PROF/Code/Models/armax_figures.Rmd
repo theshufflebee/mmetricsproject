@@ -172,25 +172,19 @@ res3 = checkresiduals(models[["Model 3"]], plot = FALSE)
 res4 = checkresiduals(models[["Model 4"]], plot = FALSE)
 res5 = checkresiduals(models[["Model 5"]], plot = FALSE)
 
-```
-
-```{r SPYresiduals table, warning=F, message=F}
-
 resnames = c("Twitter Dummy", "Twitter Count", "Tariff", "Trade", "China")
 
 #extract p-values directly from checkresiduals results
-pvals <- data.frame(Model = resnames,
-                    `Ljung-Box p-value` = c(
+pvals <- data.frame("X-Regressor" = resnames,
+                    `Full Timeframe` = c(
                       res1$p.value,
                       res2$p.value,
                       res3$p.value,
                       res4$p.value,
                       res5$p.value))
 
-#table
-knitr::kable(pvals, digits = 100, caption = "Full Timeframe Ljung-Box Test p-values")
-
 ```
+
 
 
 
@@ -238,8 +232,9 @@ res7 = checkresiduals(models[["First Term (2)"]], plot = FALSE)
 res8 = checkresiduals(models[["First Term (3)"]], plot = FALSE)
 
 pvals_new1 <- data.frame(
-  Model = c("First Term Tariffs", "First Term Trade", "First Term China"),
-  `Ljung-Box p-value` = c(
+  "First-Term" = c(
+    NA,
+    NA,
     res6$p.value,
     res7$p.value,
     res8$p.value))
@@ -311,14 +306,16 @@ res10 = checkresiduals(models[["Second Term (2)"]], plot = FALSE)
 res11 = checkresiduals(models[["Second Term (3)"]], plot = FALSE)
 
 pvals_new2 <- data.frame(
-  Model = c("Second Term Tariffs", "Second Term Trade", "Second Term China"),
-  `Ljung-Box p-value` = c(
+  "Second-Term" = c(
+    NA,
+    NA,
     res9$p.value,
     res10$p.value,
     res11$p.value))
 
 #combine with other term
-pvals_combined <- rbind(pvals_new1, pvals_new2)
+pvals_combined <- cbind(pvals,pvals_new1)
+pvals_combined <- cbind(pvals_combined, pvals_new2)
 
 ```
 
@@ -357,11 +354,12 @@ write(table2, file = "armax_table2.tex")
 ```
 
 
-## SPY Residuals Table (both terms)
+## SPY Residuals Table 
 ```{r resterms table, message=FALSE, warning=FALSE, results="asis"}
 
 table3 = knitr::kable(pvals_combined, digits = 100, format="latex",
-             caption = "Separate Terms Ljung-Box Test p-values")
+             caption = "Ljung-Box Test p-values for Residuals")
+
 table3
 
 write(table3, file = "armax_table3.tex")
