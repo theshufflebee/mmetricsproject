@@ -44,7 +44,12 @@ source(here("helperfunctions/armax_functions.R"))
 ```
 
 
-## Full Timeframe (Jan 2024 to May 2025)
+## Full Timeframe (Jan 2014 to May 2025)
+
+We choose the specification in the armax_models file. In this file, we will
+just run said specifications to produce nice tables and graphs to include in 
+our final paper. This is also why there are specification differences in the 
+separate timeframes. We always use the best fit we found earlier.
 
 ```{r datasetup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
 
@@ -63,15 +68,8 @@ mean1 = mean(data$SPY_vol)
 ```
 
 
-### SPY Models
-
-We choose the specification in the armax_models file. In this file, we will
-just run said specifications to produce nice tables and graphs to include in 
-our final paper. This is also why there are specification differences in the 
-separate timeframes. We always use the best fit we found earlier.
-
-
 ```{r fitting models, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
+#All SPY models for the full Dataframe
 
 models <- list()
 
@@ -97,7 +95,7 @@ models[["Model 5"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 
 ```
 
-### SPY Table {#sec:spy-table}
+### SPY ARMAX Table (Jan 2014 - May 2025) {#sec:spy-table}
 ```{r armaxfull, results="asis", warning=FALSE, echo=FALSE, message=FALSE}
 library(texreg)
 
@@ -138,7 +136,7 @@ cat(
 ```
 
 
-### SPY IRFs{#sec:SPY-IRF}
+### SPY ARMAX IRFs (Jan 2024 - May 2025){#sec:SPY-IRF}
 
 ```{r SPYirf, results="asis", warning=F, message=F, echo=FALSE, cache=TRUE}
 
@@ -191,9 +189,9 @@ kable(pvals, format = "html", digits = 4, caption = "Full Timeframe Ljung-Box Te
 
 
 
-## First Term
 
 ```{r datasetup first, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+#First term Calculations
 
 #load final dataset
 data = backup
@@ -206,9 +204,9 @@ mean2 = mean(data$SPY_vol)
 
 ```
 
-### SPY Models
 
 ```{r 1st term models, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
+#SPY Models first Term
 
 models <- list()
 
@@ -227,9 +225,8 @@ models[["First Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 ```
 
 
-### SPY Residuals
 ```{r 1st SPYresiduals, warning=F, message=F, results=F, echo=FALSE, cache=TRUE}
-
+# Run first term residuals
 res6 = checkresiduals(models[["First Term (1)"]], plot = FALSE)
 res7 = checkresiduals(models[["First Term (2)"]], plot = FALSE)
 res8 = checkresiduals(models[["First Term (3)"]], plot = FALSE)
@@ -246,9 +243,9 @@ pvals_new1 <- data.frame(
 
 
 
-## Second Term
 
 ```{r datasetup second, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+#Second Term Calculations
 
 #load final dataset
 data = backup
@@ -261,9 +258,9 @@ mean3 = mean(data$SPY_vol)
 
 ```
 
-### SPY Models
 
 ```{r 2nd term models, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
+#Run Second Term Models
 
 # ARMA-X(3,2,3) with Tariff Mentions as Exogenous
 models[["Second Term (1)"]] <- armax(data$SPY_vol, xreg = data$tariff, latex = F,
@@ -280,8 +277,8 @@ models[["Second Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 ```
 
 
-### SPY IRFs
 ```{r 2nd SPYirf, warning=F, message=F, echo=FALSE, cache=TRUE}
+#Calculate Second Term IRFs
 
 #we want to plot the IRFs of these models
 nb.periods = 7 * 15
@@ -289,18 +286,11 @@ nb.periods = 7 * 15
 plot2 = irf.plot(models[["Second Term (1)"]],nb.periods,
                  title="Tariff Mention Shock - Second Term")
 plot2
-
-ggsave("armax_plot2.png",plot=plot2,bg="white")
-
-plot3 = irf.plot(models[["Second Term (3)"]],nb.periods,
-                 title="China Mention Shock - Second Term")
-plot3
-
 ```
 
 
-### SPY Residuals
 ```{r 2nd SPYresiduals, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
+# Calculate SPY residuals for the second term
 
 res9 = checkresiduals(models[["Second Term (1)"]], plot = FALSE)
 res10 = checkresiduals(models[["Second Term (2)"]], plot = FALSE)
@@ -321,7 +311,7 @@ pvals_combined <- cbind(pvals_combined, pvals_new2)
 ```
 
 
-### SPY Table (both terms) {#sec:spy-table-terms}
+### SPY ARMAX Table (Separate Terms){#sec:spy-table-terms}
 
 \centering
 
@@ -359,7 +349,7 @@ htmlreg(
 ```
 
 
-## Descriptive Stats{#sec:SPYresmeans}
+## Descriptive Stats {#sec:SPYressum}
 
 ```{r means, message=F, warning=F, results="asis", echo=FALSE, cache=TRUE}
 
