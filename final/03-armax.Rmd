@@ -33,7 +33,7 @@ $Tariff_{t-2}$ are especially large, given the usual size of the volatility
 extra mention of tariffs one hour ago, leads to a whopping extra 0.02 in volatility
 which is just about the average size for the full timeframe. We can see the
 impulse response function (IRF) for this shock, in <span style="color:red"> *IRFtarif* </span>.
-Notice that there is a large response in the first periods, and then a graduate
+\@ref(fig:SPYirf). Notice that there is a large response in the first periods, and then a graduate
 decline over time. Something to note is that in our analysises of IRF's, when including
 MA terms, the decline shows up gradual while being much sharper when only including
 AR terms. 
