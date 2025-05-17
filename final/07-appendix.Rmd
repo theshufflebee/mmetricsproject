@@ -1,7 +1,7 @@
 # Appendix
 
 
-```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+```{r library_setup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
 rm(list=ls())
 require(tinytex) #LaTeX
 require(ggplot2) #plots
@@ -46,7 +46,7 @@ source(here("helperfunctions/armax_functions.R"))
 
 # Full Timeframe (Jan 2024 to May 2025)
 
-```{r datasetup, results=FALSE, warning=FALSE, message=FALSE}
+```{r datasetup_appendix, results=FALSE, warning=FALSE, message=FALSE}
 
 #load final dataset
 source(here("helperfunctions/full_data.R"))

@@ -7,7 +7,7 @@ editor_options:
     wrap: 72
 ---
 
-```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+```{r library_setup_data, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
 rm(list=ls())
 require(tinytex) #LaTeX
 require(ggplot2) #plots
@@ -50,7 +50,7 @@ source(here("helperfunctions/armax_functions.R"))
 
 ```
 
-```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
 
 #load final dataset
 source(here("helperfunctions/full_data.R"))
@@ -95,7 +95,7 @@ market open on a half-hour but closes at 4:00 pm. We can plot this data in
 <span style="color:red"> *figX* </span>.
 
 
-```{r fin plots, message=FALSE, warning=FALSE, echo=FALSE}
+```{r fin plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 
 price_plotter(SPY, title = "SPY Prices")
 
@@ -135,7 +135,7 @@ the appendix and online.
 
 <span style="color:red"> *insert wordcloud* </span>.
 
-```{r social plots, message=FALSE, warning=FALSE, echo=FALSE}
+```{r social plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 
 #find count
 tweetcount_alltime = dplyr::select(data,timestamp,N)
@@ -160,7 +160,7 @@ plot.title = element_text(face = "bold", hjust = 0.5))
 
 ## Final Dataframe
 
-```{r data, message=FALSE, warning=FALSE, echo=FALSE}
+```{r data, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 
 tail(data[1:4])
 
