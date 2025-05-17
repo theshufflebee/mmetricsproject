@@ -43,8 +43,7 @@ source(here("helperfunctions/armax_functions.R"))
 
 ```
 
-
-## Full Timeframe (Jan 2014 to May 2025)
+## ARMAX
 
 We choose the specification in the armax_models file. In this file, we will
 just run said specifications to produce nice tables and graphs to include in 
@@ -146,7 +145,7 @@ nb.periods = 7 * 15
 #irf.plot(models[["Model 1"]],nb.periods,title="Tweet Dummy Shock")
 #irf.plot(models[["Model 2"]],nb.periods,title="Tweet Count Shock")
 plot1 = irf.plot(models[["Model 3"]],nb.periods,
-                 title="Tariff Mention Shock - Full Timeframe")
+                 title="Tariff Mention Shock - Jan 2014 - May 2025")
 plot1
 #irf.plot(models[["Model 4"]],nb.periods,title="Trade Mention Shock")
 #irf.plot(models[["Model 5"]],nb.periods,title="China Mention Shock")
@@ -349,7 +348,7 @@ htmlreg(
 ```
 
 
-## Descriptive Stats {#sec:SPYressum}
+### Residual Test {#sec:SPYressum}
 
 ```{r means, message=F, warning=F, results="asis", echo=FALSE, cache=TRUE}
 

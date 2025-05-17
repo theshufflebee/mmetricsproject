@@ -23,7 +23,7 @@ split-samples-1
 conclusion
 bibliography
 appendix
-full-timeframe-jan-2014-to-may-2025
+armax
 sec:spy-table
 sec:SPY-IRF
 sec:SPYres
