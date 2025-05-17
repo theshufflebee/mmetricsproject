@@ -2134,33 +2134,858 @@ separate timeframes. We always use the best fit we found earlier.</p>
 </div>
 <div id="spy-table" class="section level3 hasAnchor" number="7.1.2">
 <h3><span class="header-section-number">7.1.2</span> SPY Table<a href="appendix.html#spy-table" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="appendix.html#cb3-1" tabindex="-1"></a>names <span class="ot">=</span> <span class="fu">list</span>( <span class="st">&quot;ar1&quot;</span> <span class="ot">=</span> <span class="st">&quot;AR(1)&quot;</span>,</span>
-<span id="cb3-2"><a href="appendix.html#cb3-2" tabindex="-1"></a>              <span class="st">&quot;ar2&quot;</span> <span class="ot">=</span> <span class="st">&quot;AR(2)&quot;</span>,</span>
-<span id="cb3-3"><a href="appendix.html#cb3-3" tabindex="-1"></a>              <span class="st">&quot;ar3&quot;</span> <span class="ot">=</span> <span class="st">&quot;AR(3)&quot;</span>,</span>
-<span id="cb3-4"><a href="appendix.html#cb3-4" tabindex="-1"></a>              <span class="st">&quot;ma1&quot;</span> <span class="ot">=</span> <span class="st">&quot;MA(1)&quot;</span>,</span>
-<span id="cb3-5"><a href="appendix.html#cb3-5" tabindex="-1"></a>              <span class="st">&quot;ma2&quot;</span> <span class="ot">=</span> <span class="st">&quot;MA(2)&quot;</span>,</span>
-<span id="cb3-6"><a href="appendix.html#cb3-6" tabindex="-1"></a>              <span class="st">&quot;ma3&quot;</span> <span class="ot">=</span> <span class="st">&quot;MA(3)&quot;</span>,</span>
-<span id="cb3-7"><a href="appendix.html#cb3-7" tabindex="-1"></a>              <span class="st">&quot;(Intercept)&quot;</span> <span class="ot">=</span> <span class="st">&quot;Constant&quot;</span>,</span>
-<span id="cb3-8"><a href="appendix.html#cb3-8" tabindex="-1"></a>              <span class="st">&quot;dummy_lag_0&quot;</span> <span class="ot">=</span> <span class="st">&quot;$TweetDummy_{t}$&quot;</span>,</span>
-<span id="cb3-9"><a href="appendix.html#cb3-9" tabindex="-1"></a>              <span class="st">&quot;dummy_lag_1&quot;</span> <span class="ot">=</span> <span class="st">&quot;$TweetDummy_{t-1}$&quot;</span>,</span>
-<span id="cb3-10"><a href="appendix.html#cb3-10" tabindex="-1"></a>              <span class="st">&quot;N_lag_0&quot;</span> <span class="ot">=</span> <span class="st">&quot;$TweetCount_{t}$&quot;</span>,</span>
-<span id="cb3-11"><a href="appendix.html#cb3-11" tabindex="-1"></a>              <span class="st">&quot;N_lag_1&quot;</span> <span class="ot">=</span> <span class="st">&quot;$TweetCount_{t-1}$&quot;</span>,</span>
-<span id="cb3-12"><a href="appendix.html#cb3-12" tabindex="-1"></a>              <span class="st">&quot;tariff_lag_0&quot;</span> <span class="ot">=</span> <span class="st">&quot;$Tariff_{t}$&quot;</span>,</span>
-<span id="cb3-13"><a href="appendix.html#cb3-13" tabindex="-1"></a>              <span class="st">&quot;tariff_lag_1&quot;</span> <span class="ot">=</span> <span class="st">&quot;$Tariff_{t-1}$&quot;</span>,</span>
-<span id="cb3-14"><a href="appendix.html#cb3-14" tabindex="-1"></a>              <span class="st">&quot;tariff_lag_2&quot;</span> <span class="ot">=</span> <span class="st">&quot;$Tariff_{t-2}$&quot;</span>,</span>
-<span id="cb3-15"><a href="appendix.html#cb3-15" tabindex="-1"></a>              <span class="st">&quot;tariff_lag_3&quot;</span> <span class="ot">=</span> <span class="st">&quot;$Tariff_{t-3}$&quot;</span>,</span>
-<span id="cb3-16"><a href="appendix.html#cb3-16" tabindex="-1"></a>              <span class="st">&quot;trade_lag_0&quot;</span> <span class="ot">=</span> <span class="st">&quot;$Trade_{t}$&quot;</span>,</span>
-<span id="cb3-17"><a href="appendix.html#cb3-17" tabindex="-1"></a>              <span class="st">&quot;trade_lag_1&quot;</span> <span class="ot">=</span> <span class="st">&quot;$Trade_{t-1}$&quot;</span>,</span>
-<span id="cb3-18"><a href="appendix.html#cb3-18" tabindex="-1"></a>              <span class="st">&quot;china_lag_0&quot;</span> <span class="ot">=</span> <span class="st">&quot;$China_{t}$&quot;</span>)</span>
-<span id="cb3-19"><a href="appendix.html#cb3-19" tabindex="-1"></a></span>
-<span id="cb3-20"><a href="appendix.html#cb3-20" tabindex="-1"></a>table1 <span class="ot">=</span> <span class="fu">texreg</span>(models,</span>
-<span id="cb3-21"><a href="appendix.html#cb3-21" tabindex="-1"></a>          <span class="at">custom.model.names =</span> <span class="fu">names</span>(models), </span>
-<span id="cb3-22"><a href="appendix.html#cb3-22" tabindex="-1"></a>          <span class="at">custom.coef.map =</span> names,</span>
-<span id="cb3-23"><a href="appendix.html#cb3-23" tabindex="-1"></a>          <span class="at">caption =</span> <span class="st">&quot;ARMAX Models of Average Hourly Volatility&quot;</span>,</span>
-<span id="cb3-24"><a href="appendix.html#cb3-24" tabindex="-1"></a>          <span class="at">caption.above =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb3-25"><a href="appendix.html#cb3-25" tabindex="-1"></a>          <span class="at">label =</span> <span class="st">&quot;tab:armax&quot;</span>,</span>
-<span id="cb3-26"><a href="appendix.html#cb3-26" tabindex="-1"></a>          <span class="at">digits =</span> <span class="dv">4</span>)</span>
-<span id="cb3-27"><a href="appendix.html#cb3-27" tabindex="-1"></a>table1</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="appendix.html#cb3-1" tabindex="-1"></a><span class="fu">library</span>(texreg)</span>
+<span id="cb3-2"><a href="appendix.html#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="appendix.html#cb3-3" tabindex="-1"></a><span class="co"># Define variable display names (HTML-friendly using &lt;sub&gt;)</span></span>
+<span id="cb3-4"><a href="appendix.html#cb3-4" tabindex="-1"></a>names <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb3-5"><a href="appendix.html#cb3-5" tabindex="-1"></a>  <span class="st">&quot;ar1&quot;</span> <span class="ot">=</span> <span class="st">&quot;AR(1)&quot;</span>,</span>
+<span id="cb3-6"><a href="appendix.html#cb3-6" tabindex="-1"></a>  <span class="st">&quot;ar2&quot;</span> <span class="ot">=</span> <span class="st">&quot;AR(2)&quot;</span>,</span>
+<span id="cb3-7"><a href="appendix.html#cb3-7" tabindex="-1"></a>  <span class="st">&quot;ar3&quot;</span> <span class="ot">=</span> <span class="st">&quot;AR(3)&quot;</span>,</span>
+<span id="cb3-8"><a href="appendix.html#cb3-8" tabindex="-1"></a>  <span class="st">&quot;ma1&quot;</span> <span class="ot">=</span> <span class="st">&quot;MA(1)&quot;</span>,</span>
+<span id="cb3-9"><a href="appendix.html#cb3-9" tabindex="-1"></a>  <span class="st">&quot;ma2&quot;</span> <span class="ot">=</span> <span class="st">&quot;MA(2)&quot;</span>,</span>
+<span id="cb3-10"><a href="appendix.html#cb3-10" tabindex="-1"></a>  <span class="st">&quot;ma3&quot;</span> <span class="ot">=</span> <span class="st">&quot;MA(3)&quot;</span>,</span>
+<span id="cb3-11"><a href="appendix.html#cb3-11" tabindex="-1"></a>  <span class="st">&quot;(Intercept)&quot;</span> <span class="ot">=</span> <span class="st">&quot;Constant&quot;</span>,</span>
+<span id="cb3-12"><a href="appendix.html#cb3-12" tabindex="-1"></a>  <span class="st">&quot;dummy_lag_0&quot;</span> <span class="ot">=</span> <span class="st">&quot;TweetDummy&lt;sub&gt;t&lt;/sub&gt;&quot;</span>,</span>
+<span id="cb3-13"><a href="appendix.html#cb3-13" tabindex="-1"></a>  <span class="st">&quot;dummy_lag_1&quot;</span> <span class="ot">=</span> <span class="st">&quot;TweetDummy&lt;sub&gt;t-1&lt;/sub&gt;&quot;</span>,</span>
+<span id="cb3-14"><a href="appendix.html#cb3-14" tabindex="-1"></a>  <span class="st">&quot;N_lag_0&quot;</span> <span class="ot">=</span> <span class="st">&quot;TweetCount&lt;sub&gt;t&lt;/sub&gt;&quot;</span>,</span>
+<span id="cb3-15"><a href="appendix.html#cb3-15" tabindex="-1"></a>  <span class="st">&quot;N_lag_1&quot;</span> <span class="ot">=</span> <span class="st">&quot;TweetCount&lt;sub&gt;t-1&lt;/sub&gt;&quot;</span>,</span>
+<span id="cb3-16"><a href="appendix.html#cb3-16" tabindex="-1"></a>  <span class="st">&quot;tariff_lag_0&quot;</span> <span class="ot">=</span> <span class="st">&quot;Tariff&lt;sub&gt;t&lt;/sub&gt;&quot;</span>,</span>
+<span id="cb3-17"><a href="appendix.html#cb3-17" tabindex="-1"></a>  <span class="st">&quot;tariff_lag_1&quot;</span> <span class="ot">=</span> <span class="st">&quot;Tariff&lt;sub&gt;t-1&lt;/sub&gt;&quot;</span>,</span>
+<span id="cb3-18"><a href="appendix.html#cb3-18" tabindex="-1"></a>  <span class="st">&quot;tariff_lag_2&quot;</span> <span class="ot">=</span> <span class="st">&quot;Tariff&lt;sub&gt;t-2&lt;/sub&gt;&quot;</span>,</span>
+<span id="cb3-19"><a href="appendix.html#cb3-19" tabindex="-1"></a>  <span class="st">&quot;tariff_lag_3&quot;</span> <span class="ot">=</span> <span class="st">&quot;Tariff&lt;sub&gt;t-3&lt;/sub&gt;&quot;</span>,</span>
+<span id="cb3-20"><a href="appendix.html#cb3-20" tabindex="-1"></a>  <span class="st">&quot;trade_lag_0&quot;</span> <span class="ot">=</span> <span class="st">&quot;Trade&lt;sub&gt;t&lt;/sub&gt;&quot;</span>,</span>
+<span id="cb3-21"><a href="appendix.html#cb3-21" tabindex="-1"></a>  <span class="st">&quot;trade_lag_1&quot;</span> <span class="ot">=</span> <span class="st">&quot;Trade&lt;sub&gt;t-1&lt;/sub&gt;&quot;</span>,</span>
+<span id="cb3-22"><a href="appendix.html#cb3-22" tabindex="-1"></a>  <span class="st">&quot;china_lag_0&quot;</span> <span class="ot">=</span> <span class="st">&quot;China&lt;sub&gt;t&lt;/sub&gt;&quot;</span></span>
+<span id="cb3-23"><a href="appendix.html#cb3-23" tabindex="-1"></a>)</span>
+<span id="cb3-24"><a href="appendix.html#cb3-24" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="appendix.html#cb3-25" tabindex="-1"></a><span class="co"># Output the HTML table directly</span></span>
+<span id="cb3-26"><a href="appendix.html#cb3-26" tabindex="-1"></a><span class="fu">cat</span>(</span>
+<span id="cb3-27"><a href="appendix.html#cb3-27" tabindex="-1"></a>  <span class="fu">htmlreg</span>(</span>
+<span id="cb3-28"><a href="appendix.html#cb3-28" tabindex="-1"></a>    models,</span>
+<span id="cb3-29"><a href="appendix.html#cb3-29" tabindex="-1"></a>    <span class="at">custom.model.names =</span> <span class="fu">names</span>(models),</span>
+<span id="cb3-30"><a href="appendix.html#cb3-30" tabindex="-1"></a>    <span class="at">custom.coef.map =</span> names,</span>
+<span id="cb3-31"><a href="appendix.html#cb3-31" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;ARMAX Models of Average Hourly Volatility&quot;</span>,</span>
+<span id="cb3-32"><a href="appendix.html#cb3-32" tabindex="-1"></a>    <span class="at">caption.above =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-33"><a href="appendix.html#cb3-33" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">4</span>,</span>
+<span id="cb3-34"><a href="appendix.html#cb3-34" tabindex="-1"></a>    <span class="at">doctype =</span> <span class="cn">FALSE</span></span>
+<span id="cb3-35"><a href="appendix.html#cb3-35" tabindex="-1"></a>  )</span>
+<span id="cb3-36"><a href="appendix.html#cb3-36" tabindex="-1"></a>)</span></code></pre></div>
+<table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;color: #000000;border-top: 2px solid #000000;">
+<caption>
+ARMAX Models of Average Hourly Volatility
+</caption>
+<thead>
+<tr>
+<th style="padding-left: 5px;padding-right: 5px;">
+ 
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 1
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 2
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 3
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 4
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 5
+</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-top: 1px solid #000000;">
+<td style="padding-left: 5px;padding-right: 5px;">
+AR(1)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.0300
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.0278
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.2200<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.1903<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.2209<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0510)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0510)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0084)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0096)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0084)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+AR(2)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.7229<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.7210<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.9388<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-1.4727<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.9382<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0397)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0399)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0037)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0173)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0037)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+AR(3)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.2110<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.2148<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.1837<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.2784<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.1837<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0287)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0284)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0079)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0082)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0079)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+MA(1)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.2751<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.2779<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.0870<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-1.8955<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.0878<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0496)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0496)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0042)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0062)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0042)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+MA(2)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.6445<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.6430<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.8960<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.9165<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.8950<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0284)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0285)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0042)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0063)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0042)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+MA(3)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.3527<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.3563<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0256)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0253)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+TweetDummy<sub>t</sub>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.0014<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0002)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+TweetDummy<sub>t-1</sub>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.0008<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0002)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+TweetCount<sub>t</sub>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.0004<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0001)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+TweetCount<sub>t-1</sub>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.0002<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0001)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Tariff<sub>t</sub>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.0035<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0014)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Tariff<sub>t-1</sub>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.0191<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0015)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Tariff<sub>t-2</sub>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.0103<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0015)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Tariff<sub>t-3</sub>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.0045<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0014)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Trade<sub>t</sub>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.0032
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0018)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Trade<sub>t-1</sub>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.0016
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0018)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+China<sub>t</sub>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.0026<sup>*</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.0012)
+</td>
+</tr>
+<tr style="border-top: 1px solid #000000;">
+<td style="padding-left: 5px;padding-right: 5px;">
+AIC
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-45761.2161
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-45737.6695
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-46020.9547
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-45816.1540
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-45840.5349
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+AICc
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-45761.2051
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-45737.6585
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-46020.9415
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-45816.1449
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-45840.5277
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+BIC
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-45682.1963
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-45658.6497
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-45934.0340
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-45745.0361
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-45777.3186
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Log Likelihood
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+22890.6081
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+22878.8348
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+23021.4773
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+22917.0770
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+22928.2675
+</td>
+</tr>
+<tr style="border-bottom: 2px solid #000000;">
+<td style="padding-left: 5px;padding-right: 5px;">
+Num. obs.
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+19970
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+19970
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+19968
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+19970
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+19971
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="font-size: 0.8em;" colspan="6">
+<sup>***</sup>p &lt; 0.001; <sup>**</sup>p &lt; 0.01; <sup>*</sup>p &lt; 0.05
+</td>
+</tr>
+</tfoot>
+</table>
 </div>
 <div id="spy-irfs" class="section level3 hasAnchor" number="7.1.3">
 <h3><span class="header-section-number">7.1.3</span> SPY IRFs<a href="appendix.html#spy-irfs" class="anchor-section" aria-label="Anchor link to header"></a></h3>

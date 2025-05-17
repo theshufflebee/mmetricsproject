@@ -98,37 +98,43 @@ models[["Model 5"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 ```
 
 ### SPY Table
+```{r armaxfull, results="asis", warning=FALSE, message=FALSE}
+library(texreg)
 
-```{r creating table, results="asis", warning=F, message=F, cache=TRUE}
+# Define variable display names (HTML-friendly using <sub>)
+names <- list(
+  "ar1" = "AR(1)",
+  "ar2" = "AR(2)",
+  "ar3" = "AR(3)",
+  "ma1" = "MA(1)",
+  "ma2" = "MA(2)",
+  "ma3" = "MA(3)",
+  "(Intercept)" = "Constant",
+  "dummy_lag_0" = "TweetDummy<sub>t</sub>",
+  "dummy_lag_1" = "TweetDummy<sub>t-1</sub>",
+  "N_lag_0" = "TweetCount<sub>t</sub>",
+  "N_lag_1" = "TweetCount<sub>t-1</sub>",
+  "tariff_lag_0" = "Tariff<sub>t</sub>",
+  "tariff_lag_1" = "Tariff<sub>t-1</sub>",
+  "tariff_lag_2" = "Tariff<sub>t-2</sub>",
+  "tariff_lag_3" = "Tariff<sub>t-3</sub>",
+  "trade_lag_0" = "Trade<sub>t</sub>",
+  "trade_lag_1" = "Trade<sub>t-1</sub>",
+  "china_lag_0" = "China<sub>t</sub>"
+)
 
-names = list( "ar1" = "AR(1)",
-              "ar2" = "AR(2)",
-              "ar3" = "AR(3)",
-              "ma1" = "MA(1)",
-              "ma2" = "MA(2)",
-              "ma3" = "MA(3)",
-              "(Intercept)" = "Constant",
-              "dummy_lag_0" = "$TweetDummy_{t}$",
-              "dummy_lag_1" = "$TweetDummy_{t-1}$",
-              "N_lag_0" = "$TweetCount_{t}$",
-              "N_lag_1" = "$TweetCount_{t-1}$",
-              "tariff_lag_0" = "$Tariff_{t}$",
-              "tariff_lag_1" = "$Tariff_{t-1}$",
-              "tariff_lag_2" = "$Tariff_{t-2}$",
-              "tariff_lag_3" = "$Tariff_{t-3}$",
-              "trade_lag_0" = "$Trade_{t}$",
-              "trade_lag_1" = "$Trade_{t-1}$",
-              "china_lag_0" = "$China_{t}$")
-
-table1 = texreg(models,
-          custom.model.names = names(models), 
-          custom.coef.map = names,
-          caption = "ARMAX Models of Average Hourly Volatility",
-          caption.above = TRUE,
-          label = "tab:armax",
-          digits = 4)
-table1
-
+# Output the HTML table directly
+cat(
+  htmlreg(
+    models,
+    custom.model.names = names(models),
+    custom.coef.map = names,
+    caption = "ARMAX Models of Average Hourly Volatility",
+    caption.above = TRUE,
+    digits = 4,
+    doctype = FALSE
+  )
+)
 ```
 
 
