@@ -325,7 +325,7 @@ library(texreg)
 #)
 #names(models) <- model_names
 
-# Flattened coefficient names in the correct order — CHECK this matches your model structure!
+# HTML coefficients names adjusted (is this correct?)
 xnames_ordered <- c(
   "AR(1)", "AR(2)", "AR(3)",
   "MA(1)", "MA(2)", "MA(3)",
@@ -335,7 +335,7 @@ xnames_ordered <- c(
   "China<sub>t</sub>", "China<sub>t-1</sub>", "China<sub>t-2</sub>"
 )
 
-# Render table in Bookdown HTML
+# Render as html -> need to render file to have it nice
 htmlreg(
   models,
   custom.coef.names = xnames_ordered,

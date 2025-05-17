@@ -2154,7 +2154,7 @@ margin-left: 2em;
 <span id="cb16-7"><a href="second-term.html#cb16-7" tabindex="-1"></a><span class="co">#)</span></span>
 <span id="cb16-8"><a href="second-term.html#cb16-8" tabindex="-1"></a><span class="co">#names(models) &lt;- model_names</span></span>
 <span id="cb16-9"><a href="second-term.html#cb16-9" tabindex="-1"></a></span>
-<span id="cb16-10"><a href="second-term.html#cb16-10" tabindex="-1"></a><span class="co"># Flattened coefficient names in the correct order — CHECK this matches your model structure!</span></span>
+<span id="cb16-10"><a href="second-term.html#cb16-10" tabindex="-1"></a><span class="co"># HTML coefficients names adjusted (is this correct?)</span></span>
 <span id="cb16-11"><a href="second-term.html#cb16-11" tabindex="-1"></a>xnames_ordered <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb16-12"><a href="second-term.html#cb16-12" tabindex="-1"></a>  <span class="st">&quot;AR(1)&quot;</span>, <span class="st">&quot;AR(2)&quot;</span>, <span class="st">&quot;AR(3)&quot;</span>,</span>
 <span id="cb16-13"><a href="second-term.html#cb16-13" tabindex="-1"></a>  <span class="st">&quot;MA(1)&quot;</span>, <span class="st">&quot;MA(2)&quot;</span>, <span class="st">&quot;MA(3)&quot;</span>,</span>
@@ -2164,7 +2164,7 @@ margin-left: 2em;
 <span id="cb16-17"><a href="second-term.html#cb16-17" tabindex="-1"></a>  <span class="st">&quot;China&lt;sub&gt;t&lt;/sub&gt;&quot;</span>, <span class="st">&quot;China&lt;sub&gt;t-1&lt;/sub&gt;&quot;</span>, <span class="st">&quot;China&lt;sub&gt;t-2&lt;/sub&gt;&quot;</span></span>
 <span id="cb16-18"><a href="second-term.html#cb16-18" tabindex="-1"></a>)</span>
 <span id="cb16-19"><a href="second-term.html#cb16-19" tabindex="-1"></a></span>
-<span id="cb16-20"><a href="second-term.html#cb16-20" tabindex="-1"></a><span class="co"># Render table in Bookdown HTML</span></span>
+<span id="cb16-20"><a href="second-term.html#cb16-20" tabindex="-1"></a><span class="co"># Render as html -&gt; need to render file to have it nice</span></span>
 <span id="cb16-21"><a href="second-term.html#cb16-21" tabindex="-1"></a><span class="fu">htmlreg</span>(</span>
 <span id="cb16-22"><a href="second-term.html#cb16-22" tabindex="-1"></a>  models,</span>
 <span id="cb16-23"><a href="second-term.html#cb16-23" tabindex="-1"></a>  <span class="at">custom.coef.names =</span> xnames_ordered,</span>
