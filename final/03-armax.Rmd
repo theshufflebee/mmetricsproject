@@ -26,11 +26,11 @@ and the mentions of words $Tariff$, $Trade$, and $China$. We first note on
 apart from trade. Notice also that all the coefficients (apart from $Tariff_{t-3}$)
 are positive, in line with our main hypothesis. The effect of $Tariff_{t-1}$ and 
 $Tariff_{t-2}$ are especially large, given the usual size of the volatility 
-(<span style="color:red"> *ARMAX Table 4* </span>). We in fact predict that an 
+(<span style="color:red"> *ARMAX Table 4* </span>) \@ref(sec:SPYresmeans). We in fact predict that an 
 extra mention of tariffs one hour ago, leads to a whopping extra 0.02 in volatility
-which is just about the average size for the full timeframe. We can see the
+ which is just about the average size for the full timeframe. We can see the
 impulse response function (IRF) for this shock, in <span style="color:red"> *IRFtarif* </span>.
-Notice that there is a large response in the first periods, and then a graduate
+\@ref(sec:SPY-IRF) Notice that there is a large response in the first periods, and then a graduate
 decline over time. Something to note is that in our analysises of IRF's, when including
 MA terms, the decline shows up gradual while being much sharper when only including
 AR terms. 
@@ -48,7 +48,7 @@ story goes for the China variable. This may lend some evidence to support the
 claim that investors are much more reactive to Trump's social media presence
 now than before. 
 Finally, we can check the residuals of all these models to test them somewhat. 
-On <span style="color:red"> *ARMAX Table 3* </span>, the pvalues being zero
+On <span style="color:red"> *ARMAX Table 3* </span>, \@ref(sec:SPYres) the pvalues being zero
 for the full timeframe and first term indicate that there is autocorrelation in 
 the residuals, thus suggesting that these estimations have problems. Note however,
 that the pvalues for the second term are quite high, lending support to our

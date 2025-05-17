@@ -46,7 +46,7 @@ source(here("helperfunctions/armax_functions.R"))
 
 ## Full Timeframe (Jan 2024 to May 2025)
 
-```{r datasetup_appendix, results=FALSE, warning=FALSE, message=FALSE, cache=TRUE}
+```{r datasetup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
 
 #load final dataset
 source(here("helperfunctions/full_data.R"))
@@ -71,7 +71,7 @@ our final paper. This is also why there are specification differences in the
 separate timeframes. We always use the best fit we found earlier.
 
 
-```{r fitting models, results=F, warning=F, message=F, cache=TRUE}
+```{r fitting models, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
 
 models <- list()
 
@@ -98,7 +98,7 @@ models[["Model 5"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 ```
 
 ### SPY Table {#sec:spy-table}
-```{r armaxfull, results="asis", warning=FALSE, message=FALSE}
+```{r armaxfull, results="asis", warning=FALSE, echo=FALSE, message=FALSE}
 library(texreg)
 
 # Define variable display names (HTML-friendly using <sub>)
@@ -138,9 +138,9 @@ cat(
 ```
 
 
-### SPY IRFs
+### SPY IRFs{#sec:SPY-IRF}
 
-```{r SPYirf, results="asis", warning=F, message=F, cache=TRUE}
+```{r SPYirf, results="asis", warning=F, message=F, echo=FALSE, cache=TRUE}
 
 #we want to plot the IRFs of these models
 nb.periods = 7 * 15
@@ -158,8 +158,8 @@ ggsave("armax_plot1.png",plot=plot1,bg="white")
 ```
 
 
-### SPY Residuals
-```{r SPYresiduals, warning=F, message=F, results=F, cache=TRUE}
+### SPY Residuals {#sec:SPYres}
+```{r, warning=F, message=F, echo=FALSE, results=F}
 
 res1 = checkresiduals(models[["Model 1"]], plot = FALSE)
 res2 = checkresiduals(models[["Model 2"]], plot = FALSE)
@@ -169,7 +169,7 @@ res5 = checkresiduals(models[["Model 5"]], plot = FALSE)
 
 ```
 
-```{r SPYresiduals table, warning=F, message=F, cache=TRUE}
+```{r SPYres, warning=F, message=F, echo=FALSE, cache=TRUE}
 
 resnames = c("Twitter Dummy", "Twitter Count", "Tariff", "Trade", "China")
 
@@ -183,7 +183,9 @@ pvals <- data.frame(Model = resnames,
                       res5$p.value))
 
 #table
-knitr::kable(pvals, digits = 100, caption = "Full Timeframe Ljung-Box Test p-values")
+# Create a styled HTML table
+kable(pvals, format = "html", digits = 4, caption = "Full Timeframe Ljung-Box Test p-values") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, position = "center")
 
 ```
 
@@ -191,7 +193,7 @@ knitr::kable(pvals, digits = 100, caption = "Full Timeframe Ljung-Box Test p-val
 
 ## First Term
 
-```{r datasetup first, results=FALSE, warning=FALSE, message=FALSE, cache=TRUE}
+```{r datasetup first, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
 
 #load final dataset
 data = backup
@@ -206,7 +208,7 @@ mean2 = mean(data$SPY_vol)
 
 ### SPY Models
 
-```{r 1st term models, results=F, warning=F, message=F, cache=TRUE}
+```{r 1st term models, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
 
 models <- list()
 
@@ -226,7 +228,7 @@ models[["First Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 
 
 ### SPY Residuals
-```{r 1st SPYresiduals, warning=F, message=F, results=F, cache=TRUE}
+```{r 1st SPYresiduals, warning=F, message=F, results=F, echo=FALSE, cache=TRUE}
 
 res6 = checkresiduals(models[["First Term (1)"]], plot = FALSE)
 res7 = checkresiduals(models[["First Term (2)"]], plot = FALSE)
@@ -245,7 +247,7 @@ pvals_new1 <- data.frame(
 
 ## Second Term
 
-```{r datasetup second, results=FALSE, warning=FALSE, message=FALSE, cache=TRUE}
+```{r datasetup second, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
 
 #load final dataset
 data = backup
@@ -260,7 +262,7 @@ mean3 = mean(data$SPY_vol)
 
 ### SPY Models
 
-```{r 2nd term models, results=F, warning=F, message=F, cache=TRUE}
+```{r 2nd term models, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
 
 # ARMA-X(3,2,3) with Tariff Mentions as Exogenous
 models[["Second Term (1)"]] <- armax(data$SPY_vol, xreg = data$tariff, latex = F,
@@ -278,7 +280,7 @@ models[["Second Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 
 
 ### SPY IRFs
-```{r 2nd SPYirf, warning=F, message=F, cache=TRUE}
+```{r 2nd SPYirf, warning=F, message=F, echo=FALSE, cache=TRUE}
 
 #we want to plot the IRFs of these models
 nb.periods = 7 * 15
@@ -297,7 +299,7 @@ plot3
 
 
 ### SPY Residuals
-```{r 2nd SPYresiduals, results=F, warning=F, message=F, cache=TRUE}
+```{r 2nd SPYresiduals, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
 
 res9 = checkresiduals(models[["Second Term (1)"]], plot = FALSE)
 res10 = checkresiduals(models[["Second Term (2)"]], plot = FALSE)
@@ -320,16 +322,16 @@ pvals_combined <- rbind(pvals_new1, pvals_new2)
 
 \centering
 
-```{r armax1, results="asis", warning=F, message=F}
+```{r armax1, results="asis", warning=F, echo=FALSE, message=F}
 
 library(texreg)
 
 # Change model names (not sure if needed anymore)
-#model_names <- c(
-# "First Term (1)", "First Term (2)", "First Term (3)",
-# "Second Term (1)", "Second Term (2)", "Second Term (3)"
-#)
-#names(models) <- model_names
+model_names <- c(
+ "First Term (1)", "First Term (2)", "First Term (3)",
+ "Second Term (1)", "Second Term (2)", "Second Term (3)"
+)
+names(models) <- model_names
 
 # HTML coefficients names adjusted (is this correct?)
 xnames_ordered <- c(
@@ -354,9 +356,9 @@ htmlreg(
 ```
 
 
-## Descriptive Stats
+## Descriptive Stats{#sec:SPYresmeans}
 
-```{r means, message=F, warning=F, results="asis", cache=TRUE}
+```{r means, message=F, warning=F, results="asis", echo=FALSE, cache=TRUE}
 
 means <- data.frame(
   Model = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
@@ -365,10 +367,10 @@ means <- data.frame(
     mean2,
     mean3))
 
-table4 = knitr::kable(means, digits = 6, format="latex",
-             caption = "Summary Statistics of SPY Volatility")
 
-table4
+
+kable(means, format = "html", digits = 6, caption = "Full Timeframe Ljung-Box Test p-values") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, position = "center")
 
 ```
 
