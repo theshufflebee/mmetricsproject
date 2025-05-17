@@ -2165,15 +2165,17 @@ margin-left: 2em;
 <span id="cb16-17"><a href="second-term.html#cb16-17" tabindex="-1"></a>  <span class="st">&quot;china_lag_2&quot;</span> <span class="ot">=</span> <span class="st">&quot;$China_{t-2}$&quot;</span></span>
 <span id="cb16-18"><a href="second-term.html#cb16-18" tabindex="-1"></a>)</span>
 <span id="cb16-19"><a href="second-term.html#cb16-19" tabindex="-1"></a></span>
-<span id="cb16-20"><a href="second-term.html#cb16-20" tabindex="-1"></a><span class="fu">msummary</span>(models,</span>
-<span id="cb16-21"><a href="second-term.html#cb16-21" tabindex="-1"></a>         <span class="at">coef_map =</span> xnames,</span>
-<span id="cb16-22"><a href="second-term.html#cb16-22" tabindex="-1"></a>         <span class="at">stars =</span> <span class="fu">c</span>(<span class="st">&#39;*&#39;</span> <span class="ot">=</span> <span class="fl">0.05</span>, <span class="st">&#39;**&#39;</span> <span class="ot">=</span> <span class="fl">0.01</span>, <span class="st">&#39;***&#39;</span> <span class="ot">=</span> <span class="fl">0.001</span>),</span>
-<span id="cb16-23"><a href="second-term.html#cb16-23" tabindex="-1"></a>         <span class="at">output =</span> <span class="st">&quot;markdown&quot;</span>,   <span class="co"># or &quot;latex&quot; for PDF, or &quot;html&quot; for HTML output</span></span>
-<span id="cb16-24"><a href="second-term.html#cb16-24" tabindex="-1"></a>         <span class="at">title =</span> <span class="st">&quot;Split-Term ARMAX Models of Average Hourly Volatility&quot;</span>,</span>
-<span id="cb16-25"><a href="second-term.html#cb16-25" tabindex="-1"></a>         <span class="at">fmt =</span> <span class="dv">4</span>,</span>
-<span id="cb16-26"><a href="second-term.html#cb16-26" tabindex="-1"></a>         <span class="at">estimate =</span> <span class="st">&quot;{estimate}{stars}&quot;</span>,</span>
-<span id="cb16-27"><a href="second-term.html#cb16-27" tabindex="-1"></a>         <span class="at">gof_omit =</span> <span class="st">&quot;IC|Log|Num. obs.&quot;</span></span>
-<span id="cb16-28"><a href="second-term.html#cb16-28" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb16-20"><a href="second-term.html#cb16-20" tabindex="-1"></a>output_format <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(knitr<span class="sc">::</span><span class="fu">is_latex_output</span>(), <span class="st">&quot;latex&quot;</span>, <span class="st">&quot;markdown&quot;</span>)</span>
+<span id="cb16-21"><a href="second-term.html#cb16-21" tabindex="-1"></a></span>
+<span id="cb16-22"><a href="second-term.html#cb16-22" tabindex="-1"></a><span class="fu">msummary</span>(models,</span>
+<span id="cb16-23"><a href="second-term.html#cb16-23" tabindex="-1"></a>         <span class="at">coef_map =</span> xnames,</span>
+<span id="cb16-24"><a href="second-term.html#cb16-24" tabindex="-1"></a>         <span class="at">stars =</span> <span class="fu">c</span>(<span class="st">&#39;*&#39;</span> <span class="ot">=</span> <span class="fl">0.05</span>, <span class="st">&#39;**&#39;</span> <span class="ot">=</span> <span class="fl">0.01</span>, <span class="st">&#39;***&#39;</span> <span class="ot">=</span> <span class="fl">0.001</span>),</span>
+<span id="cb16-25"><a href="second-term.html#cb16-25" tabindex="-1"></a>         <span class="at">output =</span> output_format,   <span class="co"># or &quot;latex&quot; for PDF, or &quot;html&quot; for HTML output</span></span>
+<span id="cb16-26"><a href="second-term.html#cb16-26" tabindex="-1"></a>         <span class="at">title =</span> <span class="st">&quot;Split-Term ARMAX Models of Average Hourly Volatility&quot;</span>,</span>
+<span id="cb16-27"><a href="second-term.html#cb16-27" tabindex="-1"></a>         <span class="at">fmt =</span> <span class="dv">4</span>,</span>
+<span id="cb16-28"><a href="second-term.html#cb16-28" tabindex="-1"></a>         <span class="at">estimate =</span> <span class="st">&quot;{estimate}{stars}&quot;</span>,</span>
+<span id="cb16-29"><a href="second-term.html#cb16-29" tabindex="-1"></a>         <span class="at">gof_omit =</span> <span class="st">&quot;IC|Log|Num. obs.&quot;</span></span>
+<span id="cb16-30"><a href="second-term.html#cb16-30" tabindex="-1"></a>)</span></code></pre></div>
 <!-- preamble start -->
 
     <script>
