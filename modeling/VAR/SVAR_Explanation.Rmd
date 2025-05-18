@@ -1,15 +1,3 @@
----
-title: "VAR Explanation"
-output:
-  pdf_document: 
-    toc: true
-    fig_caption: yes
-    latex_engine: lualatex
-header-includes:
-  - \usepackage{amsmath}
----
-\newpage
-
 # Setup
 
 ## Load packages & functions
@@ -109,7 +97,7 @@ adf.test(data$china)
 # Information Criteria
 
 we determine the optimal number of lags using  several Information 
-Criteria (AIC, SC, HQ, FPE). \
+Criteria (AIC, SC, HQ, FPE). 
 
 Here is an example using the AIC
 
@@ -160,6 +148,79 @@ screenreg(mod_vol, digits = 6)
 
 ```
 
+We run a Portmanteau-Godfrey test in order to detect some serial correlation on the
+residuals. We found strong evidence of the presence of serial correlation in all 
+estimations.  
+
+```{r tariff, warning=FALSE, message=FALSE}
+
+serial2 = serial.test(est.VAR3, lags.pt =6, type = "PT.asymptotic")
+serial2
+
+```
+Newey-West correction of Standard Error is implemented in order to correct for 
+bias in the standard errors. We run an OLS with both regressions of the VAR framework 
+in order to use the Newey-West function. Then we calculate the p-value with the robust
+estimation of the variance of the residuals in order to display correct statistical
+significance on our tables.
+
+```{r Newey West, warning=FALSE, message=FALSE}
+#extract results
+mod_vol = est.VAR$varresult$vol
+f = formula(mod_vol)
+d = model.frame(mod_vol)
+lm_clean = lm(f, data= d)
+
+#apply Newey-West
+nw_vcov = NeweyWest(lm_clean, lag=6)
+nw_se = sqrt(diag(nw_vcov))
+
+#t-stats
+coef = coef(lm_clean)
+t_stat = coef/nw_se
+
+#recalculate p-values
+robust = 2*(1-pt(abs(t_stat), df = df.residual(lm_clean)))
+
+#table
+screenreg(lm_clean, override.se = nw_se, override.pvalues = robust, digits = 6)
+```
+
+We also run Breusch-Pagan test for checking the heteroscedasticity.
+We found strong evidence of the presence of heteroscedasticity in all estimations, 
+except for the second term.
+
+
+```{r bp test}
+#H0 test whether there is NOT heteroscedasticity. 
+bptest(lm_clean3)
+
+```
+
+
+## Then we use the Newey-West formula in order to construct our Robust covariance 
+matrix using the residuals of our estimation
+
+```{r Omega Robust Matrix, warning=FALSE, message=FALSE}
+#Recreate a Robust Omega Matrix
+U = residuals(est.VAR)
+T = nrow(U)
+L = 6 #number of lag
+Omega = matrix(0, ncol(U), ncol(U))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_ = t(U[(l+1):T, , drop=FALSE]) %*% U[1:(T-l), , drop=FALSE] /T
+  if (l == 0){
+    Omega = Omega + Gamma_l_
+  } else {
+    Omega = Omega + weight*(Gamma_l_ + t(Gamma_l_))
+  }
+}
+
+```
+
+
+
 # SVAR Model
 
 ## B matrix 
@@ -179,7 +240,6 @@ true Variance-Covariance matrix.
 
 ```{r B mat3, warning=FALSE, message=FALSE}
 
-Omega3 <- var(residuals(est.VAR3))
 
 #create the B matrix
 loss3 <- function(param3){
@@ -251,6 +311,22 @@ grangertest(y3[,c("vol","tariff")], order = 6)
 
 #does tariff mentions Granger cause volatility
 grangertest(y3[,c("tariff", "vol")], order = 6)
-
 ```
 
+
+## Serial correlation and heteroscedasticity test
+
+During our analysis, we conducted several tests for serial correlation to assess
+whether the error terms of our estimations exhibit serial correlation and/or 
+heteroskedasticity
+
+```{r serial correlation bunch of test}
+#bunch of example of test
+
+serial3 = serial.test(est.VAR3, lags.pt =6, type = "PT.asymptotic")
+serial3
+
+hete = arch.test(est.VAR3, lags.multi = 80, multivariate.only = TRUE)
+hete
+
+```
