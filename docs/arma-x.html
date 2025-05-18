@@ -2270,17 +2270,16 @@ margin-left: 2em;
 <li class="chapter" data-level="7.1" data-path="appendix.html"><a href="appendix.html#armax"><i class="fa fa-check"></i><b>7.1</b> ARMAX</a>
 <ul>
 <li class="chapter" data-level="7.1.1" data-path="appendix.html"><a href="appendix.html#sec:spy-table"><i class="fa fa-check"></i><b>7.1.1</b> SPY ARMAX Table (Jan 2014 - May 2025)</a></li>
-<li class="chapter" data-level="7.1.2" data-path="appendix.html"><a href="appendix.html#sec:SPY-IRF"><i class="fa fa-check"></i><b>7.1.2</b> SPY ARMAX IRFs (Jan 2024 - May 2025)</a></li>
-<li class="chapter" data-level="7.1.3" data-path="appendix.html"><a href="appendix.html#sec:SPYres"><i class="fa fa-check"></i><b>7.1.3</b> SPY Residuals</a></li>
-<li class="chapter" data-level="7.1.4" data-path="appendix.html"><a href="appendix.html#sec:spy-table-terms"><i class="fa fa-check"></i><b>7.1.4</b> SPY ARMAX Table (Separate Terms)</a></li>
-<li class="chapter" data-level="7.1.5" data-path="appendix.html"><a href="appendix.html#sec:SPY-res-test"><i class="fa fa-check"></i><b>7.1.5</b> Residual Test</a></li>
+<li class="chapter" data-level="7.1.2" data-path="appendix.html"><a href="appendix.html#sec:SPY-IRF"><i class="fa fa-check"></i><b>7.1.2</b> SPY ARMAX IRFs (Jan 2014 - May 2025)</a></li>
+<li class="chapter" data-level="7.1.3" data-path="appendix.html"><a href="appendix.html#sec:spy-table-terms"><i class="fa fa-check"></i><b>7.1.3</b> SPY ARMAX Table (Separate Terms)</a></li>
+<li class="chapter" data-level="7.1.4" data-path="appendix.html"><a href="appendix.html#sec:SPY-res-test"><i class="fa fa-check"></i><b>7.1.4</b> Residual Test</a></li>
+<li class="chapter" data-level="7.1.5" data-path="appendix.html"><a href="appendix.html#sec:means-table"><i class="fa fa-check"></i><b>7.1.5</b> Descriptive Stats</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="8" data-path="sec:means-table.html"><a href="sec:means-table.html"><i class="fa fa-check"></i><b>8</b> Descriptive Stats</a></li>
-<li class="chapter" data-level="9" data-path="cross.html"><a href="cross.html"><i class="fa fa-check"></i><b>9</b> Cross-references</a>
+<li class="chapter" data-level="8" data-path="cross.html"><a href="cross.html"><i class="fa fa-check"></i><b>8</b> Cross-references</a>
 <ul>
-<li class="chapter" data-level="9.1" data-path="cross.html"><a href="cross.html#chapters-and-sub-chapters"><i class="fa fa-check"></i><b>9.1</b> Chapters and sub-chapters</a></li>
-<li class="chapter" data-level="9.2" data-path="cross.html"><a href="cross.html#captioned-figures-and-tables"><i class="fa fa-check"></i><b>9.2</b> Captioned figures and tables</a></li>
+<li class="chapter" data-level="8.1" data-path="cross.html"><a href="cross.html#chapters-and-sub-chapters"><i class="fa fa-check"></i><b>8.1</b> Chapters and sub-chapters</a></li>
+<li class="chapter" data-level="8.2" data-path="cross.html"><a href="cross.html#captioned-figures-and-tables"><i class="fa fa-check"></i><b>8.2</b> Captioned figures and tables</a></li>
 </ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -2329,7 +2328,7 @@ and the mentions of words <span class="math inline">\(Tariff\)</span>, <span cla
 apart from trade. Notice also that all the coefficients (apart from <span class="math inline">\(Tariff_{t-3}\)</span>)
 are positive, in line with our main hypothesis. The effect of <span class="math inline">\(Tariff_{t-1}\)</span> and
 <span class="math inline">\(Tariff_{t-2}\)</span> are especially large, given the usual size of the volatility
-(<span style="color:red"> <em>ARMAX Table 4</em> </span>) <a href="sec:means-table.html#sec:means-table">8</a>. We in fact predict that an
+(<span style="color:red"> <em>ARMAX Table 4</em> </span>) <a href="appendix.html#sec:means-table">7.1.5</a>. We in fact predict that an
 extra mention of tariffs one hour ago, leads to a whopping extra 0.02 in volatility
 which is just about the average size for the full timeframe. We can see the
 impulse response function (IRF) for this shock, in <span style="color:red"> <em>IRFtarif</em> </span>.
@@ -2345,14 +2344,14 @@ of the tariff variable for VGK.</p>
 <h3><span class="header-section-number">3.2.2</span> Split Samples<a href="arma-x.html#split-samples" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>We then split our sample for the first and second term of the Trump presidancy.
 We only run models on tariff, trade and china this time. As seen on table
-<span style="color:red"> <em>ARMAX Table 2</em> </span> <a href="appendix.html#sec:spy-table-terms">7.1.4</a>, the first interesting result
+<span style="color:red"> <em>ARMAX Table 2</em> </span> <a href="appendix.html#sec:spy-table-terms">7.1.3</a>, the first interesting result
 is in the coefficients of tariff being significant and very large in the second
 term, while being small and not statistically significant in the first. A similar
 story goes for the China variable. This may lend some evidence to support the
 claim that investors are much more reactive to Trump’s social media presence
 now than before.
 Finally, we can check the residuals of all these models to test them somewhat.
-On <span style="color:red"> <em>ARMAX Table 3</em> </span>, <a href="appendix.html#sec:SPY-res-test">7.1.5</a> the pvalues being zero
+On <span style="color:red"> <em>ARMAX Table 3</em> </span>, <a href="appendix.html#sec:SPY-res-test">7.1.4</a> the pvalues being zero
 for the full timeframe and first term indicate that there is autocorrelation in
 the residuals, thus suggesting that these estimations have problems. Note however,
 that the pvalues for the second term are quite high, lending support to our

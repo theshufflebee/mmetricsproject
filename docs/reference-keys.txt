@@ -26,7 +26,6 @@ appendix
 armax
 sec:spy-table
 sec:SPY-IRF
-sec:SPYres
 sec:spy-table-terms
 sec:SPY-res-test
 sec:means-table
