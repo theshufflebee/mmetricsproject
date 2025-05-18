@@ -1,6 +1,6 @@
 fig:fig1
 tab:data
-tab:SPYres
+tab:res-table
 tab:means
 fig:nice-fig
 tab:nice-tab
@@ -29,6 +29,7 @@ sec:SPY-IRF
 sec:SPYres
 sec:spy-table-terms
 sec:SPYressum
+descriptive-stats
 cross
 chapters-and-sub-chapters
 captioned-figures-and-tables

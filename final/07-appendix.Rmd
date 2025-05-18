@@ -50,7 +50,7 @@ just run said specifications to produce nice tables and graphs to include in
 our final paper. This is also why there are specification differences in the 
 separate timeframes. We always use the best fit we found earlier.
 
-```{r datasetup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+```{r datasetup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
 
 #load final dataset
 source(here("helperfunctions/full_data.R"))
@@ -67,7 +67,7 @@ mean1 = mean(data$SPY_vol)
 ```
 
 
-```{r fitting models, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
+```{r fitting models, results=F, warning=F, message=F, echo=FALSE, cache=FALSE}
 #All SPY models for the full Dataframe
 
 models <- list()
@@ -137,7 +137,7 @@ cat(
 
 ### SPY ARMAX IRFs (Jan 2024 - May 2025){#sec:SPY-IRF}
 
-```{r SPYirf, results="asis", warning=F, message=F, echo=FALSE, cache=TRUE}
+```{r SPYirf, results="asis", warning=F, message=F, echo=FALSE, cache=FALSE}
 
 #we want to plot the IRFs of these models
 nb.periods = 7 * 15
@@ -166,7 +166,7 @@ res5 = checkresiduals(models[["Model 5"]], plot = FALSE)
 
 ```
 
-```{r SPYres, warning=F, message=F, echo=FALSE, cache=TRUE}
+```{r SPYres, warning=F, message=F, echo=FALSE, cache=FALSE}
 
 resnames = c("Twitter Dummy", "Twitter Count", "Tariff", "Trade", "China")
 
@@ -179,17 +179,13 @@ pvals <- data.frame(Model = resnames,
                       res4$p.value,
                       res5$p.value))
 
-#table
-# Create a styled HTML table
-kable(pvals, format = "html", digits = 4, caption = "Full Timeframe Ljung-Box Test p-values") %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, position = "center")
 
 ```
 
 
 
 
-```{r datasetup first, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+```{r datasetup first, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
 #First term Calculations
 
 #load final dataset
@@ -204,7 +200,7 @@ mean2 = mean(data$SPY_vol)
 ```
 
 
-```{r 1st term models, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
+```{r 1st term models, results=F, warning=F, message=F, echo=FALSE, cache=FALSE}
 #SPY Models first Term
 
 models <- list()
@@ -224,7 +220,7 @@ models[["First Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 ```
 
 
-```{r 1st SPYresiduals, warning=F, message=F, results=F, echo=FALSE, cache=TRUE}
+```{r 1st SPYresiduals, warning=F, message=F, results=F, echo=FALSE, cache=FALSE}
 # Run first term residuals
 res6 = checkresiduals(models[["First Term (1)"]], plot = FALSE)
 res7 = checkresiduals(models[["First Term (2)"]], plot = FALSE)
@@ -243,7 +239,7 @@ pvals_new1 <- data.frame(
 
 
 
-```{r datasetup second, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+```{r datasetup second, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
 #Second Term Calculations
 
 #load final dataset
@@ -258,7 +254,7 @@ mean3 = mean(data$SPY_vol)
 ```
 
 
-```{r 2nd term models, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
+```{r 2nd term models, results=F, warning=F, message=F, echo=FALSE, cache=FALSE}
 #Run Second Term Models
 
 # ARMA-X(3,2,3) with Tariff Mentions as Exogenous
@@ -276,19 +272,8 @@ models[["Second Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 ```
 
 
-```{r 2nd SPYirf, warning=F, message=F, echo=FALSE, cache=TRUE}
-#Calculate Second Term IRFs
 
-#we want to plot the IRFs of these models
-nb.periods = 7 * 15
-
-plot2 = irf.plot(models[["Second Term (1)"]],nb.periods,
-                 title="Tariff Mention Shock - Second Term")
-plot2
-```
-
-
-```{r 2nd SPYresiduals, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
+```{r 2nd SPYresiduals, results=F, warning=F, message=F, echo=FALSE, cache=FALSE}
 # Calculate SPY residuals for the second term
 
 res9 = checkresiduals(models[["Second Term (1)"]], plot = FALSE)
@@ -348,9 +333,9 @@ htmlreg(
 ```
 
 
-### Residual Test {#sec:SPYressum}
+### Residual Test {#sec:SPY-res-test}
 
-```{r means, message=F, warning=F, results="asis", echo=FALSE, cache=TRUE}
+```{r res-table, message=F, warning=F, results="asis", echo=FALSE, cache=FALSE}
 
 kable(pvals_combined, digits = 6, format="html", caption = "Ljung-Box Test p-values for Residuals") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, position = "center")
@@ -358,4 +343,23 @@ kable(pvals_combined, digits = 6, format="html", caption = "Ljung-Box Test p-val
 
 
 ```
+
+# Descriptive Stats{#sec:means-table}
+ 
+```{r means, message=F, warning=F, results="asis"}
+
+means <- data.frame(
+  Model = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
+  `SPY Volatility Mean` = c(
+    mean1,
+    mean2,
+    mean3))
+
+kable(means, digits = 6, format="html", caption = "Summary Statistics of SPY Volatility") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, position = "center")
+
+
+
+```
+
 
