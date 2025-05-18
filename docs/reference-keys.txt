@@ -28,8 +28,8 @@ sec:spy-table
 sec:SPY-IRF
 sec:SPYres
 sec:spy-table-terms
-sec:SPYressum
-descriptive-stats
+sec:SPY-res-test
+sec:means-table
 cross
 chapters-and-sub-chapters
 captioned-figures-and-tables
