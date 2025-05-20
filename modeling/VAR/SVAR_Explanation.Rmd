@@ -313,3 +313,20 @@ grangertest(y3[,c("vol","tariff")], order = 6)
 grangertest(y3[,c("tariff", "vol")], order = 6)
 ```
 
+
+## Serial correlation and heteroscedasticity test
+
+During our analysis, we conducted several tests for serial correlation to assess
+whether the error terms of our estimations exhibit serial correlation and/or 
+heteroskedasticity
+
+```{r serial correlation bunch of test}
+#bunch of example of test
+
+serial3 = serial.test(est.VAR3, lags.pt =6, type = "PT.asymptotic")
+serial3
+
+hete = arch.test(est.VAR3, lags.multi = 80, multivariate.only = TRUE)
+hete
+
+```
