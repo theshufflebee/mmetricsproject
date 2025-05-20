@@ -55,8 +55,9 @@ for the full timeframe and first term indicate that there is autocorrelation in
 the residuals, thus suggesting that these estimations have problems. Note however,
 that the p-values for the second term are quite high, lending support to our
 models on the split sample. These results suggest that perhaps ARMA-X models are
-not right in this context, as it is not unreasonable to think that Trump does 
-in fact react to market movements. With this information, we decided to run
+not right in this context as it is not unreasonable to think that Trump does 
+in fact react to market movements, which would break the exogeneity assumption
+that is critical for this type of model. With this information, we decided to run
 a VAR model to deepen our understanding of these variables.
 
 

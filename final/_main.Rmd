@@ -70,6 +70,8 @@ truths <- truths_raw %>%
 
 # Introduction
 
+## Motivation
+
 Over the past 15 years social media has become an important
 communication tool for politicians. One of the pioneers of this novel
 approach has been Donald Trump, the 45th and 47th President of the United
@@ -91,10 +93,10 @@ This brings us to our research question:  Do Donald Trumps Posts impact market V
     
 \@ref(fig:fig1)
 
-```{r fig1, warning=FALSE, echo=FALSE, cache=TRUE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)"}
+```{r fig1, echo=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)", warning=FALSE, cache=TRUE}
  #Create the scatter plot
 ggplot(truths, aes(x = day, y = time_shifted)) +
-  geom_point(alpha = 0.5, color = "blue", shape = ".") +  # Transparancy to create "heatmap"
+  geom_point(alpha = 0.5, color = "blue", size = 0.55) +  # Transparancy to create "heatmap"
   scale_y_continuous(
     breaks = seq(-12, 12, by = 3),  # Custom Y scale
     labels = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00", "24:00")  # 24-hour format labels
@@ -182,12 +184,10 @@ positive relationship between volatility in European stock markets and
 tweeter activity of Trump, and this effect tends to intensify as public
 intention for his tweet grows @nishimuraImpactsDonaldTrumps2025.
 
-Our paper is built as follows:
-
-Section 2 Looks at the how the data was procured, what transformations were done
-and how the final dataset looks like. Section three then shows methodology and
-Results of ARMA-X estimations while Section 4 does the same for VAR models. Section
-5 then discusses these results
+Our paper is built as follows: Section 2 describes the data, their sources, and 
+the several transformations applied. Section 3 focuses on ARMA-X models, describing 
+both our methodology and results. Section 4 does the same, though for our VAR models. 
+Section 5 concludes.
 
 <!--chapter:end:01-introduction.Rmd-->
 
@@ -285,7 +285,7 @@ every minute.
 We used a custom function in order to get the AHV for each open market hour. Note 
 that the first hour is from 9:30 am to 10:00 am since the 
 market open on a half-hour but closes at 4:00 pm. We can plot this data in
-<span style="color:red"> *figX* </span>.
+the following table:
 
 
 ```{r fin plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
@@ -296,21 +296,19 @@ hvol_plotter(SPY, breaks = "yearly", title = "SPY Realised Volatility")
 
 ```
 
-
+We can clearly see that the last few months show a new era of never seen before
+levels of volatility. Shocks on volatility recently have reached, and even surpassed
+(for a few data points) levels seen during the COVID-19 pandemic.
 
 ## Political Data
 
 We have two sources for Trump's posts. The Tweets are from Kaggle
 @shantanuDonaldTrumpTweets and go until the 8th of January 2021. Since he
-switched his primary Posting platform to Truth Social we use only that
-Data from 2021 onwards. All Truth Social Posts were scrapped from
-trumpstruth.org, a webpage that aims to conserve all his posts. You can
-find the dataset, and webscrapper, and Data cleaning process in the
-Appendix.
-
-Since we're using financial data that is constrained by trading hours,
-we decided to move posts after 16:00 to the next trading day's opening
-hour.
+switched his primary posting platform to Truth Social we use only that
+Data from 2021 onwards. All Truth Social posts were scrapped from
+trumpstruth.org, a webpage that aims to conserve all his posts. Note that we have 
+had to use web-scrapping methods in order to download all his Truth Social posts
+in a dataset.
 
 A big problem we had in our analysis was what to do with social media posts
 which appeared outside market hours. We first decided to simply ignore them, but 
@@ -323,10 +321,8 @@ then construct multiple variables from the social media data. These include
 a dummy for whether there was a post, the number of posts an hour and counts
 for certain words ("tariffs","trade","china"). Further we applied some simple 
 sentiment analysis algorithms on the data to see if there are certain sentiments 
-in his tweets that move the markets. More information and detailed process are in 
-the appendix and online.
-
-<span style="color:red"> *insert wordcloud* </span>.
+in his tweets that move the markets. Details on all our data management procedures
+can be found in the GitHub repository.
 
 ```{r social plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 
@@ -408,30 +404,33 @@ extra mention of tariffs one hour ago, leads to a whopping extra 0.02 in volatil
  which is just about the average size for the full timeframe. We can see the
 impulse response function (IRF) for this shock, in <span style="color:red"> *IRFtarif* </span>.
 \@ref(sec:SPY-IRF) Notice that there is a large response in the first periods, and then a graduate
-decline over time. Something to note is that in our analysises of IRF's, when including
+decline over time. Something to note is that in our analyses of IRF's, when including
 MA terms, the decline shows up gradual while being much sharper when only including
 AR terms. 
 Note that we ran all these models on the VGK and ASHR ETF's as well, though no
-signficant results appear apart from a small but statistically significant effect
+significant results appear apart from a small but statistically significant effect
 of the tariff variable for VGK.
 
 ### Split Samples
-We then split our sample for the first and second term of the Trump presidancy.
+We then split our sample for the first and second term of the Trump presidency.
 We only run models on tariff, trade and china this time. As seen on table
 <span style="color:red"> *ARMAX Table 2* </span> \@ref(sec:spy-table-terms), the first interesting result
 is in the coefficients of tariff being significant and very large in the second
 term, while being small and not statistically significant in the first. A similar
 story goes for the China variable. This may lend some evidence to support the 
 claim that investors are much more reactive to Trump's social media presence
-now than before. 
+now than before. We've found similar IRF's as for the full timeframe. Tables \@ref(sec:SPY-IRF)
+show the IRF's for the second term, of the impacts of tariff and china mention
+shocks on the AHV.
 Finally, we can check the residuals of all these models to test them somewhat. 
 On <span style="color:red"> *ARMAX Table 3* </span>, \@ref(sec:SPY-res-test) the pvalues being zero
 for the full timeframe and first term indicate that there is autocorrelation in 
 the residuals, thus suggesting that these estimations have problems. Note however,
-that the pvalues for the second term are quite high, lending support to our
+that the p-values for the second term are quite high, lending support to our
 models on the split sample. These results suggest that perhaps ARMA-X models are
-not right in this context, as it is not unreasonable to think that Trump does 
-in fact react to market movements. With this information, we decided to run
+not right in this context as it is not unreasonable to think that Trump does 
+in fact react to market movements, which would break the exogeneity assumption
+that is critical for this type of model. With this information, we decided to run
 a VAR model to deepen our understanding of these variables.
 
 
@@ -458,6 +457,24 @@ a VAR model to deepen our understanding of these variables.
 
 # Conclusion
 
+We started this project with the intention of understanding whether the impact 
+of Trump's social media posts affect financial markets, and to see if there
+is perhaps a difference from his first presidential mandate. After various 
+headaches with our data, we first ran ARMA-X models where we found significant
+and positive results albeit with strong auto-correlation in the errors, with only
+the second term analysis offering more convincing results. We then try VAR models
+for a possibly more accurate picture, albeit with little to no success. We once
+again find strong auto-correlation in the errors, which we here fix by using 
+Newey-West standard errors. We found that the only significant coefficients are
+actually negative, suggesting Trump's social media presence would reduce volatility.
+
+However, we would suggest strong against trying to interpret these results given
+that the models seem to not fit particularly well. This may be due to seasonality
+in our data (a common trend seen is our daily AVH is high volatility in the first 
+open hours, and a gradual slowdown for the rest of the day), or to our handling 
+of non-market hours. Further work could look at these issues in more detail, could
+further complicate the models by adding more variables and interaction between them,
+and/or additionally <span style="color:red"> *use more sophisticated models, such as models including co-integration.* </span>
 
 <!--chapter:end:05-conclusion.Rmd-->
 
@@ -604,8 +621,8 @@ cat(
     caption.above = TRUE,
     digits = 4,
     doctype = FALSE
-  )
-)
+  ))
+
 ```
 
 
@@ -800,9 +817,11 @@ htmlreg(
   custom.coef.names = xnames_ordered,
   custom.model.names = model_names,
   caption = "Split-Term ARMAX Models of Average Hourly Volatility",
+  caption.above = TRUE,
+  digits = 4,
   stars = c(0.001, 0.01, 0.05),
-  doctype = FALSE
-)
+  doctype = FALSE)
+
 
 ```
 
