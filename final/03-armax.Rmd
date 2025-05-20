@@ -21,16 +21,16 @@ which sees minimal AIC loss and simplifying our models considerably.
 
 ### Full Timeframe
 We run models with the following exogenous regressors: $TweetDummy$, $TweetCount$,
-and the mentions of words $Tariff$, $Trade$, and $China$. We first note on 
-<span style="color:red"> *ARMAX Table 1* </span> \@ref(sec:spy-table)that all the x-regressors are significant,
+and the mentions of words $Tariff$, $Trade$, and $China$. We first note on the table
+ in section \@ref(sec:spy-table) that all the x-regressors are significant,
 apart from trade. Notice also that all the coefficients (apart from $Tariff_{t-3}$)
 are positive, in line with our main hypothesis. The effect of $Tariff_{t-1}$ and 
-$Tariff_{t-2}$ are especially large, given the usual size of the volatility 
-(<span style="color:red"> *ARMAX Table 4* </span>) \@ref(sec:means-table). We in fact predict that an 
+$Tariff_{t-2}$ are especially large, given the usual size of the volatility as seen
+in Section \@ref(sec:means-table). We in fact predict that an 
 extra mention of tariffs one hour ago, leads to a whopping extra 0.02 in volatility
  which is just about the average size for the full timeframe. We can see the
-impulse response function (IRF) for this shock, in <span style="color:red"> *IRFtarif* </span>.
-\@ref(sec:SPY-IRF) Notice that there is a large response in the first periods, and then a graduate
+impulse response function (IRF) for this shock in Section \@ref(sec:SPY-IRF).
+Notice that there is a large response in the first periods, and then a graduate
 decline over time. Something to note is that in our analysises of IRF's, when including
 MA terms, the decline shows up gradual while being much sharper when only including
 AR terms. 
@@ -40,15 +40,15 @@ of the tariff variable for VGK.
 
 ### Split Samples
 We then split our sample for the first and second term of the Trump presidancy.
-We only run models on tariff, trade and china this time. As seen on table
-<span style="color:red"> *ARMAX Table 2* </span> \@ref(sec:spy-table-terms), the first interesting result
+We only run models on tariff, trade and china this time. As seen on the table in
+Section \@ref(sec:spy-table-terms), the first interesting result
 is in the coefficients of tariff being significant and very large in the second
 term, while being small and not statistically significant in the first. A similar
 story goes for the China variable. This may lend some evidence to support the 
 claim that investors are much more reactive to Trump's social media presence
 now than before. 
 Finally, we can check the residuals of all these models to test them somewhat. 
-On <span style="color:red"> *ARMAX Table 3* </span>, \@ref(sec:SPY-res-test) the pvalues being zero
+In Section \@ref(sec:SPY-res-test), the pvalues being zero
 for the full timeframe and first term indicate that there is autocorrelation in 
 the residuals, thus suggesting that these estimations have problems. Note however,
 that the pvalues for the second term are quite high, lending support to our
