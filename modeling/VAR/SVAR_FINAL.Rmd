@@ -1,18 +1,13 @@
 ---
 title: "Final_VAR"
-author: "pte"
-date: "2025-05-15"
 output:
-  html_document:
-    css: "table-style.css"
-  pdf_document: default
-editor_options:
-  markdown:
-    wrap: 72
-    includes:
+  pdf_document: 
+    toc: true
+    fig_caption: yes
+    latex_engine: lualatex
+header-includes:
+  - \usepackage{amsmath}
 ---
-
-autocorrelation des erreurs dans le arma-x
 
 ARMAX
 
@@ -132,7 +127,7 @@ term, mainly on the first, second and fourth lag, but non of them was
 significant. Grangertest and impact on Trump
 
 
-```{r load packages, error=FALSE, warning=FALSE, echoes = FALSE}
+```{r load packages, message=FALSE, warning=FALSE, echo = FALSE}
 
 library("quantmod")
 library("TSA")
@@ -218,7 +213,7 @@ source(here::here("helperfunctions/truths_cleaning_function.R"))
 source(here::here("helperfunctions/armax_functions.R"))
 ```
 
-```{r load data}
+```{r load data, message=FALSE, warning=FALSE, results=FALSE, echo=FALSE}
 rm(Vdata)
 #load final dataset
 source(here::here("helperfunctions/full_data.R"))
@@ -227,7 +222,7 @@ source(here::here("helperfunctions/full_data.R"))
 Vdata = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
 ```
 
-```{r Estime dummy}
+```{r Estime dummy, message=FALSE, warning=FALSE}
 y = cbind(Vdata$dummy, Vdata$SPY_vol)
 colnames(y)[1:2] <- c("dummy", "vol")
 est.VAR <- VAR(y,p=6)
@@ -257,7 +252,7 @@ screenreg(lm_clean, override.se = nw_se, override.pvalues = robust, digits = 6)
 
 ## N
 
-```{r estimate with N}
+```{r estimate with N, message=FALSE, warning=FALSE}
 y2 = cbind(Vdata$N, Vdata$SPY_vol)
 colnames(y2)[1:2] <- c("N", "vol")
 est.VAR2 <- VAR(y2,p=6)
@@ -285,7 +280,7 @@ screenreg(lm_clean2, override.se = nw_se2, override.pvalues = robust2, digits = 
 
 ## Tariff
 
-```{r estime tariff}
+```{r estime tariff, message=FALSE, warning=FALSE}
 y3 = cbind(Vdata$tariff, Vdata$SPY_vol)
 colnames(y3)[1:2] <- c("tariff", "vol")
 est.VAR3 <- VAR(y3,p=6)
@@ -313,7 +308,7 @@ screenreg(lm_clean3, override.se = nw_se3, override.pvalues = robust3, digits = 
 
 ## Trade
 
-```{r estimate trade}
+```{r estimate trade, message=FALSE, warning=FALSE}
 y4 = cbind(Vdata$trade, Vdata$SPY_vol)
 colnames(y4)[1:2] <- c("trade", "vol")
 est.VAR4 <- VAR(y4,p=6)
@@ -341,7 +336,7 @@ screenreg(lm_clean4, override.se = nw_se4, override.pvalues = robust4, digits = 
 
 ## China
 
-```{r estime China}
+```{r estime China, message=FALSE, warning=FALSE}
 
 ychina = cbind(Vdata$china, Vdata$SPY_vol)
 colnames(ychina)[1:2] <- c("china", "vol")
@@ -375,7 +370,7 @@ summarise(mean_vol_day = mean(SPY_vol, na.rm = TRUE))
 
 mean(mean_day_filtered\$mean_vol_day)
 
-```{r }
+```{r mana, message=FALSE, warning=FALSE, results='asis'}
 
 dt_t = d %>%
     rename(X.l1 = dummy.l1,
@@ -505,11 +500,11 @@ custom_names <- list(
 )
 
 # Générer le tableau
-table_texreg <- screenreg(
+table_texreg <- texreg(
   l = models_list,
   override.se = robust_ses,
   override.pvalues = robust_pvals,
-  custom.model.names = c("Dummy", "N", "Tariff", "Trade", "China"),
+  custom.model.names = c("TweetDummy", "TweetCount", "Tariff", "Trade", "China"),
   caption = "VAR Models of Average Hourly Volatility",
   label = "tab:VAR_Second_Term",
   caption.above = TRUE,
@@ -821,7 +816,7 @@ robust_s_ch = 2*(1-pt(abs(t_stat_s_ch), df = df.residual(lm_clean_s_ch)))
 
 ```
 
-```{r truc a}
+```{r truc, message=FALSE, warning=FALSE, results='asis'}
 
 
 #first
@@ -932,11 +927,11 @@ custom_names <- list(
 )
 
 # Générer tableau texreg pour first
-table_texreg_f <- screenreg(
+table_texreg_f <- texreg(
   l = models_list_f,
   override.se = robust_ses_f,
   override.pvalues = robust_pvals_f,
-  custom.model.names = c("Dummy", "TweetCount", "Tariff", "Trade", "China"),
+  custom.model.names = c("TweetDummy", "TweetCount", "Tariff", "Trade", "China"),
   custom.coef.map = custom_names,
   caption = "First-Term VAR Models of Average Hourly Volatility",
   label = "tab:VAR_First_Term",
@@ -1043,11 +1038,11 @@ robust_ses_s <- list(nw_se_s_d_t, nw_se_s_n_t, nw_se_s_ta_t, nw_se_s_tr_t, nw_se
 robust_pvals_s <- list(robust_s_d_t, robust_s_n_t, robust_s_ta_t, robust_s_tr_t, robust_s_ch_t)
 
 # Générer tableau texreg pour second
-table_texreg_s <- screenreg(
+table_texreg_s <- texreg(
   l = models_list_s,
   override.se = robust_ses_s,
   override.pvalues = robust_pvals_s,
-  custom.model.names = c("Dummy", "TweetCount", "Tariff", "Trade", "China"),
+  custom.model.names = c("TweetDummy", "TweetCount", "Tariff", "Trade", "China"),
   custom.coef.map = custom_names,
   caption = "Second-Term VAR Models of Average Hourly Volatility",
   label = "tab:VAR_Second_Term",
