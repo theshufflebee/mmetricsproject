@@ -81,8 +81,12 @@ dfm_tweets <- dfm(tokens_tweets)
 
 
 
-```{r wordcould, warning=FALSE, message=FALSE, cache=FALSE}
-textplot_wordcloud(dfm_tweets, min_count = 200, color = RColorBrewer::brewer.pal(8, "Reds"))
+```{r wordcould, cache=FALSE, echo=FALSE}
+print(textplot_wordcloud(
+  dfm_tweets,
+  min_count = 200,
+  color = RColorBrewer::brewer.pal(8, "Reds")
+))
 ```
 
 
