@@ -100,7 +100,7 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
     labels = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00", "24:00")  # 24-hour format labels
   ) +
   labs(title = "Terminally Online: Trumps Twitter & Truth Social Posts (EDT)",
-       x = "Date",
+       x = "",
        y = "Time of Day") +
   theme_minimal() +
   
@@ -301,7 +301,7 @@ hvol_plotter(SPY, breaks = "yearly", title = "SPY Realised Volatility")
 ## Political Data
 
 We have two sources for Trump's posts. The Tweets are from Kaggle
-@DonaldTrumpTweets and go until the 8th of January 2021. Since he
+@shantanuDonaldTrumpTweets and go until the 8th of January 2021. Since he
 switched his primary Posting platform to Truth Social we use only that
 Data from 2021 onwards. All Truth Social Posts were scrapped from
 trumpstruth.org, a webpage that aims to conserve all his posts. You can
