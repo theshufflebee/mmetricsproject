@@ -68,7 +68,7 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
     labels = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00", "24:00")  # 24-hour format labels
   ) +
   labs(title = "Terminally Online: Trumps Twitter & Truth Social Posts (EDT)",
-       x = "Date",
+       x = "",
        y = "Time of Day") +
   theme_minimal() +
   
