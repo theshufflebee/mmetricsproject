@@ -38,6 +38,8 @@ truths <- truths_raw %>%
 
 # Introduction
 
+## Motivation
+
 Over the past 15 years social media has become an important
 communication tool for politicians. One of the pioneers of this novel
 approach has been Donald Trump, the 45th and 47th President of the United
@@ -59,10 +61,10 @@ This brings us to our research question:  Do Donald Trumps Posts impact market V
     
 \@ref(fig:fig1)
 
-```{r fig1, warning=FALSE, echo=FALSE, cache=TRUE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)"}
+```{r fig1, echo=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)", warning=FALSE, cache=TRUE}
  #Create the scatter plot
 ggplot(truths, aes(x = day, y = time_shifted)) +
-  geom_point(alpha = 0.5, color = "blue", shape = ".") +  # Transparancy to create "heatmap"
+  geom_point(alpha = 0.5, color = "blue", size = 0.55) +  # Transparancy to create "heatmap"
   scale_y_continuous(
     breaks = seq(-12, 12, by = 3),  # Custom Y scale
     labels = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00", "24:00")  # 24-hour format labels
@@ -150,9 +152,7 @@ positive relationship between volatility in European stock markets and
 tweeter activity of Trump, and this effect tends to intensify as public
 intention for his tweet grows @nishimuraImpactsDonaldTrumps2025.
 
-Our paper is built as follows:
-
-Section 2 Looks at the how the data was procured, what transformations were done
-and how the final dataset looks like. Section three then shows methodology and
-Results of ARMA-X estimations while Section 4 does the same for VAR models. Section
-5 then discusses these results
+Our paper is built as follows: Section 2 describes the data, their sources, and 
+the several transformations applied. Section 3 focuses on ARMA-X models, describing 
+both our methodology and results. Section 4 does the same, though for our VAR models. 
+Section 5 concludes.

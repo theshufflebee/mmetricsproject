@@ -92,7 +92,7 @@ every minute.
 We used a custom function in order to get the AHV for each open market hour. Note 
 that the first hour is from 9:30 am to 10:00 am since the 
 market open on a half-hour but closes at 4:00 pm. We can plot this data in
-<span style="color:red"> *figX* </span>.
+the following table:
 
 
 ```{r fin plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
@@ -103,21 +103,19 @@ hvol_plotter(SPY, breaks = "yearly", title = "SPY Realised Volatility")
 
 ```
 
-
+We can clearly see that the last few months show a new era of never seen before
+levels of volatility. Shocks on volatility recently have reached, and even surpassed
+(for a few data points) levels seen during the COVID-19 pandemic.
 
 ## Political Data
 
 We have two sources for Trump's posts. The Tweets are from Kaggle
 @shantanuDonaldTrumpTweets and go until the 8th of January 2021. Since he
-switched his primary Posting platform to Truth Social we use only that
-Data from 2021 onwards. All Truth Social Posts were scrapped from
-trumpstruth.org, a webpage that aims to conserve all his posts. You can
-find the dataset, and webscrapper, and Data cleaning process in the
-Appendix.
-
-Since we're using financial data that is constrained by trading hours,
-we decided to move posts after 16:00 to the next trading day's opening
-hour.
+switched his primary posting platform to Truth Social we use only that
+Data from 2021 onwards. All Truth Social posts were scrapped from
+trumpstruth.org, a webpage that aims to conserve all his posts. Note that we have 
+had to use web-scrapping methods in order to download all his Truth Social posts
+in a dataset.
 
 A big problem we had in our analysis was what to do with social media posts
 which appeared outside market hours. We first decided to simply ignore them, but 
@@ -130,10 +128,8 @@ then construct multiple variables from the social media data. These include
 a dummy for whether there was a post, the number of posts an hour and counts
 for certain words ("tariffs","trade","china"). Further we applied some simple 
 sentiment analysis algorithms on the data to see if there are certain sentiments 
-in his tweets that move the markets. More information and detailed process are in 
-the appendix and online.
-
-<span style="color:red"> *insert wordcloud* </span>.
+in his tweets that move the markets. Details on all our data management procedures
+can be found in the GitHub repository.
 
 ```{r social plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 

@@ -1,2 +1,10 @@
 # Conclusion
 
+We started this project with the intention of understanding whether the impact 
+of Trump's social media posts affect financial markets, and to see if there
+is perhaps a difference from his first presidential mandate. After various 
+headaches with our data, we first ran ARMA-X models where we found significant
+and positive results albeit with strong auto-correlation in the errors, with only
+the second term analysis offering more convincing results. We then try VAR models
+for a possibly more accurate picture, albeit with little to no success. We once
+again find strong auto-correlation 

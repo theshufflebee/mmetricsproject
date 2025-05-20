@@ -131,8 +131,8 @@ cat(
     caption.above = TRUE,
     digits = 4,
     doctype = FALSE
-  )
-)
+  ))
+
 ```
 
 
@@ -327,9 +327,11 @@ htmlreg(
   custom.coef.names = xnames_ordered,
   custom.model.names = model_names,
   caption = "Split-Term ARMAX Models of Average Hourly Volatility",
+  caption.above = TRUE,
+  digits = 4,
   stars = c(0.001, 0.01, 0.05),
-  doctype = FALSE
-)
+  doctype = FALSE)
+
 
 ```
 
