@@ -155,7 +155,7 @@ plot.title = element_text(face = "bold", hjust = 0.5))
 
 
 ## Final Dataframe
-
+Here is a look into our final, fully cleaned, fully transformed dataset.
 ```{r data, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 
 tail(data[1:4])
