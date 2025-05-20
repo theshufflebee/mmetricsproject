@@ -1,7 +1,7 @@
-This is LuaHBTeX, Version 1.22.0 (TeX Live 2025)  (format=lualatex 2025.4.16)  20 MAY 2025 13:18
+This is LuaHBTeX, Version 1.22.0 (TeX Live 2025)  (format=lualatex 2025.4.16)  20 MAY 2025 13:34
  restricted system commands enabled.
-**SVAR_FINAL.tex
-(./SVAR_FINAL.tex
+**SVAR_FIGURES.tex
+(./SVAR_FIGURES.tex
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-03-26>
 Lua module: luaotfload 2024-12-03 v3.29 Lua based OpenType font support
@@ -530,12 +530,12 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 28
 ) (c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/bookmark/bkm-pdftex.def
 File: bkm-pdftex.def 2023-12-10 v1.31 bookmark driver for pdfTeX and luaTeX (HO)
 \BKM@id=\count337
-)) (./SVAR_FINAL.aux
+)) (./SVAR_FIGURES.aux
 
 LaTeX Warning: Label `tab:VAR_Second_Term' multiply defined.
 
 )
-\openout1 = SVAR_FINAL.aux
+\openout1 = SVAR_FIGURES.aux
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 127.
 LaTeX Font Info:    ... okay on input line 127.
@@ -813,20 +813,20 @@ LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
 (Font)              scaled to size 8.0pt on input line 129.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
 (Font)              scaled to size 6.0pt on input line 129.
-(./SVAR_FINAL.toc)
+(./SVAR_FIGURES.toc)
 \tf@toc=\write4
 
-\openout4 = SVAR_FINAL.toc
+\openout4 = SVAR_FIGURES.toc
 
 
 [1
 
 {c:/Users/fries/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10> not available
+(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 138.
+
 
 [2]
-LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 253.
-
 
 [3]
 
@@ -839,16 +839,16 @@ LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10> not available
 [7]
 
 [8]
+Underfull \vbox (badness 10000) detected at line 636
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 636
+ []
+
+
 
 [9]
-Underfull \vbox (badness 10000) detected at line 750
- []
-
-
-Underfull \vbox (badness 10000) detected at line 750
- []
-
-
 
 [10]
 
@@ -861,53 +861,40 @@ Underfull \vbox (badness 10000) detected at line 750
 [14]
 
 [15]
+Underfull \vbox (badness 2600) detected at line 1076
+ []
+
+
 
 [16]
+Underfull \vbox (badness 10000) detected at line 1076
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 1076
+ []
+
+
 
 [17]
-Underfull \vbox (badness 10000) detected at line 1204
- []
-
-
-Underfull \vbox (badness 10000) detected at line 1204
- []
-
-
 
 [18]
 
 [19]
+Underfull \vbox (badness 10000) detected at line 1235
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 1235
+ []
+
+
 
 [20]
-Underfull \vbox (badness 10000) detected at line 1363
- []
-
-
-Underfull \vbox (badness 10000) detected at line 1363
- []
-
-
 
 [21]
-Underfull \hbox (badness 2310) in paragraph at lines 1416--1430
-[]\TU/lmr/m/n/10 stargazer(model_f_d, model_f_n, model_f_ta, model_f_tr, model_f_ch, type = ``text'', se =
- []
 
-
-Underfull \hbox (badness 6995) in paragraph at lines 1416--1430
-\TU/lmr/m/n/10 bust_f_d_t, ro-bust_f_n_t, ro-bust_f_ta_t, ro-bust_f_tr_t, ro-bust_f_ch_t), col-umn.la-bels =
- []
-
-
-Underfull \hbox (badness 5345) in paragraph at lines 1416--1430
-\TU/lmr/m/n/10 = FALSE, co-vari-ate.la-bels = c(''volt-1``,''volt-2``,''volt-3``,''volt-4``,''volt-5``,''volt-6``,''Xt-1``,''Xt-2``,''Xt-
- []
-
-
-
-[22]
-
-[23] (./SVAR_FINAL.aux)
+[22] (./SVAR_FIGURES.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-03-26>
@@ -918,19 +905,19 @@ LaTeX Warning: There were multiply-defined labels.
 )
 
 Here is how much of LuaTeX's memory you used:
- 19677 strings out of 471941
- 125002,953878 words of node,token memory allocated
- 551 words of node memory still in use:
-   6 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 8 attribute, 63 glue_spec, 8 attribute_list, 1 write, 1 user_defined nodes
-   avail lists: 2:3989,3:970,4:828,5:804,6:74,7:9438,8:12,9:1236,10:12,11:651
- 45842 multiletter control sequences out of 65536+600000
- 66 fonts using 19471699 bytes
- 90i,12n,114p,408b,448s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman7-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-italic.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmonolt10-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-italic.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman12-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman17-regular.otf>
-Output written on SVAR_FINAL.pdf (23 pages, 109798 bytes).
+ 19661 strings out of 471941
+ 100000,953878 words of node,token memory allocated
+ 546 words of node memory still in use:
+   6 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 8 attribute, 62 glue_spec, 8 attribute_list, 1 write, 1 user_defined nodes
+   avail lists: 2:3809,3:969,4:806,5:764,6:75,7:9173,8:12,9:1218,10:4,11:51
+ 45833 multiletter control sequences out of 65536+600000
+ 65 fonts using 19340163 bytes
+ 90i,12n,114p,410b,446s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman7-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-italic.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmonolt10-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman12-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman17-regular.otf>
+Output written on SVAR_FIGURES.pdf (22 pages, 91562 bytes).
 
-PDF statistics: 237 PDF objects out of 1000 (max. 8388607)
- 174 compressed objects within 2 object streams
- 40 named destinations out of 1000 (max. 131072)
- 57 words of extra memory for PDF output out of 10000 (max. 100000000)
+PDF statistics: 212 PDF objects out of 1000 (max. 8388607)
+ 153 compressed objects within 2 object streams
+ 33 named destinations out of 1000 (max. 131072)
+ 41 words of extra memory for PDF output out of 10000 (max. 100000000)
 
