@@ -78,6 +78,9 @@ source(here::here("helperfunctions/full_data.R"))
 Vdata = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
 ```
 
+
+## Dummy
+
 ```{r Estime dummy, message=FALSE, warning=FALSE}
 y = cbind(Vdata$dummy, Vdata$SPY_vol)
 colnames(y)[1:2] <- c("dummy", "vol")
@@ -100,10 +103,95 @@ t_stat = coef/nw_se
 #recalculate p-values
 robust = 2*(1-pt(abs(t_stat), df = df.residual(lm_clean)))
 
-#table
-screenreg(lm_clean, override.se = nw_se, override.pvalues = robust, digits = 6)
 
 
+
+```
+
+```{r B mat}
+
+#Recreate a Robust Omega Matrix
+U = residuals(est.VAR)
+T = nrow(U)
+L = 6 #number of lag
+Omega = matrix(0, ncol(U), ncol(U))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_ = t(U[(l+1):T, , drop=FALSE]) %*% U[1:(T-l), , drop=FALSE] /T
+  if (l == 0){
+    Omega = Omega + Gamma_l_
+  } else {
+    Omega = Omega + weight*(Gamma_l_ + t(Gamma_l_))
+  }
+}
+
+
+#make the B matrix
+loss <- function(param){
+  #Define the restriction
+  B <- matrix(c(param[1], param[2], 0, param[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X <- Omega - B %*% t(B)
+  
+  #loss function
+  loss <- sum(X^2)
+  return(loss)
+}
+
+res.opt <- optim(c(1, 0, 1), loss, method = "BFGS")
+B.hat <- matrix(c(res.opt$par[1], res.opt$par[2], 0, res.opt$par[3]), ncol = 2)
+
+print(cbind(Omega,B.hat %*% t(B.hat)))
+
+
+```
+
+
+```{r IRF 1dummy}
+nb.sim = 7*7
+#get back the coefficient of est.VAR
+phi <- Acoef(est.VAR)
+PHI = make.PHI(phi)
+
+#take the constant
+constant <- sapply(est.VAR$varresult, function(eq) coef(eq)["const"])
+c=as.matrix(constant)
+
+#Simulate the IRF
+p <- length(phi)
+n <- dim(phi[[1]])[1]
+
+
+Y <- simul.VAR(c=c, Phi = phi, B = B.hat, nb.sim ,y0.star=rep(0, n*p),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+
+Yd = data.frame(
+  period = 1:nrow(Y),
+  response = Y[,2])
+
+ggplot(Yd,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P IRF of Dummy on Volatility")+
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+
+```
+
+```{r IRF 2Dummy}
+ggplot(Yd,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P Cumulalitve IRF of Dummy on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
 ```
 
 ## N
@@ -130,8 +218,6 @@ t_stat2 = coef2/nw_se2
 #recalculate p-values
 robust2 = 2*(1-pt(abs(t_stat2), df = df.residual(lm_clean2)))
 
-#table
-screenreg(lm_clean2, override.se = nw_se2, override.pvalues = robust2, digits = 6)
 ```
 
 ## Tariff
@@ -158,8 +244,88 @@ t_stat3 = coef3/nw_se3
 #recalculate p-values
 robust3 = 2*(1-pt(abs(t_stat3), df = df.residual(lm_clean3)))
 
-#table
-screenreg(lm_clean3, override.se = nw_se3, override.pvalues = robust3, digits = 6)
+```
+
+```{r B mat3}
+#Recreate a Robust Omega Matrix
+U3 = residuals(est.VAR3)
+T3 = nrow(U3)
+Omega3 = matrix(0, ncol(U3), ncol(U3))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_3 = t(U3[(l+1):T3, , drop=FALSE]) %*% U3[1:(T3-l), , drop=FALSE] /T3
+  if (l == 0){
+    Omega3 = Omega3 + Gamma_l_3
+  } else {
+    Omega3 = Omega3 + weight*(Gamma_l_3 + t(Gamma_l_3))
+  }
+}
+
+
+#make the B matrix
+loss3 <- function(param3){
+  #Define the restriction
+  B3 <- matrix(c(param3[1], param3[2], 0, param3[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X3 <- Omega3 - B3 %*% t(B3)
+  
+  #loss function
+  loss3 <- sum(X3^2)
+  return(loss3)
+}
+
+res.opt3 <- optim(c(1, 0, 1), loss3, method = "BFGS")
+B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol = 2)
+
+print(cbind(Omega3,B.hat3 %*% t(B.hat3)))
+
+
+```
+
+
+```{r IRF tariffff}
+#get back the coefficient of est.VAR
+phi3 <- Acoef(est.VAR3)
+PHI3 = make.PHI(phi3)
+
+#take the constant
+constant3 <- sapply(est.VAR3$varresult, function(eq) coef(eq)["const"])
+c3=as.matrix(constant3)
+
+#Simulate the IRF
+p3 <- length(phi3)
+n3 <- dim(phi3[[1]])[1]
+
+Y3 <- simul.VAR(c=c3, Phi = phi3, B = B.hat3, nb.sim ,y0.star=rep(0, n3*p3),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd3 = data.frame(
+  period = 1:nrow(Y3),
+  response = Y3[,2])
+
+ggplot(Yd3,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P IRF of tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+
+```{r IRF tariff}
+ggplot(Yd3,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P Cumulalitve IRF of tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
 ```
 
 ## Trade
@@ -186,8 +352,7 @@ t_stat4 = coef4/nw_se4
 #recalculate p-values
 robust4 = 2*(1-pt(abs(t_stat4), df = df.residual(lm_clean4)))
 
-#table
-screenreg(lm_clean4, override.se = nw_se4, override.pvalues = robust4, digits = 6)
+
 ```
 
 ## China
@@ -215,16 +380,9 @@ t_statchina = coefchina/nw_sechina
 #recalculate p-values
 robustchina = 2*(1-pt(abs(t_statchina), df = df.residual(lm_cleanchina)))
 
-#table
-screenreg(lm_cleanchina, override.se = nw_sechina, override.pvalues = robustchina, digits = 6)
+
 ```
 
-mean_day_filtered \<- Vdata %\>% mutate( day = as.Date(timestamp), year
-= year(day), month = month(day) ) %\>% filter(!(year == 2025 & month
-%in% c(4, 5))) %\>% \# exclut avril et mai 2025 group_by(day) %\>%
-summarise(mean_vol_day = mean(SPY_vol, na.rm = TRUE))
-
-mean(mean_day_filtered\$mean_vol_day)
 
 ```{r mana, message=FALSE, warning=FALSE, results='asis'}
 
@@ -366,7 +524,8 @@ table_texreg <- texreg(
   label = "tab:VAR_Second_Term",
   caption.above = TRUE,
   digits = 6,
-  custom.gof.rows = list("Shock (IRF)" = c(0.0041713, 0.003061, 0.001189, 0.000215, 0.001937))
+  custom.gof.rows = list("Shock (IRF)" = c(0.0041713, 0.003061, 0.001189, 0.000215, 0.001937)),
+  custom.note = "This table displays VAR regression with only two variables : AHV and the X regressor. The column names represent the X variable for the selected model."
 )
 
 
@@ -424,6 +583,8 @@ robust_f_d = 2*(1-pt(abs(t_stat_f_d), df = df.residual(lm_clean_f_d)))
 
 ```
 
+## N
+
 ```{r first mandate N, warning=FALSE, message=FALSE, results="asis"}
 
 y_f_n = cbind(Vdata_f$N, Vdata_f$SPY_vol)
@@ -447,6 +608,8 @@ t_stat_f_n = coef_f_n/nw_se_f_n
 #recalculate p-values
 robust_f_n = 2*(1-pt(abs(t_stat_f_n), df = df.residual(lm_clean_f_n)))
 ```
+
+## Tariff
 
 ```{r first mandate tariff, warning=FALSE, message=FALSE, results="asis"}
 
@@ -473,6 +636,8 @@ robust_f_ta = 2*(1-pt(abs(t_stat_f_ta), df = df.residual(lm_clean_f_ta)))
 
 ```
 
+## Trade
+
 ```{r first mandate trade, warning=FALSE, message=FALSE, results="asis"}
 
 y_f_tr = cbind(Vdata_f$trade, Vdata_f$SPY_vol)
@@ -496,6 +661,8 @@ t_stat_f_tr = coef_f_tr/nw_se_f_tr
 #recalculate p-values
 robust_f_tr = 2*(1-pt(abs(t_stat_f_tr), df = df.residual(lm_clean_f_tr)))
 ```
+
+## China
 
 ```{r first mandate china, warning=FALSE, message=FALSE, results="asis"}
 
@@ -523,6 +690,12 @@ robust_f_ch = 2*(1-pt(abs(t_stat_f_ch), df = df.residual(lm_clean_f_ch)))
 
 ```
 
+
+
+# Second Mandate
+
+## Dummy
+
 ```{r second mandate dum, warning=FALSE, message=FALSE, results="asis"}
 
 y_s_d = cbind(Vdata_s$dummy, Vdata_s$SPY_vol)
@@ -546,6 +719,9 @@ t_stat_s_d = coef_s_d/nw_se_s_d
 #recalculate p-values
 robust_s_d = 2*(1-pt(abs(t_stat_s_d), df = df.residual(lm_clean_s_d)))
 ```
+
+
+## N 
 
 ```{r second mandate N, warning=FALSE, message=FALSE, results="asis"}
 
@@ -573,6 +749,8 @@ robust_s_n = 2*(1-pt(abs(t_stat_s_n), df = df.residual(lm_clean_s_n)))
 
 ```
 
+## Tariff
+
 ```{r second mandate tariff, warning=FALSE, message=FALSE, results="asis"}
 
 y_s_ta = cbind(Vdata_s$tariff, Vdata_s$SPY_vol)
@@ -597,6 +775,8 @@ t_stat_s_ta = coef_s_ta/nw_se_s_ta
 robust_s_ta = 2*(1-pt(abs(t_stat_s_ta), df = df.residual(lm_clean_s_ta)))
 
 ```
+
+## Trade
 
 ```{r second mandate trade, warning=FALSE, message=FALSE, results="asis"}
 
@@ -623,6 +803,8 @@ robust_s_tr = 2*(1-pt(abs(t_stat_s_tr), df = df.residual(lm_clean_s_tr)))
 
 ```
 
+## China
+
 ```{r second mandate china, warning=FALSE, message=FALSE, results="asis"}
 
 y_s_ch = cbind(Vdata_s$china, Vdata_s$SPY_vol)
@@ -648,7 +830,88 @@ robust_s_ch = 2*(1-pt(abs(t_stat_s_ch), df = df.residual(lm_clean_s_ch)))
 
 ```
 
-```{r truc, message=FALSE, warning=FALSE, results='asis'}
+```{r B mat second mandate china, warning=FALSE, message=FALSE}
+#Construct the Robust Omega Matrix
+U_s_ch = residuals(est.VAR_s_ch)
+T_s_ch = nrow(U_s_ch)
+Omega_s_ch = matrix(0, ncol(U_s_ch), ncol(U_s_ch))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l__s_ch = t(U_s_ch[(l+1):T_s_ch, , drop=FALSE]) %*% U_s_ch[1:(T_s_ch-l), , drop=FALSE] /T_s_ch
+  if (l == 0){
+    Omega_s_ch = Omega_s_ch + Gamma_l__s_ch
+  } else {
+    Omega_s_ch = Omega_s_ch + weight*(Gamma_l__s_ch + t(Gamma_l__s_ch))
+  }
+}
+
+
+#make the B matrix
+loss_s_ch <- function(param_s_ch){
+  #Define the restriction
+  B_s_ch <- matrix(c(param_s_ch[1], param_s_ch[2], 0, param_s_ch[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X_s_ch <- Omega_s_ch - B_s_ch %*% t(B_s_ch)
+  
+  #loss function
+  loss_s_ch <- sum(X_s_ch^2)
+  return(loss_s_ch)
+}
+
+res.opt_s_ch <- optim(c(1, 0, 1), loss_s_ch, method = "BFGS")
+B.hat_s_ch <- matrix(c(res.opt_s_ch$par[1], res.opt_s_ch$par[2], 0, res.opt_s_ch$par[3]), ncol = 2)
+
+print(cbind(Omega_s_ch,B.hat_s_ch %*% t(B.hat_s_ch)))
+
+```
+
+```{r IRF second china, warning=FALSE, message=FALSE}
+#get back the coefficient of est.VAR
+phi_s_ch <- Acoef(est.VAR_s_ch)
+PHI_s_ch = make.PHI(phi_s_ch)
+
+#take the constant
+constant_s_ch <- sapply(est.VAR_s_ch$varresult, function(eq) coef(eq)["const"])
+c_s_ch=as.matrix(constant_s_ch)
+
+#Simulate the IRF
+p_s_ch <- length(phi_s_ch)
+n_s_ch <- dim(phi_s_ch[[1]])[1]
+
+Y_s_ch <- simul.VAR(c=c_s_ch, Phi = phi_s_ch, B = B.hat_s_ch, nb.sim ,y0.star=rep(0, n_s_ch*p_s_ch),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd_s_ch = data.frame(
+  period = 1:nrow(Y_s_ch),
+  response = Y_s_ch[,2])
+
+ggplot(Yd_s_ch,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P IRF of Second Term China on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF _s_ch}
+ggplot(Yd_s_ch,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P Cumulalitve IRF of Second Term China on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+# Tables Terms
+
+```{r table first term, message=FALSE, warning=FALSE, results='asis'}
 
 
 #first
@@ -770,17 +1033,21 @@ table_texreg_f <- texreg(
   caption.above = TRUE,
   digits = 6,
   custom.gof.rows = list("Shock (IRF)" = c(0.002919, 0.002236, 0.000484, 0.000702, 0.000904)),
-  star.cutoffs = c(0.001, 0.01, 0.05)
+  star.cutoffs = c(0.001, 0.01, 0.05),
+  custom.note = "This table displays VAR regression with only two variables : AHV and the X regressor. The column names represent the X variable for the selected model."
 )
 
 # Afficher le tableau
 table_texreg_f
+```
 
 
 
 
-#second
 
+```{r Table second Term, message=FALSE, warning=FALSE, results='asis'}
+
+#Second
 
 d_s_d_t = d_s_d %>%
     rename(X.l1 = dummy.l1,
@@ -881,7 +1148,8 @@ table_texreg_s <- texreg(
   caption.above = TRUE,
   digits = 6,
   custom.gof.rows = list("Shock (IRF)" = c(0.016739, 0.015714, 0.011582, -0.004131, 0.015569)),
-  star.cutoffs = c(0.05, 0.01, 0.001)
+  star.cutoffs = c(0.05, 0.01, 0.001),
+  custom.note = "This table displays VAR regression with only two variables : AHV and the X regressor. The column names represent the X variable for the selected model."
 )
 
 
