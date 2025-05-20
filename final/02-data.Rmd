@@ -108,7 +108,7 @@ hvol_plotter(SPY, breaks = "yearly", title = "SPY Realised Volatility")
 ## Political Data
 
 We have two sources for Trump's posts. The Tweets are from Kaggle
-@DonaldTrumpTweets and go until the 8th of January 2021. Since he
+@shantanuDonaldTrumpTweets and go until the 8th of January 2021. Since he
 switched his primary Posting platform to Truth Social we use only that
 Data from 2021 onwards. All Truth Social Posts were scrapped from
 trumpstruth.org, a webpage that aims to conserve all his posts. You can

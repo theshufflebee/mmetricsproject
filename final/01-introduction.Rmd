@@ -105,7 +105,8 @@ available information, adjusting immediately to any new data
 @famaAdjustmentStockPrices2003 , and thereby creating a strong demand
 for information flow. In addition, the “Mixture of Distribution
 Hypothesis” states that the release of new information is closely linked
-to movements in both realized and implied volatility (1)(3)(7).
+to movements in both realized and implied volatility
+@andersenReturnVolatilityTrading1996 (1)(3).
 
 Consequently, a large part of the literature had focused on the relation
 between announcements, news and market activity. For example,
@@ -123,7 +124,8 @@ which revolutionized the dissemination and accessibility of information.
 Social media enable investors, analysts or politicians to instantly
 share their information, news or opinions. This led some studies to
 focus on the communication dynamics of social platform to predict
-changes in the returns of financial assets (6)(8). In this context, the
+changes in the returns of financial assets @dechoudhuryCanBlogCommunication2008 & 
+@bartovCanTwitterHelp2018. In this context, the
 impact of Trump’s tweets on various financial and macroeconomic
 variables has been analysed by several studies, especially during his
 first mandate.
@@ -134,15 +136,23 @@ trading volume, along with a decline in the U.S. stock market—regardless
 of the tweet's content. However, the effect was stronger when Trump used
 confrontational words such as "tariff" or "trade war." Some of his
 announcements also influenced the U.S. dollar exchange rate (l) and
-certain market indices within minutes of the tweet being posted (r)(a).
+certain market indices within minutes of the tweet being posted
+@colonescuEffectsDonaldTrumps2018 & @kinyuaAnalysisImpactPresident2021.
 
 Other scholars have shown that negative Trump tweets about specific
-companies tended to reduce demand for their stocks (b)(g), whereas some
+companies tended to reduce demand for their stocks @bransHisThumbEffect2020 &
+@mendelsStanfordResearchSeries2019, whereas some
 other have shown that they also impact market volatility indices such as
-the VIX (w) or the Volfele(v). The effects of his tweets also extended
-beyond the U.S.. For example, @nishimuraImpactsDonaldTrumps2025 shows a
+the VIX @fendelPoliticalNewsStock2019 or the Volfele @klausMeasuringTrumpVolfefe2021.
+The effects of his tweets also extended beyond the U.S.. For example,
+@nishimuraImpactsDonaldTrumps2025 shows a
 positive relationship between volatility in European stock markets and
 tweeter activity of Trump, and this effect tends to intensify as public
-intention for his tweet grows (z).
+intention for his tweet grows @nishimuraImpactsDonaldTrumps2025.
 
-Our paper is built as follows: 
+Our paper is built as follows:
+
+Section 2 Looks at the how the data was procured, what transformations were done
+and how the final dataset looks like. Section three then shows methodology and
+Results of ARMA-X estimations while Section 4 does the same for VAR models. Section
+5 then discusses these results
