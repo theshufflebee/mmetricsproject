@@ -11,7 +11,7 @@ header-includes:
 \newpage
 
 # Setup
-```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
+```{r library_setup, results=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
 rm(list=ls())
 require(tinytex) #LaTeX
 require(ggplot2) #plots
@@ -72,7 +72,7 @@ TruthSocial posts, we had to go and scrape the data ourselves (see the
 scraper function for details). \
 Our data ends on the 7th of May 2025 and starts at 2009 for Twitter, and 2014 
 for the financial data.
-```{r rawdata_setup, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
+```{r rawdata_setup, results=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
 
 # 1. Political 
 
@@ -109,7 +109,7 @@ no observations for 2021 to 2022 as Trump was banned from Twitter and hadn't yet
 created TruthSocial. \
 As for the financial data, nothing really is needed as it comes from a more 
 traditional data source.
-```{r cleanup, results=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
+```{r cleanup, results=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
 
 # 1. Tweets 
 tweets = raw_tweets
@@ -159,6 +159,25 @@ social = filter(social,between(timestamp,
                             as.Date('2009-01-01'),
                             as.Date('2025-12-12')))
 
+#for plot
+truths_plot <- social %>%
+  mutate(
+    # Use POSIX 'timestamp' directly
+    date_time_parsed = as.POSIXct(timestamp, format = "%Y-%m-%d %H:%M:%S"),
+    
+    # Extract date only for plot
+    day = as.Date(date_time_parsed),
+    
+    # Extract time only for plot
+    time = format(date_time_parsed, "%H:%M"),
+    
+    # Convert time to numeric hours & minutes as fractions
+    time_numeric = hour(date_time_parsed) + minute(date_time_parsed) / 60,
+    
+    # Shift time such that y = 0 corresponds to 12 PM
+    time_shifted = time_numeric - 12)
+
+
 # 3. Financial
 
 #remove index
@@ -166,6 +185,43 @@ SPY = raw_SPY[-1]
 VGK = raw_VGK[-1]
 ASHR = raw_ASHR[-1]
 
+```
+
+Here's the plot we use in our introduction, showing the endless stream of Trump's
+social media presence.
+```{r fig1, warning=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)"}
+
+ #Create the scatter plot
+ggplot(truths_plot, aes(x = day, y = time_shifted)) +
+  geom_point(alpha = 0.5, color = "blue", shape = ".") +  # Transparancy to create "heatmap"
+  scale_y_continuous(
+    breaks = seq(-12, 12, by = 3),  # Custom Y scale
+    labels = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00", "24:00")  # 24-hour format labels
+  ) +
+  labs(title = "Terminally Online: Trumps Twitter & Truth Social Posts (EDT)",
+       x = "",
+       y = "Time of Day") +
+  theme_minimal() +
+  
+  
+  # Customize X Axis
+  scale_x_date(
+    date_labels = "%b %Y",  # Format labels to show month and year
+    date_breaks = "9 months"
+  ) +
+  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  
+  # Add vertical lines at 9:30 AM and 4:00 PM for stock market
+  geom_hline(yintercept = (9 + 30 / 60) - 12, linetype = "longdash", color = "red") + 
+  geom_hline(yintercept = 16 - 12, linetype = "dashed", color = "red") +   
+  
+  # theme adjustments
+  theme(
+    panel.grid.minor = element_blank(),  # Remove minor gridlines
+    panel.grid.major = element_line(linewidth = 0.5),  # Major gridlines
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10))
 ```
 
 \newpage
