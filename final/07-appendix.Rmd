@@ -296,7 +296,7 @@ pvals_combined <- cbind(pvals_combined, pvals_new2)
 ```
 
 
-### SPY ARMAX Table (Separate Terms){#sec:spy-table-terms}
+### SPY ARMAX Table (Split Presidential Terms){#sec:spy-table-terms}
 
 \centering
 
@@ -330,6 +330,28 @@ htmlreg(
   stars = c(0.001, 0.01, 0.05),
   doctype = FALSE
 )
+
+```
+
+
+### SPY ARMAX IRFs (Split Terms){#sec:SPY-SPLIT-IRF}
+
+```{r 2nd SPYirf, warning=F, message=F, echo=FALSE, cache=TRUE}
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 15
+
+plot2 = irf.plot(models[["Second Term (1)"]],nb.periods,
+                 title="Tariff Mention Shock - Second Term")
+plot2
+
+#ggsave("armax_plot2.png",plot=plot2,bg="white")
+
+plot3 = irf.plot(models[["Second Term (3)"]],nb.periods,
+                 title="China Mention Shock - Second Term")
+plot3
+
+#ggsave("armax_plot3.png",plot=plot3,bg="white")
 
 ```
 
