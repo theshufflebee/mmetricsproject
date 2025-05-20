@@ -28,6 +28,7 @@ require(quanteda) #tokenization
 require(texreg) #arima tables
 require(future.apply) #parallel computation (speed)
 require(aTSA) #adf test
+require(kableExtra)
 
 getwd()
 #setwd("...") -> set wd at base repo folder
@@ -135,7 +136,7 @@ cat(
 ```
 
 
-### SPY ARMAX IRFs (Jan 2024 - May 2025){#sec:SPY-IRF}
+### SPY ARMAX IRFs (Jan 2014 - May 2025){#sec:SPY-IRF}
 
 ```{r SPYirf, results="asis", warning=F, message=F, echo=FALSE, cache=TRUE}
 
@@ -155,8 +156,8 @@ ggsave("armax_plot1.png",plot=plot1,bg="white")
 ```
 
 
-### SPY Residuals {#sec:SPYres}
 ```{r, warning=F, message=F, echo=FALSE, results=F}
+#Calculate residuals
 
 res1 = checkresiduals(models[["Model 1"]], plot = FALSE)
 res2 = checkresiduals(models[["Model 2"]], plot = FALSE)
@@ -171,18 +172,14 @@ res5 = checkresiduals(models[["Model 5"]], plot = FALSE)
 resnames = c("Twitter Dummy", "Twitter Count", "Tariff", "Trade", "China")
 
 #extract p-values directly from checkresiduals results
-pvals <- data.frame(Model = resnames,
-                    `Ljung-Box p-value` = c(
+pvals <- data.frame("X-Regressor" = resnames,
+                    `Full Timeframe` = c(
                       res1$p.value,
                       res2$p.value,
                       res3$p.value,
                       res4$p.value,
                       res5$p.value))
 
-#table
-# Create a styled HTML table
-kable(pvals, format = "html", digits = 4, caption = "Full Timeframe Ljung-Box Test p-values") %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, position = "center")
 
 ```
 
@@ -276,17 +273,6 @@ models[["Second Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 ```
 
 
-```{r 2nd SPYirf, warning=F, message=F, echo=FALSE, cache=TRUE}
-#Calculate Second Term IRFs
-
-#we want to plot the IRFs of these models
-nb.periods = 7 * 15
-
-plot2 = irf.plot(models[["Second Term (1)"]],nb.periods,
-                 title="Tariff Mention Shock - Second Term")
-plot2
-```
-
 
 ```{r 2nd SPYresiduals, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
 # Calculate SPY residuals for the second term
@@ -348,9 +334,9 @@ htmlreg(
 ```
 
 
-### Residual Test {#sec:SPYressum}
+### Residual Test {#sec:SPY-res-test}
 
-```{r means, message=F, warning=F, results="asis", echo=FALSE, cache=TRUE}
+```{r res-table, message=F, warning=F, results="asis", echo=FALSE, cache=TRUE}
 
 kable(pvals_combined, digits = 6, format="html", caption = "Ljung-Box Test p-values for Residuals") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, position = "center")
@@ -358,4 +344,23 @@ kable(pvals_combined, digits = 6, format="html", caption = "Ljung-Box Test p-val
 
 
 ```
+
+### Descriptive Stats{#sec:means-table}
+ 
+```{r means, message=F, warning=F, results="asis"}
+
+means <- data.frame(
+  Model = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
+  `SPY Volatility Mean` = c(
+    mean1,
+    mean2,
+    mean3))
+
+kable(means, digits = 6, format="html", caption = "Summary Statistics of SPY Volatility") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, position = "center")
+
+
+
+```
+
 
