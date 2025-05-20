@@ -172,8 +172,8 @@ res5 = checkresiduals(models[["Model 5"]], plot = FALSE)
 resnames = c("Twitter Dummy", "Twitter Count", "Tariff", "Trade", "China")
 
 #extract p-values directly from checkresiduals results
-pvals <- data.frame(Model = resnames,
-                    `Ljung-Box p-value` = c(
+pvals <- data.frame("X-Regressor" = resnames,
+                    `Full Timeframe` = c(
                       res1$p.value,
                       res2$p.value,
                       res3$p.value,
