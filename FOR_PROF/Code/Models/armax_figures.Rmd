@@ -287,7 +287,7 @@ plot2 = irf.plot(models[["Second Term (1)"]],nb.periods,
                  title="Tariff Mention Shock - Second Term")
 plot2
 
-ggsave("armax_plot2.png",plot=plot2,bg="white")
+#ggsave("armax_plot2.png",plot=plot2,bg="white")
 
 plot3 = irf.plot(models[["Second Term (3)"]],nb.periods,
                  title="China Mention Shock - Second Term")

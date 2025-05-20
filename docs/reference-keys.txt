@@ -27,6 +27,7 @@ armax
 sec:spy-table
 sec:SPY-IRF
 sec:spy-table-terms
+sec:SPY-SPLIT-IRF
 sec:SPY-res-test
 sec:means-table
 cross
