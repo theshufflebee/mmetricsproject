@@ -2231,7 +2231,8 @@ margin-left: 2em;
 <li class="chapter" data-level="" data-path="abstract.html"><a href="abstract.html"><i class="fa fa-check"></i>Abstract</a></li>
 <li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
 <ul>
-<li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#literature-review"><i class="fa fa-check"></i><b>1.1</b> Literature Review</a></li>
+<li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#motivation"><i class="fa fa-check"></i><b>1.1</b> Motivation</a></li>
+<li class="chapter" data-level="1.2" data-path="introduction.html"><a href="introduction.html#literature-review"><i class="fa fa-check"></i><b>1.2</b> Literature Review</a></li>
 </ul></li>
 <li class="chapter" data-level="2" data-path="data.html"><a href="data.html"><i class="fa fa-check"></i><b>2</b> Data</a>
 <ul>
@@ -2301,6 +2302,23 @@ margin-left: 2em;
             <section class="normal" id="section-">
 <div id="conclusion" class="section level1 hasAnchor" number="5">
 <h1><span class="header-section-number">Part 5</span> Conclusion<a href="conclusion.html#conclusion" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>We started this project with the intention of understanding whether the impact
+of Trump’s social media posts affect financial markets, and to see if there
+is perhaps a difference from his first presidential mandate. After various
+headaches with our data, we first ran ARMA-X models where we found significant
+and positive results albeit with strong auto-correlation in the errors, with only
+the second term analysis offering more convincing results. We then try VAR models
+for a possibly more accurate picture, albeit with little to no success. We once
+again find strong auto-correlation in the errors, which we here fix by using
+Newey-West standard errors. We found that the only significant coefficients are
+actually negative, suggesting Trump’s social media presence would reduce volatility.</p>
+<p>However, we would suggest strong against trying to interpret these results given
+that the models seem to not fit particularly well. This may be due to seasonality
+in our data (a common trend seen is our daily AVH is high volatility in the first
+open hours, and a gradual slowdown for the rest of the day), or to our handling
+of non-market hours. Further work could look at these issues in more detail, could
+further complicate the models by adding more variables and interaction between them,
+and/or additionally <span style="color:red"> <em>use more sophisticated models, such as models including co-integration.</em> </span></p>
 
 </div>
             </section>

@@ -2231,7 +2231,8 @@ margin-left: 2em;
 <li class="chapter" data-level="" data-path="abstract.html"><a href="abstract.html"><i class="fa fa-check"></i>Abstract</a></li>
 <li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
 <ul>
-<li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#literature-review"><i class="fa fa-check"></i><b>1.1</b> Literature Review</a></li>
+<li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#motivation"><i class="fa fa-check"></i><b>1.1</b> Motivation</a></li>
+<li class="chapter" data-level="1.2" data-path="introduction.html"><a href="introduction.html#literature-review"><i class="fa fa-check"></i><b>1.2</b> Literature Review</a></li>
 </ul></li>
 <li class="chapter" data-level="2" data-path="data.html"><a href="data.html"><i class="fa fa-check"></i><b>2</b> Data</a>
 <ul>
@@ -2329,33 +2330,48 @@ are positive, in line with our main hypothesis. The effect of <span class="math 
 in Section <a href="appendix.html#sec:means-table">7.1.6</a>. We in fact predict that an
 extra mention of tariffs one hour ago, leads to a whopping extra 0.02 in volatility
 which is just about the average size for the full timeframe. We can see the
+<<<<<<< HEAD
 impulse response function (IRF) for this shock in Section <a href="appendix.html#sec:SPY-IRF">7.1.2</a>.
 Notice that there is a large response in the first periods, and then a graduate
 decline over time. Something to note is that in our analysises of IRF’s, when including
+=======
+impulse response function (IRF) for this shock, in <span style="color:red"> <em>IRFtarif</em> </span>.
+<a href="appendix.html#sec:SPY-IRF">7.1.2</a> Notice that there is a large response in the first periods, and then a graduate
+decline over time. Something to note is that in our analyses of IRF’s, when including
+>>>>>>> 249c30f04f33d9c802ee965feef5b2f53edab0bc
 MA terms, the decline shows up gradual while being much sharper when only including
 AR terms.
 Note that we ran all these models on the VGK and ASHR ETF’s as well, though no
-signficant results appear apart from a small but statistically significant effect
+significant results appear apart from a small but statistically significant effect
 of the tariff variable for VGK.</p>
 </div>
 <div id="split-samples" class="section level3 hasAnchor" number="3.2.2">
 <h3><span class="header-section-number">3.2.2</span> Split Samples<a href="arma-x.html#split-samples" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<<<<<<< HEAD
 <p>We then split our sample for the first and second term of the Trump presidancy.
 We only run models on tariff, trade and china this time. As seen on the table in
 Section <a href="appendix.html#sec:spy-table-terms">7.1.3</a>, the first interesting result
+=======
+<p>We then split our sample for the first and second term of the Trump presidency.
+We only run models on tariff, trade and china this time. As seen on table
+<span style="color:red"> <em>ARMAX Table 2</em> </span> <a href="appendix.html#sec:spy-table-terms">7.1.3</a>, the first interesting result
+>>>>>>> 249c30f04f33d9c802ee965feef5b2f53edab0bc
 is in the coefficients of tariff being significant and very large in the second
 term, while being small and not statistically significant in the first. A similar
 story goes for the China variable. This may lend some evidence to support the
 claim that investors are much more reactive to Trump’s social media presence
-now than before.
+now than before. We’ve found similar IRF’s as for the full timeframe. Tables <a href="appendix.html#sec:SPY-IRF">7.1.2</a>
+show the IRF’s for the second term, of the impacts of tariff and china mention
+shocks on the AHV.
 Finally, we can check the residuals of all these models to test them somewhat.
 In Section <a href="appendix.html#sec:SPY-res-test">7.1.5</a>, the pvalues being zero
 for the full timeframe and first term indicate that there is autocorrelation in
 the residuals, thus suggesting that these estimations have problems. Note however,
-that the pvalues for the second term are quite high, lending support to our
+that the p-values for the second term are quite high, lending support to our
 models on the split sample. These results suggest that perhaps ARMA-X models are
-not right in this context, as it is not unreasonable to think that Trump does
-in fact react to market movements. With this information, we decided to run
+not right in this context as it is not unreasonable to think that Trump does
+in fact react to market movements, which would break the exogeneity assumption
+that is critical for this type of model. With this information, we decided to run
 a VAR model to deepen our understanding of these variables.</p>
 
 </div>

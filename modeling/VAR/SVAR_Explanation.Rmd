@@ -129,35 +129,42 @@ ggplot (resultats1, aes(x=n, y= name)) +
 ```
 
 
-# VAR Models
+# VAR Model
 
-## Volatility & Tariff Mention
+## Volatility & TweetDummy 
 
 We first extract and bind the relevant variables, estimate a VAR model using the 
 VAR function, and then display the results in a table for the volatility equation. 
-Our main interest is in the effect of tariff mentions on volatility (and not the inverse).
+Our main interest is in the effect of a post (dummy) on volatility (and not the inverse).
 
 
-```{r tariff, warning=FALSE, message=FALSE}
+```{r dummy, warning=FALSE, message=FALSE}
 
-y3 = cbind(Vdata$tariff, Vdata$SPY_vol)
-colnames(y3)[1:2] <- c("tariff", "vol")
-est.VAR3 <- VAR(y3,p=6)
-mod_vol <- est.VAR3$varresult$vol
+y = cbind(Vdata$dummy, Vdata$SPY_vol)
+colnames(y)[1:2] <- c("dummy", "vol")
+est.VAR <- VAR(y,p=6)
+mod_vol <- est.VAR$varresult$vol
 screenreg(mod_vol, digits = 6)
 
 ```
 
+
+## Serial test
 We run a Portmanteau-Godfrey test in order to detect some serial correlation on the
 residuals. We found strong evidence of the presence of serial correlation in all 
 estimations.  
 
-```{r tariff, warning=FALSE, message=FALSE}
+```{r dummy, warning=FALSE, message=FALSE}
 
-serial2 = serial.test(est.VAR3, lags.pt =6, type = "PT.asymptotic")
+serial2 = serial.test(est.VAR, lags.pt =6, type = "PT.asymptotic")
 serial2
 
 ```
+
+
+## Newey-west estimator
+
+
 Newey-West correction of Standard Error is implemented in order to correct for 
 bias in the standard errors. We run an OLS with both regressions of the VAR framework 
 in order to use the Newey-West function. Then we calculate the p-value with the robust
@@ -182,23 +189,60 @@ t_stat = coef/nw_se
 #recalculate p-values
 robust = 2*(1-pt(abs(t_stat), df = df.residual(lm_clean)))
 
+nw_se       <- nw_se[names(coef(lm_clean))]
+robust      <- robust[names(coef(lm_clean))]
+
 #table
 screenreg(lm_clean, override.se = nw_se, override.pvalues = robust, digits = 6)
 ```
+
+
+We also look for the effect of the AHV on Trump's post, here TweetDummy, with robust standard error
+
+```{r effect of Vol on dummy}
+#extract results
+mod_post = est.VAR$varresult$dummy
+ff = formula(mod_post)
+dd = model.frame(mod_post)
+lm_clean_post = lm(ff, data= dd)
+
+#apply Newey-West
+nw_vcov_post = NeweyWest(lm_clean_post, lag=6)
+nw_se_post = sqrt(diag(nw_vcov_post))
+
+#t-stats
+coef_post = coef(lm_clean_post)
+t_stat_post = coef_post/nw_se_post
+
+#recalculate p-values
+robust_post = 2*(1-pt(abs(t_stat_post), df = df.residual(lm_clean_post)))
+
+nw_se_post       <- nw_se_post[names(coef(lm_clean_post))]
+robust_post      <- robust_post[names(coef(lm_clean_post))]
+
+#table
+screenreg(lm_clean_post, override.se = nw_se_post, override.pvalues = robust_post, digits = 6)
+
+
+```
+
+
+## Breusch-Pagan test
 
 We also run Breusch-Pagan test for checking the heteroscedasticity.
 We found strong evidence of the presence of heteroscedasticity in all estimations, 
 except for the second term.
 
-
 ```{r bp test}
 #H0 test whether there is NOT heteroscedasticity. 
-bptest(lm_clean3)
+bptest(lm_clean)
 
 ```
 
 
-## Then we use the Newey-West formula in order to construct our Robust covariance 
+## B matrix
+
+Then we use the Newey-West formula in order to construct our Robust covariance 
 matrix using the residuals of our estimation
 
 ```{r Omega Robust Matrix, warning=FALSE, message=FALSE}
@@ -238,29 +282,29 @@ the elements of B matrix (B.hat) that minimize the distance with the
 true Variance-Covariance matrix.
 
 
-```{r B mat3, warning=FALSE, message=FALSE}
+```{r B mat, warning=FALSE, message=FALSE}
 
 
 #create the B matrix
-loss3 <- function(param3){
+loss <- function(param){
   #define the restriction
-  B3 <- matrix(c(param3[1], param3[2], 0, param3[3]), ncol = 2)
+  B <- matrix(c(param[1], param[2], 0, param[3]), ncol = 2)
   
   #make BB' approximatively equal to omega
-  X3 <- Omega3 - B3 %*% t(B3)
+  X <- Omega - B %*% t(B)
   
   #loss function
-  loss3 <- sum(X3^2)
-  return(loss3)
+  loss <- sum(X^2)
+  return(loss)
 }
 
-res.opt3 <- optim(c(1, 0, 1), loss3, method = "BFGS")
-B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol = 2)
+res.opt <- optim(c(1, 0, 1), loss, method = "BFGS")
+B.hat <- matrix(c(res.opt$par[1], res.opt$par[2], 0, res.opt$par[3]), ncol = 2)
 
-print(cbind(Omega3,B.hat3 %*% t(B.hat3)))
+print(cbind(Omega,B.hat %*% t(B.hat)))
 
-#shock by tariff
-B.hat3
+#shock by dummy
+B.hat
 
 ```
 
@@ -268,33 +312,58 @@ B.hat3
 ## IRF 
 
 We then use the irf() function of the vars packages in order 
-to graph the effect of a choc of Trump post (here tariff mentions) 
+to graph the effect of a choc of Trump post (here TweetDummy) 
 on market volatility using the coefficient of our 
 est.VAR function and using the choc coefficient of our 
 estimated B matrix with our restriction.
 
 
-```{r IRF tariff, warning=FALSE, message=FALSE}
+```{r IRF 1dummy}
+nb.sim = 7*7
+#get back the coefficient of est.VAR
+phi <- Acoef(est.VAR)
+PHI = make.PHI(phi)
 
-#irf creation
-irf_res <- irf(est.VAR3, impulse = "tariff", response = "vol", 
-                  bmat=b.hat3, n.ahead = 7 * 5, boot = TRUE, ci = 0.95)
+#take the constant
+constant <- sapply(est.VAR$varresult, function(eq) coef(eq)["const"])
+c=as.matrix(constant)
 
-#function to extract relevant objects for plotting
-single_varirf <- extract_varirf(irf_res)
+#Simulate the IRF
+p <- length(phi)
+n <- dim(phi[[1]])[1]
 
-#the plot
-single_varirf %>% 
-  ggplot(aes(x=period, y=irf_tariff_vol, ymin=lower_tariff_vol, ymax=upper_tariff_vol)) +
+
+Y <- simul.VAR(c=c, Phi = phi, B = B.hat, nb.sim ,y0.star=rep(0, n*p),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+
+Yd = data.frame(
+  period = 1:nrow(Y),
+  response = Y[,2])
+
+ggplot(Yd,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
-  geom_ribbon(fill="grey", alpha=0.2) +
   geom_line() +
   theme_light() +
-  ggtitle("Orthogonal impulse response, asylum - asylum")+
-  ylab("log(total asylum flow)")+
+  ggtitle("S&P IRF of Dummy on Volatility")+
+  ylab("")+
   xlab("") +
   theme_minimal()
 
+```
+
+We also graph cumulative IRF as well.
+
+```{r IRF 2Dummy}
+ggplot(Yd,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P Cumulalitve IRF of Dummy on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
 ```
 
 ## Granger test
@@ -302,31 +371,15 @@ single_varirf %>%
 Finally, we use a Granger causality test to evalutate 
 the robustness of the correlation we've found. We look 
 for Granger causalities in both directions, i.e. whether 
-volatility Granger-causes tariff mentions and vice versa.
+volatility Granger-causes dummy mentions and vice versa.
 
 ```{r granger, warning=FALSE, message=FALSE}
 
-#does volatility Granger cause tariff mentions
-grangertest(y3[,c("vol","tariff")], order = 6)
+#does volatility Granger cause dummy mentions
+grangertest(y[,c("vol","dummy")], order = 6)
 
-#does tariff mentions Granger cause volatility
-grangertest(y3[,c("tariff", "vol")], order = 6)
+#does dummy mentions Granger cause volatility
+grangertest(y[,c("dummy", "vol")], order = 6)
 ```
 
 
-## Serial correlation and heteroscedasticity test
-
-During our analysis, we conducted several tests for serial correlation to assess
-whether the error terms of our estimations exhibit serial correlation and/or 
-heteroskedasticity
-
-```{r serial correlation bunch of test}
-#bunch of example of test
-
-serial3 = serial.test(est.VAR3, lags.pt =6, type = "PT.asymptotic")
-serial3
-
-hete = arch.test(est.VAR3, lags.multi = 80, multivariate.only = TRUE)
-hete
-
-```
