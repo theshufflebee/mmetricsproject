@@ -6,13 +6,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Part 3 ARMA-X | Terminally Online: Does Donald Trump impact Financial Markets</title>
   <meta name="description" content="&lt;p&gt;This is our website for a Universityproject. We put this together from a basic bookdown example so there might be some stuff in here from that.&lt;/p&gt;" />
-  <meta name="generator" content="bookdown 0.42 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.43 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Part 3 ARMA-X | Terminally Online: Does Donald Trump impact Financial Markets" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="&lt;p&gt;This is our website for a Universityproject. We put this together from a basic bookdown example so there might be some stuff in here from that.&lt;/p&gt;" />
-  <meta name="github-repo" content="theshufflebee/mmetricsproject" />
+  <meta name="github-repo" content="www.github.com/theshufflebee/mmetricsproject" />
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Part 3 ARMA-X | Terminally Online: Does Donald Trump impact Financial Markets" />
@@ -2227,10 +2227,7 @@ margin-left: 2em;
 <li><a href="./">Terminally Online: Does Donald Trump impact Financial Markets</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Readme</a>
-<ul>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#usage"><i class="fa fa-check"></i>Usage</a></li>
-</ul></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Readme</a></li>
 <li class="chapter" data-level="" data-path="abstract.html"><a href="abstract.html"><i class="fa fa-check"></i>Abstract</a></li>
 <li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
 <ul>
@@ -2324,16 +2321,16 @@ which sees minimal AIC loss and simplifying our models considerably.</p>
 <div id="full-timeframe" class="section level3 hasAnchor" number="3.2.1">
 <h3><span class="header-section-number">3.2.1</span> Full Timeframe<a href="arma-x.html#full-timeframe" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>We run models with the following exogenous regressors: <span class="math inline">\(TweetDummy\)</span>, <span class="math inline">\(TweetCount\)</span>,
-and the mentions of words <span class="math inline">\(Tariff\)</span>, <span class="math inline">\(Trade\)</span>, and <span class="math inline">\(China\)</span>. We first note on
-<span style="color:red"> <em>ARMAX Table 1</em> </span> <a href="appendix.html#sec:spy-table">7.1.1</a>that all the x-regressors are significant,
+and the mentions of words <span class="math inline">\(Tariff\)</span>, <span class="math inline">\(Trade\)</span>, and <span class="math inline">\(China\)</span>. We first note on the table
+in section <a href="appendix.html#sec:spy-table">7.1.1</a> that all the x-regressors are significant,
 apart from trade. Notice also that all the coefficients (apart from <span class="math inline">\(Tariff_{t-3}\)</span>)
 are positive, in line with our main hypothesis. The effect of <span class="math inline">\(Tariff_{t-1}\)</span> and
-<span class="math inline">\(Tariff_{t-2}\)</span> are especially large, given the usual size of the volatility
-(<span style="color:red"> <em>ARMAX Table 4</em> </span>) <a href="appendix.html#sec:means-table">7.1.6</a>. We in fact predict that an
+<span class="math inline">\(Tariff_{t-2}\)</span> are especially large, given the usual size of the volatility as seen
+in Section <a href="appendix.html#sec:means-table">7.1.6</a>. We in fact predict that an
 extra mention of tariffs one hour ago, leads to a whopping extra 0.02 in volatility
 which is just about the average size for the full timeframe. We can see the
-impulse response function (IRF) for this shock, in <span style="color:red"> <em>IRFtarif</em> </span>.
-<a href="appendix.html#sec:SPY-IRF">7.1.2</a> Notice that there is a large response in the first periods, and then a graduate
+impulse response function (IRF) for this shock in Section <a href="appendix.html#sec:SPY-IRF">7.1.2</a>.
+Notice that there is a large response in the first periods, and then a graduate
 decline over time. Something to note is that in our analysises of IRF’s, when including
 MA terms, the decline shows up gradual while being much sharper when only including
 AR terms.
@@ -2344,15 +2341,15 @@ of the tariff variable for VGK.</p>
 <div id="split-samples" class="section level3 hasAnchor" number="3.2.2">
 <h3><span class="header-section-number">3.2.2</span> Split Samples<a href="arma-x.html#split-samples" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>We then split our sample for the first and second term of the Trump presidancy.
-We only run models on tariff, trade and china this time. As seen on table
-<span style="color:red"> <em>ARMAX Table 2</em> </span> <a href="appendix.html#sec:spy-table-terms">7.1.3</a>, the first interesting result
+We only run models on tariff, trade and china this time. As seen on the table in
+Section <a href="appendix.html#sec:spy-table-terms">7.1.3</a>, the first interesting result
 is in the coefficients of tariff being significant and very large in the second
 term, while being small and not statistically significant in the first. A similar
 story goes for the China variable. This may lend some evidence to support the
 claim that investors are much more reactive to Trump’s social media presence
 now than before.
 Finally, we can check the residuals of all these models to test them somewhat.
-On <span style="color:red"> <em>ARMAX Table 3</em> </span>, <a href="appendix.html#sec:SPY-res-test">7.1.5</a> the pvalues being zero
+In Section <a href="appendix.html#sec:SPY-res-test">7.1.5</a>, the pvalues being zero
 for the full timeframe and first term indicate that there is autocorrelation in
 the residuals, thus suggesting that these estimations have problems. Note however,
 that the pvalues for the second term are quite high, lending support to our

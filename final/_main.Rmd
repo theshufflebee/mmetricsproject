@@ -11,11 +11,7 @@ description: |
   This is our website for a Universityproject. We put this together from a basic bookdown example so there might be some stuff in here from that.
 link-citations: true           # clickable citations
 csl: apa.csl
-<<<<<<< HEAD
 github-repo: www.github.com/theshufflebee/mmetricsproject
-=======
-github-repo: theshufflebee/mmetricsproject
->>>>>>> 58fbf1175c82f0d1be2a6273d49ede48d786588a
 ---
 
 
@@ -85,7 +81,7 @@ dfm_tweets <- dfm(tokens_tweets)
 
 
 
-```{r wordcould, results=FALSE, warning=FALSE, message=FALSE, cache=FALSE}
+```{r wordcould, warning=FALSE, message=FALSE, cache=FALSE}
 textplot_wordcloud(dfm_tweets, min_count = 200, color = RColorBrewer::brewer.pal(8, "Reds"))
 ```
 
@@ -263,11 +259,7 @@ Results of ARMA-X estimations while Section 4 does the same for VAR models. Sect
 <!--chapter:end:01-introduction.Rmd-->
 
 ---
-<<<<<<< HEAD
 bibliography: citations.bib
-=======
-bibliography: macroeconometrics_citations.bib  #
->>>>>>> 58fbf1175c82f0d1be2a6273d49ede48d786588a
 csl: apa.csl
 link-citations: true
 editor_options: 
@@ -359,12 +351,7 @@ every minute.
 
 We used a custom function in order to get the AHV for each open market hour. Note 
 that the first hour is from 9:30 am to 10:00 am since the 
-<<<<<<< HEAD
 market open on a half-hour but closes at 4:00 pm. We can plot this data.
-=======
-market open on a half-hour but closes at 4:00 pm. We can plot this data in
-<span style="color:red"> *figX* </span>.
->>>>>>> 58fbf1175c82f0d1be2a6273d49ede48d786588a
 
 
 ```{r fin plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
@@ -477,7 +464,6 @@ which sees minimal AIC loss and simplifying our models considerably.
 
 ### Full Timeframe
 We run models with the following exogenous regressors: $TweetDummy$, $TweetCount$,
-<<<<<<< HEAD
 and the mentions of words $Tariff$, $Trade$, and $China$. We first note on the table
  in section \@ref(sec:spy-table) that all the x-regressors are significant,
 apart from trade. Notice also that all the coefficients (apart from $Tariff_{t-3}$)
@@ -488,18 +474,6 @@ extra mention of tariffs one hour ago, leads to a whopping extra 0.02 in volatil
  which is just about the average size for the full timeframe. We can see the
 impulse response function (IRF) for this shock in Section \@ref(sec:SPY-IRF).
 Notice that there is a large response in the first periods, and then a graduate
-=======
-and the mentions of words $Tariff$, $Trade$, and $China$. We first note on 
-<span style="color:red"> *ARMAX Table 1* </span> \@ref(sec:spy-table)that all the x-regressors are significant,
-apart from trade. Notice also that all the coefficients (apart from $Tariff_{t-3}$)
-are positive, in line with our main hypothesis. The effect of $Tariff_{t-1}$ and 
-$Tariff_{t-2}$ are especially large, given the usual size of the volatility 
-(<span style="color:red"> *ARMAX Table 4* </span>) \@ref(sec:means-table). We in fact predict that an 
-extra mention of tariffs one hour ago, leads to a whopping extra 0.02 in volatility
- which is just about the average size for the full timeframe. We can see the
-impulse response function (IRF) for this shock, in <span style="color:red"> *IRFtarif* </span>.
-\@ref(sec:SPY-IRF) Notice that there is a large response in the first periods, and then a graduate
->>>>>>> 58fbf1175c82f0d1be2a6273d49ede48d786588a
 decline over time. Something to note is that in our analysises of IRF's, when including
 MA terms, the decline shows up gradual while being much sharper when only including
 AR terms. 
@@ -509,24 +483,15 @@ of the tariff variable for VGK.
 
 ### Split Samples
 We then split our sample for the first and second term of the Trump presidancy.
-<<<<<<< HEAD
 We only run models on tariff, trade and china this time. As seen on the table in
 Section \@ref(sec:spy-table-terms), the first interesting result
-=======
-We only run models on tariff, trade and china this time. As seen on table
-<span style="color:red"> *ARMAX Table 2* </span> \@ref(sec:spy-table-terms), the first interesting result
->>>>>>> 58fbf1175c82f0d1be2a6273d49ede48d786588a
 is in the coefficients of tariff being significant and very large in the second
 term, while being small and not statistically significant in the first. A similar
 story goes for the China variable. This may lend some evidence to support the 
 claim that investors are much more reactive to Trump's social media presence
 now than before. 
 Finally, we can check the residuals of all these models to test them somewhat. 
-<<<<<<< HEAD
 In Section \@ref(sec:SPY-res-test), the pvalues being zero
-=======
-On <span style="color:red"> *ARMAX Table 3* </span>, \@ref(sec:SPY-res-test) the pvalues being zero
->>>>>>> 58fbf1175c82f0d1be2a6273d49ede48d786588a
 for the full timeframe and first term indicate that there is autocorrelation in 
 the residuals, thus suggesting that these estimations have problems. Note however,
 that the pvalues for the second term are quite high, lending support to our
@@ -575,7 +540,7 @@ a VAR model to deepen our understanding of these variables.
 # Appendix
 
 
-```{r library_setup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+```{r library_setup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
 rm(list=ls())
 require(tinytex) #LaTeX
 require(ggplot2) #plots
@@ -870,11 +835,7 @@ pvals_combined <- cbind(pvals_combined, pvals_new2)
 ```
 
 
-<<<<<<< HEAD
-### SPY ARMAX Table (Separate Terms){#sec:spy-table-terms}
-=======
 ### SPY ARMAX Table (Split Presidential Terms){#sec:spy-table-terms}
->>>>>>> 58fbf1175c82f0d1be2a6273d49ede48d786588a
 
 \centering
 
@@ -912,8 +873,6 @@ htmlreg(
 ```
 
 
-<<<<<<< HEAD
-=======
 ### SPY ARMAX IRFs (Split Terms){#sec:SPY-SPLIT-IRF}
 
 ```{r 2nd SPYirf, warning=F, message=F, echo=FALSE, cache=TRUE}
@@ -936,7 +895,6 @@ plot3
 ```
 
 
->>>>>>> 58fbf1175c82f0d1be2a6273d49ede48d786588a
 ### Residual Test {#sec:SPY-res-test}
 
 ```{r res-table, message=F, warning=F, results="asis", echo=FALSE, cache=TRUE}
