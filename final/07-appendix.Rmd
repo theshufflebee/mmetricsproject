@@ -28,6 +28,7 @@ require(quanteda) #tokenization
 require(texreg) #arima tables
 require(future.apply) #parallel computation (speed)
 require(aTSA) #adf test
+require(kableExtra)
 
 getwd()
 #setwd("...") -> set wd at base repo folder
