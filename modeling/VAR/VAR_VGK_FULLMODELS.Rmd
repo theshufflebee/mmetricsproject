@@ -1,5 +1,5 @@
 ---
-title: "VAR_SPY_FULL"
+title: "VAR_VGK_FULL"
 author: "pte"
 date: "2025-05-15"
 output:
@@ -7,7 +7,7 @@ output:
   pdf_document: default
 ---
 
-# SPY Analysis
+# VGK Analysis
 
 ```{r load packages, error=FALSE, warning=FALSE, echoes = FALSE}
 library("quantmod")
@@ -109,14 +109,14 @@ Vdata = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-0
 #Nombre of lag
 
 #series
-pro_v = ts(Vdata$SPY_vol)
+pro_v = ts(Vdata$VGK_vol)
 autoplot(pro_v)
 
 ```
 
 ```{r AIC}
 ##with dummy
-y = cbind(Vdata$dummy, Vdata$SPY_vol)
+y = cbind(Vdata$dummy, Vdata$VGK_vol)
 
 y_lag = VARselect(y, lag.max = 80)
 y_list = list(y_lag)
@@ -208,23 +208,23 @@ ggplot (resultats4, aes(x=n, y= name)) +
 
 ```{r acf}
 
-y = cbind(Vdata$dummy, Vdata$SPY_vol)
+y = cbind(Vdata$dummy, Vdata$VGK_vol)
 colnames(y)[1:2] <- c("dum", "vol")
 est.VAR <- VAR(y,p=6)
 
-acf(Vdata$SPY_vol)
+acf(Vdata$VGK_vol)
 
 
 ```
 
 ```{r pacf}
-pacf(Vdata$SPY_vol)
+pacf(Vdata$VGK_vol)
 
 
 ```
 
 ```{r adf test for volatility}
-adf.test(Vdata$SPY_vol, k = 6)
+adf.test(Vdata$VGK_vol, k = 6)
 
 
 ```
@@ -279,7 +279,7 @@ plot(stru2)
 ## Dummy
 
 ```{r Estime dummy}
-y = cbind(Vdata$dummy, Vdata$SPY_vol)
+y = cbind(Vdata$dummy, Vdata$VGK_vol)
 colnames(y)[1:2] <- c("dummy", "vol")
 est.VAR <- VAR(y,p=6)
 
@@ -419,7 +419,7 @@ ggplot(Yd,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Dummy on Volatility")+
+  ggtitle("VGK IRF of Dummy on Volatility")+
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -431,7 +431,7 @@ ggplot(Yd,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Dummy on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Dummy on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -444,7 +444,7 @@ ggplot(Yd,aes(x=period, y=cumsum(response))) +
 ## N
 
 ```{r estimate with N}
-y2 = cbind(Vdata$N, Vdata$SPY_vol)
+y2 = cbind(Vdata$N, Vdata$VGK_vol)
 colnames(y2)[1:2] <- c("N", "vol")
 est.VAR2 <- VAR(y2,p=6)
 
@@ -566,7 +566,7 @@ ggplot(Yd2,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of N on Volatility") +
+  ggtitle("VGK IRF of N on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -577,7 +577,7 @@ ggplot(Yd2,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of N on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of N on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -596,7 +596,7 @@ grangertest(y2[,c("vol", "N")], order = 6)
 ## Tariff
 
 ```{r estime tariff}
-y3 = cbind(Vdata$tariff, Vdata$SPY_vol)
+y3 = cbind(Vdata$tariff, Vdata$VGK_vol)
 colnames(y3)[1:2] <- c("tariff", "vol")
 est.VAR3 <- VAR(y3,p=6)
 
@@ -724,7 +724,7 @@ ggplot(Yd3,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of tariff on Volatility") +
+  ggtitle("VGK IRF of tariff on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -745,7 +745,7 @@ ggplot(Yd3,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of tariff on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of tariff on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -754,7 +754,7 @@ ggplot(Yd3,aes(x=period, y=cumsum(response))) +
 ## Trade
 
 ```{r estimate trade}
-y4 = cbind(Vdata$trade, Vdata$SPY_vol)
+y4 = cbind(Vdata$trade, Vdata$VGK_vol)
 colnames(y4)[1:2] <- c("trade", "vol")
 est.VAR4 <- VAR(y4,p=6)
 
@@ -880,7 +880,7 @@ ggplot(Yd4,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Trade on Volatility") +
+  ggtitle("VGK IRF of Trade on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -906,7 +906,7 @@ ggplot(Yd4,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of trade on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of trade on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -916,7 +916,7 @@ ggplot(Yd4,aes(x=period, y=cumsum(response))) +
 
 ```{r estime China}
 
-ychina = cbind(Vdata$china, Vdata$SPY_vol)
+ychina = cbind(Vdata$china, Vdata$VGK_vol)
 colnames(ychina)[1:2] <- c("china", "vol")
 est.VARchina <- VAR(ychina,p=6)
 
@@ -1042,7 +1042,7 @@ ggplot(Ydchina,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of China on Volatility") +
+  ggtitle("VGK IRF of China on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -1053,7 +1053,7 @@ ggplot(Ydchina,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of China on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of China on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -1079,7 +1079,7 @@ grangertest(ychina[,c("china", "vol")], order = 6)
 ## Positive
 
 ```{r estime positive }
-y5 = cbind(Vdata$prop_positive, Vdata$SPY_vol)
+y5 = cbind(Vdata$prop_positive, Vdata$VGK_vol)
 colnames(y5)[1:2] <- c("positive", "vol")
 est.VAR5 <- VAR(y5,p=6)
 
@@ -1204,7 +1204,7 @@ ggplot(Yd5,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Positive on Volatility") +
+  ggtitle("VGK IRF of Positive on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -1215,7 +1215,7 @@ ggplot(Yd5,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Positive on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Positive on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -1237,7 +1237,7 @@ grangertest(y5[,c("positive", "vol")], order = 6)
 ## Negative
 
 ```{r estimate negative}
-y6 = cbind(Vdata$prop_negative, Vdata$SPY_vol)
+y6 = cbind(Vdata$prop_negative, Vdata$VGK_vol)
 colnames(y6)[1:2] <- c("negative", "vol")
 est.VAR6 <- VAR(y6,p=6)
 
@@ -1363,7 +1363,7 @@ ggplot(Yd6,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Negative on Volatility") +
+  ggtitle("VGK IRF of Negative on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -1374,7 +1374,7 @@ ggplot(Yd6,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Negative on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Negative on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -1393,7 +1393,7 @@ grangertest(y6[,c("vol", "negative")], order = 6)
 ## Trust
 
 ```{r estimate truste}
-y7 = cbind(Vdata$prop_trust, Vdata$SPY_vol)
+y7 = cbind(Vdata$prop_trust, Vdata$VGK_vol)
 colnames(y7)[1:2] <- c("trust", "vol")
 est.VAR7 <- VAR(y7,p=6)
 
@@ -1491,7 +1491,7 @@ ggplot(Yd7,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Trust on Volatility") +
+  ggtitle("VGK IRF of Trust on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -1502,7 +1502,7 @@ ggplot(Yd7,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Trust on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Trust on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -1521,7 +1521,7 @@ grangertest(y7[,c("vol", "trust")], order = 6)
 ## Surprise
 
 ```{r estimate surprise}
-y8 = cbind(Vdata$prop_surprise, Vdata$SPY_vol)
+y8 = cbind(Vdata$prop_surprise, Vdata$VGK_vol)
 colnames(y8)[1:2] <- c("surprise", "vol")
 est.VAR8 <- VAR(y8,p=6)
 
@@ -1611,7 +1611,7 @@ ggplot(Yd8,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Surprise on Volatility") +
+  ggtitle("VGK IRF of Surprise on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -1622,7 +1622,7 @@ ggplot(Yd8,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Surprise on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Surprise on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -1641,7 +1641,7 @@ grangertest(y8[,c("vol", "surprise")], order = 6)
 ## Sadness
 
 ```{r estimate sadness}
-y9 = cbind(Vdata$prop_sadness, Vdata$SPY_vol)
+y9 = cbind(Vdata$prop_sadness, Vdata$VGK_vol)
 colnames(y9)[1:2] <- c("sadness", "vol")
 est.VAR9 <- VAR(y9,p=6)
 
@@ -1739,7 +1739,7 @@ ggplot(Yd9,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Sadness on Volatility") +
+  ggtitle("VGK IRF of Sadness on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -1750,7 +1750,7 @@ ggplot(Yd9,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Sadness on Volatility") +
+  ggtitle("VGK IRF of Sadness on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -1769,7 +1769,7 @@ grangertest(y9[,c("vol", "sadness")], order = 6)
 ## Joy
 
 ```{r estimate joy}
-y10 = cbind(Vdata$prop_joy, Vdata$SPY_vol)
+y10 = cbind(Vdata$prop_joy, Vdata$VGK_vol)
 colnames(y10)[1:2] <- c("joy", "vol")
 est.VAR10 <- VAR(y10,p=6)
 
@@ -1866,7 +1866,7 @@ ggplot(Yd10,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Joy on Volatility") +
+  ggtitle("VGK IRF of Joy on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -1877,7 +1877,7 @@ ggplot(Yd10,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Joy on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Joy on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -1896,7 +1896,7 @@ grangertest(y10[,c("vol", "joy")], order = 6)
 ## Fear
 
 ```{r estimate fear}
-y32 = cbind(Vdata$prop_fear, Vdata$SPY_vol)
+y32 = cbind(Vdata$prop_fear, Vdata$VGK_vol)
 colnames(y32)[1:2] <- c("fear", "vol")
 est.VAR32 <- VAR(y32,p=6)
 
@@ -1993,7 +1993,7 @@ ggplot(Yd32,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Fear on Volatility") +
+  ggtitle("VGK IRF of Fear on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2004,7 +2004,7 @@ ggplot(Yd32,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Fear on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Fear on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2023,7 +2023,7 @@ grangertest(y32[,c("vol", "fear")], order = 6)
 ## Disgust
 
 ```{r estimate disgust}
-y11 = cbind(Vdata$prop_disgust, Vdata$SPY_vol)
+y11 = cbind(Vdata$prop_disgust, Vdata$VGK_vol)
 colnames(y11)[1:2] <- c("disgust", "vol")
 est.VAR11 <- VAR(y11,p=6)
 
@@ -2120,7 +2120,7 @@ ggplot(Yd11,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Disgust on Volatility") +
+  ggtitle("VGK IRF of Disgust on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2131,7 +2131,7 @@ ggplot(Yd11,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Disgust on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Disgust on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2151,7 +2151,7 @@ grangertest(y11[,c("vol", "disgust")], order = 6)
 
 ```{r estimate anticipation}
 
-y15 = cbind(Vdata$prop_anticipation, Vdata$SPY_vol)
+y15 = cbind(Vdata$prop_anticipation, Vdata$VGK_vol)
 colnames(y15)[1:2] <- c("anticipation", "vol")
 est.VAR15 <- VAR(y15,p=6)
 
@@ -2243,7 +2243,7 @@ ggplot(Yd15,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Anticipation on Volatility") +
+  ggtitle("VGK IRF of Anticipation on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2254,7 +2254,7 @@ ggplot(Yd15,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Anticipation on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Anticipation on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2273,7 +2273,7 @@ grangertest(y15[,c("vol", "anticipation")], order =6)
 ## Anger
 
 ```{r estimate anger}
-y16 = cbind(Vdata$prop_anger, Vdata$SPY_vol)
+y16 = cbind(Vdata$prop_anger, Vdata$VGK_vol)
 colnames(y16)[1:2] <- c("anger", "vol")
 est.VAR16 <- VAR(y16,p=6)
 
@@ -2370,7 +2370,7 @@ ggplot(Yd16,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Anger on Volatility") +
+  ggtitle("VGK IRF of Anger on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2381,7 +2381,7 @@ ggplot(Yd16,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Anger on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Anger on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2403,7 +2403,7 @@ grangertest(y16[,c("vol", "anger")], order =6)
 
 ```{r estimate int N tariff}
 int1 = Vdata$tariff * Vdata$N
-y12 = cbind(int1, Vdata$SPY_vol)
+y12 = cbind(int1, Vdata$VGK_vol)
 colnames(y12)[1:2] <- c("interaction", "vol")
 est.VAR12 <- VAR(y12,p=6)
 
@@ -2499,7 +2499,7 @@ ggplot(Yd12,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of N*Tariff on Volatility") +
+  ggtitle("VGK IRF of N*Tariff on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2510,7 +2510,7 @@ ggplot(Yd12,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of N*tariff on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of N*tariff on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2521,7 +2521,7 @@ ggplot(Yd12,aes(x=period, y=cumsum(response))) +
 ```{r estimate int Ntariff with N}
 
 y12.2 = cbind(Vdata$tariff, int1)
-y12.2 = cbind(y12.2, Vdata$SPY_vol)
+y12.2 = cbind(y12.2, Vdata$VGK_vol)
 colnames(y12.2)[1:3] <- c("tariff", "interaction", "vol")
 est.VAR12.2 <- VAR(y12.2,p=6)
 
@@ -2625,7 +2625,7 @@ ggplot(Yd12.2.1,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of N*Tariff on Volatility") +
+  ggtitle("VGK IRF of N*Tariff on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2636,7 +2636,7 @@ ggplot(Yd12.2.1,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of N*tariff on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of N*tariff on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2658,7 +2658,7 @@ ggplot(Yd12.2.2,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Tariff on Volatility") +
+  ggtitle("VGK IRF of Tariff on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2669,7 +2669,7 @@ ggplot(Yd12.2.2,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Tariff on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Tariff on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2680,7 +2680,7 @@ ggplot(Yd12.2.2,aes(x=period, y=cumsum(response))) +
 ```{r estimate Ntrade}
 int5 = Vdata$trade * Vdata$N
 
-y14 = cbind(int5, Vdata$SPY_vol)
+y14 = cbind(int5, Vdata$VGK_vol)
 colnames(y14)[1:2] <- c("interaction", "vol")
 est.VAR14 <- VAR(y14,p=6)
 
@@ -2772,7 +2772,7 @@ ggplot(Yd14,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of N*Trade on Volatility") +
+  ggtitle("VGK IRF of N*Trade on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2783,7 +2783,7 @@ ggplot(Yd14,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of N*Trade on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of N*Trade on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2794,7 +2794,7 @@ ggplot(Yd14,aes(x=period, y=cumsum(response))) +
 ```{r Estimate Ntrade with trade}
 
 y14.2 = cbind(Vdata$trade, int5)
-y14.2 = cbind(y14.2, Vdata$SPY_vol)
+y14.2 = cbind(y14.2, Vdata$VGK_vol)
 colnames(y14.2)[1:3] <- c("trade", "interaction", "vol")
 est.VAR14.2 <- VAR(y14.2,p=6)
 
@@ -2904,7 +2904,7 @@ ggplot(Yd14.2.1,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of N*Trade on Volatility") +
+  ggtitle("VGK IRF of N*Trade on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2916,7 +2916,7 @@ ggplot(Yd14.2.1,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of N*Trade on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of N*Trade on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2937,7 +2937,7 @@ ggplot(Yd14.2.2,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Trade on Volatility") +
+  ggtitle("VGK IRF of Trade on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2948,7 +2948,7 @@ ggplot(Yd14.2.2,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Trade on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Trade on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -2975,7 +2975,7 @@ Vdata_s = filter(data,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05
 ### Dummy
 
 ```{r first mandate dum, warning=FALSE, message=FALSE, results="asis"}
-y_f_d = cbind(Vdata_f$dummy, Vdata_f$SPY_vol)
+y_f_d = cbind(Vdata_f$dummy, Vdata_f$VGK_vol)
 colnames(y_f_d)[1:2] <- c("dummy", "vol")
 est.VAR_f_d <- VAR(y_f_d,p=6)
 
@@ -3099,7 +3099,7 @@ ggplot(Yd_f_d,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of First Term Dummy on Volatility") +
+  ggtitle("VGK IRF of First Term Dummy on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -3110,7 +3110,7 @@ ggplot(Yd_f_d,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of First Mandate Dummy on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of First Mandate Dummy on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -3130,7 +3130,7 @@ grangertest(y_f_d[,c("dummy", "vol")], order =6)
 
 ```{r first mandate N, warning=FALSE, message=FALSE, results="asis"}
 
-y_f_n = cbind(Vdata_f$N, Vdata_f$SPY_vol)
+y_f_n = cbind(Vdata_f$N, Vdata_f$VGK_vol)
 colnames(y_f_n)[1:2] <- c("N", "vol")
 est.VAR_f_n <- VAR(y_f_n,p=6)
 
@@ -3253,7 +3253,7 @@ ggplot(Yd_f_n,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of First Term N on Volatility") +
+  ggtitle("VGK IRF of First Term N on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -3264,7 +3264,7 @@ ggplot(Yd_f_n,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of First Mandate N on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of First Mandate N on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -3284,7 +3284,7 @@ grangertest(y_f_n[,c("N", "vol")], order =6)
 
 ```{r first mandate tariff, warning=FALSE, message=FALSE, results="asis"}
 
-y_f_ta = cbind(Vdata_f$tariff, Vdata_f$SPY_vol)
+y_f_ta = cbind(Vdata_f$tariff, Vdata_f$VGK_vol)
 colnames(y_f_ta)[1:2] <- c("tariff", "vol")
 est.VAR_f_ta <- VAR(y_f_ta,p=6)
 
@@ -3407,7 +3407,7 @@ ggplot(Yd_f_ta,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of First Term Tariff on Volatility") +
+  ggtitle("VGK IRF of First Term Tariff on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -3418,7 +3418,7 @@ ggplot(Yd_f_ta,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of First Mandate Tariff on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of First Mandate Tariff on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -3438,7 +3438,7 @@ grangertest(y_f_ta[,c("tariff", "vol")], order =6)
 
 ```{r first mandate trade, warning=FALSE, message=FALSE, results="asis"}
 
-y_f_tr = cbind(Vdata_f$trade, Vdata_f$SPY_vol)
+y_f_tr = cbind(Vdata_f$trade, Vdata_f$VGK_vol)
 colnames(y_f_tr)[1:2] <- c("trade", "vol")
 est.VAR_f_tr <- VAR(y_f_tr,p=6)
 
@@ -3561,7 +3561,7 @@ ggplot(Yd_f_tr,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of First Term Trade on Volatility") +
+  ggtitle("VGK IRF of First Term Trade on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -3572,7 +3572,7 @@ ggplot(Yd_f_tr,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of First Mandate Trade on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of First Mandate Trade on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -3592,7 +3592,7 @@ grangertest(y_f_tr[,c("trade", "vol")], order =6)
 
 ```{r first mandate china, warning=FALSE, message=FALSE, results="asis"}
 
-y_f_ch = cbind(Vdata_f$china, Vdata_f$SPY_vol)
+y_f_ch = cbind(Vdata_f$china, Vdata_f$VGK_vol)
 colnames(y_f_ch)[1:2] <- c("china", "vol")
 est.VAR_f_ch <- VAR(y_f_ch,p=6)
 
@@ -3715,7 +3715,7 @@ ggplot(Yd_f_ch,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of First Term China on Volatility") +
+  ggtitle("VGK IRF of First Term China on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -3726,7 +3726,7 @@ ggplot(Yd_f_ch,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of First Mandate China on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of First Mandate China on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -3748,7 +3748,7 @@ grangertest(y_f_ch[,c("china", "vol")], order =6)
 
 ```{r second mandate dum, warning=FALSE, message=FALSE, results="asis"}
 
-y_s_d = cbind(Vdata_s$dummy, Vdata_s$SPY_vol)
+y_s_d = cbind(Vdata_s$dummy, Vdata_s$VGK_vol)
 colnames(y_s_d)[1:2] <- c("dummy", "vol")
 est.VAR_s_d <- VAR(y_s_d,p=6)
 
@@ -3872,7 +3872,7 @@ ggplot(Yd_s_d,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Second Term Dummy on Volatility") +
+  ggtitle("VGK IRF of Second Term Dummy on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -3883,7 +3883,7 @@ ggplot(Yd_s_d,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Second Mandate Dummy on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Second Mandate Dummy on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -3903,7 +3903,7 @@ grangertest(y_s_d[,c("dummy", "vol")], order =6)
 
 ```{r second mandate N, warning=FALSE, message=FALSE, results="asis"}
 
-y_s_n = cbind(Vdata_s$N, Vdata_s$SPY_vol)
+y_s_n = cbind(Vdata_s$N, Vdata_s$VGK_vol)
 colnames(y_s_n)[1:2] <- c("N", "vol")
 est.VAR_s_n <- VAR(y_s_n,p=6)
 
@@ -4026,7 +4026,7 @@ ggplot(Yd_s_n,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Second Term N on Volatility") +
+  ggtitle("VGK IRF of Second Term N on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -4037,7 +4037,7 @@ ggplot(Yd_s_n,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Second Mandate N on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Second Mandate N on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -4057,7 +4057,7 @@ grangertest(y_s_n[,c("N", "vol")], order =6)
 
 ```{r second mandate tariff, warning=FALSE, message=FALSE, results="asis"}
 
-y_s_ta = cbind(Vdata_s$tariff, Vdata_s$SPY_vol)
+y_s_ta = cbind(Vdata_s$tariff, Vdata_s$VGK_vol)
 colnames(y_s_ta)[1:2] <- c("tariff", "vol")
 est.VAR_s_ta <- VAR(y_s_ta,p=6)
 
@@ -4180,7 +4180,7 @@ ggplot(Yd_s_ta,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Second Term Tariff on Volatility") +
+  ggtitle("VGK IRF of Second Term Tariff on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -4191,7 +4191,7 @@ ggplot(Yd_s_ta,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Second Mandate Tariff on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Second Mandate Tariff on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -4211,7 +4211,7 @@ grangertest(y_s_ta[,c("tariff", "vol")], order =6)
 
 ```{r second mandate trade, warning=FALSE, message=FALSE, results="asis"}
 
-y_s_tr = cbind(Vdata_s$trade, Vdata_s$SPY_vol)
+y_s_tr = cbind(Vdata_s$trade, Vdata_s$VGK_vol)
 colnames(y_s_tr)[1:2] <- c("trade", "vol")
 est.VAR_s_tr <- VAR(y_s_tr,p=6)
 
@@ -4334,7 +4334,7 @@ ggplot(Yd_s_tr,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Second Term Trade on Volatility") +
+  ggtitle("VGK IRF of Second Term Trade on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -4345,7 +4345,7 @@ ggplot(Yd_s_tr,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Second Mandate Trade on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Second Mandate Trade on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -4365,7 +4365,7 @@ grangertest(y_s_tr[,c("trade", "vol")], order =6)
 
 ```{r second mandate china, warning=FALSE, message=FALSE, results="asis"}
 
-y_s_ch = cbind(Vdata_s$china, Vdata_s$SPY_vol)
+y_s_ch = cbind(Vdata_s$china, Vdata_s$VGK_vol)
 colnames(y_s_ch)[1:2] <- c("china", "vol")
 est.VAR_s_ch <- VAR(y_s_ch,p=6)
 
@@ -4489,7 +4489,7 @@ ggplot(Yd_s_ch,aes(x=period, y=response)) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P IRF of Second Term China on Volatility") +
+  ggtitle("VGK IRF of Second Term China on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
@@ -4500,7 +4500,7 @@ ggplot(Yd_s_ch,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
   theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Second Term China on Volatility") +
+  ggtitle("VGK Cumulalitve IRF of Second Term China on Volatility") +
   ylab("")+
   xlab("") +
   theme_minimal()
