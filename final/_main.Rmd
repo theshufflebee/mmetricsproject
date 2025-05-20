@@ -1,32 +1,103 @@
 ---
 title: "Terminally Online: Does Donald Trump impact Financial Markets"
 author: "Marcos Constantinou, Ryan Fellarhi & Jonas Bruno"
-date: "Last edited: 12.05.2025"
+date: "Last edited: 20.05.2025"
 site: bookdown::bookdown_site
 documentclass: book
-bibliography: [packages.bib, macroeconometrics_citations.bib] #name bib files
+bibliography: [packages.bib, citations.bib] #name bib files
 # url: your book url like https://bookdown.org/yihui/bookdown
 # cover-image: path to the social sharing image like images/cover.jpg -> Do Later
 description: |
   This is our website for a Universityproject. We put this together from a basic bookdown example so there might be some stuff in here from that.
-link-citations: true           # optional but helpful for clickable citations
+link-citations: true           # clickable citations
 csl: apa.csl
-github-repo: theshufflebee/mmetricsproject
+github-repo: www.github.com/theshufflebee/mmetricsproject
 ---
+
+
+```{r r library_setup:index, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
+#rm(list=ls())
+require(here)
+require(stringr)
+require(dplyr)
+require(ggplot2)
+require(lubridate)
+require(RColorBrewer)
+require(wordcloud)
+require(tidyr)
+require(tidytext)
+require(textstem)
+require(tidyverse)
+require(tm)
+require(SnowballC)
+require(quanteda.textplots)
+require(quantmod)
+require(alphavantager)
+require(quanteda)
+require(rvest)
+require(httr)
+require(xml2)
+require(textdata)
+require(sentimentr)
+require(syuzhet)
+require(text)
+library(wordcloud2)
+
+
+#load datasets
+tweets <- read.csv(here("data/political_data/tweets.csv"))
+truths <- read.csv(here("data/political_data/truths250510.csv"))
+
+source(here("helperfunctions/truths_cleaning_function.R"))
+```
+
+
+
+```{r data_title, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+#Only keep original Tweets
+tweets_clean <- tweets %>% filter(isRetweet != "t")
+tweets_clean <- tweets_clean$text
+truths_clean <- truths_processer(truths)
+
+truths_clean2 <- truths_clean$post
+
+full_posts <- c(tweets_clean, truths_clean2)
+
+tokens <- tokens(full_posts)
+dfm <- dfm(tokens)
+corpus_tweets <- corpus(tweets$text)
+
+additional_words <- c("rt")
+all_stopwords <- c(stopwords("en"), additional_words)
+
+tokens_tweets <- tokens(corpus_tweets,  
+                        remove_punct = TRUE, 
+                        remove_numbers = TRUE)
+
+tokens_tweets <- tokens_remove(tokens_tweets, all_stopwords)  # Remove stopwords
+
+dfm_tweets <- dfm(tokens_tweets)
+```
+
+
+
+```{r wordcould, cache=FALSE, echo=FALSE}
+print(textplot_wordcloud(
+  dfm_tweets,
+  min_count = 200,
+  color = RColorBrewer::brewer.pal(8, "Reds")
+))
+```
+
 
 # Readme {.unnumbered}
 
-This is a Website for a class project from the 2025 Class Macroeconometrics at Université de Lausanne.
-
-IMPORTANT:use: bookdown::render_book("final/index.Rmd") to render site
-
-## Usage {.unnumbered}
-
-You can find all sections on the left. There is the Main Report which we hand in. This serves as a complete collection of the whole project to make sure everything is available to readers.
+This is a Website for a class project from the 2025 Class Macroeconometrics at Université de Lausanne. It is intended as an archive and Display of our Project. You can find all data for recreation on www.github.com/theshufflebee/mmetricsproject.
 
 # Abstract {.unnumbered}
 
 This Project assesses to what extent Financial Markets react to information provided by Donald Trump on Twitter and Truth Social. We asses the impact of posts on hourly volatility using ARMA-X. We evaluate multiple time horizons and independent variables, such as if Trump posts anything, specific words such as tariff and sentiments. We then calculate IRFs and show that there are significant impacts on volatility.
+
 
 <!--chapter:end:index.Rmd-->
 
@@ -192,7 +263,7 @@ Section 5 concludes.
 <!--chapter:end:01-introduction.Rmd-->
 
 ---
-bibliography: macroeconometrics_citations.bib  #
+bibliography: citations.bib
 csl: apa.csl
 link-citations: true
 editor_options: 
@@ -284,8 +355,12 @@ every minute.
 
 We used a custom function in order to get the AHV for each open market hour. Note 
 that the first hour is from 9:30 am to 10:00 am since the 
+<<<<<<< HEAD
+market open on a half-hour but closes at 4:00 pm. We can plot this data.
+=======
 market open on a half-hour but closes at 4:00 pm. We can plot this data in
 the following table:
+>>>>>>> 249c30f04f33d9c802ee965feef5b2f53edab0bc
 
 
 ```{r fin plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
@@ -394,17 +469,23 @@ which sees minimal AIC loss and simplifying our models considerably.
 
 ### Full Timeframe
 We run models with the following exogenous regressors: $TweetDummy$, $TweetCount$,
-and the mentions of words $Tariff$, $Trade$, and $China$. We first note on 
-<span style="color:red"> *ARMAX Table 1* </span> \@ref(sec:spy-table)that all the x-regressors are significant,
+and the mentions of words $Tariff$, $Trade$, and $China$. We first note on the table
+ in section \@ref(sec:spy-table) that all the x-regressors are significant,
 apart from trade. Notice also that all the coefficients (apart from $Tariff_{t-3}$)
 are positive, in line with our main hypothesis. The effect of $Tariff_{t-1}$ and 
-$Tariff_{t-2}$ are especially large, given the usual size of the volatility 
-(<span style="color:red"> *ARMAX Table 4* </span>) \@ref(sec:means-table). We in fact predict that an 
+$Tariff_{t-2}$ are especially large, given the usual size of the volatility as seen
+in Section \@ref(sec:means-table). We in fact predict that an 
 extra mention of tariffs one hour ago, leads to a whopping extra 0.02 in volatility
  which is just about the average size for the full timeframe. We can see the
+<<<<<<< HEAD
+impulse response function (IRF) for this shock in Section \@ref(sec:SPY-IRF).
+Notice that there is a large response in the first periods, and then a graduate
+decline over time. Something to note is that in our analysises of IRF's, when including
+=======
 impulse response function (IRF) for this shock, in <span style="color:red"> *IRFtarif* </span>.
 \@ref(sec:SPY-IRF) Notice that there is a large response in the first periods, and then a graduate
 decline over time. Something to note is that in our analyses of IRF's, when including
+>>>>>>> 249c30f04f33d9c802ee965feef5b2f53edab0bc
 MA terms, the decline shows up gradual while being much sharper when only including
 AR terms. 
 Note that we ran all these models on the VGK and ASHR ETF's as well, though no
@@ -412,9 +493,15 @@ significant results appear apart from a small but statistically significant effe
 of the tariff variable for VGK.
 
 ### Split Samples
+<<<<<<< HEAD
+We then split our sample for the first and second term of the Trump presidancy.
+We only run models on tariff, trade and china this time. As seen on the table in
+Section \@ref(sec:spy-table-terms), the first interesting result
+=======
 We then split our sample for the first and second term of the Trump presidency.
 We only run models on tariff, trade and china this time. As seen on table
 <span style="color:red"> *ARMAX Table 2* </span> \@ref(sec:spy-table-terms), the first interesting result
+>>>>>>> 249c30f04f33d9c802ee965feef5b2f53edab0bc
 is in the coefficients of tariff being significant and very large in the second
 term, while being small and not statistically significant in the first. A similar
 story goes for the China variable. This may lend some evidence to support the 
@@ -423,7 +510,7 @@ now than before. We've found similar IRF's as for the full timeframe. Tables \@r
 show the IRF's for the second term, of the impacts of tariff and china mention
 shocks on the AHV.
 Finally, we can check the residuals of all these models to test them somewhat. 
-On <span style="color:red"> *ARMAX Table 3* </span>, \@ref(sec:SPY-res-test) the pvalues being zero
+In Section \@ref(sec:SPY-res-test), the pvalues being zero
 for the full timeframe and first term indicate that there is autocorrelation in 
 the residuals, thus suggesting that these estimations have problems. Note however,
 that the p-values for the second term are quite high, lending support to our
@@ -491,7 +578,7 @@ and/or additionally <span style="color:red"> *use more sophisticated models, suc
 # Appendix
 
 
-```{r library_setup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+```{r library_setup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
 rm(list=ls())
 require(tinytex) #LaTeX
 require(ggplot2) #plots

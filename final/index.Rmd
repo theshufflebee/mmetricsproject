@@ -1,30 +1,101 @@
 ---
 title: "Terminally Online: Does Donald Trump impact Financial Markets"
 author: "Marcos Constantinou, Ryan Fellarhi & Jonas Bruno"
-date: "Last edited: 12.05.2025"
+date: "Last edited: 20.05.2025"
 site: bookdown::bookdown_site
 documentclass: book
-bibliography: [packages.bib, macroeconometrics_citations.bib] #name bib files
+bibliography: [packages.bib, citations.bib] #name bib files
 # url: your book url like https://bookdown.org/yihui/bookdown
 # cover-image: path to the social sharing image like images/cover.jpg -> Do Later
 description: |
   This is our website for a Universityproject. We put this together from a basic bookdown example so there might be some stuff in here from that.
-link-citations: true           # optional but helpful for clickable citations
+link-citations: true           # clickable citations
 csl: apa.csl
-github-repo: theshufflebee/mmetricsproject
+github-repo: www.github.com/theshufflebee/mmetricsproject
 ---
+
+
+```{r r library_setup:index, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
+#rm(list=ls())
+require(here)
+require(stringr)
+require(dplyr)
+require(ggplot2)
+require(lubridate)
+require(RColorBrewer)
+require(wordcloud)
+require(tidyr)
+require(tidytext)
+require(textstem)
+require(tidyverse)
+require(tm)
+require(SnowballC)
+require(quanteda.textplots)
+require(quantmod)
+require(alphavantager)
+require(quanteda)
+require(rvest)
+require(httr)
+require(xml2)
+require(textdata)
+require(sentimentr)
+require(syuzhet)
+require(text)
+library(wordcloud2)
+
+
+#load datasets
+tweets <- read.csv(here("data/political_data/tweets.csv"))
+truths <- read.csv(here("data/political_data/truths250510.csv"))
+
+source(here("helperfunctions/truths_cleaning_function.R"))
+```
+
+
+
+```{r data_title, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+#Only keep original Tweets
+tweets_clean <- tweets %>% filter(isRetweet != "t")
+tweets_clean <- tweets_clean$text
+truths_clean <- truths_processer(truths)
+
+truths_clean2 <- truths_clean$post
+
+full_posts <- c(tweets_clean, truths_clean2)
+
+tokens <- tokens(full_posts)
+dfm <- dfm(tokens)
+corpus_tweets <- corpus(tweets$text)
+
+additional_words <- c("rt")
+all_stopwords <- c(stopwords("en"), additional_words)
+
+tokens_tweets <- tokens(corpus_tweets,  
+                        remove_punct = TRUE, 
+                        remove_numbers = TRUE)
+
+tokens_tweets <- tokens_remove(tokens_tweets, all_stopwords)  # Remove stopwords
+
+dfm_tweets <- dfm(tokens_tweets)
+```
+
+
+
+```{r wordcould, cache=FALSE, echo=FALSE}
+print(textplot_wordcloud(
+  dfm_tweets,
+  min_count = 200,
+  color = RColorBrewer::brewer.pal(8, "Reds")
+))
+```
+
 
 # Readme {.unnumbered}
 
-This is a Website for a class project from the 2025 Class Macroeconometrics at Université de Lausanne.
-
-IMPORTANT:use: bookdown::render_book("final/index.Rmd") to render site
-
-## Usage {.unnumbered}
-
-You can find all sections on the left. There is the Main Report which we hand in. This serves as a complete collection of the whole project to make sure everything is available to readers.
+This is a Website for a class project from the 2025 Class Macroeconometrics at Université de Lausanne. It is intended as an archive and Display of our Project. You can find all data for recreation on www.github.com/theshufflebee/mmetricsproject.
 
 # Abstract {.unnumbered}
+
 
 In this short paper, we aim to asses to what extent financial markets may react
 to Donald Trump's social media posts, and specifically the effect on average
@@ -32,8 +103,5 @@ realised volatility. We do so using both ARMA-X and VAR models, with data spanni
 the 1st of January 2014, to the 7th of May 2025, over various time horizons and
 independent variables. We find limited evidence that there is a significant positive
 effect, and provide some explanations as to why this could be the case.
-
-
-
 
 
