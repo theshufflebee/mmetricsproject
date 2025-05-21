@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.22.0 (TeX Live 2025)  (format=lualatex 2025.5.16)  21 MAY 2025 09:48
+This is LuaHBTeX, Version 1.22.0 (TeX Live 2025)  (format=lualatex 2025.5.16)  21 MAY 2025 10:22
  restricted system commands enabled.
 **SVAR_FIGURES.tex
 (./SVAR_FIGURES.tex
@@ -830,7 +830,7 @@ LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10> not available
 <SVAR_FIGURES_files/figure-latex/IRF 1dummy-1.pdf, id=56, 469.755pt x 325.215pt>
 File: SVAR_FIGURES_files/figure-latex/IRF 1dummy-1.pdf Graphic file (type pdf)
 <use SVAR_FIGURES_files/figure-latex/IRF 1dummy-1.pdf>
-Package luatex.def Info: SVAR_FIGURES_files/figure-latex/IRF 1dummy-1.pdf  used on input line 243.
+Package luatex.def Info: SVAR_FIGURES_files/figure-latex/IRF 1dummy-1.pdf  used on input line 235.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
@@ -838,7 +838,7 @@ Package luatex.def Info: SVAR_FIGURES_files/figure-latex/IRF 1dummy-1.pdf  used 
 <SVAR_FIGURES_files/figure-latex/IRF 2Dummy-1.pdf, id=61, 469.755pt x 325.215pt>
 File: SVAR_FIGURES_files/figure-latex/IRF 2Dummy-1.pdf Graphic file (type pdf)
 <use SVAR_FIGURES_files/figure-latex/IRF 2Dummy-1.pdf>
-Package luatex.def Info: SVAR_FIGURES_files/figure-latex/IRF 2Dummy-1.pdf  used on input line 258.
+Package luatex.def Info: SVAR_FIGURES_files/figure-latex/IRF 2Dummy-1.pdf  used on input line 250.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
@@ -850,7 +850,7 @@ Package luatex.def Info: SVAR_FIGURES_files/figure-latex/IRF 2Dummy-1.pdf  used 
 <SVAR_FIGURES_files/figure-latex/IRF tariffff-1.pdf, id=82, 469.755pt x 325.215pt>
 File: SVAR_FIGURES_files/figure-latex/IRF tariffff-1.pdf Graphic file (type pdf)
 <use SVAR_FIGURES_files/figure-latex/IRF tariffff-1.pdf>
-Package luatex.def Info: SVAR_FIGURES_files/figure-latex/IRF tariffff-1.pdf  used on input line 391.
+Package luatex.def Info: SVAR_FIGURES_files/figure-latex/IRF tariffff-1.pdf  used on input line 375.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
@@ -858,7 +858,7 @@ Package luatex.def Info: SVAR_FIGURES_files/figure-latex/IRF tariffff-1.pdf  use
 <SVAR_FIGURES_files/figure-latex/IRF tariff-1.pdf, id=87, 469.755pt x 325.215pt>
 File: SVAR_FIGURES_files/figure-latex/IRF tariff-1.pdf Graphic file (type pdf)
 <use SVAR_FIGURES_files/figure-latex/IRF tariff-1.pdf>
-Package luatex.def Info: SVAR_FIGURES_files/figure-latex/IRF tariff-1.pdf  used on input line 406.
+Package luatex.def Info: SVAR_FIGURES_files/figure-latex/IRF tariff-1.pdf  used on input line 390.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
@@ -867,31 +867,26 @@ Package luatex.def Info: SVAR_FIGURES_files/figure-latex/IRF tariff-1.pdf  used 
 [9<./SVAR_FIGURES_files/figure-latex/IRF tariff-1.pdf>]
 
 [10]
-Underfull \vbox (badness 10000) detected at line 612
+Underfull \vbox (badness 10000) detected at line 595
  []
 
 
-Underfull \vbox (badness 10000) detected at line 612
+Underfull \vbox (badness 10000) detected at line 595
  []
 
 
 
 [11]
-Underfull \vbox (badness 10000) detected at line 612
+Underfull \vbox (badness 10000) detected at line 595
  []
 
 
-Underfull \vbox (badness 10000) detected at line 612
+Underfull \vbox (badness 10000) detected at line 595
  []
 
 
 
 [12]
-Overfull \hbox (87.067pt too wide) in paragraph at lines 617--657
- [] 
- []
-
-
 
 [13]
 
@@ -904,63 +899,72 @@ Overfull \hbox (87.067pt too wide) in paragraph at lines 617--657
 [17]
 
 [18]
-
-[19]
-<SVAR_FIGURES_files/figure-latex/IRF second china-1.pdf, id=151, 469.755pt x 325.215pt>
+<SVAR_FIGURES_files/figure-latex/IRF second china-1.pdf, id=147, 469.755pt x 325.215pt>
 File: SVAR_FIGURES_files/figure-latex/IRF second china-1.pdf Graphic file (type pdf)
 <use SVAR_FIGURES_files/figure-latex/IRF second china-1.pdf>
-Package luatex.def Info: SVAR_FIGURES_files/figure-latex/IRF second china-1.pdf  used on input line 1023.
+Package luatex.def Info: SVAR_FIGURES_files/figure-latex/IRF second china-1.pdf  used on input line 997.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
+
+
+[19]
 <SVAR_FIGURES_files/figure-latex/IRF _s_ch-1.pdf, id=152, 469.755pt x 325.215pt>
 File: SVAR_FIGURES_files/figure-latex/IRF _s_ch-1.pdf Graphic file (type pdf)
 <use SVAR_FIGURES_files/figure-latex/IRF _s_ch-1.pdf>
-Package luatex.def Info: SVAR_FIGURES_files/figure-latex/IRF _s_ch-1.pdf  used on input line 1038.
+Package luatex.def Info: SVAR_FIGURES_files/figure-latex/IRF _s_ch-1.pdf  used on input line 1012.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
 [20<./SVAR_FIGURES_files/figure-latex/IRF second china-1.pdf>]
 
 [21<./SVAR_FIGURES_files/figure-latex/IRF _s_ch-1.pdf>]
-Underfull \vbox (badness 10000) detected at line 1170
+Underfull \vbox (badness 10000) detected at line 1152
  []
 
 
-Underfull \vbox (badness 10000) detected at line 1170
+Underfull \vbox (badness 10000) detected at line 1152
  []
 
 
 
 [22]
-Overfull \hbox (87.067pt too wide) in paragraph at lines 1175--1214
- [] 
+Underfull \vbox (badness 10000) detected at line 1152
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 1152
  []
 
 
 
 [23]
-
-[24]
-Underfull \vbox (badness 10000) detected at line 1329
+Overfull \hbox (87.067pt too wide) in paragraph at lines 1157--1196
+ [] 
  []
 
 
-Underfull \vbox (badness 10000) detected at line 1329
+
+[24]
+Underfull \vbox (badness 10000) detected at line 1319
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 1319
  []
 
 
 
 [25]
-Underfull \vbox (badness 10000) detected at line 1329
+Underfull \vbox (badness 10000) detected at line 1319
  []
 
 
-Underfull \vbox (badness 10000) detected at line 1329
+Underfull \vbox (badness 10000) detected at line 1319
  []
 
 
 
 [26]
-Overfull \hbox (87.067pt too wide) in paragraph at lines 1334--1373
+Overfull \hbox (87.067pt too wide) in paragraph at lines 1324--1363
  [] 
  []
 
@@ -981,15 +985,15 @@ Here is how much of LuaTeX's memory you used:
  125007,953878 words of node,token memory allocated
  547 words of node memory still in use:
    6 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 7 attribute, 63 glue_spec, 7 attribute_list, 1 write, 1 user_defined nodes
-   avail lists: 2:4554,3:295,4:1052,5:950,6:77,7:11484,8:12,9:1275,10:1,11:57
+   avail lists: 2:3735,3:295,4:892,5:880,6:77,7:11434,8:12,9:1370,10:2,11:54
  45938 multiletter control sequences out of 65536+600000
- 65 fonts using 19340011 bytes
- 90i,11n,114p,492b,379s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman7-regular.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-italic.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmonolt10-bold.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-regular.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-bold.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-regular.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman12-bold.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman17-regular.otf>
-Output written on SVAR_FIGURES.pdf (27 pages, 132479 bytes).
+ 67 fonts using 19603311 bytes
+ 90i,11n,114p,527b,461s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman7-regular.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman9-italic.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-italic.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmonolt10-bold.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-regular.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-bold.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-regular.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman12-bold.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman17-regular.otf>
+Output written on SVAR_FIGURES.pdf (27 pages, 136439 bytes).
 
-PDF statistics: 316 PDF objects out of 1000 (max. 8388607)
- 242 compressed objects within 3 object streams
+PDF statistics: 323 PDF objects out of 1000 (max. 8388607)
+ 246 compressed objects within 3 object streams
  50 named destinations out of 1000 (max. 131072)
  137 words of extra memory for PDF output out of 10000 (max. 100000000)
 
