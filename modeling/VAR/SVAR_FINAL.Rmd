@@ -9,22 +9,8 @@ header-includes:
   - \usepackage{amsmath}
 ---
 
-ARMAX
 
-Once we have our final dataframe, we could then finally start on some
-analysis. We first thought of a simple ARMA-X type specification, taking
-the AHV as our "y variable" and taking any of the social media variables
-as the exogenous regressors. The assumption here is that, while the
-market reacts to Trump posts, Trump's posts are chaotic, nonsensical,
-and random enough to be considered exogenous.
-
-We of course first start by checking stationarity of our variables
-(ADF), where we find p-values of 0.01 suggesting that the processes are
-not explosive. Then, we use a custom function in order to choose the
-number of lags based on the AIC criterion. This however, while often
-choose a very high number of lags, which could be explained by our data
-being hourly. As such we decided to put a limit of 3 lags, which sees
-minimal AIC loss and simplifying our models considerably.
+# Methodology
 
 ## SVAR
 
@@ -33,7 +19,7 @@ short-run shocks from Trump's posts on AHV, and to evaluate whether
 market volatility can, in turn, influence Trump's posting behavior. In
 this framework, we systematically pair AHV with one explanatory variable
 at a time. The SVAR approach offers the advantage of accounting for
-structural endogeneity.In this regards, we assume that the volatility
+structural endogeneity. In this regards, we assume that the volatility
 does not contemporaneously affect Trump's posting activity - neither
 quantitatively nor qualitatively. Consequently, we impose a short-run
 restriction on the shock of volatility for all the Trump tweet's
@@ -43,89 +29,78 @@ Based on the information criteria, we found similar results across all
 specification, with a recommended lag length of around 70. However,
 inducing more than 6 lags (corresponding to a full trading day)
 introduces strong seasonality. Moreover, the higher the number of lags,
-the greater the persistence - up to unrealistic levels, i.e., 150 days
-for Tweet Count, which is implausible. Therefore, we chose to fix the
+the greater the persistence of a shock - up to unrealistic levels, i.e., 
+150 days for Tweet Count, which is implausible. Therefore, we chose to fix the
 number of lags at 6. Finally, given the presence of heteroscedasticity
 and serial correlation in the residuals, we use the Newey-West estimator
-to compute a robust covariance matrix.
+to compute a robust standard errors.
 
-## Results
 
-### Full Timeframe
 
-We run models with the following exogenous regressors: $TweetDummy$,
-$TweetCount$, and the mentions of words $Tariff$, $Trade$, and $China$.
-We first note on [*bigfigX*]{style="color:red"} that all the
-x-regressors are significant, apart from trade. Notice also that all the
-coefficients (apart from $Tariff_{t-3}$) are positive, in line with our
-main hypothesis. The effect of $Tariff_{t-1}$ and $Tariff_{t-2}$ are
-especially large, given the usual size of the volatility
-([*smalldescfigX*]{style="color:red"}). We in fact predict that an extra
-mention of tariffs one hour ago, leads to a whopping extra 0.02 in
-volatility which is just about the average size for the full timeframe.
-We can see the impulse response function (IRF) for this shock, in
-[*IRFtarif*]{style="color:red"}. Notice that there is a large response
-in the first periods, and then a graduate decline over time. Something
-to note is that in our analysises of IRF's, when including MA terms, the
-decline shows up gradual while being much sharper when only including AR
-terms. Note that we ran all these models on the VGK and ASHR ETF's as
-well, though no signficant results appear apart from a small but
-statistically significant effect of the tariff variable for VGK.
+# Results
 
-### Split Samples
+## Full Timeframe
 
-We then split our sample for the first and second term of the Trump
-presidancy. We only run models on tariff, trade and china this time. As
-seen on table [*bigtableX2*]{style="color:red"}, the first interesting
-result is in the coefficients of tariff being significant and very large
-in the second term, while being small and not statistically significant
-in the first. A similar story goes for the China variable. This may lend
-some evidence to support the claim that investors are much more reactive
-to Trump's social media presence now than before. Finally, we can check
-the residuals of all these models to test them somewhat. On
-[*smalldescfigX*]{style="color:red"}, the pvalues being zero for the
-full timeframe and first term indicate that there is autocorrelation in
-the residuals, thus suggesting that these estimations have problems.
-Note however, that the pvalues for the second term are quite high,
-lending support to our models on the split sample. These results suggest
-that perhaps ARMA-X models are not right in this context, as it is not
-unreasonable to think that Trump does in fact react to market movements.
-With this information, we decided to run a VAR model to deepen our
-understanding of these variables.
 
-### Full Timeframe
+As in the ARMA-X framework, we initially estimate a model for each of our five
+main variables. For all estimations, using the US ETF market, the significant 
+coefficients of post-related variables were consistently negative, while the 
+positive coefficients were large but not significant. ([*desc1figVAR*]{style="color:red"})
+For the Tariff, Trade and China variables, the first, second and sometimes forth 
+lag were positive and relatively large (especially in the case of Tariff), while 
+the remaining ones were not. In contrast, for TweetCount and TweetDummy, we 
+observed fewer and smaller positive coefficients. At the same time, we found 
+that the contemporaneous effects of the shocks were all positive and relatively 
+strong. This leads to two types of scenarios : either 
+the IRFs experienced a positive shock and remain elevated (Tariff, Trade and China), 
+or a highly positive shock occurs, but the cumulative effect turns negative after few 
+hours (TweetDummy and Count). [*IRFtarifVAR*]{style="color:red"} [*IRFdummyVAR*]{style="color:red"}
 
-As in the ARMA-X framework, we initially run an estimation for each of
-our five main variables where we find similar results on the effect of
-the posts. For all estimations, taking the US ETF market, the
-significant coefficient of post's variables were all negative, and the
-positive one where large but insignificant. Except for TweetCount, the
-first and sometimes second coefficient were positive while the rest not.
-In the mean time, we find that the contemporaneously effect of the
-shocks were all positive and high, up to 0.2 for TweetCount. This lead
-to the IRFs to explode when the shocks occur and tend to decrease, even
-going negative some hours after the shock. But, for Tariff, China and
-Trade, the effect show a clear cumulative positive effect of the post.
-Finally, except for Tariff, all Granger test manifests that Trump post
-has an impact on Volatility. This model clearly shows that Trump's post
-seem to have a positive instantaneous effect on volatility, but
-encompass very low persistence. Finally, taking the European and Chinese
-ETF market, we observe similar pattern, except for the impact of Tariff
-and China variables on the ASHR market, where the cumulative effect show
-no positive impact. impact on Trump and granger test.
+Finally, except for Tariff, all Granger causality tests indicate that Trump's 
+posts have an impact on volatility. However, due to serial correlation in the 
+residuals, these results should be interpreted with caution. Overall, this model 
+suggest that Trump's posts tend to have a positive instantaneous effect on 
+volatility, but with very low persistence.
+When analyzing the European and Chinese ETF markets, we observe similar patterns 
+though with lower magnitude -except for the impact of Tariff and China on the 
+ASHR market, where the cumulative effects show no positive impact. Additionally, 
+the European ETF market appears to react more strongly than the ASHR market to 
+Trump's posts, especially those mentioning Trade and Tariff.
 
-### Split Sample
+Regarding the impact of AHV on Trump's posts, we find some evidence of a 
+negative effect. For all variables, we observe one or two significantly 
+negative coefficients per variables -typically on the first and fourth lag- alongside many 
+insignificant ones. However, only TweetCount and China pass the Granger test in 
+the S&P market. Surprisingly, a large number of Granger test in the chinese and 
+European markets indicate strong Granger causality, which may point to a limitation 
+of the test itself, as such results appear unrealistic. 
 
-For the splitting framework, the results were similar and striking.
-While we found rather small shock effect and almost all negative
-coefficient leading to cumulative IRF to show negative impact of posts,
-we found shock effect in the second term that were between 5 times (for
-TweetCount and TweetDummy) to 25 times higher (for Tariff), except for
-Trade were we found a negative impact of a shock in the second term.
-Once again we found positive coefficient of lag variables in the second
-term, mainly on the first, second and fourth lag, but non of them was
-significant. Grangertest and impact on Trump
 
+
+
+
+## Split Sample
+
+
+For the splitting framework, the results were similar and striking. While we
+observed relatively small shock effects and almost entirely negatives coefficients 
+during the first term ([*descFirsttermfigVAR*]{style="color:red"}), leading the 
+cumulative IRFs to indicate a negative impact of posts, the shock effects in the
+second term were substantially larger - ranging from 5 times (for TweetCount and 
+TweetDummy) to as much as 25 times greater (for Tariff). the only exception was 
+Trade in the second term, which showed the only negative impact from a shock.
+Once again, we found positive lagged coefficients in the second term, mostly on 
+the first, second and forth lags. However, none of these coefficients were
+statistically significant, but the cumulative IRFs clearly show an high positive 
+impact on AHV, except for TweetDummy and TweetCount, whose
+coefficients and cumulative IRFs displayed similar patterns to those observed 
+in the first term. ([*descSecondtermfigVAR*]{style="color:red"})
+Moreover, the Granger tests generally failed in both terms, with the sole
+exception being China in the second term.
+Regarding the ASHR market, we found results similar to those for the US ETF
+market. Surprisingly, in the case of the European market, we observed a positive
+impact of Trump’s posts on AHV during the first term. Nevertheless, the results 
+still indicate a stronger impact of posts during the second term.
 
 ```{r load packages, message=FALSE, warning=FALSE, echo = FALSE}
 
@@ -222,6 +197,123 @@ source(here::here("helperfunctions/full_data.R"))
 Vdata = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
 ```
 
+
+
+
+#IRF
+
+## Tariff (Overall)
+
+```{r estime tariff, message=FALSE, warning=FALSE}
+y3 = cbind(Vdata$tariff, Vdata$SPY_vol)
+colnames(y3)[1:2] <- c("tariff", "vol")
+est.VAR3 <- VAR(y3,p=6)
+
+#extract results
+mod_vol3 = est.VAR3$varresult$vol
+f3 = formula(mod_vol3)
+d3 = model.frame(mod_vol3)
+lm_clean3 = lm(f3, data= d3)
+
+#apply Newey-West
+nw_vcov3 = NeweyWest(lm_clean3, lag=6)
+nw_se3 = sqrt(diag(nw_vcov3))
+
+#t-stats
+coef3 = coef(lm_clean3)
+t_stat3 = coef3/nw_se3
+
+#recalculate p-values
+robust3 = 2*(1-pt(abs(t_stat3), df = df.residual(lm_clean3)))
+
+```
+
+```{r B mat3}
+#Recreate a Robust Omega Matrix
+U3 = residuals(est.VAR3)
+T3 = nrow(U3)
+Omega3 = matrix(0, ncol(U3), ncol(U3))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_3 = t(U3[(l+1):T3, , drop=FALSE]) %*% U3[1:(T3-l), , drop=FALSE] /T3
+  if (l == 0){
+    Omega3 = Omega3 + Gamma_l_3
+  } else {
+    Omega3 = Omega3 + weight*(Gamma_l_3 + t(Gamma_l_3))
+  }
+}
+
+
+#make the B matrix
+loss3 <- function(param3){
+  #Define the restriction
+  B3 <- matrix(c(param3[1], param3[2], 0, param3[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X3 <- Omega3 - B3 %*% t(B3)
+  
+  #loss function
+  loss3 <- sum(X3^2)
+  return(loss3)
+}
+
+res.opt3 <- optim(c(1, 0, 1), loss3, method = "BFGS")
+B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol = 2)
+
+
+
+```
+
+
+```{r IRF tariffff}
+#get back the coefficient of est.VAR
+phi3 <- Acoef(est.VAR3)
+PHI3 = make.PHI(phi3)
+
+#take the constant
+constant3 <- sapply(est.VAR3$varresult, function(eq) coef(eq)["const"])
+c3=as.matrix(constant3)
+
+#Simulate the IRF
+p3 <- length(phi3)
+n3 <- dim(phi3[[1]])[1]
+
+Y3 <- simul.VAR(c=c3, Phi = phi3, B = B.hat3, nb.sim ,y0.star=rep(0, n3*p3),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd3 = data.frame(
+  period = 1:nrow(Y3),
+  response = Y3[,2])
+
+ggplot(Yd3,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P IRF of tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+
+```{r IRF tariff}
+ggplot(Yd3,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P Cumulalitve IRF of tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+
+
+## Dummy (Overall)
+
+
 ```{r Estime dummy, message=FALSE, warning=FALSE}
 y = cbind(Vdata$dummy, Vdata$SPY_vol)
 colnames(y)[1:2] <- c("dummy", "vol")
@@ -244,10 +336,214 @@ t_stat = coef/nw_se
 #recalculate p-values
 robust = 2*(1-pt(abs(t_stat), df = df.residual(lm_clean)))
 
-#table
-screenreg(lm_clean, override.se = nw_se, override.pvalues = robust, digits = 6)
 
 
+
+```
+
+```{r B mat}
+
+#Recreate a Robust Omega Matrix
+U = residuals(est.VAR)
+T = nrow(U)
+L = 6 #number of lag
+Omega = matrix(0, ncol(U), ncol(U))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_ = t(U[(l+1):T, , drop=FALSE]) %*% U[1:(T-l), , drop=FALSE] /T
+  if (l == 0){
+    Omega = Omega + Gamma_l_
+  } else {
+    Omega = Omega + weight*(Gamma_l_ + t(Gamma_l_))
+  }
+}
+
+
+#make the B matrix
+loss <- function(param){
+  #Define the restriction
+  B <- matrix(c(param[1], param[2], 0, param[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X <- Omega - B %*% t(B)
+  
+  #loss function
+  loss <- sum(X^2)
+  return(loss)
+}
+
+res.opt <- optim(c(1, 0, 1), loss, method = "BFGS")
+B.hat <- matrix(c(res.opt$par[1], res.opt$par[2], 0, res.opt$par[3]), ncol = 2)
+
+
+
+```
+
+
+```{r IRF 1dummy}
+nb.sim = 7*7
+#get back the coefficient of est.VAR
+phi <- Acoef(est.VAR)
+PHI = make.PHI(phi)
+
+#take the constant
+constant <- sapply(est.VAR$varresult, function(eq) coef(eq)["const"])
+c=as.matrix(constant)
+
+#Simulate the IRF
+p <- length(phi)
+n <- dim(phi[[1]])[1]
+
+
+Y <- simul.VAR(c=c, Phi = phi, B = B.hat, nb.sim ,y0.star=rep(0, n*p),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+
+Yd = data.frame(
+  period = 1:nrow(Y),
+  response = Y[,2])
+
+ggplot(Yd,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P IRF of Dummy on Volatility")+
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+
+```
+
+```{r IRF 2Dummy}
+ggplot(Yd,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P Cumulalitve IRF of Dummy on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+
+
+
+# Tables
+
+
+## Dummy
+
+```{r Estime dummy, message=FALSE, warning=FALSE}
+y = cbind(Vdata$dummy, Vdata$SPY_vol)
+colnames(y)[1:2] <- c("dummy", "vol")
+est.VAR <- VAR(y,p=6)
+
+#extract results
+mod_vol = est.VAR$varresult$vol
+f = formula(mod_vol)
+d = model.frame(mod_vol)
+lm_clean = lm(f, data= d)
+
+#apply Newey-West
+nw_vcov = NeweyWest(lm_clean, lag=6)
+nw_se = sqrt(diag(nw_vcov))
+
+#t-stats
+coef = coef(lm_clean)
+t_stat = coef/nw_se
+
+#recalculate p-values
+robust = 2*(1-pt(abs(t_stat), df = df.residual(lm_clean)))
+
+
+
+
+```
+
+```{r B mat}
+
+#Recreate a Robust Omega Matrix
+U = residuals(est.VAR)
+T = nrow(U)
+L = 6 #number of lag
+Omega = matrix(0, ncol(U), ncol(U))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_ = t(U[(l+1):T, , drop=FALSE]) %*% U[1:(T-l), , drop=FALSE] /T
+  if (l == 0){
+    Omega = Omega + Gamma_l_
+  } else {
+    Omega = Omega + weight*(Gamma_l_ + t(Gamma_l_))
+  }
+}
+
+
+#make the B matrix
+loss <- function(param){
+  #Define the restriction
+  B <- matrix(c(param[1], param[2], 0, param[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X <- Omega - B %*% t(B)
+  
+  #loss function
+  loss <- sum(X^2)
+  return(loss)
+}
+
+res.opt <- optim(c(1, 0, 1), loss, method = "BFGS")
+B.hat <- matrix(c(res.opt$par[1], res.opt$par[2], 0, res.opt$par[3]), ncol = 2)
+
+
+
+```
+
+
+```{r IRF 1dummy}
+nb.sim = 7*7
+#get back the coefficient of est.VAR
+phi <- Acoef(est.VAR)
+PHI = make.PHI(phi)
+
+#take the constant
+constant <- sapply(est.VAR$varresult, function(eq) coef(eq)["const"])
+c=as.matrix(constant)
+
+#Simulate the IRF
+p <- length(phi)
+n <- dim(phi[[1]])[1]
+
+
+Y <- simul.VAR(c=c, Phi = phi, B = B.hat, nb.sim ,y0.star=rep(0, n*p),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+
+Yd = data.frame(
+  period = 1:nrow(Y),
+  response = Y[,2])
+
+ggplot(Yd,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P IRF of Dummy on Volatility")+
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+
+```
+
+```{r IRF 2Dummy}
+ggplot(Yd,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P Cumulalitve IRF of Dummy on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
 ```
 
 ## N
@@ -274,8 +570,6 @@ t_stat2 = coef2/nw_se2
 #recalculate p-values
 robust2 = 2*(1-pt(abs(t_stat2), df = df.residual(lm_clean2)))
 
-#table
-screenreg(lm_clean2, override.se = nw_se2, override.pvalues = robust2, digits = 6)
 ```
 
 ## Tariff
@@ -302,8 +596,87 @@ t_stat3 = coef3/nw_se3
 #recalculate p-values
 robust3 = 2*(1-pt(abs(t_stat3), df = df.residual(lm_clean3)))
 
-#table
-screenreg(lm_clean3, override.se = nw_se3, override.pvalues = robust3, digits = 6)
+```
+
+```{r B mat3}
+#Recreate a Robust Omega Matrix
+U3 = residuals(est.VAR3)
+T3 = nrow(U3)
+Omega3 = matrix(0, ncol(U3), ncol(U3))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_3 = t(U3[(l+1):T3, , drop=FALSE]) %*% U3[1:(T3-l), , drop=FALSE] /T3
+  if (l == 0){
+    Omega3 = Omega3 + Gamma_l_3
+  } else {
+    Omega3 = Omega3 + weight*(Gamma_l_3 + t(Gamma_l_3))
+  }
+}
+
+
+#make the B matrix
+loss3 <- function(param3){
+  #Define the restriction
+  B3 <- matrix(c(param3[1], param3[2], 0, param3[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X3 <- Omega3 - B3 %*% t(B3)
+  
+  #loss function
+  loss3 <- sum(X3^2)
+  return(loss3)
+}
+
+res.opt3 <- optim(c(1, 0, 1), loss3, method = "BFGS")
+B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol = 2)
+
+
+
+```
+
+
+```{r IRF tariffff}
+#get back the coefficient of est.VAR
+phi3 <- Acoef(est.VAR3)
+PHI3 = make.PHI(phi3)
+
+#take the constant
+constant3 <- sapply(est.VAR3$varresult, function(eq) coef(eq)["const"])
+c3=as.matrix(constant3)
+
+#Simulate the IRF
+p3 <- length(phi3)
+n3 <- dim(phi3[[1]])[1]
+
+Y3 <- simul.VAR(c=c3, Phi = phi3, B = B.hat3, nb.sim ,y0.star=rep(0, n3*p3),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd3 = data.frame(
+  period = 1:nrow(Y3),
+  response = Y3[,2])
+
+ggplot(Yd3,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P IRF of tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+
+```{r IRF tariff}
+ggplot(Yd3,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P Cumulalitve IRF of tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
 ```
 
 ## Trade
@@ -330,8 +703,7 @@ t_stat4 = coef4/nw_se4
 #recalculate p-values
 robust4 = 2*(1-pt(abs(t_stat4), df = df.residual(lm_clean4)))
 
-#table
-screenreg(lm_clean4, override.se = nw_se4, override.pvalues = robust4, digits = 6)
+
 ```
 
 ## China
@@ -359,16 +731,9 @@ t_statchina = coefchina/nw_sechina
 #recalculate p-values
 robustchina = 2*(1-pt(abs(t_statchina), df = df.residual(lm_cleanchina)))
 
-#table
-screenreg(lm_cleanchina, override.se = nw_sechina, override.pvalues = robustchina, digits = 6)
+
 ```
 
-mean_day_filtered \<- Vdata %\>% mutate( day = as.Date(timestamp), year
-= year(day), month = month(day) ) %\>% filter(!(year == 2025 & month
-%in% c(4, 5))) %\>% \# exclut avril et mai 2025 group_by(day) %\>%
-summarise(mean_vol_day = mean(SPY_vol, na.rm = TRUE))
-
-mean(mean_day_filtered\$mean_vol_day)
 
 ```{r mana, message=FALSE, warning=FALSE, results='asis'}
 
@@ -444,11 +809,11 @@ f_tchina <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vo
 modelchina <- lm(f_tchina, data = dt_tchina)
 
 
-nw_se_t <- sqrt(diag(sandwich::NeweyWest(model, lag = 6, prewhite = FALSE)))
-nw_se2_t <- sqrt(diag(sandwich::NeweyWest(model2, lag = 6, prewhite = FALSE)))
-nw_se3_t <- sqrt(diag(sandwich::NeweyWest(model3, lag = 6, prewhite = FALSE)))
-nw_se4_t <- sqrt(diag(sandwich::NeweyWest(model4, lag = 6, prewhite = FALSE)))
-nw_sechina_t <- sqrt(diag(sandwich::NeweyWest(modelchina, lag = 6, prewhite = FALSE)))
+nw_se_t <- sqrt(diag(sandwich::NeweyWest(model, lag = 6)))
+nw_se2_t <- sqrt(diag(sandwich::NeweyWest(model2, lag = 6)))
+nw_se3_t <- sqrt(diag(sandwich::NeweyWest(model3, lag = 6)))
+nw_se4_t <- sqrt(diag(sandwich::NeweyWest(model4, lag = 6)))
+nw_sechina_t <- sqrt(diag(sandwich::NeweyWest(modelchina, lag = 6)))
 
 
 robust_t <- 2 * (1-pt(abs(coef(model) / nw_se_t), df = df.residual(model)))
@@ -473,23 +838,23 @@ robustchina_t <- robustchina_t[names(coef(modelchina))]
 
 
 
-# Créer la liste des modèles
+# Create list for models
 models_list <- list(model, model2, model3, model4, modelchina)
 
-# Créer la liste des SE robustes
+# Create list for SE robustes
 robust_ses <- list(nw_se_t, nw_se2_t, nw_se3_t, nw_se4_t, nw_sechina_t)
 
-# Créer la liste des p-values
+# Create list for p-value
 robust_pvals <- list(robust_t, robust2_t, robust3_t, robust4_t, robustchina_t)
 
-# Nom des variables (affichées dans le tableau)
+# Name of Variables
 custom_names <- list(
-  "vol.l1" = "$Vol_{t-1}$",
-  "vol.l2" = "$Vol_{t-2}$",
-  "vol.l3" = "$Vol_{t-3}$",
-  "vol.l4" = "$Vol_{t-4}$",
-  "vol.l5" = "$Vol_{t-5}$",
-  "vol.l6" = "$Vol_{t-6}$",
+  "vol.l1" = "$AHV_{t-1}$",
+  "vol.l2" = "$AHV_{t-2}$",
+  "vol.l3" = "$AHV_{t-3}$",
+  "vol.l4" = "$AHV_{t-4}$",
+  "vol.l5" = "$AHV_{t-5}$",
+  "vol.l6" = "$AHV_{t-6}$",
   "X.l1" = "$X_{t-1}$",
   "X.l2" = "$X_{t-2}$",
   "X.l3" = "$X_{t-3}$",
@@ -499,22 +864,24 @@ custom_names <- list(
   "const" = "Constant"
 )
 
-# Générer le tableau
+# Generate table
 table_texreg <- texreg(
   l = models_list,
   override.se = robust_ses,
+  custom.coef.map = custom_names,
   override.pvalues = robust_pvals,
   custom.model.names = c("TweetDummy", "TweetCount", "Tariff", "Trade", "China"),
   caption = "VAR Models of Average Hourly Volatility",
   label = "tab:VAR_Second_Term",
   caption.above = TRUE,
   digits = 6,
-  custom.gof.rows = list("Shock (IRF)" = c(0.0041713, 0.003061, 0.001189, 0.000215, 0.001937))
+  custom.gof.rows = list("Shock (IRF)" = c(0.0041713, 0.003061, 0.001189, 0.000215, 0.001937)),
+  custom.note = "\\parbox[t]{0.9\\textwidth}{\\small\\textit{This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.}}"
 )
 
 
 
-# Afficher dans le Viewer
+# print
 table_texreg
 
 
@@ -522,31 +889,6 @@ table_texreg
 
 
 ```
-0.004171303
-0.003061411
-0.001189108
-0.0002157857
-0.0019376
-
-
-
-stargazer(model, model2, model3, model4, modelchina,
-  type = "text",
-  se = list(nw_se_t, nw_se2_t, nw_se3_t, nw_se4_t, nw_sechina_t),
-  p = list(robust_t, robust2_t, robust3_t, robust4_t, robustchina_t),
-  column.labels = c("Model 1", "Model 2", "Model 3", "Model 4", "Model 5"),
-  dep.var.labels = "",
-  dep.var.labels.include = FALSE,
-  model.names = FALSE,
-  model.numbers = FALSE,
-  title = "Table 1 : Trump's Post on Volatility (Newey-West robust SE)",
-  digits = 6,
-  no.space = TRUE,
-  omit.stat = c("f", "ser", "rsq", "adj.rsq"),
-  star.cutoffs = c(0.05, 0.01, 0.001),
-  flip = TRUE,
-  add.lines=list(c("shock", "0.004171303", "0.003061411", "0.001189108", "0.0002157857", "0.0019376")))
-
 
 
 
@@ -592,6 +934,8 @@ robust_f_d = 2*(1-pt(abs(t_stat_f_d), df = df.residual(lm_clean_f_d)))
 
 ```
 
+## N
+
 ```{r first mandate N, warning=FALSE, message=FALSE, results="asis"}
 
 y_f_n = cbind(Vdata_f$N, Vdata_f$SPY_vol)
@@ -615,6 +959,8 @@ t_stat_f_n = coef_f_n/nw_se_f_n
 #recalculate p-values
 robust_f_n = 2*(1-pt(abs(t_stat_f_n), df = df.residual(lm_clean_f_n)))
 ```
+
+## Tariff
 
 ```{r first mandate tariff, warning=FALSE, message=FALSE, results="asis"}
 
@@ -641,6 +987,8 @@ robust_f_ta = 2*(1-pt(abs(t_stat_f_ta), df = df.residual(lm_clean_f_ta)))
 
 ```
 
+## Trade
+
 ```{r first mandate trade, warning=FALSE, message=FALSE, results="asis"}
 
 y_f_tr = cbind(Vdata_f$trade, Vdata_f$SPY_vol)
@@ -664,6 +1012,8 @@ t_stat_f_tr = coef_f_tr/nw_se_f_tr
 #recalculate p-values
 robust_f_tr = 2*(1-pt(abs(t_stat_f_tr), df = df.residual(lm_clean_f_tr)))
 ```
+
+## China
 
 ```{r first mandate china, warning=FALSE, message=FALSE, results="asis"}
 
@@ -691,6 +1041,12 @@ robust_f_ch = 2*(1-pt(abs(t_stat_f_ch), df = df.residual(lm_clean_f_ch)))
 
 ```
 
+
+
+# Second Term
+
+## Dummy
+
 ```{r second mandate dum, warning=FALSE, message=FALSE, results="asis"}
 
 y_s_d = cbind(Vdata_s$dummy, Vdata_s$SPY_vol)
@@ -714,6 +1070,9 @@ t_stat_s_d = coef_s_d/nw_se_s_d
 #recalculate p-values
 robust_s_d = 2*(1-pt(abs(t_stat_s_d), df = df.residual(lm_clean_s_d)))
 ```
+
+
+## N 
 
 ```{r second mandate N, warning=FALSE, message=FALSE, results="asis"}
 
@@ -741,6 +1100,8 @@ robust_s_n = 2*(1-pt(abs(t_stat_s_n), df = df.residual(lm_clean_s_n)))
 
 ```
 
+## Tariff
+
 ```{r second mandate tariff, warning=FALSE, message=FALSE, results="asis"}
 
 y_s_ta = cbind(Vdata_s$tariff, Vdata_s$SPY_vol)
@@ -765,6 +1126,8 @@ t_stat_s_ta = coef_s_ta/nw_se_s_ta
 robust_s_ta = 2*(1-pt(abs(t_stat_s_ta), df = df.residual(lm_clean_s_ta)))
 
 ```
+
+## Trade
 
 ```{r second mandate trade, warning=FALSE, message=FALSE, results="asis"}
 
@@ -791,6 +1154,8 @@ robust_s_tr = 2*(1-pt(abs(t_stat_s_tr), df = df.residual(lm_clean_s_tr)))
 
 ```
 
+## China
+
 ```{r second mandate china, warning=FALSE, message=FALSE, results="asis"}
 
 y_s_ch = cbind(Vdata_s$china, Vdata_s$SPY_vol)
@@ -816,7 +1181,88 @@ robust_s_ch = 2*(1-pt(abs(t_stat_s_ch), df = df.residual(lm_clean_s_ch)))
 
 ```
 
-```{r truc, message=FALSE, warning=FALSE, results='asis'}
+```{r B mat second mandate china, warning=FALSE, message=FALSE}
+#Construct the Robust Omega Matrix
+U_s_ch = residuals(est.VAR_s_ch)
+T_s_ch = nrow(U_s_ch)
+Omega_s_ch = matrix(0, ncol(U_s_ch), ncol(U_s_ch))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l__s_ch = t(U_s_ch[(l+1):T_s_ch, , drop=FALSE]) %*% U_s_ch[1:(T_s_ch-l), , drop=FALSE] /T_s_ch
+  if (l == 0){
+    Omega_s_ch = Omega_s_ch + Gamma_l__s_ch
+  } else {
+    Omega_s_ch = Omega_s_ch + weight*(Gamma_l__s_ch + t(Gamma_l__s_ch))
+  }
+}
+
+
+#make the B matrix
+loss_s_ch <- function(param_s_ch){
+  #Define the restriction
+  B_s_ch <- matrix(c(param_s_ch[1], param_s_ch[2], 0, param_s_ch[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X_s_ch <- Omega_s_ch - B_s_ch %*% t(B_s_ch)
+  
+  #loss function
+  loss_s_ch <- sum(X_s_ch^2)
+  return(loss_s_ch)
+}
+
+res.opt_s_ch <- optim(c(1, 0, 1), loss_s_ch, method = "BFGS")
+B.hat_s_ch <- matrix(c(res.opt_s_ch$par[1], res.opt_s_ch$par[2], 0, res.opt_s_ch$par[3]), ncol = 2)
+
+
+
+```
+
+```{r IRF second china, warning=FALSE, message=FALSE}
+#get back the coefficient of est.VAR
+phi_s_ch <- Acoef(est.VAR_s_ch)
+PHI_s_ch = make.PHI(phi_s_ch)
+
+#take the constant
+constant_s_ch <- sapply(est.VAR_s_ch$varresult, function(eq) coef(eq)["const"])
+c_s_ch=as.matrix(constant_s_ch)
+
+#Simulate the IRF
+p_s_ch <- length(phi_s_ch)
+n_s_ch <- dim(phi_s_ch[[1]])[1]
+
+Y_s_ch <- simul.VAR(c=c_s_ch, Phi = phi_s_ch, B = B.hat_s_ch, nb.sim ,y0.star=rep(0, n_s_ch*p_s_ch),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd_s_ch = data.frame(
+  period = 1:nrow(Y_s_ch),
+  response = Y_s_ch[,2])
+
+ggplot(Yd_s_ch,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P IRF of Second Term China on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+```{r IRF _s_ch}
+ggplot(Yd_s_ch,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P Cumulalitve IRF of Second Term China on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+# Tables Terms
+
+```{r table first term, message=FALSE, warning=FALSE, results='asis'}
 
 
 #first
@@ -886,11 +1332,11 @@ model_f_ch <- lm(f_t_f_ch, data = d_f_ch_t)
 
 
 
-nw_se_f_d_t <- sqrt(diag(sandwich::NeweyWest(model_f_d, lag = 6, prewhite = FALSE)))
-nw_se_f_n_t <- sqrt(diag(sandwich::NeweyWest(model_f_n, lag = 6, prewhite = FALSE)))
-nw_se_f_ta_t <- sqrt(diag(sandwich::NeweyWest(model_f_ta, lag = 6, prewhite = FALSE)))
-nw_se_f_tr_t <- sqrt(diag(sandwich::NeweyWest(model_f_tr, lag = 6, prewhite = FALSE)))
-nw_se_f_china_t <- sqrt(diag(sandwich::NeweyWest(model_f_ch, lag = 6, prewhite = FALSE)))
+nw_se_f_d_t <- sqrt(diag(sandwich::NeweyWest(model_f_d, lag = 6)))
+nw_se_f_n_t <- sqrt(diag(sandwich::NeweyWest(model_f_n, lag = 6)))
+nw_se_f_ta_t <- sqrt(diag(sandwich::NeweyWest(model_f_ta, lag = 6)))
+nw_se_f_tr_t <- sqrt(diag(sandwich::NeweyWest(model_f_tr, lag = 6)))
+nw_se_f_china_t <- sqrt(diag(sandwich::NeweyWest(model_f_ch, lag = 6)))
 
 
 robust_f_d_t <- 2 * (1-pt(abs(coef(model_f_d) / nw_se_f_d_t), df = df.residual(model_f_d)))
@@ -900,23 +1346,31 @@ robust_f_tr_t <- 2 * (1-pt(abs(coef(model_f_tr) / nw_se_f_tr_t), df = df.residua
 robust_f_ch_t <- 2 * (1-pt(abs(coef(model_f_ch) / nw_se_f_china_t), df = df.residual(model_f_ch)))
 
 
-nw_se_f_d_t <- nw_se_f_d_t[names(coef(model_f_d))]
-robust_f_d_t <- robust_f_d_t[names(coef(model_f_d))]
+nw_se_f_d_t       <- nw_se_f_d_t[names(coef(model_f_d))]
+robust_f_d_t      <- robust_f_d_t[names(coef(model_f_d))]
+nw_se_f_n_t      <- nw_se_f_n_t[names(coef(model_f_n))]
+robust_f_n_t     <- robust_f_n_t[names(coef(model_f_n))]
+nw_se_f_ta_t      <- nw_se_f_ta_t[names(coef(model_f_ta))]
+robust_f_ta_t     <- robust_f_ta_t[names(coef(model_f_ta))]
+nw_se_f_tr_t     <- nw_se_f_tr_t[names(coef(model_f_tr))]
+robust_f_tr_t     <- robust_f_tr_t[names(coef(model_f_tr))]
+nw_se_f_china_t  <- nw_se_f_china_t[names(coef(model_f_ch))]
+robust_f_ch_t <- robust_f_ch_t[names(coef(model_f_ch))]
 
 
-# Listes modèles, SE robustes et p-values robustes pour first
+# list of models, SE and p-value
 models_list_f <- list(model_f_d, model_f_n, model_f_ta, model_f_tr, model_f_ch)
 robust_ses_f <- list(nw_se_f_d_t, nw_se_f_n_t, nw_se_f_ta_t, nw_se_f_tr_t, nw_se_f_china_t)
 robust_pvals_f <- list(robust_f_d_t, robust_f_n_t, robust_f_ta_t, robust_f_tr_t, robust_f_ch_t)
 
-# Noms personnalisés des coefficients
+# Name of coefficient
 custom_names <- list(
-  "vol.l1" = "$Vol_{t-1}$",
-  "vol.l2" = "$Vol_{t-2}$",
-  "vol.l3" = "$Vol_{t-3}$",
-  "vol.l4" = "$Vol_{t-4}$",
-  "vol.l5" = "$Vol_{t-5}$",
-  "vol.l6" = "$Vol_{t-6}$",
+  "vol.l1" = "$AHV_{t-1}$",
+  "vol.l2" = "$AHV_{t-2}$",
+  "vol.l3" = "$AHV_{t-3}$",
+  "vol.l4" = "$AHV_{t-4}$",
+  "vol.l5" = "$AHV_{t-5}$",
+  "vol.l6" = "$AHV_{t-6}$",
   "X.l1" = "$X_{t-1}$",
   "X.l2" = "$X_{t-2}$",
   "X.l3" = "$X_{t-3}$",
@@ -926,7 +1380,7 @@ custom_names <- list(
   "const" = "Constant"
 )
 
-# Générer tableau texreg pour first
+# Generate table
 table_texreg_f <- texreg(
   l = models_list_f,
   override.se = robust_ses_f,
@@ -938,17 +1392,21 @@ table_texreg_f <- texreg(
   caption.above = TRUE,
   digits = 6,
   custom.gof.rows = list("Shock (IRF)" = c(0.002919, 0.002236, 0.000484, 0.000702, 0.000904)),
-  star.cutoffs = c(0.001, 0.01, 0.05)
+  star.cutoffs = c(0.001, 0.01, 0.05),
+  custom.note = "\\parbox[t]{0.9\\textwidth}{\\small\\textit{This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.}}"
 )
 
-# Afficher le tableau
+# Print table
 table_texreg_f
+```
 
 
 
 
-#second
 
+```{r Table second Term, message=FALSE, warning=FALSE, results='asis'}
+
+#Second
 
 d_s_d_t = d_s_d %>%
     rename(X.l1 = dummy.l1,
@@ -1016,11 +1474,11 @@ f_t_s_ch <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vo
 model_s_ch <- lm(f_t_s_ch, data = d_s_ch_t)
 
 
-nw_se_s_d_t <- sqrt(diag(sandwich::NeweyWest(model_s_d, lag = 6, prewhite = FALSE)))
-nw_se_s_n_t <- sqrt(diag(sandwich::NeweyWest(model_s_n, lag = 6, prewhite = FALSE)))
-nw_se_s_ta_t <- sqrt(diag(sandwich::NeweyWest(model_s_ta, lag = 6, prewhite = FALSE)))
-nw_se_s_tr_t <- sqrt(diag(sandwich::NeweyWest(model_s_tr, lag = 6, prewhite = FALSE)))
-nw_se_s_china_t <- sqrt(diag(sandwich::NeweyWest(model_s_ch, lag = 6, prewhite = FALSE)))
+nw_se_s_d_t <- sqrt(diag(sandwich::NeweyWest(model_s_d, lag = 6)))
+nw_se_s_n_t <- sqrt(diag(sandwich::NeweyWest(model_s_n, lag = 6)))
+nw_se_s_ta_t <- sqrt(diag(sandwich::NeweyWest(model_s_ta, lag = 6)))
+nw_se_s_tr_t <- sqrt(diag(sandwich::NeweyWest(model_s_tr, lag = 6)))
+nw_se_s_china_t <- sqrt(diag(sandwich::NeweyWest(model_s_ch, lag = 6)))
 
 
 robust_s_d_t <- 2 * (1-pt(abs(coef(model_s_d) / nw_se_s_d_t), df = df.residual(model_s_d)))
@@ -1029,15 +1487,23 @@ robust_s_ta_t <- 2 * (1-pt(abs(coef(model_s_ta) / nw_se_s_ta_t), df = df.residua
 robust_s_tr_t <- 2 * (1-pt(abs(coef(model_s_tr) / nw_se_s_tr_t), df = df.residual(model_s_tr)))
 robust_s_ch_t <- 2 * (1-pt(abs(coef(model_s_ch) / nw_se_s_china_t), df = df.residual(model_s_ch)))
 
-nw_se_s_d_t <- nw_se_s_d_t[names(coef(model_s_d))]
-robust_s_d_t <- robust_s_d_t[names(coef(model_s_d))]
+nw_se_s_d_t       <- nw_se_s_d_t[names(coef(model_s_d))]
+robust_s_d_t      <- robust_s_d_t[names(coef(model_s_d))]
+nw_se_s_n_t      <- nw_se_s_n_t[names(coef(model_s_n))]
+robust_s_n_t     <- robust_s_n_t[names(coef(model_s_n))]
+nw_se_s_ta_t      <- nw_se_s_ta_t[names(coef(model_s_ta))]
+robust_s_ta_t     <- robust_s_ta_t[names(coef(model_s_ta))]
+nw_se_s_tr_t     <- nw_se_s_tr_t[names(coef(model_s_tr))]
+robust_s_tr_t     <- robust_s_tr_t[names(coef(model_s_tr))]
+nw_se_s_china_t  <- nw_se_s_china_t[names(coef(model_s_ch))]
+robust_s_ch_t <- robust_s_ch_t[names(coef(model_s_ch))]
 
-# Listes modèles, SE robustes et p-values robustes pour second
+# lists of model, robust SE  and p-values 
 models_list_s <- list(model_s_d, model_s_n, model_s_ta, model_s_tr, model_s_ch)
 robust_ses_s <- list(nw_se_s_d_t, nw_se_s_n_t, nw_se_s_ta_t, nw_se_s_tr_t, nw_se_s_china_t)
 robust_pvals_s <- list(robust_s_d_t, robust_s_n_t, robust_s_ta_t, robust_s_tr_t, robust_s_ch_t)
 
-# Générer tableau texreg pour second
+# Generate table
 table_texreg_s <- texreg(
   l = models_list_s,
   override.se = robust_ses_s,
@@ -1048,98 +1514,16 @@ table_texreg_s <- texreg(
   label = "tab:VAR_Second_Term",
   caption.above = TRUE,
   digits = 6,
-  custom.gof.rows = list("Shock (IRF)" = c(0.016739, 0.015714, 0.011582, -0.004131, 0.015569)),
-  star.cutoffs = c(0.05, 0.01, 0.001)
+  custom.gof.rows = list("Shock (IRF)" = c(0.014659, 0.013315, 0.010752, -0.005665, 0.013937)),
+  star.cutoffs = c(0.05, 0.01, 0.001),
+  custom.note = "\\parbox[t]{0.9\\textwidth}{\\small\\textit{This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.}}"
 )
 
+ 
 
-
-# Afficher le tableau
+# Print
 table_texreg_s
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```
-browseURL(file.path(getwd(), "table_trump.html"))
 
-
-
-0.002919823
-0.002236589
-0.0004843789
-0.0007026808
-0.0009049532
-
-
-0.01673941
-0.01571499 
-0.01158212
--0.004131086
-0.01556975
-
-
-stargazer(model_f_d, model_f_n, model_f_ta, model_f_tr, model_f_ch, 
-type = "text",
-  se = list(nw_se_f_d_t, nw_se_f_n_t, nw_se_f_ta_t, nw_se_f_tr_t, nw_se_f_china_t),
-  p = list(robust_f_d_t, robust_f_n_t, robust_f_ta_t, robust_f_tr_t, robust_f_ch_t),
-  column.labels = c("Dummy", "TweetCount", "Tariff", "Trade", "China"),
-  dep.var.labels = "",
-  dep.var.labels.include = FALSE,
-  covariate.labels = c(
-    "vol<sub>t-1</sub>", "vol<sub>t-2</sub>", "vol<sub>t-3</sub>", 
-    "vol<sub>t-4</sub>", "vol<sub>t-5</sub>", "vol<sub>t-6</sub>",
-    "X<sub>t-1</sub>", "X<sub>t-2</sub>", "X<sub>t-3</sub>", 
-    "X<sub>t-4</sub>", "X<sub>t-5</sub>", "X<sub>t-6</sub>", 
-    "const"),
-  model.names = FALSE,
-  model.numbers = FALSE,
-  title = "Table 1 : Trump's Post on Volatility (Newey-West robust SE)",
-  digits = 6,
-  no.space = TRUE,
-  omit.stat = c("f", "ser", "rsq", "adj.rsq"),
-  star.cutoffs = c(0.001, 0.01, 0.0),
-  flip = TRUE,
-  add.lines=list(c("shock", "1", "2", "3", "4", "5")))
