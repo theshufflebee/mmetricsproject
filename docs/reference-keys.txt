@@ -36,7 +36,6 @@ sec:irf-dummy
 sec:irf-cum-dummy
 sec:irf-tariff
 sec:irf-cum-tariff
-svar-table-full-timeframe
 sec:svar-table-1
 sec:irf-china-2
 sec:irf-cum-china-2
