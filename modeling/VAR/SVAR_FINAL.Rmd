@@ -305,7 +305,7 @@ ggplot(Yd,aes(x=period, y=response)) +
 
 ```
 
-```{r IRF 2Dummy}
+```{r IRF Dummy cumul}
 ggplot(Yd,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
@@ -322,7 +322,7 @@ ggplot(Yd,aes(x=period, y=cumsum(response))) +
 
 ## Tariff (Overall)
 
-```{r estime tariff, message=FALSE, warning=FALSE}
+```{r estime tariff overall, message=FALSE, warning=FALSE}
 y3 = cbind(Vdata$tariff, Vdata$SPY_vol)
 colnames(y3)[1:2] <- c("tariff", "vol")
 est.VAR3 <- VAR(y3,p=6)
@@ -383,7 +383,7 @@ B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol =
 ```
 
 
-```{r IRF tariffff}
+```{r IRF tariffff for print}
 #get back the coefficient of est.VAR
 phi3 <- Acoef(est.VAR3)
 PHI3 = make.PHI(phi3)
@@ -416,7 +416,7 @@ ggplot(Yd3,aes(x=period, y=response)) +
 ```
 
 
-```{r IRF tariff}
+```{r IRF tariff cumul for print}
 ggplot(Yd3,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
@@ -505,7 +505,7 @@ B.hat <- matrix(c(res.opt$par[1], res.opt$par[2], 0, res.opt$par[3]), ncol = 2)
 ```
 
 
-```{r IRF 1dummy}
+```{r IRF for dummy}
 nb.sim = 7*7
 #get back the coefficient of est.VAR
 phi <- Acoef(est.VAR)
