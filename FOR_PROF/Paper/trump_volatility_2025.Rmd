@@ -1,0 +1,810 @@
+---
+title: "Trump's Tweets on Market Volatility"
+author: "Marcos Constantinou, Ryan Fellarhi & Jonas Bruno"
+date: "25.05.2025"
+output:
+  bookdown::pdf_document2: 
+    toc: true
+    fig_caption: true
+    latex_engine: lualatex
+header-includes:
+  - \usepackage{amsmath}
+bibliography: [packages.bib, citations.bib] #name bib files
+link-citations: true           # optional but helpful for clickable citations
+csl: apa.csl
+abstract: "In this short paper, we aim to asses to what extent financial markets may react to Donald Trump’s social media posts, and specifically the effect on average realised volatility. We do so using both ARMA-X and VAR models, with data spanning the 1st of January 2014, to the 7th of May 2025, over various time horizons and independent variables. We find limited evidence that there is a significant positive effect, and provide some explanations as to why this could be the case."
+---
+\newpage
+
+
+
+```{r setup, warning=FALSE, echo=FALSE, cache=TRUE, message=FALSE}
+require("here")
+require("stringr")
+require("dplyr")
+require("ggplot2")
+require("lubridate")
+require("tinytex")
+
+truths_raw <- read.csv(here("data/mothership", "social.csv"))
+
+truths <- truths_raw %>%
+  mutate(
+    # Use POSIX 'timestamp' directly
+    date_time_parsed = as.POSIXct(timestamp, format = "%Y-%m-%d %H:%M:%S"),
+    
+    # Extract date only for plot
+    day = as.Date(date_time_parsed),
+    
+    # Extract time only for plot
+    time = format(date_time_parsed, "%H:%M"),
+    
+    # Convert time to numeric hours & minutes as fractions
+    time_numeric = hour(date_time_parsed) + minute(date_time_parsed) / 60,
+    
+    # Shift time such that y = 0 corresponds to 12 PM
+    time_shifted = time_numeric - 12
+  )
+
+```
+
+
+# Introduction
+
+## Motivation
+
+Over the past 15 years social media has become an important
+communication tool for politicians. One of the pioneers of this novel
+approach has been Donald Trump, the 45th and 47th President of the United
+States. Since his ban on Twitter after the January 6th riots, his quantity of
+social media posts has drastically increased[^1].
+
+[^1]: Includes both Posts and Reposts
+
+The content of his posts can sometimes have announcements or teases of future
+political decisions. Note the recent infamous "THIS IS A GREAT TIME TO BUY!!! DJT"
+post sent just an hour before lifting his reciprocal tariffs. It is then not 
+improbable that agents in financial markets might take this information into 
+account in their decision making. This question has been asked before in the 
+literature, focusing rather on his first term. 
+
+This brings us to our research question:  Do Donald Trumps Posts impact market Volatility?
+
+    
+
+
+```{r fig1, echo=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)", warning=FALSE, cache=TRUE}
+ #Create the scatter plot
+ggplot(truths, aes(x = day, y = time_shifted)) +
+  geom_point(alpha = 0.5, color = "blue", size = 0.55) +  # Transparancy to create "heatmap"
+  scale_y_continuous(
+    breaks = seq(-12, 12, by = 3),  # Custom Y scale
+    labels = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00", "24:00")  # 24-hour format labels
+  ) +
+  labs(title = "Terminally Online: Trumps Twitter & Truth Social Posts (EDT)",
+       x = "",
+       y = "Time of Day") +
+  theme_minimal() +
+  
+  
+  # Customize X Axis
+  scale_x_date(
+    date_labels = "%b %Y",  # Format labels to show month and year
+    date_breaks = "9 months"
+  ) +
+  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  
+  # Add vertical lines at 9:30 AM and 4:00 PM for stock market
+  geom_hline(yintercept = (9 + 30 / 60) - 12, linetype = "longdash", color = "red") + 
+  geom_hline(yintercept = 16 - 12, linetype = "dashed", color = "red") +   
+  
+  # theme adjustments
+  theme(
+    panel.grid.minor = element_blank(),  # Remove minor gridlines
+    panel.grid.major = element_line(linewidth = 0.5),  # Major gridlines
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10))
+
+```
+
+
+## Literature Review
+
+Information is one of the most valuable assets in the financial market.
+Its importance lies at the core of the "Efficient Market Hypothesis", 
+which states that the prices of assets fully reflect all
+available information, adjusting immediately to any new data
+@famaAdjustmentStockPrices2003 , and thereby creating a strong demand
+for information flow. In addition, the “Mixture of Distribution
+Hypothesis” states that the release of new information is closely linked
+to movements in both realized and implied volatility
+@andersenReturnVolatilityTrading1996, @frenchStockReturnVariances1986,
+@vlastakisInformationDemandStock2012.
+
+Consequently, a large part of the literature had focused on the relation
+between announcements, news and market activity. For example,
+@schumakerTextualAnalysisStock2009 use various linguistic and textual
+representations derived from financial news to predict stock market
+prices. Similarly, @ederingtonHowMarketsProcess1993 analyze the impact
+of macroeconomic news announcements on interest rate and foreign
+exchange futures markets, particularly in terms of price changes and
+volatility. Both studies, among others, find that prices— such as stock
+prices—react primarily within minutes after the release of new
+information.
+
+Recently, the world has witnessed the rise of the Internet
+which revolutionized the dissemination and accessibility of information.
+Social media enable investors, analysts or politicians to instantly
+share their information, news or opinions. This led some studies to
+focus on the communication dynamics of social platform to predict
+changes in the returns of financial assets @dechoudhuryCanBlogCommunication2008 & 
+@bartovCanTwitterHelp2018. In this context, the
+impact of Trump’s tweets on various financial and macroeconomic
+variables has been analysed by several studies, especially during his
+first mandate.
+
+Using high-frequency financial data,
+@gjerstadPresidentTrumpsTweets2021 found an increase in uncertainty and
+trading volume, along with a decline in the U.S. stock market—regardless
+of the tweet's content. However, the effect was stronger when Trump used
+confrontational words such as "tariff" or "trade war." Some of his
+announcements also influenced the U.S. dollar exchange rate @vlastakisInformationDemandStock2012
+and certain market indices within minutes of the tweet being posted
+@colonescuEffectsDonaldTrumps2018 & @kinyuaAnalysisImpactPresident2021.
+
+Other scholars have shown that negative Trump tweets about specific
+companies tended to reduce demand for their stocks @bransHisThumbEffect2020 &
+@mendelsStanfordResearchSeries2019, whereas some
+other have shown that they also impact market volatility indices such as
+the VIX @fendelPoliticalNewsStock2019 or the Volfele @klausMeasuringTrumpVolfefe2021.
+The effects of his tweets also extended beyond the U.S.. For example,
+@nishimuraImpactsDonaldTrumps2025 shows a
+positive relationship between volatility in European stock markets and
+tweeter activity of Trump, and this effect tends to intensify as public
+intention for his tweet grows @nishimuraImpactsDonaldTrumps2025.
+
+
+
+
+
+
+# Data
+
+```{r library_setup_data, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenization
+require(texreg) #arima tables
+require(future.apply) #parallel computation (speed)
+require(aTSA) #adf test
+require(bookdown)
+
+getwd()
+#setwd("X:/Onedrive/Desktop/Macroeconometrics/R stuff/Project/mmetricsproject/final") 
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/armax_functions.R"))
+
+```
+
+```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+
+#load final dataset
+source(here("helperfunctions/full_data.R"))
+
+#load initial financial for plots
+SPY <- read.csv(here("data/mothership", "SPY.csv"))
+SPY$timestamp = as.POSIXct(SPY$timestamp,format = "%Y-%m-%d %H:%M:%S")
+SPY = filter(SPY,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
+
+#select timeframe 
+data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
+
+```
+
+## Financial Data
+
+For our financial data, we decided to try to find minute-by-minute prices for 
+broad market indices. While the actual indices do not update their prices so often,
+we had to take proxies under the form of ETF's that track them. Our 3 markets of
+analysis are: SPY to track the S&P500, VGK to track the FTSE Developed Europe 
+All Cap Index, and finally ASHR to track the CSI 300 China. We accessed this data
+through a free stock API, Alpha Vantage. Our timeframe is from the first 
+of January 2014 to the 7th of May 2025.
+
+
+We then had to transform this data to get our main variable of interest, Average
+Hourly Volatility (AHV). Note that this is realised market volatility. We did so 
+with the following formula:
+$$
+\begin{aligned}
+  v_t = \frac{1}{N}&\sum_{i=1}^N(\Delta p_{t,i})^2 
+\end{aligned}
+$$
+Where $\Delta p_t$ is the difference in price (open - close) and $i$ represents
+every minute.
+
+We used a custom function in order to get the AHV for each open market hour. Note 
+that the first hour is from 9:30 am to 10:00 am since the market opens on a half-hour 
+but closes at 4:00 pm. 
+
+
+```{r fin plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE, eval=FALSE}
+
+hvol_plotter(SPY, breaks = "yearly", title = "SPY Realised Volatility")
+
+```
+
+We can clearly see that the last few months show a new era of never seen before
+levels of volatility. Shocks on volatility recently have reached, and even surpassed
+(for a few data points) levels seen during the COVID-19 pandemic.
+
+
+## Political Data
+
+We have two sources for Trump's posts. The Tweets are from Kaggle
+@shantanuDonaldTrumpTweets and go until the 8th of January 2021. Since he
+switched his primary posting platform to Truth Social we use only that
+Data from 2021 onwards. All Truth Social posts were scrapped from
+trumpstruth.org, a webpage that aims to conserve all his posts. Note that we have 
+had to use web-scrapping methods in order to download all his Truth Social posts
+in a dataset.
+
+A big problem we had in our analysis was what to do with social media posts
+which appeared outside market hours. We first decided to simply ignore them, but 
+it turned out to remove a lot of observations. We finally decided to push all the 
+social media information outside market hours to the next open hour. This comes 
+as an assumption[^2]. 
+
+[^2]: For instance, if Trump tweets on Good Friday (market holiday), then the 
+market will only react to this new information on Monday at 9:30 am. 
+
+Since our financial data is hourly, we aggregate the social data by hour. We 
+then construct multiple variables from the social media data. These include
+a dummy for whether there was a post, the number of posts an hour and counts
+for certain words ("tariffs","trade","china"). Further we applied some simple 
+sentiment analysis algorithms on the data to see if there are certain sentiments 
+in his tweets that move the markets. Details on all our data management procedures
+can be found in the GitHub repository.
+
+```{r social plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE, eval=FALSE}
+
+#find count
+tweetcount_alltime = dplyr::select(data,timestamp,N)
+#select time period
+tweetcount = filter(tweetcount_alltime,
+between(timestamp,
+as.Date('2014-01-01'),
+as.Date('2025-04-10')))
+#plot
+ggplot(tweetcount_alltime, aes(x = timestamp, y = N)) +
+geom_point(color = "#253494", size = 1) +
+scale_x_datetime(date_labels = "%b %Y", date_breaks = "9 month") +
+labs(title = "Trump Social Media Count",
+x = NULL,
+y = "number of tweets/truths") +
+theme_minimal(base_size = 14) +
+theme(axis.text.x = element_text(angle = 45, hjust = 1),
+plot.title = element_text(face = "bold", hjust = 0.5))
+
+```
+
+
+
+
+
+
+# ARMA-X
+
+## Methodology
+
+Once we have our final dataframe, we could then finally start on some analysis.
+We first thought of a simple ARMA-X type specification, taking the AHV as our
+"y variable" and taking any of the social media variables as the exogenous
+regressors. The assumption here is that, while the market reacts to Trump posts,
+Trump's posts are chaotic, nonsensical, and random enough to be considered 
+exogenous. 
+
+We of course first start by checking stationarity of our variables (ADF), where we find
+p-values of 0.01 suggesting that the processes are not explosive. Then, we use 
+a custom function in order to choose the number of lags based on the AIC criterion.
+This however, while often choose a very high number of lags, which could be 
+explained by our data being hourly. As such we decided to put a limit of 3 lags,
+which sees minimal AIC loss and simplifying our models considerably.
+
+## Results
+
+
+### Full Timeframe
+We run models with the following exogenous regressors: $TweetDummy$, $TweetCount$,
+and the mentions of words $Tariff$, $Trade$, and $China$. We first note on the table
+ in section \@ref(sec:spy-table) that all the x-regressors are significant,
+apart from trade. Notice also that all the coefficients (apart from $Tariff_{t-3}$)
+are positive, in line with our main hypothesis. The effect of $Tariff_{t-1}$ and 
+$Tariff_{t-2}$ are especially large, given the usual size of the volatility as seen
+in Section \@ref(sec:means-table). We in fact predict that an 
+extra mention of tariffs one hour ago, leads to a whopping extra 0.02 in volatility
+ which is just about the average size for the full timeframe. We can see the
+impulse response function (IRF) for this shock, in \@ref(sec:SPY-IRF) Notice that
+there is a large response in the first periods, and then a graduate
+decline over time. Something to note is that in our analyses of IRF's, when including
+MA terms, the decline shows up gradual while being much sharper when only including
+AR terms. 
+Note that we ran all these models on the VGK and ASHR ETF's as well, though no
+significant results appear apart from a small but statistically significant effect
+of the tariff variable for VGK.
+
+### Split Samples
+We then split our sample for the first and second term of the Trump presidency.
+We only run models on tariff, trade and china this time. As seen on table
+\@ref(sec:spy-table-terms), the first interesting result
+is in the coefficients of tariff being significant and very large in the second
+term, while being small and not statistically significant in the first. A similar
+story goes for the China variable. This may lend some evidence to support the 
+claim that investors are much more reactive to Trump's social media presence
+now than before. We've found similar IRF's as for the full timeframe. Tables \@ref(sec:SPY-IRF)
+show the IRF's for the second term, of the impacts of tariff and china mention
+shocks on the AHV.
+Finally, we can check the residuals of all these models to test them somewhat. 
+In Section \@ref(sec:SPY-res-test), the pvalues being zero
+for the full timeframe and first term indicate that there is autocorrelation in 
+the residuals, thus suggesting that these estimations have problems. Note however,
+that the p-values for the second term are quite high, lending support to our
+models on the split sample. These results suggest that perhaps ARMA-X models are
+not right in this context as it is not unreasonable to think that Trump does 
+in fact react to market movements, which would break the exogeneity assumption
+that is critical for this type of model. With this information, we decided to run
+a VAR model to deepen our understanding of these variables.
+
+
+
+
+# VAR
+
+## Methodology
+
+## Results
+
+
+# Conclusion
+
+\clearpage
+
+\AtEndDocument{\pagebreak
+\begin{appendix}
+
+
+
+# Appendix
+
+
+```{r library_setup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
+rm(list=ls())
+require(tinytex) #LaTeX
+require(ggplot2) #plots
+require(AEC) #JP-Renne functions
+require(AER) #NW formula
+require(forecast) #time series stuff
+require(expm) #matrix exponents
+require(here) #directory finder
+require(stringr) # analysis of strings, important for the detection in tweets
+require(dplyr) #data management
+require(lubridate) #data dates management
+require(zoo) #for lagging
+require(jtools) #tables
+require(huxtable) #tables
+require(lmtest) #reg tests
+require(vroom) #for loading data
+require(data.table) #for data filtering
+require(sysid) #for ARMA-X modeling
+require(sandwich) #regression errors
+require(stargazer) #nice reg tables
+require(tidytext) #text mining
+require(textstem) #lemmatization
+require(quanteda) #tokenization
+require(texreg) #arima tables
+require(future.apply) #parallel computation (speed)
+require(aTSA) #adf test
+require(kableExtra)
+
+getwd()
+#setwd("...") -> set wd at base repo folder
+
+#load helper functions
+source(here("helperfunctions/data_loaders.R"))
+source(here("helperfunctions/date_selector.R"))
+source(here("helperfunctions/plotters.R"))
+source(here("helperfunctions/quick_arma.R"))
+source(here("helperfunctions/r.vol_calculators.R"))
+source(here("helperfunctions/truths_cleaning_function.R"))
+source(here("helperfunctions/armax_functions.R"))
+
+```
+
+## ARMAX
+
+We choose the specification in the armax_models file. In this file, we will
+just run said specifications to produce nice tables and graphs to include in 
+our final paper. This is also why there are specification differences in the 
+separate timeframes. We always use the best fit we found earlier.
+
+```{r datasetup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+
+#load final dataset
+source(here("helperfunctions/full_data.R"))
+
+#backup
+backup = data
+
+#select timeframe 
+data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
+
+#for interpretation
+mean1 = mean(data$SPY_vol)
+
+```
+
+
+```{r fitting models, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
+#All SPY models for the full Dataframe
+
+models <- list()
+
+# ARMA-X(3,3,1) with Tweet Dummy as Exogenous
+models[["Model 1"]] <- armax(data$SPY_vol, xreg = data$dummy, latex = F,
+                             nb.lags = 1, p = 3, q = 3) 
+
+# ARMA-X(3,3,1) with Tweet Count as Exogenous
+models[["Model 2"]] <- armax(data$SPY_vol, xreg = data$N, latex = F,
+                             nb.lags = 1, p = 3, q = 3) 
+
+# ARMA-X(3,2,3) with Tariff Mentions as Exogenous
+models[["Model 3"]] <- armax(data$SPY_vol, xreg = data$tariff, latex = F,
+                             nb.lags = 3, p = 3, q = 2) 
+
+# ARMA-X(3,2,1) with Trade Mentions as Exogenous
+models[["Model 4"]] <- armax(data$SPY_vol, xreg = data$trade, latex = F,
+                             nb.lags = 1, p = 3, q = 2) 
+
+# ARMA-X(3,2,0) with China Mentions as Exogenous
+models[["Model 5"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
+                             nb.lags = 0, p = 3, q = 2) 
+
+```
+
+### SPY ARMAX Table (Jan 2014 - May 2025) 
+```{r spy-table, results="asis", warning=F, message=F, echo=FALSE}
+
+names = list( "ar1" = "AR(1)",
+              "ar2" = "AR(2)",
+              "ar3" = "AR(3)",
+              "ma1" = "MA(1)",
+              "ma2" = "MA(2)",
+              "ma3" = "MA(3)",
+              "(Intercept)" = "Constant",
+              "dummy_lag_0" = "$TweetDummy_{t}$",
+              "dummy_lag_1" = "$TweetDummy_{t-1}$",
+              "N_lag_0" = "$TweetCount_{t}$",
+              "N_lag_1" = "$TweetCount_{t-1}$",
+              "tariff_lag_0" = "$Tariff_{t}$",
+              "tariff_lag_1" = "$Tariff_{t-1}$",
+              "tariff_lag_2" = "$Tariff_{t-2}$",
+              "tariff_lag_3" = "$Tariff_{t-3}$",
+              "trade_lag_0" = "$Trade_{t}$",
+              "trade_lag_1" = "$Trade_{t-1}$",
+              "china_lag_0" = "$China_{t}$")
+
+table1 = texreg(models,
+          custom.model.names = names(models), 
+          custom.coef.map = names,
+          caption = "ARMAX Models of Average Hourly Volatility",
+          caption.above = TRUE,
+          label = "tab:armax",
+          digits = 4)
+table1
+
+#write(table1, file = "armax_table1.tex")
+
+```
+
+
+### SPY ARMAX IRFs (Jan 2014 - May 2025)
+
+```{r SPY-IRF, results="asis", warning=F, message=F, echo=FALSE, cache=TRUE}
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 15
+
+#irf.plot(models[["Model 1"]],nb.periods,title="Tweet Dummy Shock")
+#irf.plot(models[["Model 2"]],nb.periods,title="Tweet Count Shock")
+plot1 = irf.plot(models[["Model 3"]],nb.periods,
+                 title="Tariff Mention Shock - Jan 2014 - May 2025")
+plot1
+#irf.plot(models[["Model 4"]],nb.periods,title="Trade Mention Shock")
+#irf.plot(models[["Model 5"]],nb.periods,title="China Mention Shock")
+
+#ggsave("armax_plot1.png",plot=plot1,bg="white")
+
+```
+
+
+```{r, warning=F, message=F, echo=FALSE, results=F}
+#Calculate residuals
+
+res1 = checkresiduals(models[["Model 1"]], plot = FALSE)
+res2 = checkresiduals(models[["Model 2"]], plot = FALSE)
+res3 = checkresiduals(models[["Model 3"]], plot = FALSE)
+res4 = checkresiduals(models[["Model 4"]], plot = FALSE)
+res5 = checkresiduals(models[["Model 5"]], plot = FALSE)
+
+```
+
+```{r SPYres, warning=F, message=F, echo=FALSE, cache=TRUE}
+
+resnames = c("Twitter Dummy", "Twitter Count", "Tariff", "Trade", "China")
+
+#extract p-values directly from checkresiduals results
+pvals <- data.frame("X-Regressor" = resnames,
+                    `Full Timeframe` = c(
+                      res1$p.value,
+                      res2$p.value,
+                      res3$p.value,
+                      res4$p.value,
+                      res5$p.value))
+
+
+```
+
+
+
+
+```{r datasetup first, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+#First term Calculations
+
+#load final dataset
+data = backup
+
+#first term
+data = filter(data,between(timestamp, as.Date('2017-01-20'), as.Date('2021-01-20')))
+
+#for interpretation
+mean2 = mean(data$SPY_vol)
+
+```
+
+
+```{r 1st term models, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
+#SPY Models first Term
+
+models <- list()
+
+# ARMA-X(3,3,0) with Tariff Mentions as Exogenous
+models[["First Term (1)"]] <- armax(data$SPY_vol, xreg = data$tariff, latex = F,
+                             nb.lags = 0, p = 3, q = 3) 
+
+# ARMA-X(3,3,0) with Trade Mentions as Exogenous
+models[["First Term (2)"]] <- armax(data$SPY_vol, xreg = data$trade, latex = F,
+                             nb.lags = 0, p = 3, q = 3)
+
+# ARMA-X(3,3,0) with Trade Mentions as Exogenous
+models[["First Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
+                             nb.lags = 0, p = 3, q = 3) 
+
+```
+
+
+```{r 1st SPYresiduals, warning=F, message=F, results=F, echo=FALSE, cache=TRUE}
+# Run first term residuals
+res6 = checkresiduals(models[["First Term (1)"]], plot = FALSE)
+res7 = checkresiduals(models[["First Term (2)"]], plot = FALSE)
+res8 = checkresiduals(models[["First Term (3)"]], plot = FALSE)
+
+pvals_new1 <- data.frame(
+  "First-Term" = c(
+    NA,
+    NA,
+    res6$p.value,
+    res7$p.value,
+    res8$p.value))
+
+```
+
+
+
+
+```{r datasetup second, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+#Second Term Calculations
+
+#load final dataset
+data = backup
+
+#second term
+data = filter(data,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05-07')))
+
+#for interpretation
+mean3 = mean(data$SPY_vol)
+
+```
+
+
+```{r 2nd term models, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
+#Run Second Term Models
+
+# ARMA-X(3,2,3) with Tariff Mentions as Exogenous
+models[["Second Term (1)"]] <- armax(data$SPY_vol, xreg = data$tariff, latex = F,
+                             nb.lags = 2, p = 1, q = 2) 
+
+# ARMA-X(3,2,1) with Trade Mentions as Exogenous
+models[["Second Term (2)"]] <- armax(data$SPY_vol, xreg = data$trade, latex = F,
+                             nb.lags = 0, p = 1, q = 2) 
+
+# ARMA-X(3,2,0) with China Mentions as Exogenous
+models[["Second Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
+                             nb.lags = 2, p = 1, q = 2) 
+
+```
+
+
+
+```{r 2nd SPYresiduals, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
+# Calculate SPY residuals for the second term
+
+res9 = checkresiduals(models[["Second Term (1)"]], plot = FALSE)
+res10 = checkresiduals(models[["Second Term (2)"]], plot = FALSE)
+res11 = checkresiduals(models[["Second Term (3)"]], plot = FALSE)
+
+pvals_new2 <- data.frame(
+  "Second-Term" = c(
+    NA,
+    NA,
+    res9$p.value,
+    res10$p.value,
+    res11$p.value))
+
+#combine with other term
+pvals_combined <- cbind(pvals,pvals_new1)
+pvals_combined <- cbind(pvals_combined, pvals_new2)
+
+```
+
+
+### SPY ARMAX Table (Split Presidential Terms)
+
+\centering 
+
+```{r spy-table-terms, results="asis", warning=F, message=F}
+
+xnames = list("ar1" = "AR(1)",
+              "ar2" = "AR(2)",
+              "ar3" = "AR(3)",
+              "ma1" = "MA(1)",
+              "ma2" = "MA(2)",
+              "ma3" = "MA(3)",
+              "(Intercept)" = "Constant",
+              "tariff_lag_0" = "$Tariff_{t}$",
+              "tariff_lag_1" = "$Tariff_{t-1}$",
+              "tariff_lag_2" = "$Tariff_{t-2}$",
+              "trade_lag_0" = "$Trade_{t}$",
+              "china_lag_0" = "$China_{t}$",
+              "china_lag_1" = "$China_{t-1}$",
+              "china_lag_2" = "$China_{t-2}$")
+
+table2 = texreg(models,
+       custom.model.names = names(models), 
+       custom.coef.map = xnames,
+       caption = "Split-Term ARMAX Models of Average Hourly Volatility",
+       caption.above = TRUE,
+       label = "tab:armax_term",
+       digits = 4)
+table2
+
+#write(table2, file = "armax_table2.tex")
+
+```
+
+
+### SPY ARMAX IRFs (Split Terms)
+
+```{r SPY-SPLIT-IRF, warning=F, message=F, echo=FALSE, cache=TRUE}
+
+#we want to plot the IRFs of these models
+nb.periods = 7 * 15
+
+plot2 = irf.plot(models[["Second Term (1)"]],nb.periods,
+                 title="Tariff Mention Shock - Second Term")
+plot2
+
+#ggsave("armax_plot2.png",plot=plot2,bg="white")
+
+plot3 = irf.plot(models[["Second Term (3)"]],nb.periods,
+                 title="China Mention Shock - Second Term")
+plot3
+
+#ggsave("armax_plot3.png",plot=plot3,bg="white")
+
+```
+
+
+### Residual Test 
+
+```{r SPY-res-test, message=FALSE, warning=FALSE, results="asis"}
+
+table3 = knitr::kable(pvals_combined, digits = 100, format="latex",
+             caption = "Ljung-Box Test p-values for Residuals")
+
+table3
+
+#write(table3, file = "armax_table3.tex")
+
+```
+
+### Descriptive Stats
+ 
+```{r means-table, message=F, warning=F, results="asis"}
+
+means <- data.frame(
+  Model = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
+  `SPY Volatility Mean` = c(
+    mean1,
+    mean2,
+    mean3))
+
+table4 = knitr::kable(means, digits = 6, format="latex",
+             caption = "Summary Statistics of SPY Volatility")
+
+table4
+
+#write(table4, file = "armax_table4.tex")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{appendix}}
+
+
+
+
+
+
+\clearpage
