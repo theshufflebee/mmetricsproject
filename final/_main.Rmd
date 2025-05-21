@@ -214,12 +214,12 @@ Information is one of the most valuable assets in the financial market.
 Its importance lies at the core of the "Efficient Market Hypothesis", 
 which states that the prices of assets fully reflect all
 available information, adjusting immediately to any new data
-@famaAdjustmentStockPrices2003 , and thereby creating a strong demand
+(@famaAdjustmentStockPrices2003) , and thereby creating a strong demand
 for information flow. In addition, the “Mixture of Distribution
 Hypothesis” states that the release of new information is closely linked
 to movements in both realized and implied volatility
-@andersenReturnVolatilityTrading1996, @frenchStockReturnVariances1986,
-@vlastakisInformationDemandStock2012.
+(@andersenReturnVolatilityTrading1996, @frenchStockReturnVariances1986,
+@vlastakisInformationDemandStock2012).
 
 Consequently, a large part of the literature had focused on the relation
 between announcements, news and market activity. For example,
@@ -237,8 +237,8 @@ which revolutionized the dissemination and accessibility of information.
 Social media enable investors, analysts or politicians to instantly
 share their information, news or opinions. This led some studies to
 focus on the communication dynamics of social platform to predict
-changes in the returns of financial assets @dechoudhuryCanBlogCommunication2008 & 
-@bartovCanTwitterHelp2018. In this context, the
+changes in the returns of financial assets (@dechoudhuryCanBlogCommunication2008,
+@bartovCanTwitterHelp2018). In this context, the
 impact of Trump’s tweets on various financial and macroeconomic
 variables has been analysed by several studies, especially during his
 first mandate.
@@ -248,20 +248,20 @@ Using high-frequency financial data,
 trading volume, along with a decline in the U.S. stock market—regardless
 of the tweet's content. However, the effect was stronger when Trump used
 confrontational words such as "tariff" or "trade war." Some of his
-announcements also influenced the U.S. dollar exchange rate @vlastakisInformationDemandStock2012
-and certain market indices within minutes of the tweet being posted
-@colonescuEffectsDonaldTrumps2018 & @kinyuaAnalysisImpactPresident2021.
+announcements also influenced the U.S. dollar exchange rate (@vlastakisInformationDemandStock2012)
+and certain market indices within minutes of the tweet being posted(
+@colonescuEffectsDonaldTrumps2018 & @kinyuaAnalysisImpactPresident2021).
 
 Other scholars have shown that negative Trump tweets about specific
-companies tended to reduce demand for their stocks @bransHisThumbEffect2020 &
-@mendelsStanfordResearchSeries2019, whereas some
+companies tended to reduce demand for their stocks (@bransHisThumbEffect2020,
+@mendelsStanfordResearchSeries2019), whereas some
 other have shown that they also impact market volatility indices such as
-the VIX @fendelPoliticalNewsStock2019 or the Volfele @klausMeasuringTrumpVolfefe2021.
+the VIX (@fendelPoliticalNewsStock2019) or the Volfele (@klausMeasuringTrumpVolfefe2021).
 The effects of his tweets also extended beyond the U.S.. For example,
 @nishimuraImpactsDonaldTrumps2025 shows a
 positive relationship between volatility in European stock markets and
 tweeter activity of Trump, and this effect tends to intensify as public
-intention for his tweet grows @nishimuraImpactsDonaldTrumps2025.
+intention for his tweet grows.
 
 Our paper is built as follows: Section 2 describes the data, their sources, and 
 the several transformations applied. Section 3 focuses on ARMA-X models, describing 
@@ -1052,7 +1052,7 @@ kable(pvals_combined, digits = 6, format="html", caption = "Ljung-Box Test p-val
 ```{r tab-means, message=F, warning=F, results="asis", cache=TRUE, echo=FALSE}
 
 means <- data.frame(
-  Model = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
+  Timeframe = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
   `SPY Volatility Mean` = c(
     mean1,
     mean2,
@@ -2165,7 +2165,7 @@ table_texreg_s <- htmlreg(
   digits = 6,
   custom.gof.rows = list("Shock (IRF)" = c(0.014659, 0.013315, 0.010752, -0.005665, 0.013937)),
   star.cutoffs = c(0.05, 0.01, 0.001),
-  custom.note = "\\parbox[t]{0.9\\textwidth}{\\small\\textit{This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.}}",
+  custom.note = "This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.",
   file = tmpfile_s
 )
 
