@@ -1042,7 +1042,7 @@ table_texreg_f <- texreg(
   digits = 6,
   custom.gof.rows = list("Shock (IRF)" = c(0.002919, 0.002236, 0.000484, 0.000702, 0.000904)),
   star.cutoffs = c(0.001, 0.01, 0.05),
-  custom.note = "This table displays VAR regression with only two variables : AHV and the X regressor. The column names represent the X variable for the selected model."
+  custom.note = "\\parbox[t]{0.9\\textwidth}{\\small\\textit{This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.}}"
 )
 
 # Print table
@@ -1165,7 +1165,7 @@ table_texreg_s <- texreg(
   digits = 6,
   custom.gof.rows = list("Shock (IRF)" = c(0.014659, 0.013315, 0.010752, -0.005665, 0.013937)),
   star.cutoffs = c(0.05, 0.01, 0.001),
-  custom.note = "This table displays VAR regression with only two variables : AHV and the X regressor. The column names represent the X variable for the selected model."
+  custom.note = "\\parbox[t]{0.9\\textwidth}{\\small\\textit{This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.}}"
 )
 
 
