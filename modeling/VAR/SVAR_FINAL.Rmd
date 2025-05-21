@@ -1,12 +1,14 @@
 ---
 title: "Final_VAR"
 output:
-  pdf_document: 
+  html_document:
     toc: true
-    fig_caption: yes
+    df_print: paged
+  pdf_document:
+    toc: true
+    fig_caption: true
     latex_engine: lualatex
-header-includes:
-  - \usepackage{amsmath}
+header-includes: \usepackage{amsmath}
 ---
 
 
@@ -199,118 +201,6 @@ Vdata = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-0
 
 
 
-
-#IRF
-
-## Tariff (Overall)
-
-```{r estime tariff, message=FALSE, warning=FALSE}
-y3 = cbind(Vdata$tariff, Vdata$SPY_vol)
-colnames(y3)[1:2] <- c("tariff", "vol")
-est.VAR3 <- VAR(y3,p=6)
-
-#extract results
-mod_vol3 = est.VAR3$varresult$vol
-f3 = formula(mod_vol3)
-d3 = model.frame(mod_vol3)
-lm_clean3 = lm(f3, data= d3)
-
-#apply Newey-West
-nw_vcov3 = NeweyWest(lm_clean3, lag=6)
-nw_se3 = sqrt(diag(nw_vcov3))
-
-#t-stats
-coef3 = coef(lm_clean3)
-t_stat3 = coef3/nw_se3
-
-#recalculate p-values
-robust3 = 2*(1-pt(abs(t_stat3), df = df.residual(lm_clean3)))
-
-```
-
-```{r B mat3}
-#Recreate a Robust Omega Matrix
-U3 = residuals(est.VAR3)
-T3 = nrow(U3)
-Omega3 = matrix(0, ncol(U3), ncol(U3))
-for(l in 0:L) {
-  weight = 1 - l/(L+1)
-  Gamma_l_3 = t(U3[(l+1):T3, , drop=FALSE]) %*% U3[1:(T3-l), , drop=FALSE] /T3
-  if (l == 0){
-    Omega3 = Omega3 + Gamma_l_3
-  } else {
-    Omega3 = Omega3 + weight*(Gamma_l_3 + t(Gamma_l_3))
-  }
-}
-
-
-#make the B matrix
-loss3 <- function(param3){
-  #Define the restriction
-  B3 <- matrix(c(param3[1], param3[2], 0, param3[3]), ncol = 2)
-  
-  #Make BB' approximatively equal to omega
-  X3 <- Omega3 - B3 %*% t(B3)
-  
-  #loss function
-  loss3 <- sum(X3^2)
-  return(loss3)
-}
-
-res.opt3 <- optim(c(1, 0, 1), loss3, method = "BFGS")
-B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol = 2)
-
-
-
-```
-
-
-```{r IRF tariffff}
-#get back the coefficient of est.VAR
-phi3 <- Acoef(est.VAR3)
-PHI3 = make.PHI(phi3)
-
-#take the constant
-constant3 <- sapply(est.VAR3$varresult, function(eq) coef(eq)["const"])
-c3=as.matrix(constant3)
-
-#Simulate the IRF
-p3 <- length(phi3)
-n3 <- dim(phi3[[1]])[1]
-
-Y3 <- simul.VAR(c=c3, Phi = phi3, B = B.hat3, nb.sim ,y0.star=rep(0, n3*p3),
-                  indic.IRF = 1, u.shock = c(1,0))
-
-
-#Plot the IRF
-Yd3 = data.frame(
-  period = 1:nrow(Y3),
-  response = Y3[,2])
-
-ggplot(Yd3,aes(x=period, y=response)) +
-  geom_hline(yintercept = 0, color="red") +
-  geom_line() +
-  theme_light() +
-  ggtitle("S&P IRF of tariff on Volatility") +
-  ylab("")+
-  xlab("") +
-  theme_minimal()
-```
-
-
-```{r IRF tariff}
-ggplot(Yd3,aes(x=period, y=cumsum(response))) +
-  geom_hline(yintercept = 0, color="red") +
-  geom_line() +
-  theme_light() +
-  ggtitle("S&P Cumulalitve IRF of tariff on Volatility") +
-  ylab("")+
-  xlab("") +
-  theme_minimal()
-```
-
-
-
 ## Dummy (Overall)
 
 
@@ -425,6 +315,120 @@ ggplot(Yd,aes(x=period, y=cumsum(response))) +
   xlab("") +
   theme_minimal()
 ```
+
+
+#IRF
+
+## Tariff (Overall)
+
+```{r estime tariff, message=FALSE, warning=FALSE}
+y3 = cbind(Vdata$tariff, Vdata$SPY_vol)
+colnames(y3)[1:2] <- c("tariff", "vol")
+est.VAR3 <- VAR(y3,p=6)
+
+#extract results
+mod_vol3 = est.VAR3$varresult$vol
+f3 = formula(mod_vol3)
+d3 = model.frame(mod_vol3)
+lm_clean3 = lm(f3, data= d3)
+
+#apply Newey-West
+nw_vcov3 = NeweyWest(lm_clean3, lag=6)
+nw_se3 = sqrt(diag(nw_vcov3))
+
+#t-stats
+coef3 = coef(lm_clean3)
+t_stat3 = coef3/nw_se3
+
+#recalculate p-values
+robust3 = 2*(1-pt(abs(t_stat3), df = df.residual(lm_clean3)))
+
+```
+
+```{r B mat3}
+#Recreate a Robust Omega Matrix
+U3 = residuals(est.VAR3)
+T3 = nrow(U3)
+Omega3 = matrix(0, ncol(U3), ncol(U3))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_3 = t(U3[(l+1):T3, , drop=FALSE]) %*% U3[1:(T3-l), , drop=FALSE] /T3
+  if (l == 0){
+    Omega3 = Omega3 + Gamma_l_3
+  } else {
+    Omega3 = Omega3 + weight*(Gamma_l_3 + t(Gamma_l_3))
+  }
+}
+
+
+#make the B matrix
+loss3 <- function(param3){
+  #Define the restriction
+  B3 <- matrix(c(param3[1], param3[2], 0, param3[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X3 <- Omega3 - B3 %*% t(B3)
+  
+  #loss function
+  loss3 <- sum(X3^2)
+  return(loss3)
+}
+
+res.opt3 <- optim(c(1, 0, 1), loss3, method = "BFGS")
+B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol = 2)
+
+
+
+```
+
+
+```{r IRF tariffff}
+#get back the coefficient of est.VAR
+phi3 <- Acoef(est.VAR3)
+PHI3 = make.PHI(phi3)
+
+#take the constant
+constant3 <- sapply(est.VAR3$varresult, function(eq) coef(eq)["const"])
+c3=as.matrix(constant3)
+
+#Simulate the IRF
+p3 <- length(phi3)
+n3 <- dim(phi3[[1]])[1]
+
+Y3 <- simul.VAR(c=c3, Phi = phi3, B = B.hat3, nb.sim ,y0.star=rep(0, n3*p3),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd3 = data.frame(
+  period = 1:nrow(Y3),
+  response = Y3[,2])
+
+ggplot(Yd3,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P IRF of tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+
+```{r IRF tariff}
+ggplot(Yd3,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("S&P Cumulalitve IRF of tariff on Volatility") +
+  ylab("")+
+  xlab("") +
+  theme_minimal()
+```
+
+
+
+
 
 
 
