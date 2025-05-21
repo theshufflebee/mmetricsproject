@@ -2,27 +2,18 @@
 
 ## Methodology
 
-We develop a SVAR model in order to assess the impact of
-short-run shocks from Trump's posts on AHV, and to evaluate whether
-market volatility can, in turn, influence Trump's posting behavior. In
-this framework, we systematically pair AHV with one explanatory variable
-at a time (our X-regressor). The SVAR approach offers the advantage of accounting for
-structural endogeneity. Our main assumption is that the volatility
-does not contemporaneously affect Trump's posting activity - neither
-quantitatively nor qualitatively, while Trump's posts do affect markets instantly. 
-In essence, we impose a short-run restriction on the shock of volatility for all the
-social media variables.
-
-Based on the information criteria, we found similar results across all
-specifications, with a recommended lag length of around 70. However,
-inducing more than 6 lags (corresponding to a full trading day)
-introduces strong seasonality. Moreover, the higher the number of lags,
-the greater the persistence of a shock, up to unrealistic levels such as 150 days 
-for the number of Tweets, which seems implausible. Therefore, we chose to fix the
-number of lags at a maximum of 6. Finally, given the presence of heteroscedasticity
-and serial correlation in the residuals, we use the Newey-West estimator
+We develop an SVARmodel in order to assess the impact of short-run shocks from Trump’s posts on AHV, and to evaluate
+whether market volatility can, in turn, influence Trump’s posting behavior. In this framework, we systematically pair
+AHV with one explanatory variable at a time (our X-regressor). The SVAR approach offers the advantage of accounting
+for structural endogeneity. Our main assumption is that the volatility does not contemporaneously affect Trump’s posting
+activity- neither quantitatively nor qualitatively, while Trump’s posts do affect markets instantly. In essence, we impose
+a short-run restriction on the shock of volatility for all the social media variables.
+Based on the information criteria, we found similar results across all specifications, with a recommended lag length of
+around 70. However, inducing more than 6 lags (corresponding to a full trading day) introduces strong seasonality.
+Moreover, the higher the number of lags, the greater the persistence of a shock, up to unrealistic levels such as 150 days
+for the number of Tweets, which seems implausible. Therefore, we chose to fix the number of lags at a maximum of 6.
+Finally, given the presence of heteroscedasticity and serial correlation in the residuals, we use the Newey-West estimator
 to compute robust standard errors.
-
 
 ## Results
 
