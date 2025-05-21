@@ -67,7 +67,7 @@ tokens <- tokens(full_posts)
 dfm <- dfm(tokens)
 corpus_tweets <- corpus(tweets$text)
 
-additional_words <- c("rt")
+additional_words <- c("rt", "amp")
 all_stopwords <- c(stopwords("en"), additional_words)
 
 tokens_tweets <- tokens(corpus_tweets,  
