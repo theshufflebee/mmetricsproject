@@ -1168,7 +1168,7 @@ table_texreg_s <- texreg(
   custom.note = "\\parbox[t]{0.9\\textwidth}{\\small\\textit{This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.}}"
 )
 
-
+ 
 
 # Print
 table_texreg_s
