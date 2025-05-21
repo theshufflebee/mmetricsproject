@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Part 3 ARMA-X | Terminally Online: Does Donald Trump impact Financial Markets</title>
+  <title>Part 4 SVAR | Terminally Online: Does Donald Trump impact Financial Markets</title>
   <meta name="description" content="&lt;p&gt;This is our website for a Universityproject. We put this together from a basic bookdown example so there might be some stuff in here from that.&lt;/p&gt;" />
   <meta name="generator" content="bookdown 0.43 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Part 3 ARMA-X | Terminally Online: Does Donald Trump impact Financial Markets" />
+  <meta property="og:title" content="Part 4 SVAR | Terminally Online: Does Donald Trump impact Financial Markets" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="&lt;p&gt;This is our website for a Universityproject. We put this together from a basic bookdown example so there might be some stuff in here from that.&lt;/p&gt;" />
   <meta name="github-repo" content="www.github.com/theshufflebee/mmetricsproject" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Part 3 ARMA-X | Terminally Online: Does Donald Trump impact Financial Markets" />
+  <meta name="twitter:title" content="Part 4 SVAR | Terminally Online: Does Donald Trump impact Financial Markets" />
   
   <meta name="twitter:description" content="&lt;p&gt;This is our website for a Universityproject. We put this together from a basic bookdown example so there might be some stuff in here from that.&lt;/p&gt;" />
   
@@ -29,8 +29,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="data.html"/>
-<link rel="next" href="svar.html"/>
+<link rel="prev" href="arma-x.html"/>
+<link rel="next" href="conclusion.html"/>
 
 
 
@@ -2313,67 +2313,89 @@ margin-left: 2em;
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="arma-x" class="section level1 hasAnchor" number="3">
-<h1><span class="header-section-number">Part 3</span> ARMA-X<a href="arma-x.html#arma-x" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<div id="methodology" class="section level2 hasAnchor" number="3.1">
-<h2><span class="header-section-number">3.1</span> Methodology<a href="arma-x.html#methodology" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Once we have our final dataframe, we could then finally start on some analysis.
-We first thought of a simple ARMA-X type specification, taking the AHV as our
-“y variable” and taking any of the social media variables as the exogenous
-regressors. The assumption here is that, while the market reacts to Trump posts,
-Trump’s posts are chaotic, nonsensical, and random enough to be considered
-exogenous.</p>
-<p>We of course first start by checking stationarity of our variables (ADF), where we find
-p-values of 0.01 suggesting that the processes are not explosive. Then, we use
-a custom function in order to choose the number of lags based on the AIC criterion.
-This however, while often choose a very high number of lags, which could be
-explained by our data being hourly. As such we decided to put a limit of 3 lags,
-which sees minimal AIC loss and simplifying our models considerably.</p>
+<div id="svar" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">Part 4</span> SVAR<a href="svar.html#svar" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="methodology-1" class="section level2 hasAnchor" number="4.1">
+<h2><span class="header-section-number">4.1</span> Methodology<a href="svar.html#methodology-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We develop a SVAR model in order to assess the impact of
+short-run shocks from Trump’s posts on AHV, and to evaluate whether
+market volatility can, in turn, influence Trump’s posting behavior. In
+this framework, we systematically pair AHV with one explanatory variable
+at a time (our X-regressor). The SVAR approach offers the advantage of accounting for
+structural endogeneity. Our main assumption is that the volatility
+does not contemporaneously affect Trump’s posting activity - neither
+quantitatively nor qualitatively, while Trump’s posts do affect markets instantly.
+In essence, we impose a short-run restriction on the shock of volatility for all the
+social media variables.</p>
+<p>Based on the information criteria, we found similar results across all
+specifications, with a recommended lag length of around 70. However,
+inducing more than 6 lags (corresponding to a full trading day)
+introduces strong seasonality. Moreover, the higher the number of lags,
+the greater the persistence of a shock, up to unrealistic levels such as 150 days
+for the number of Tweets, which seems implausible. Therefore, we chose to fix the
+number of lags at a maximum of 6. Finally, given the presence of heteroscedasticity
+and serial correlation in the residuals, we use the Newey-West estimator
+to compute robust standard errors.</p>
 </div>
-<div id="results" class="section level2 hasAnchor" number="3.2">
-<h2><span class="header-section-number">3.2</span> Results<a href="arma-x.html#results" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="full-timeframe" class="section level3 hasAnchor" number="3.2.1">
-<h3><span class="header-section-number">3.2.1</span> Full Timeframe<a href="arma-x.html#full-timeframe" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>We run models with the following exogenous regressors: <span class="math inline">\(TweetDummy\)</span>, <span class="math inline">\(TweetCount\)</span>,
-and the mentions of words <span class="math inline">\(Tariff\)</span>, <span class="math inline">\(Trade\)</span>, and <span class="math inline">\(China\)</span>. We first note on the table
-in section <a href="appendix.html#sec:spy-table">7.1.1</a> that all the x-regressors are significant,
-apart from trade. Notice also that all the coefficients (apart from <span class="math inline">\(Tariff_{t-3}\)</span>)
-are positive, in line with our main hypothesis. The effect of <span class="math inline">\(Tariff_{t-1}\)</span> and
-<span class="math inline">\(Tariff_{t-2}\)</span> are especially large, given the usual size of the volatility as seen
-in Section <a href="appendix.html#sec:means-table">7.1.6</a>. We in fact predict that an
-extra mention of tariffs one hour ago, leads to a whopping extra 0.02 in volatility
-which is just about the average size for the full timeframe. We can see the
-impulse response function (IRF) for this shock, in <a href="appendix.html#sec:SPY-IRF">7.1.2</a> Notice that
-there is a large response in the first periods, and then a graduate
-decline over time. Something to note is that in our analyses of IRF’s, when including
-MA terms, the decline shows up gradual while being much sharper when only including
-AR terms.
-Note that we ran all these models on the VGK and ASHR ETF’s as well, though no
-significant results appear apart from a small but statistically significant effect
-of the tariff variable for VGK.</p>
+<div id="results-1" class="section level2 hasAnchor" number="4.2">
+<h2><span class="header-section-number">4.2</span> Results<a href="svar.html#results-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="full-timeframe-1" class="section level3 hasAnchor" number="4.2.1">
+<h3><span class="header-section-number">4.2.1</span> Full Timeframe<a href="svar.html#full-timeframe-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>As in the ARMA-X framework, we initially estimate a model for each of our five
+main variables. For all estimations using the SPY ETF market, the significant
+coefficients of social media variables were consistently negative, while the
+positive coefficients were large but not significant <a href="appendix.html#sec:svar-table-1">7.2.6</a>.
+(<span style="color:red"><em>desc1figVAR</em></span>)
+For the <span class="math inline">\(Tariff\)</span>, <span class="math inline">\(Trade\)</span> and <span class="math inline">\(China\)</span> mention variables, the first, second and sometimes forth
+lag were positive and relatively large (especially in the case of Tariff), while
+the remaining ones were not. In contrast, for <span class="math inline">\(TweetCount\)</span> and <span class="math inline">\(TweetDummy\)</span>, we
+observed fewer and smaller positive coefficients. At the same time, we found
+that the contemporaneous effects of the shocks were all positive and relatively
+strong. This leads to two types of scenarios : either
+the IRF’s experienced a positive shock and remain elevated (<span class="math inline">\(Tariff\)</span>, <span class="math inline">\(Trade\)</span> and <span class="math inline">\(China\)</span>),
+or a highly positive shock occurs, but the cumulative effect turns negative after few
+hours (<span class="math inline">\(TweetDummy\)</span> and <span class="math inline">\(Count\)</span>). <a href="appendix.html#sec:irf-dummy">7.2.1</a>, <a href="appendix.html#sec:irf-cum-dummy">7.2.2</a>
+<span style="color:red"><em>IRFtarifVAR</em></span> <span style="color:red"><em>IRFdummyVAR</em></span></p>
+<p>Finally, except for <span class="math inline">\(Tariff\)</span>, all Granger causality tests indicate that Trump’s
+posts have an impact on volatility. However, due to serial correlation in the
+residuals, these results should be interpreted with caution. Overall, this model
+suggest that Trump’s posts tend to have a positive instantaneous effect on
+volatility, but with very low persistence.
+When analyzing the European and Chinese ETF’s, we observe similar patterns
+though with lower magnitude, except for the impact of <span class="math inline">\(Tariff\)</span> and <span class="math inline">\(China\)</span> on the
+ASHR ETF (Chinese Market), where the cumulative effects show no positive impact. Additionally,
+the VGK ETF (European Market) appears to react more strongly than ASHR to
+Trump’s posts, especially those mentioning <span class="math inline">\(Trade\)</span> and <span class="math inline">\(Tariff\)</span>.</p>
+<p>Regarding the impact of AHV on Trump’s posts, we find some evidence of a
+negative effect. For all variables, we observe one or two significantly
+negative coefficients per variables, typically on the first and fourth lag, alongside many
+insignificant ones. However, only <span class="math inline">\(TweetCount\)</span> and China pass the Granger test in
+the US ETF Surprisingly, a large number of Granger tests in the Chinese and
+European ETFs indicate strong Granger causality, which may point to a limitation
+of the test itself, as such results appear unrealistic.</p>
 </div>
-<div id="split-samples" class="section level3 hasAnchor" number="3.2.2">
-<h3><span class="header-section-number">3.2.2</span> Split Samples<a href="arma-x.html#split-samples" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>We then split our sample for the first and second term of the Trump presidency.
-We only run models on tariff, trade and china this time. As seen on table
-<a href="appendix.html#sec:spy-table-terms">7.1.3</a>, the first interesting result
-is in the coefficients of tariff being significant and very large in the second
-term, while being small and not statistically significant in the first. A similar
-story goes for the China variable. This may lend some evidence to support the
-claim that investors are much more reactive to Trump’s social media presence
-now than before. We’ve found similar IRF’s as for the full timeframe. Tables <a href="appendix.html#sec:SPY-IRF">7.1.2</a>
-show the IRF’s for the second term, of the impacts of tariff and china mention
-shocks on the AHV.
-Finally, we can check the residuals of all these models to test them somewhat.
-In Section <a href="appendix.html#sec:SPY-res-test">7.1.5</a>, the pvalues being zero
-for the full timeframe and first term indicate that there is autocorrelation in
-the residuals, thus suggesting that these estimations have problems. Note however,
-that the p-values for the second term are quite high, lending support to our
-models on the split sample. These results suggest that perhaps ARMA-X models are
-not right in this context as it is not unreasonable to think that Trump does
-in fact react to market movements, which would break the exogeneity assumption
-that is critical for this type of model. With this information, we decided to run
-a VAR model to deepen our understanding of these variables.</p>
+<div id="split-sample" class="section level3 hasAnchor" number="4.2.2">
+<h3><span class="header-section-number">4.2.2</span> Split Sample<a href="svar.html#split-sample" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>For the split framework, the results were similar and striking <a href="appendix.html#sec:irf-china-2">7.2.7</a>
+<span style="color:red"><em>IRFchinasecondtermVAR</em></span>. While we
+observed relatively small shock effects and almost entirely negative coefficients
+during the first term <a href="appendix.html#sec:tab-svar-1">7.2.9</a> (<span style="color:red"><em>descFirsttermfigVAR</em></span>), leading the
+cumulative IRF’s to indicate a negative impact of posts, the shock effects in the
+second term were substantially larger, ranging from 5 times (for <span class="math inline">\(TweetCount\)</span> and
+<span class="math inline">\(TweetDummy\)</span>) to as much as 25 times greater (for <span class="math inline">\(Tariff\)</span>). the only exception was
+<span class="math inline">\(Trade\)</span> in the second term, which showed the only negative impact from a shock.
+Once again, we found positive lagged coefficients in the second term, mostly on
+the first, second and forth lags. However, none of these coefficients were
+statistically significant, but the cumulative IRF’s clearly show a high positive
+impact on everything except for <span class="math inline">\(TweetDummy\)</span> and <span class="math inline">\(TweetCount\)</span>, whose
+coefficients and cumulative IRF’s displayed similar patterns to those observed
+in the first term. <a href="appendix.html#sec:tab-svar-2">7.2.10</a> (<span style="color:red"><em>descSecondtermfigVAR</em></span>)
+Moreover, the Granger tests generally failed in both terms, with the sole
+exception being <span class="math inline">\(China\)</span> in the second term.
+Regarding the ASHR ETF, we found results similar to those for the US ETF. Surprisingly,
+in the case of the European market, we observed a positive
+impact of Trump’s posts on AHV during the first term. Nevertheless, the results
+still indicate a stronger impact of posts during the second term.</p>
 
 </div>
 </div>
@@ -2383,8 +2405,8 @@ a VAR model to deepen our understanding of these variables.</p>
           </div>
         </div>
       </div>
-<a href="data.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="svar.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="arma-x.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="conclusion.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script>/*! jQuery v3.6.0 | (c) OpenJS Foundation and other contributors | jquery.org/license */
@@ -3395,7 +3417,7 @@ gitbook.start({
     "size": 2
   },
   "edit": {
-    "link": "https://github.com/USERNAME/REPO/edit/BRANCH/03-armax.Rmd",
+    "link": "https://github.com/USERNAME/REPO/edit/BRANCH/04-var.Rmd",
     "text": "Edit"
   },
   "history": {

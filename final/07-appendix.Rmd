@@ -120,7 +120,7 @@ models[["Model 5"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 ```
 
 ### SPY ARMAX Table (Jan 2014 - May 2025) {#sec:spy-table}
-```{r armaxfull, results="asis", warning=FALSE, echo=FALSE, message=FALSE, cache=TRUE}
+```{r tab-armax-full, results="asis", warning=FALSE, echo=FALSE, message=FALSE, cache=TRUE}
 library(texreg)
 
 # Define variable display names (HTML-friendly using <sub>)
@@ -162,7 +162,7 @@ cat(
 
 ### SPY ARMAX IRFs (Jan 2014 - May 2025){#sec:SPY-IRF}
 
-```{r SPYirf, results="asis", warning=F, message=F, echo=FALSE, cache=TRUE}
+```{r fig-SPYirf, results="asis", warning=F, message=F, echo=FALSE, cache=TRUE}
 
 #we want to plot the IRFs of these models
 nb.periods = 7 * 15
@@ -324,7 +324,7 @@ pvals_combined <- cbind(pvals_combined, pvals_new2)
 
 \centering
 
-```{r armax1, results="asis", warning=F, echo=FALSE, message=F, cache=TRUE}
+```{r tab-armax-split, results="asis", warning=F, echo=FALSE, message=F, cache=TRUE}
 
 library(texreg)
 
@@ -384,7 +384,7 @@ plot3
 
 ### Residual Test {#sec:SPY-res-test}
 
-```{r res-table, message=F, warning=F, results="asis", echo=FALSE, cache=TRUE}
+```{r tab-res-test, message=F, warning=F, results="asis", echo=FALSE, cache=TRUE}
 
 kable(pvals_combined, digits = 6, format="html", caption = "Ljung-Box Test p-values for Residuals") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, position = "center")
@@ -395,7 +395,7 @@ kable(pvals_combined, digits = 6, format="html", caption = "Ljung-Box Test p-val
 
 ### Descriptive Stats{#sec:means-table}
  
-```{r means, message=F, warning=F, results="asis", cache=TRUE, echo=FALSE}
+```{r tab-means, message=F, warning=F, results="asis", cache=TRUE, echo=FALSE}
 
 means <- data.frame(
   Model = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
@@ -477,7 +477,7 @@ res.opt <- optim(c(1, 0, 1), loss, method = "BFGS")
 B.hat <- matrix(c(res.opt$par[1], res.opt$par[2], 0, res.opt$par[3]), ncol = 2)
 ```
 
-### Full Timeframe IRF Tweet Dummy
+### SVAR IRF for Tweet Dummy{#sec:irf-dummy}
 
 ```{r IRF 1dummy, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 nb.sim = 7*7
@@ -514,7 +514,7 @@ ggplot(Yd,aes(x=period, y=response)) +
 
 ```
 
-### Cumultative IRF of Dummy Full term
+### SVAR Cumultative IRF of Tweet Dummy{#sec:irf-cum-dummy}
 
 ```{r IRF 2Dummy, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 ggplot(Yd,aes(x=period, y=cumsum(response))) +
@@ -613,7 +613,7 @@ B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol =
 
 ```
 
-### IRF Tariff full Timeframe
+### SVAR IRF for Tariff{#sec:irf-tariff}
 
 ```{r IRF tariffff, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 #get back the coefficient of est.VAR
@@ -647,7 +647,7 @@ ggplot(Yd3,aes(x=period, y=response)) +
   theme_minimal()
 ```
 
-### IRF Tariff Cumultative
+### SVAR Cumultatove IRF for Tariff{#sec:irf-cum-tariff}
 
 ```{r IRF tariff, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 ggplot(Yd3,aes(x=period, y=cumsum(response))) +
@@ -714,7 +714,7 @@ t_statchina = coefchina/nw_sechina
 robustchina = 2*(1-pt(abs(t_statchina), df = df.residual(lm_cleanchina)))
 ```
 
-### Table 1 VAR results='asis'
+### SVAR Table Full Timeframe
 
 ```{r mana, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 dt_t = d %>%
@@ -844,9 +844,9 @@ custom_names <- list(
   "const" = "Constant"
 )
 ```
-### html table
+### SVAR Table Full Timeframe{#sec:svar-table-1}
 
-```{r, warning=FALSE, results='asis', echo=FALSE}
+```{r tab:first-var, warning=FALSE, results='asis', echo=FALSE}
 tmpfile <- tempfile(fileext = ".html")  # create temp file
 
 table_texreg_html <- htmlreg(
@@ -862,6 +862,7 @@ table_texreg_html <- htmlreg(
   file = tmpfile
 )
 
+# Manually add a caption in HTML format
 cat(readLines(tmpfile), sep = "\n")
 ```
 
@@ -886,7 +887,6 @@ Vdata_s = filter(data,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05
 ```
 
 
-### Dummy First Term
 
 ```{r first mandate dum, warning=FALSE, message=FALSE, results="asis", cache=TRUE, echo=FALSE}
 # First Term Estimates
@@ -918,10 +918,10 @@ robust_f_d = 2*(1-pt(abs(t_stat_f_d), df = df.residual(lm_clean_f_d)))
 
 ```
 
-### First Mandate
 
 ```{r first mandate N, warning=FALSE, message=FALSE, results="asis", cache=TRUE, echo=FALSE}
-
+# First Mandate Calculations
+#-------------------------------
 y_f_n = cbind(Vdata_f$N, Vdata_f$SPY_vol)
 colnames(y_f_n)[1:2] <- c("N", "vol")
 est.VAR_f_n <- VAR(y_f_n,p=6)
@@ -944,9 +944,10 @@ t_stat_f_n = coef_f_n/nw_se_f_n
 robust_f_n = 2*(1-pt(abs(t_stat_f_n), df = df.residual(lm_clean_f_n)))
 ```
 
-### Tariff first Mandate
 
 ```{r first mandate tariff, warning=FALSE, message=FALSE, results="asis", cache=TRUE, echo=FALSE}
+# Tariff first Mandate
+#--------------------------
 
 y_f_ta = cbind(Vdata_f$tariff, Vdata_f$SPY_vol)
 colnames(y_f_ta)[1:2] <- c("tariff", "vol")
@@ -971,10 +972,10 @@ robust_f_ta = 2*(1-pt(abs(t_stat_f_ta), df = df.residual(lm_clean_f_ta)))
 
 ```
 
-### Trade First Mandate
 
 ```{r first mandate trade, warning=FALSE, message=FALSE, results="asis", cache=TRUE, echo=FALSE}
-
+# Trade FIrst Mandate
+#------------------------
 y_f_tr = cbind(Vdata_f$trade, Vdata_f$SPY_vol)
 colnames(y_f_tr)[1:2] <- c("trade", "vol")
 est.VAR_f_tr <- VAR(y_f_tr,p=6)
@@ -997,9 +998,10 @@ t_stat_f_tr = coef_f_tr/nw_se_f_tr
 robust_f_tr = 2*(1-pt(abs(t_stat_f_tr), df = df.residual(lm_clean_f_tr)))
 ```
 
-### China First Mandate
 
 ```{r first mandate china, warning=FALSE, message=FALSE, results="asis", cache=TRUE, echo=FALSE}
+# China First Mandate
+#-----------------------
 
 y_f_ch = cbind(Vdata_f$china, Vdata_f$SPY_vol)
 colnames(y_f_ch)[1:2] <- c("china", "vol")
@@ -1026,13 +1028,9 @@ robust_f_ch = 2*(1-pt(abs(t_stat_f_ch), df = df.residual(lm_clean_f_ch)))
 ```
 
 
-
-### Second Term
-
-### Dummy
-
 ```{r second mandate dum, warning=FALSE, message=FALSE, results="asis", cache=TRUE, echo=FALSE}
-
+# Second term
+#---------------------
 y_s_d = cbind(Vdata_s$dummy, Vdata_s$SPY_vol)
 colnames(y_s_d)[1:2] <- c("dummy", "vol")
 est.VAR_s_d <- VAR(y_s_d,p=6)
@@ -1055,8 +1053,6 @@ t_stat_s_d = coef_s_d/nw_se_s_d
 robust_s_d = 2*(1-pt(abs(t_stat_s_d), df = df.residual(lm_clean_s_d)))
 ```
 
-
-### N 
 
 ```{r second mandate N, warning=FALSE, message=FALSE, results="asis", cache=TRUE, echo=FALSE}
 
@@ -1084,9 +1080,10 @@ robust_s_n = 2*(1-pt(abs(t_stat_s_n), df = df.residual(lm_clean_s_n)))
 
 ```
 
-### Tariff
 
 ```{r second mandate tariff, warning=FALSE, message=FALSE, results="asis", cache=TRUE, echo=FALSE}
+# Tariff
+#-------------
 
 y_s_ta = cbind(Vdata_s$tariff, Vdata_s$SPY_vol)
 colnames(y_s_ta)[1:2] <- c("tariff", "vol")
@@ -1111,9 +1108,10 @@ robust_s_ta = 2*(1-pt(abs(t_stat_s_ta), df = df.residual(lm_clean_s_ta)))
 
 ```
 
-### Trade
 
 ```{r second mandate trade, warning=FALSE, message=FALSE, results="asis", cache=TRUE, echo=FALSE}
+# Trade
+#----------
 
 y_s_tr = cbind(Vdata_s$trade, Vdata_s$SPY_vol)
 colnames(y_s_tr)[1:2] <- c("trade", "vol")
@@ -1138,9 +1136,10 @@ robust_s_tr = 2*(1-pt(abs(t_stat_s_tr), df = df.residual(lm_clean_s_tr)))
 
 ```
 
-### China
 
 ```{r second mandate china, warning=FALSE, message=FALSE, results="asis", cache=TRUE, echo=FALSE}
+# China
+#--------------
 
 y_s_ch = cbind(Vdata_s$china, Vdata_s$SPY_vol)
 colnames(y_s_ch)[1:2] <- c("china", "vol")
@@ -1165,7 +1164,6 @@ robust_s_ch = 2*(1-pt(abs(t_stat_s_ch), df = df.residual(lm_clean_s_ch)))
 
 ```
 
-###
 
 ```{r B mat second mandate china, warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
 #Construct the Robust Omega Matrix
@@ -1206,7 +1204,7 @@ B.hat_s_ch <- matrix(c(res.opt_s_ch$par[1], res.opt_s_ch$par[2], 0, res.opt_s_ch
 
 ```
 
-### IRF Second Term China
+### SVAR IRF for China - Second Term{#sec:irf-china-2}
 
 ```{r IRF second china, warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
 #get back the coefficient of est.VAR
@@ -1240,7 +1238,7 @@ ggplot(Yd_s_ch,aes(x=period, y=response)) +
   theme_minimal()
 ```
 
-### IRF Cumultative Second Term China
+### SVAR Cumultative IRF for China - Second Term{#sec:irf-cum-china-2}
 ```{r IRF _s_ch, cache=TRUE, echo=FALSE}
 ggplot(Yd_s_ch,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
@@ -1252,9 +1250,9 @@ ggplot(Yd_s_ch,aes(x=period, y=cumsum(response))) +
   theme_minimal()
 ```
 
-### Tables Terms
+### SVAR Table First Term{#sec:tab-svar-1}
 
-```{r table first term, message=FALSE, warning=FALSE, results='asis', cache=TRUE, echo=FALSE}
+```{r tab-second-var, message=FALSE, warning=FALSE, results='asis', cache=TRUE, echo=FALSE}
 
 
 #first
@@ -1396,9 +1394,9 @@ cat(readLines(tmpfile_f), sep = "\n")
 
 ```
 
-### VAR Third Table
+### SVAR Table Second Term{#sec:tab-svar-2}
 
-```{r third_table, message=FALSE, warning=FALSE, results='asis', cache=TRUE, echo=FALSE}
+```{r tab-third-var, message=FALSE, warning=FALSE, results='asis', cache=TRUE, echo=FALSE}
 
 #Second
 
