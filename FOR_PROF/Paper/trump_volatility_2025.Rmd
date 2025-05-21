@@ -386,14 +386,38 @@ a VAR model to deepen our understanding of these variables.
 
 
 
-# VAR
+# SVAR
 
 ## Methodology
+We develop an SVAR model in order to assess the impact of
+short-run shocks from Trump's posts on AHV, and to evaluate whether
+market volatility can, in turn, influence Trump's posting behavior. In
+this framework, we systematically pair AHV with one explanatory variable
+at a time (our X-regressor). The SVAR approach offers the advantage of accounting for
+structural endogeneity. Our main assumption is that the volatility
+does not contemporaneously affect Trump's posting activity - neither
+quantitatively nor qualitatively, while Trump's posts do affect markets instantly. 
+In essence, we impose a short-run restriction on the shock of volatility for all the
+social media variables.
+
+Based on the information criteria, we found similar results across all
+specifications, with a recommended lag length of around 70. However,
+inducing more than 6 lags (corresponding to a full trading day)
+introduces strong seasonality. Moreover, the higher the number of lags,
+the greater the persistence of a shock, up to unrealistic levels such as 150 days 
+for the number of Tweets, which seems implausible. Therefore, we chose to fix the
+number of lags at a maximum of 6. Finally, given the presence of heteroscedasticity
+and serial correlation in the residuals, we use the Newey-West estimator
+to compute robust standard errors.
 
 ## Results
 
 
 # Conclusion
+
+We started this project with the intention of understanding whether the impact of Trump’s social media posts affect financial markets, and to see if there is perhaps a difference from his first presidential mandate. After various headaches with our data, we first ran ARMA-X models where we found significant and positive results albeit with strong auto-correlation in the errors, with only the second term analysis offering more convincing results. We then try VAR models for a possibly more accurate picture, albeit with little to no success. We once again find strong auto-correlation in the errors, which we here fix by using Newey-West standard errors. We found that the only significant coefficients are actually negative, suggesting Trump’s social media presence would reduce volatility.
+
+However, we would suggest strong against trying to interpret these results given that the models seem to not fit particularly well. This may be due to seasonality in our data (a common trend seen is our daily AVH is high volatility in the first open hours, and a gradual slowdown for the rest of the day), or to our handling of non-market hours. Further work could look at exploring said issues in greater depth, further complicate the models by adding more variables and interactions between them, and/or additionally use more sophisticated models with very large lag counts. 
 
 \clearpage
 
@@ -461,6 +485,7 @@ source(here("helperfunctions/full_data.R"))
 
 #backup
 backup = data
+Vdata = backup
 
 #select timeframe 
 data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
@@ -540,7 +565,7 @@ table1
 
 \newpage
 
-### SPY ARMA-X IRF (Jan 2014 - May 2025)
+### SPY ARMA-X IRF 
 
 ```{r armaxirf1, results="asis", warning=F, message=F, echo=FALSE, cache=TRUE, fig.cap="ARMA-X IRF", fig.width=6, fig.height=2.5}
 
@@ -550,7 +575,7 @@ nb.periods = 7 * 15
 #irf.plot(models[["Model 1"]],nb.periods,title="Tweet Dummy Shock")
 #irf.plot(models[["Model 2"]],nb.periods,title="Tweet Count Shock")
 plot1 = irf.plot(models[["Model 3"]],nb.periods,
-                 title="Tariff Mention Shock - Jan 2014 - May 2025")
+                 title="Tariff Mention Shock: Jan 2014 - May 2025")
 plot1
 #irf.plot(models[["Model 4"]],nb.periods,title="Trade Mention Shock")
 #irf.plot(models[["Model 5"]],nb.periods,title="China Mention Shock")
@@ -779,17 +804,984 @@ table4
 ```
 
 
+## VAR
+
+```{r load packages for var, message=FALSE, warning=FALSE, echo = FALSE}
+library("quantmod")
+library("TSA")
+library("aTSA")
+library("rugarch")
+library("rmgarch")
+library("ggplot2")
+library("tibble")
+library("dplyr")
+library("lubridate")
+library(tibble)
+library(tidyverse)
+library(knitr)
+library("fGarch")
+library(FinTS)
+library(kableExtra)
+library(writexl)
+library("purrr")
+library("forecast")
+library("texreg")
+require(vars)
+```
+
+### SPY VAR Models (Jan 2014 - May 2025) 
+
+```{r Estime dummy, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+y = cbind(Vdata$dummy, Vdata$SPY_vol)
+colnames(y)[1:2] <- c("dummy", "vol")
+est.VAR <- VAR(y,p=6)
+
+#extract results
+mod_vol = est.VAR$varresult$vol
+f = formula(mod_vol)
+d = model.frame(mod_vol)
+lm_clean = lm(f, data= d)
+
+#apply Newey-West
+nw_vcov = NeweyWest(lm_clean, lag=6)
+nw_se = sqrt(diag(nw_vcov))
+
+#t-stats
+coef = coef(lm_clean)
+t_stat = coef/nw_se
+
+#recalculate p-values
+robust = 2*(1-pt(abs(t_stat), df = df.residual(lm_clean)))
 
 
 
 
+```
+
+```{r B mat, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+
+#Recreate a Robust Omega Matrix
+U = residuals(est.VAR)
+T = nrow(U)
+L = 6 #number of lag
+Omega = matrix(0, ncol(U), ncol(U))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_ = t(U[(l+1):T, , drop=FALSE]) %*% U[1:(T-l), , drop=FALSE] /T
+  if (l == 0){
+    Omega = Omega + Gamma_l_
+  } else {
+    Omega = Omega + weight*(Gamma_l_ + t(Gamma_l_))
+  }
+}
+
+
+#make the B matrix
+loss <- function(param){
+  #Define the restriction
+  B <- matrix(c(param[1], param[2], 0, param[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X <- Omega - B %*% t(B)
+  
+  #loss function
+  loss <- sum(X^2)
+  return(loss)
+}
+
+res.opt <- optim(c(1, 0, 1), loss, method = "BFGS")
+B.hat <- matrix(c(res.opt$par[1], res.opt$par[2], 0, res.opt$par[3]), ncol = 2)
+
+```
+
+```{r estimate with N, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+y2 = cbind(Vdata$N, Vdata$SPY_vol)
+colnames(y2)[1:2] <- c("N", "vol")
+est.VAR2 <- VAR(y2,p=6)
+
+#extract results
+mod_vol2 = est.VAR2$varresult$vol
+f2 = formula(mod_vol2)
+d2 = model.frame(mod_vol2)
+lm_clean2 = lm(f2, data= d2)
+
+#apply Newey-West
+nw_vcov2 = NeweyWest(lm_clean2, lag=6)
+nw_se2 = sqrt(diag(nw_vcov2))
+
+#t-stats
+coef2 = coef(lm_clean2)
+t_stat2 = coef2/nw_se2
+
+#recalculate p-values
+robust2 = 2*(1-pt(abs(t_stat2), df = df.residual(lm_clean2)))
+
+```
+
+```{r estime tariff, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+y3 = cbind(Vdata$tariff, Vdata$SPY_vol)
+colnames(y3)[1:2] <- c("tariff", "vol")
+est.VAR3 <- VAR(y3,p=6)
+
+#extract results
+mod_vol3 = est.VAR3$varresult$vol
+f3 = formula(mod_vol3)
+d3 = model.frame(mod_vol3)
+lm_clean3 = lm(f3, data= d3)
+
+#apply Newey-West
+nw_vcov3 = NeweyWest(lm_clean3, lag=6)
+nw_se3 = sqrt(diag(nw_vcov3))
+
+#t-stats
+coef3 = coef(lm_clean3)
+t_stat3 = coef3/nw_se3
+
+#recalculate p-values
+robust3 = 2*(1-pt(abs(t_stat3), df = df.residual(lm_clean3)))
+
+```
+
+```{r B mat3, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+#Recreate a Robust Omega Matrix
+U3 = residuals(est.VAR3)
+T3 = nrow(U3)
+Omega3 = matrix(0, ncol(U3), ncol(U3))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l_3 = t(U3[(l+1):T3, , drop=FALSE]) %*% U3[1:(T3-l), , drop=FALSE] /T3
+  if (l == 0){
+    Omega3 = Omega3 + Gamma_l_3
+  } else {
+    Omega3 = Omega3 + weight*(Gamma_l_3 + t(Gamma_l_3))
+  }
+}
+
+
+#make the B matrix
+loss3 <- function(param3){
+  #Define the restriction
+  B3 <- matrix(c(param3[1], param3[2], 0, param3[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X3 <- Omega3 - B3 %*% t(B3)
+  
+  #loss function
+  loss3 <- sum(X3^2)
+  return(loss3)
+}
+
+res.opt3 <- optim(c(1, 0, 1), loss3, method = "BFGS")
+B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol = 2)
+
+```
+
+```{r estimate trade, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+y4 = cbind(Vdata$trade, Vdata$SPY_vol)
+colnames(y4)[1:2] <- c("trade", "vol")
+est.VAR4 <- VAR(y4,p=6)
+
+#extract results
+mod_vol4 = est.VAR4$varresult$vol
+f4 = formula(mod_vol4)
+d4 = model.frame(mod_vol4)
+lm_clean4 = lm(f4, data= d4)
+
+#apply Newey-West
+nw_vcov4 = NeweyWest(lm_clean4, lag=6)
+nw_se4 = sqrt(diag(nw_vcov4))
+
+#t-stats
+coef4 = coef(lm_clean4)
+t_stat4 = coef4/nw_se4
+
+#recalculate p-values
+robust4 = 2*(1-pt(abs(t_stat4), df = df.residual(lm_clean4)))
+
+
+```
+
+```{r estime China, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE, results="asis"}
+
+ychina = cbind(Vdata$china, Vdata$SPY_vol)
+colnames(ychina)[1:2] <- c("china", "vol")
+est.VARchina <- VAR(ychina,p=6)
+
+#extract results
+mod_volchina = est.VARchina$varresult$vol
+fchina = formula(mod_volchina)
+dchina = model.frame(mod_volchina)
+lm_cleanchina = lm(fchina, data= dchina)
+
+#apply Newey-West
+nw_vcovchina = NeweyWest(lm_cleanchina, lag=6)
+nw_sechina = sqrt(diag(nw_vcovchina))
+
+#t-stats
+coefchina = coef(lm_cleanchina)
+t_statchina = coefchina/nw_sechina
+
+#recalculate p-values
+robustchina = 2*(1-pt(abs(t_statchina), df = df.residual(lm_cleanchina)))
+
+```
+
+
+```{r vartable1, message=FALSE, warning=FALSE, results='asis', echo=FALSE, cache=TRUE}
+
+dt_t = d %>%
+    rename(X.l1 = dummy.l1,
+    X.l2 = dummy.l2,
+    X.l3 = dummy.l3,
+    X.l4 = dummy.l4,
+    X.l5 = dummy.l5,
+    X.l6 = dummy.l6)
+
+
+f_t <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vol.l6 +
+                         X.l1 + X.l2 + X.l3 + X.l4 + X.l5 + X.l6 + const")
+model <- lm(f_t, data = dt_t)
+
+dt_t2 = d2 %>%
+    rename(X.l1 = N.l1,
+    X.l2 = N.l2,
+    X.l3 = N.l3,
+    X.l4 = N.l4,
+    X.l5 = N.l5,
+    X.l6 = N.l6)
+
+
+
+f_t2 <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vol.l6 +
+                         X.l1 + X.l2 + X.l3 + X.l4 + X.l5 + X.l6 + const")
+model2 <- lm(f_t2, data = dt_t2)
+
+
+dt_t3 = d3 %>%
+    rename(X.l1 = tariff.l1,
+    X.l2 = tariff.l2,
+    X.l3 = tariff.l3,
+    X.l4 = tariff.l4,
+    X.l5 = tariff.l5,
+    X.l6 = tariff.l6)
+
+
+
+f_t3 <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vol.l6 +
+                         X.l1 + X.l2 + X.l3 + X.l4 + X.l5 + X.l6 + const")
+model3 <- lm(f_t3, data = dt_t3)
+
+
+dt_t4 = d4 %>%
+    rename(X.l1 = trade.l1,
+    X.l2 = trade.l2,
+    X.l3 = trade.l3,
+    X.l4 = trade.l4,
+    X.l5 = trade.l5,
+    X.l6 = trade.l6)
+  
+
+
+f_t4 <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vol.l6 +
+                         X.l1 + X.l2 + X.l3 + X.l4 + X.l5 + X.l6 + const")
+model4 <- lm(f_t4, data = dt_t4)
+
+dt_tchina = dchina %>%
+    rename(X.l1 = china.l1,
+    X.l2 = china.l2,
+    X.l3 = china.l3,
+    X.l4 = china.l4,
+    X.l5 = china.l5,
+    X.l6 = china.l6)
+
+
+
+f_tchina <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vol.l6 +
+                         X.l1 + X.l2 + X.l3 + X.l4 + X.l5 + X.l6 + const")
+modelchina <- lm(f_tchina, data = dt_tchina)
+
+
+nw_se_t <- sqrt(diag(sandwich::NeweyWest(model, lag = 6)))
+nw_se2_t <- sqrt(diag(sandwich::NeweyWest(model2, lag = 6)))
+nw_se3_t <- sqrt(diag(sandwich::NeweyWest(model3, lag = 6)))
+nw_se4_t <- sqrt(diag(sandwich::NeweyWest(model4, lag = 6)))
+nw_sechina_t <- sqrt(diag(sandwich::NeweyWest(modelchina, lag = 6)))
+
+
+robust_t <- 2 * (1-pt(abs(coef(model) / nw_se_t), df = df.residual(model)))
+robust2_t <- 2 * (1-pt(abs(coef(model2) / nw_se2_t), df = df.residual(model2)))
+robust3_t <- 2 * (1-pt(abs(coef(model3) / nw_se3_t), df = df.residual(model3)))
+robust4_t <- 2 * (1-pt(abs(coef(model4) / nw_se4_t), df = df.residual(model4)))
+robustchina_t <- 2 * (1-pt(abs(coef(modelchina) / nw_sechina_t), df = df.residual(modelchina)))
+
+
+
+nw_se_t       <- nw_se_t[names(coef(model))]
+robust_t      <- robust_t[names(coef(model))]
+nw_se2_t      <- nw_se2_t[names(coef(model2))]
+robust2_t     <- robust2_t[names(coef(model2))]
+nw_se3_t      <- nw_se3_t[names(coef(model3))]
+robust3_t     <- robust3_t[names(coef(model3))]
+nw_se4_t      <- nw_se4_t[names(coef(model4))]
+robust4_t     <- robust4_t[names(coef(model4))]
+nw_sechina_t  <- nw_sechina_t[names(coef(modelchina))]
+robustchina_t <- robustchina_t[names(coef(modelchina))]
 
 
 
 
+# Create list for models
+models_list <- list(model, model2, model3, model4, modelchina)
+
+# Create list for robust SEs
+robust_ses <- list(nw_se_t, nw_se2_t, nw_se3_t, nw_se4_t, nw_sechina_t)
+
+# Create list for p-value
+robust_pvals <- list(robust_t, robust2_t, robust3_t, robust4_t, robustchina_t)
+
+# Name of Variables
+custom_names <- list(
+  "vol.l1" = "$AHV_{t-1}$",
+  "vol.l2" = "$AHV_{t-2}$",
+  "vol.l3" = "$AHV_{t-3}$",
+  "vol.l4" = "$AHV_{t-4}$",
+  "vol.l5" = "$AHV_{t-5}$",
+  "vol.l6" = "$AHV_{t-6}$",
+  "X.l1" = "$X_{t-1}$",
+  "X.l2" = "$X_{t-2}$",
+  "X.l3" = "$X_{t-3}$",
+  "X.l4" = "$X_{t-4}$",
+  "X.l5" = "$X_{t-5}$",
+  "X.l6" = "$X_{t-6}$",
+  "const" = "Constant"
+)
+
+# Generate table
+table_texreg <- texreg(
+  l = models_list,
+  override.se = robust_ses,
+  custom.coef.map = custom_names,
+  override.pvalues = robust_pvals,
+  custom.model.names = c("TweetDummy", "TweetCount", "Tariff", "Trade", "China"),
+  caption = "VAR Models of Average Hourly Volatility",
+  label = "tab:VAR",
+  caption.above = TRUE,
+  digits = 4,
+  fontsize = "small",
+  float.pos = "H",
+  custom.gof.rows = list("Shock (IRF)" = c(0.0041713, 0.003061, 0.001189, 0.000215, 0.001937)),
+  custom.note = "\\parbox{.4\\linewidth}
+{\\vspace{2pt}Each VAR regression has only two variables: AHV and X. The column names represent the X variable for the selected model. \\\\ %stars.}")
+
+# print
+table_texreg
+
+```
+
+### SPY VAR IRFs 
+
+```{r VARirf1, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE, fig.cap="VAR IRF 1", fig.width=6, fig.height=2.3}
+nb.sim = 7*7
+#get back the coefficient of est.VAR
+phi3 <- Acoef(est.VAR3)
+PHI3 = make.PHI(phi3)
+
+#take the constant
+constant3 <- sapply(est.VAR3$varresult, function(eq) coef(eq)["const"])
+c3=as.matrix(constant3)
+
+#Simulate the IRF
+p3 <- length(phi3)
+n3 <- dim(phi3[[1]])[1]
+
+Y3 <- simul.VAR(c=c3, Phi = phi3, B = B.hat3, nb.sim ,y0.star=rep(0, n3*p3),
+                  indic.IRF = 1, u.shock = c(1,0))
+
+
+#Plot the IRF
+Yd3 = data.frame(
+  period = 1:nrow(Y3),
+  response = Y3[,2])
+
+ggplot(Yd3,aes(x=period, y=response)) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Tariff Mention Shock: Jan 2014 - May 2025") +
+  ylab("")+
+  xlab("Hours after shock") +
+  theme_minimal() +
+            theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r VARirf2, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE, fig.cap="VAR IRF 2", fig.width=6, fig.height=2.5, results='asis', fig.pos="H"}
+ggplot(Yd3,aes(x=period, y=cumsum(response))) +
+  geom_hline(yintercept = 0, color="red") +
+  geom_line() +
+  theme_light() +
+  ggtitle("Cumulative Tariff Mention Shock: Jan 2014 - May 2025") +
+  ylab("")+
+  xlab("Hours after shock") +
+  theme_minimal() +
+            theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### SPY VAR First-Term Models
+
+```{r datasetup2, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+
+# First and Second Mandate
+
+#first term
+Vdata_f = filter(Vdata,between(timestamp, as.Date('2017-01-20'), as.Date('2021-01-20')))
+
+#second term
+Vdata_s = filter(Vdata,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05-07')))
+
+```
+
+```{r first mandate dum, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+y_f_d = cbind(Vdata_f$dummy, Vdata_f$SPY_vol)
+colnames(y_f_d)[1:2] <- c("dummy", "vol")
+est.VAR_f_d <- VAR(y_f_d,p=6)
+
+#extract results
+mod_vol_f_d = est.VAR_f_d$varresult$vol
+f_f_d = formula(mod_vol_f_d)
+d_f_d = model.frame(mod_vol_f_d)
+lm_clean_f_d = lm(f_f_d, data= d_f_d)
+
+#apply Newey-West
+nw_vcov_f_d = NeweyWest(lm_clean_f_d, lag=6)
+nw_se_f_d = sqrt(diag(nw_vcov_f_d))
+
+#t-stats
+coef_f_d = coef(lm_clean_f_d)
+t_stat_f_d = coef_f_d/nw_se_f_d
+
+#recalculate p-values
+robust_f_d = 2*(1-pt(abs(t_stat_f_d), df = df.residual(lm_clean_f_d)))
+
+```
+
+```{r first mandate N, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+
+y_f_n = cbind(Vdata_f$N, Vdata_f$SPY_vol)
+colnames(y_f_n)[1:2] <- c("N", "vol")
+est.VAR_f_n <- VAR(y_f_n,p=6)
+
+#extract results
+mod_vol_f_n = est.VAR_f_n$varresult$vol
+f_f_n = formula(mod_vol_f_n)
+d_f_n = model.frame(mod_vol_f_n)
+lm_clean_f_n = lm(f_f_n, data= d_f_n)
+
+#apply Newey-West
+nw_vcov_f_n = NeweyWest(lm_clean_f_n, lag=6)
+nw_se_f_n = sqrt(diag(nw_vcov_f_n))
+
+#t-stats
+coef_f_n = coef(lm_clean_f_n)
+t_stat_f_n = coef_f_n/nw_se_f_n
+
+#recalculate p-values
+robust_f_n = 2*(1-pt(abs(t_stat_f_n), df = df.residual(lm_clean_f_n)))
+```
+
+```{r first mandate tariff, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+
+y_f_ta = cbind(Vdata_f$tariff, Vdata_f$SPY_vol)
+colnames(y_f_ta)[1:2] <- c("tariff", "vol")
+est.VAR_f_ta <- VAR(y_f_ta,p=6)
+
+#extract results
+mod_vol_f_ta = est.VAR_f_ta$varresult$vol
+f_f_ta = formula(mod_vol_f_ta)
+d_f_ta = model.frame(mod_vol_f_ta)
+lm_clean_f_ta = lm(f_f_ta, data= d_f_ta)
+
+#apply Newey-West
+nw_vcov_f_ta = NeweyWest(lm_clean_f_ta, lag=6)
+nw_se_f_ta = sqrt(diag(nw_vcov_f_ta))
+
+#t-stats
+coef_f_ta = coef(lm_clean_f_ta)
+t_stat_f_ta = coef_f_ta/nw_se_f_ta
+
+#recalculate p-values
+robust_f_ta = 2*(1-pt(abs(t_stat_f_ta), df = df.residual(lm_clean_f_ta)))
+
+```
+
+```{r first mandate trade, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+
+y_f_tr = cbind(Vdata_f$trade, Vdata_f$SPY_vol)
+colnames(y_f_tr)[1:2] <- c("trade", "vol")
+est.VAR_f_tr <- VAR(y_f_tr,p=6)
+
+#extract results
+mod_vol_f_tr = est.VAR_f_tr$varresult$vol
+f_f_tr = formula(mod_vol_f_tr)
+d_f_tr = model.frame(mod_vol_f_tr)
+lm_clean_f_tr = lm(f_f_tr, data= d_f_tr)
+
+#apply Newey-West
+nw_vcov_f_tr = NeweyWest(lm_clean_f_tr, lag=6)
+nw_se_f_tr = sqrt(diag(nw_vcov_f_tr))
+
+#t-stats
+coef_f_tr = coef(lm_clean_f_tr)
+t_stat_f_tr = coef_f_tr/nw_se_f_tr
+
+#recalculate p-values
+robust_f_tr = 2*(1-pt(abs(t_stat_f_tr), df = df.residual(lm_clean_f_tr)))
+```
+
+```{r first mandate china, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+
+y_f_ch = cbind(Vdata_f$china, Vdata_f$SPY_vol)
+colnames(y_f_ch)[1:2] <- c("china", "vol")
+est.VAR_f_ch <- VAR(y_f_ch,p=6)
+
+#extract results
+mod_vol_f_ch = est.VAR_f_ch$varresult$vol
+f_f_ch = formula(mod_vol_f_ch)
+d_f_ch = model.frame(mod_vol_f_ch)
+lm_clean_f_ch = lm(f_f_ch, data= d_f_ch)
+
+#apply Newey-West
+nw_vcov_f_ch = NeweyWest(lm_clean_f_ch, lag=6)
+nw_se_f_ch = sqrt(diag(nw_vcov_f_ch))
+
+#t-stats
+coef_f_ch = coef(lm_clean_f_ch)
+t_stat_f_ch = coef_f_ch/nw_se_f_ch
+
+#recalculate p-values
+robust_f_ch = 2*(1-pt(abs(t_stat_f_ch), df = df.residual(lm_clean_f_ch)))
+
+```
+
+```{r table first term, message=FALSE, warning=FALSE, results='asis', echo=FALSE, cache=TRUE, eval=TRUE}
+
+
+#first
+
+d_f_d_t = d_f_d %>%
+    rename(X.l1 = dummy.l1,
+    X.l2 = dummy.l2,
+    X.l3 = dummy.l3,
+    X.l4 = dummy.l4,
+    X.l5 = dummy.l5,
+    X.l6 = dummy.l6)
+
+f_t_f_d <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vol.l6 +
+                         X.l1 + X.l2 + X.l3 + X.l4 + X.l5 + X.l6 + const")
+model_f_d <- lm(f_t_f_d, data = d_f_d_t)
+
+d_f_n_t = d_f_n %>%
+    rename(X.l1 = N.l1,
+    X.l2 = N.l2,
+    X.l3 = N.l3,
+    X.l4 = N.l4,
+    X.l5 = N.l5,
+    X.l6 = N.l6)
+
+f_t_f_n <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vol.l6 +
+                         X.l1 + X.l2 + X.l3 + X.l4 + X.l5 + X.l6 + const")
+model_f_n <- lm(f_t_f_n, data = d_f_n_t)
+
+d_f_ta_t = d_f_ta %>%
+    rename(X.l1 = tariff.l1,
+    X.l2 = tariff.l2,
+    X.l3 = tariff.l3,
+    X.l4 = tariff.l4,
+    X.l5 = tariff.l5,
+    X.l6 = tariff.l6)
+
+f_t_f_ta <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vol.l6 +
+                         X.l1 + X.l2 + X.l3 + X.l4 + X.l5 + X.l6 + const")
+model_f_ta <- lm(f_t_f_ta, data = d_f_ta_t)
+
+
+d_f_tr_t = d_f_tr %>%
+    rename(X.l1 = trade.l1,
+    X.l2 = trade.l2,
+    X.l3 = trade.l3,
+    X.l4 = trade.l4,
+    X.l5 = trade.l5,
+    X.l6 = trade.l6)
+
+f_t_f_tr <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vol.l6 +
+                         X.l1 + X.l2 + X.l3 + X.l4 + X.l5 + X.l6 + const")
+model_f_tr <- lm(f_t_f_tr, data = d_f_tr_t)
+
+
+d_f_ch_t = d_f_ch %>%
+    rename(X.l1 = china.l1,
+    X.l2 = china.l2,
+    X.l3 = china.l3,
+    X.l4 = china.l4,
+    X.l5 = china.l5,
+    X.l6 = china.l6)
+
+f_t_f_ch <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vol.l6 +
+                         X.l1 + X.l2 + X.l3 + X.l4 + X.l5 + X.l6 + const")
+model_f_ch <- lm(f_t_f_ch, data = d_f_ch_t)
 
 
 
 
+nw_se_f_d_t <- sqrt(diag(sandwich::NeweyWest(model_f_d, lag = 6)))
+nw_se_f_n_t <- sqrt(diag(sandwich::NeweyWest(model_f_n, lag = 6)))
+nw_se_f_ta_t <- sqrt(diag(sandwich::NeweyWest(model_f_ta, lag = 6)))
+nw_se_f_tr_t <- sqrt(diag(sandwich::NeweyWest(model_f_tr, lag = 6)))
+nw_se_f_china_t <- sqrt(diag(sandwich::NeweyWest(model_f_ch, lag = 6)))
 
+
+robust_f_d_t <- 2 * (1-pt(abs(coef(model_f_d) / nw_se_f_d_t), df = df.residual(model_f_d)))
+robust_f_n_t <- 2 * (1-pt(abs(coef(model_f_n) / nw_se_f_n_t), df = df.residual(model_f_n)))
+robust_f_ta_t <- 2 * (1-pt(abs(coef(model_f_ta) / nw_se_f_ta_t), df = df.residual(model_f_ta)))
+robust_f_tr_t <- 2 * (1-pt(abs(coef(model_f_tr) / nw_se_f_tr_t), df = df.residual(model_f_tr)))
+robust_f_ch_t <- 2 * (1-pt(abs(coef(model_f_ch) / nw_se_f_china_t), df = df.residual(model_f_ch)))
+
+
+nw_se_f_d_t       <- nw_se_f_d_t[names(coef(model_f_d))]
+robust_f_d_t      <- robust_f_d_t[names(coef(model_f_d))]
+nw_se_f_n_t      <- nw_se_f_n_t[names(coef(model_f_n))]
+robust_f_n_t     <- robust_f_n_t[names(coef(model_f_n))]
+nw_se_f_ta_t      <- nw_se_f_ta_t[names(coef(model_f_ta))]
+robust_f_ta_t     <- robust_f_ta_t[names(coef(model_f_ta))]
+nw_se_f_tr_t     <- nw_se_f_tr_t[names(coef(model_f_tr))]
+robust_f_tr_t     <- robust_f_tr_t[names(coef(model_f_tr))]
+nw_se_f_china_t  <- nw_se_f_china_t[names(coef(model_f_ch))]
+robust_f_ch_t <- robust_f_ch_t[names(coef(model_f_ch))]
+
+
+# list of models, SE and p-value
+models_list_f <- list(model_f_d, model_f_n, model_f_ta, model_f_tr, model_f_ch)
+robust_ses_f <- list(nw_se_f_d_t, nw_se_f_n_t, nw_se_f_ta_t, nw_se_f_tr_t, nw_se_f_china_t)
+robust_pvals_f <- list(robust_f_d_t, robust_f_n_t, robust_f_ta_t, robust_f_tr_t, robust_f_ch_t)
+
+# Name of coefficient
+custom_names <- list(
+  "vol.l1" = "$AHV_{t-1}$",
+  "vol.l2" = "$AHV_{t-2}$",
+  "vol.l3" = "$AHV_{t-3}$",
+  "vol.l4" = "$AHV_{t-4}$",
+  "vol.l5" = "$AHV_{t-5}$",
+  "vol.l6" = "$AHV_{t-6}$",
+  "X.l1" = "$X_{t-1}$",
+  "X.l2" = "$X_{t-2}$",
+  "X.l3" = "$X_{t-3}$",
+  "X.l4" = "$X_{t-4}$",
+  "X.l5" = "$X_{t-5}$",
+  "X.l6" = "$X_{t-6}$",
+  "const" = "Constant"
+)
+
+# Generate table
+table_texreg_f <- texreg(
+  l = models_list_f,
+  override.se = robust_ses_f,
+  override.pvalues = robust_pvals_f,
+  custom.model.names = c("TweetDummy", "TweetCount", "Tariff", "Trade", "China"),
+  custom.coef.map = custom_names,
+  caption = "First-Term VAR Models of Average Hourly Volatility",
+  label = "tab:VARf",
+  caption.above = TRUE,
+  digits = 4,
+  fontsize = "small",
+  float.pos = "H",
+  custom.gof.rows = list("Shock (IRF)" = c(0.002919, 0.002236, 0.000484, 0.000702, 0.000904)),
+  star.cutoffs = c(0.001, 0.01, 0.05),
+  custom.note = "\\parbox{.4\\linewidth}
+{\\vspace{2pt}Each VAR regression has only two variables: AHV and X. The column names represent the X variable for the selected model. \\\\ %stars.}")
+
+# Print table
+table_texreg_f
+```
+
+### SPY VAR Second-Term Models
+
+```{r second mandate dum, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+
+y_s_d = cbind(Vdata_s$dummy, Vdata_s$SPY_vol)
+colnames(y_s_d)[1:2] <- c("dummy", "vol")
+est.VAR_s_d <- VAR(y_s_d,p=6)
+
+#extract results
+mod_vol_s_d = est.VAR_s_d$varresult$vol
+f_s_d = formula(mod_vol_s_d)
+d_s_d = model.frame(mod_vol_s_d)
+lm_clean_s_d = lm(f_s_d, data= d_s_d)
+
+#apply Newey-West
+nw_vcov_s_d = NeweyWest(lm_clean_s_d, lag=6)
+nw_se_s_d = sqrt(diag(nw_vcov_s_d))
+
+#t-stats
+coef_s_d = coef(lm_clean_s_d)
+t_stat_s_d = coef_s_d/nw_se_s_d
+
+#recalculate p-values
+robust_s_d = 2*(1-pt(abs(t_stat_s_d), df = df.residual(lm_clean_s_d)))
+```
+
+```{r second mandate N, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+
+y_s_n = cbind(Vdata_s$N, Vdata_s$SPY_vol)
+colnames(y_s_n)[1:2] <- c("N", "vol")
+est.VAR_s_n <- VAR(y_s_n,p=6)
+
+#extract results
+mod_vol_s_n = est.VAR_s_n$varresult$vol
+f_s_n = formula(mod_vol_s_n)
+d_s_n = model.frame(mod_vol_s_n)
+lm_clean_s_n = lm(f_s_n, data= d_s_n)
+
+#apply Newey-West
+nw_vcov_s_n = NeweyWest(lm_clean_s_n, lag=6)
+nw_se_s_n = sqrt(diag(nw_vcov_s_n))
+
+#t-stats
+coef_s_n = coef(lm_clean_s_n)
+t_stat_s_n = coef_s_n/nw_se_s_n
+
+#recalculate p-values
+robust_s_n = 2*(1-pt(abs(t_stat_s_n), df = df.residual(lm_clean_s_n)))
+
+
+```
+
+```{r second mandate tariff, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+
+y_s_ta = cbind(Vdata_s$tariff, Vdata_s$SPY_vol)
+colnames(y_s_ta)[1:2] <- c("tariff", "vol")
+est.VAR_s_ta <- VAR(y_s_ta,p=6)
+
+#extract results
+mod_vol_s_ta = est.VAR_s_ta$varresult$vol
+f_s_ta = formula(mod_vol_s_ta)
+d_s_ta = model.frame(mod_vol_s_ta)
+lm_clean_s_ta = lm(f_s_ta, data= d_s_ta)
+
+#apply Newey-West
+nw_vcov_s_ta = NeweyWest(lm_clean_s_ta, lag=6)
+nw_se_s_ta = sqrt(diag(nw_vcov_s_ta))
+
+#t-stats
+coef_s_ta = coef(lm_clean_s_ta)
+t_stat_s_ta = coef_s_ta/nw_se_s_ta
+
+#recalculate p-values
+robust_s_ta = 2*(1-pt(abs(t_stat_s_ta), df = df.residual(lm_clean_s_ta)))
+
+```
+
+```{r second mandate trade, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+
+y_s_tr = cbind(Vdata_s$trade, Vdata_s$SPY_vol)
+colnames(y_s_tr)[1:2] <- c("trade", "vol")
+est.VAR_s_tr <- VAR(y_s_tr,p=6)
+
+#extract results
+mod_vol_s_tr = est.VAR_s_tr$varresult$vol
+f_s_tr = formula(mod_vol_s_tr)
+d_s_tr = model.frame(mod_vol_s_tr)
+lm_clean_s_tr = lm(f_s_tr, data= d_s_tr)
+
+#apply Newey-West
+nw_vcov_s_tr = NeweyWest(lm_clean_s_tr, lag=6)
+nw_se_s_tr = sqrt(diag(nw_vcov_s_tr))
+
+#t-stats
+coef_s_tr = coef(lm_clean_s_tr)
+t_stat_s_tr = coef_s_tr/nw_se_s_tr
+
+#recalculate p-values
+robust_s_tr = 2*(1-pt(abs(t_stat_s_tr), df = df.residual(lm_clean_s_tr)))
+
+```
+
+```{r second mandate china, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+
+y_s_ch = cbind(Vdata_s$china, Vdata_s$SPY_vol)
+colnames(y_s_ch)[1:2] <- c("china", "vol")
+est.VAR_s_ch <- VAR(y_s_ch,p=6)
+
+#extract results
+mod_vol_s_ch = est.VAR_s_ch$varresult$vol
+f_s_ch = formula(mod_vol_s_ch)
+d_s_ch = model.frame(mod_vol_s_ch)
+lm_clean_s_ch = lm(f_s_ch, data= d_s_ch)
+
+#apply Newey-West
+nw_vcov_s_ch = NeweyWest(lm_clean_s_ch, lag=6)
+nw_se_s_ch = sqrt(diag(nw_vcov_s_ch))
+
+#t-stats
+coef_s_ch = coef(lm_clean_s_ch)
+t_stat_s_ch = coef_s_ch/nw_se_s_ch
+
+#recalculate p-values
+robust_s_ch = 2*(1-pt(abs(t_stat_s_ch), df = df.residual(lm_clean_s_ch)))
+
+```
+
+```{r B mat second mandate china, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+#Construct the Robust Omega Matrix
+U_s_ch = residuals(est.VAR_s_ch)
+T_s_ch = nrow(U_s_ch)
+Omega_s_ch = matrix(0, ncol(U_s_ch), ncol(U_s_ch))
+for(l in 0:L) {
+  weight = 1 - l/(L+1)
+  Gamma_l__s_ch = t(U_s_ch[(l+1):T_s_ch, , drop=FALSE]) %*% U_s_ch[1:(T_s_ch-l), , drop=FALSE] /T_s_ch
+  if (l == 0){
+    Omega_s_ch = Omega_s_ch + Gamma_l__s_ch
+  } else {
+    Omega_s_ch = Omega_s_ch + weight*(Gamma_l__s_ch + t(Gamma_l__s_ch))
+  }
+}
+
+
+#make the B matrix
+loss_s_ch <- function(param_s_ch){
+  #Define the restriction
+  B_s_ch <- matrix(c(param_s_ch[1], param_s_ch[2], 0, param_s_ch[3]), ncol = 2)
+  
+  #Make BB' approximatively equal to omega
+  X_s_ch <- Omega_s_ch - B_s_ch %*% t(B_s_ch)
+  
+  #loss function
+  loss_s_ch <- sum(X_s_ch^2)
+  return(loss_s_ch)
+}
+
+res.opt_s_ch <- optim(c(1, 0, 1), loss_s_ch, method = "BFGS")
+B.hat_s_ch <- matrix(c(res.opt_s_ch$par[1], res.opt_s_ch$par[2], 0, res.opt_s_ch$par[3]), ncol = 2)
+
+```
+
+```{r Table second Term, message=FALSE, warning=FALSE, results='asis', echo=FALSE, cache=TRUE}
+
+#Second
+
+d_s_d_t = d_s_d %>%
+    rename(X.l1 = dummy.l1,
+    X.l2 = dummy.l2,
+    X.l3 = dummy.l3,
+    X.l4 = dummy.l4,
+    X.l5 = dummy.l5,
+    X.l6 = dummy.l6)
+
+f_t_s_d <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vol.l6 +
+                         X.l1 + X.l2 + X.l3 + X.l4 + X.l5 + X.l6 + const")
+model_s_d <- lm(f_t_s_d, data = d_s_d_t)
+
+
+d_s_n_t = d_s_n %>%
+    rename(X.l1 = N.l1,
+    X.l2 = N.l2,
+    X.l3 = N.l3,
+    X.l4 = N.l4,
+    X.l5 = N.l5,
+    X.l6 = N.l6)
+
+f_t_s_n <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vol.l6 +
+                         X.l1 + X.l2 + X.l3 + X.l4 + X.l5 + X.l6 + const")
+model_s_n <- lm(f_t_s_n, data = d_s_n_t)
+
+
+d_s_ta_t = d_s_ta %>%
+    rename(X.l1 = tariff.l1,
+    X.l2 = tariff.l2,
+    X.l3 = tariff.l3,
+    X.l4 = tariff.l4,
+    X.l5 = tariff.l5,
+    X.l6 = tariff.l6)
+
+f_t_s_ta <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vol.l6 +
+                         X.l1 + X.l2 + X.l3 + X.l4 + X.l5 + X.l6 + const")
+model_s_ta <- lm(f_t_s_ta, data = d_s_ta_t)
+
+
+d_s_tr_t = d_s_tr %>%
+    rename(X.l1 = trade.l1,
+    X.l2 = trade.l2,
+    X.l3 = trade.l3,
+    X.l4 = trade.l4,
+    X.l5 = trade.l5,
+    X.l6 = trade.l6)
+
+
+f_t_s_tr <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vol.l6 +
+                         X.l1 + X.l2 + X.l3 + X.l4 + X.l5 + X.l6 + const")
+model_s_tr <- lm(f_t_s_tr, data = d_s_tr_t)
+
+
+d_s_ch_t = d_s_ch %>%
+    rename(X.l1 = china.l1,
+    X.l2 = china.l2,
+    X.l3 = china.l3,
+    X.l4 = china.l4,
+    X.l5 = china.l5,
+    X.l6 = china.l6)
+
+f_t_s_ch <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vol.l6 +
+                         X.l1 + X.l2 + X.l3 + X.l4 + X.l5 + X.l6 + const")
+model_s_ch <- lm(f_t_s_ch, data = d_s_ch_t)
+
+
+nw_se_s_d_t <- sqrt(diag(sandwich::NeweyWest(model_s_d, lag = 6)))
+nw_se_s_n_t <- sqrt(diag(sandwich::NeweyWest(model_s_n, lag = 6)))
+nw_se_s_ta_t <- sqrt(diag(sandwich::NeweyWest(model_s_ta, lag = 6)))
+nw_se_s_tr_t <- sqrt(diag(sandwich::NeweyWest(model_s_tr, lag = 6)))
+nw_se_s_china_t <- sqrt(diag(sandwich::NeweyWest(model_s_ch, lag = 6)))
+
+
+robust_s_d_t <- 2 * (1-pt(abs(coef(model_s_d) / nw_se_s_d_t), df = df.residual(model_s_d)))
+robust_s_n_t <- 2 * (1-pt(abs(coef(model_s_n) / nw_se_s_n_t), df = df.residual(model_s_n)))
+robust_s_ta_t <- 2 * (1-pt(abs(coef(model_s_ta) / nw_se_s_ta_t), df = df.residual(model_s_ta)))
+robust_s_tr_t <- 2 * (1-pt(abs(coef(model_s_tr) / nw_se_s_tr_t), df = df.residual(model_s_tr)))
+robust_s_ch_t <- 2 * (1-pt(abs(coef(model_s_ch) / nw_se_s_china_t), df = df.residual(model_s_ch)))
+
+nw_se_s_d_t       <- nw_se_s_d_t[names(coef(model_s_d))]
+robust_s_d_t      <- robust_s_d_t[names(coef(model_s_d))]
+nw_se_s_n_t      <- nw_se_s_n_t[names(coef(model_s_n))]
+robust_s_n_t     <- robust_s_n_t[names(coef(model_s_n))]
+nw_se_s_ta_t      <- nw_se_s_ta_t[names(coef(model_s_ta))]
+robust_s_ta_t     <- robust_s_ta_t[names(coef(model_s_ta))]
+nw_se_s_tr_t     <- nw_se_s_tr_t[names(coef(model_s_tr))]
+robust_s_tr_t     <- robust_s_tr_t[names(coef(model_s_tr))]
+nw_se_s_china_t  <- nw_se_s_china_t[names(coef(model_s_ch))]
+robust_s_ch_t <- robust_s_ch_t[names(coef(model_s_ch))]
+
+# lists of model, robust SE  and p-values 
+models_list_s <- list(model_s_d, model_s_n, model_s_ta, model_s_tr, model_s_ch)
+robust_ses_s <- list(nw_se_s_d_t, nw_se_s_n_t, nw_se_s_ta_t, nw_se_s_tr_t, nw_se_s_china_t)
+robust_pvals_s <- list(robust_s_d_t, robust_s_n_t, robust_s_ta_t, robust_s_tr_t, robust_s_ch_t)
+
+# Generate table
+table_texreg_s <- texreg(
+  l = models_list_s,
+  override.se = robust_ses_s,
+  override.pvalues = robust_pvals_s,
+  custom.model.names = c("TweetDummy", "TweetCount", "Tariff", "Trade", "China"),
+  custom.coef.map = custom_names,
+  caption = "Second-Term VAR Models of Average Hourly Volatility",
+  label = "tab:VARs",
+  caption.above = TRUE,
+  digits = 4,
+  fontsize = "small",
+  float.pos = "H",
+  custom.gof.rows = list("Shock (IRF)" = c(0.014659, 0.013315, 0.010752, -0.005665, 0.013937)),
+  star.cutoffs = c(0.05, 0.01, 0.001),
+  custom.note = "\\parbox{.4\\linewidth}
+{\\vspace{2pt}Each VAR regression has only two variables: AHV and X. The column names represent the X variable for the selected model. \\\\ %stars.}")
+
+# Print
+table_texreg_s
+
+```
 
