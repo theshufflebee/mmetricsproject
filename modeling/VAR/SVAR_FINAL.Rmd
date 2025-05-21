@@ -82,7 +82,7 @@ of the test itself, as such results appear unrealistic.
 ## Split Sample
 
 
-For the splitting framework, the results were similar and striking. While we
+For the splitting framework, the results were similar and striking [*IRFchinasecondtermVAR*]{style="color:red"}. While we
 observed relatively small shock effects and almost entirely negatives coefficients 
 during the first term ([*descFirsttermfigVAR*]{style="color:red"}), leading the 
 cumulative IRFs to indicate a negative impact of posts, the shock effects in the
@@ -92,11 +92,11 @@ Trade in the second term, which showed the only negative impact from a shock.
 Once again, we found positive lagged coefficients in the second term, mostly on 
 the first, second and forth lags. However, none of these coefficients were
 statistically significant, but the cumulative IRFs clearly show an high positive 
-impact on AHV, except for TweetDummy and TweetCount, whose
+impact on except for TweetDummy and TweetCount, whose
 coefficients and cumulative IRFs displayed similar patterns to those observed 
 in the first term. ([*descSecondtermfigVAR*]{style="color:red"})
 Moreover, the Granger tests generally failed in both terms, with the sole
-exception being China in the second term.
+exception being China in the second term. 
 Regarding the ASHR market, we found results similar to those for the US ETF
 market. Surprisingly, in the case of the European market, we observed a positive
 impact of Trump’s posts on AHV during the first term. Nevertheless, the results 
