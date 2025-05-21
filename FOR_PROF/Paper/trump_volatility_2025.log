@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.22.0 (TeX Live 2025)  (format=lualatex 2025.5.21)  21 MAY 2025 12:34
+This is LuaHBTeX, Version 1.22.0 (TeX Live 2025)  (format=lualatex 2025.5.21)  21 MAY 2025 12:38
  restricted system commands enabled.
 **trump_volatility_2025.tex
 (./trump_volatility_2025.tex
@@ -837,89 +837,75 @@ LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
 [1
 
 {c:/Users/fries/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-<trump_volatility_2025_files/figure-latex/fig1-1.pdf, id=51, 469.755pt x 325.215pt>
-File: trump_volatility_2025_files/figure-latex/fig1-1.pdf Graphic file (type pdf)
-<use trump_volatility_2025_files/figure-latex/fig1-1.pdf>
-Package luatex.def Info: trump_volatility_2025_files/figure-latex/fig1-1.pdf  used on input line 204.
-(luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
-
-[2<./trump_volatility_2025_files/figure-latex/fig1-1.pdf>]
+[2]
 
 [3]
 
-LaTeX Warning: Reference `sec:spy-table' on page 4 undefined on input line 343.
+LaTeX Warning: Reference `tab:spy-table' on page 4 undefined on input line 337.
 
 
-LaTeX Warning: Reference `sec:means-table' on page 4 undefined on input line 347.
+LaTeX Warning: Reference `fig:SPY-IRF' on page 4 undefined on input line 344.
 
 
-LaTeX Warning: Reference `sec:SPY-IRF' on page 4 undefined on input line 350.
+LaTeX Warning: Reference `tab:spy-table-terms' on page 4 undefined on input line 357.
 
 
-LaTeX Warning: Reference `sec:spy-table-terms' on page 4 undefined on input line 363.
-
-
-LaTeX Warning: Reference `sec:SPY-IRF' on page 4 undefined on input line 368.
-
-
-LaTeX Warning: Reference `sec:SPY-res-test' on page 4 undefined on input line 372.
+LaTeX Warning: Reference `fig:SPY-IRF' on page 4 undefined on input line 362.
 
 
 
 [4]
-
-[5]
-Underfull \hbox (badness 3019) in paragraph at lines 442--443
+Underfull \hbox (badness 3019) in paragraph at lines 436--437
 []\TU/lmr/m/n/10 Shan-tanu, R. (n.d.). \TU/lmr/m/it/10 Don-ald Trump Tweets Dataset\TU/lmr/m/n/10 . https://www.kag-gle.com/datasets/code-
  []
 
 
 
-[6
+[5
 
 ]
-<trump_volatility_2025_files/figure-latex/SPY-IRF-1.pdf, id=147, 469.755pt x 325.215pt>
+<trump_volatility_2025_files/figure-latex/SPY-IRF-1.pdf, id=137, 469.755pt x 325.215pt>
 File: trump_volatility_2025_files/figure-latex/SPY-IRF-1.pdf Graphic file (type pdf)
 <use trump_volatility_2025_files/figure-latex/SPY-IRF-1.pdf>
-Package luatex.def Info: trump_volatility_2025_files/figure-latex/SPY-IRF-1.pdf  used on input line 518.
+Package luatex.def Info: trump_volatility_2025_files/figure-latex/SPY-IRF-1.pdf  used on input line 512.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 526.
+(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 520.
 
 
-[7<./trump_volatility_2025_files/figure-latex/SPY-IRF-1.pdf>]
+[6<./trump_volatility_2025_files/figure-latex/SPY-IRF-1.pdf>]
 
-[8]
-Overfull \hbox (89.51498pt too wide) in paragraph at lines 555--595
+[7]
+Overfull \hbox (89.51498pt too wide) in paragraph at lines 549--589
  [] 
  []
 
 
 
-[9]
-<trump_volatility_2025_files/figure-latex/SPY-SPLIT-IRF-1.pdf, id=173, 469.755pt x 325.215pt>
+[8]
+<trump_volatility_2025_files/figure-latex/SPY-SPLIT-IRF-1.pdf, id=163, 469.755pt x 325.215pt>
 File: trump_volatility_2025_files/figure-latex/SPY-SPLIT-IRF-1.pdf Graphic file (type pdf)
 <use trump_volatility_2025_files/figure-latex/SPY-SPLIT-IRF-1.pdf>
-Package luatex.def Info: trump_volatility_2025_files/figure-latex/SPY-SPLIT-IRF-1.pdf  used on input line 606.
+Package luatex.def Info: trump_volatility_2025_files/figure-latex/SPY-SPLIT-IRF-1.pdf  used on input line 600.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
-<trump_volatility_2025_files/figure-latex/SPY-SPLIT-IRF-2.pdf, id=174, 469.755pt x 325.215pt>
+<trump_volatility_2025_files/figure-latex/SPY-SPLIT-IRF-2.pdf, id=164, 469.755pt x 325.215pt>
 File: trump_volatility_2025_files/figure-latex/SPY-SPLIT-IRF-2.pdf Graphic file (type pdf)
 <use trump_volatility_2025_files/figure-latex/SPY-SPLIT-IRF-2.pdf>
-Package luatex.def Info: trump_volatility_2025_files/figure-latex/SPY-SPLIT-IRF-2.pdf  used on input line 606.
+Package luatex.def Info: trump_volatility_2025_files/figure-latex/SPY-SPLIT-IRF-2.pdf  used on input line 600.
 (luatex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
-[10]
+[9]
 
-[11]
+[10]
 Overfull \vbox (25.9534pt too high) has occurred while \output is active []
 
 
 
-[12<./trump_volatility_2025_files/figure-latex/SPY-SPLIT-IRF-1.pdf><./trump_volatility_2025_files/figure-latex/SPY-SPLIT-IRF-2.pdf>]
+[11<./trump_volatility_2025_files/figure-latex/SPY-SPLIT-IRF-1.pdf><./trump_volatility_2025_files/figure-latex/SPY-SPLIT-IRF-2.pdf>]
 
-[13] (./trump_volatility_2025.aux)
+[12] (./trump_volatility_2025.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-04-29>
@@ -930,19 +916,19 @@ LaTeX Warning: There were undefined references.
 )
 
 Here is how much of LuaTeX's memory you used:
- 19968 strings out of 471907
+ 19950 strings out of 471907
  100000,953878 words of node,token memory allocated
- 630 words of node memory still in use:
-   6 hlist, 2 vlist, 2 rule, 5 glue, 4 kern, 1 glyph, 14 attribute, 68 glue_spec, 14 attribute_list, 2 write, 1 user_defined, 1 pdf_action nodes
-   avail lists: 1:1,2:2265,3:457,4:200,5:640,6:81,7:9532,8:46,9:1332,10:11,11:592
- 46121 multiletter control sequences out of 65536+600000
- 70 fonts using 19998299 bytes
+ 619 words of node memory still in use:
+   6 hlist, 2 vlist, 2 rule, 4 glue, 4 kern, 1 glyph, 13 attribute, 68 glue_spec, 13 attribute_list, 2 write, 1 user_defined, 1 pdf_action nodes
+   avail lists: 1:1,2:2265,3:457,4:200,5:640,6:81,7:9402,8:46,9:1332,10:11,11:701
+ 46108 multiletter control sequences out of 65536+600000
+ 70 fonts using 19998451 bytes
  90i,12n,114p,524b,383s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-italic.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmonolt10-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-italic.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman8-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman6-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman7-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman12-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman9-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman9-bold.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman12-regular.otf><c:/Users/fries/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman17-regular.otf>
-Output written on trump_volatility_2025.pdf (13 pages, 3005397 bytes).
+Output written on trump_volatility_2025.pdf (12 pages, 124933 bytes).
 
-PDF statistics: 367 PDF objects out of 1000 (max. 8388607)
- 290 compressed objects within 3 object streams
- 64 named destinations out of 1000 (max. 131072)
+PDF statistics: 355 PDF objects out of 1000 (max. 8388607)
+ 281 compressed objects within 3 object streams
+ 62 named destinations out of 1000 (max. 131072)
  129 words of extra memory for PDF output out of 10000 (max. 100000000)
 
