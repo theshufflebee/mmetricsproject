@@ -108,7 +108,8 @@ available information, adjusting immediately to any new data
 for information flow. In addition, the “Mixture of Distribution
 Hypothesis” states that the release of new information is closely linked
 to movements in both realized and implied volatility
-@andersenReturnVolatilityTrading1996 (1)(3).
+@andersenReturnVolatilityTrading1996, @frenchStockReturnVariances1986,
+@vlastakisInformationDemandStock2012.
 
 Consequently, a large part of the literature had focused on the relation
 between announcements, news and market activity. For example,
@@ -137,8 +138,8 @@ Using high-frequency financial data,
 trading volume, along with a decline in the U.S. stock market—regardless
 of the tweet's content. However, the effect was stronger when Trump used
 confrontational words such as "tariff" or "trade war." Some of his
-announcements also influenced the U.S. dollar exchange rate (l) and
-certain market indices within minutes of the tweet being posted
+announcements also influenced the U.S. dollar exchange rate @vlastakisInformationDemandStock2012
+and certain market indices within minutes of the tweet being posted
 @colonescuEffectsDonaldTrumps2018 & @kinyuaAnalysisImpactPresident2021.
 
 Other scholars have shown that negative Trump tweets about specific
