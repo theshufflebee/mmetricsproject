@@ -398,7 +398,7 @@ kable(pvals_combined, digits = 6, format="html", caption = "Ljung-Box Test p-val
 ```{r tab-means, message=F, warning=F, results="asis", cache=TRUE, echo=FALSE}
 
 means <- data.frame(
-  Model = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
+  Timeframe = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
   `SPY Volatility Mean` = c(
     mean1,
     mean2,
