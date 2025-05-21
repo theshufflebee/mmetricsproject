@@ -32,8 +32,7 @@ to compute robust standard errors.
 As in the ARMA-X framework, we initially estimate a model for each of our five
 main variables. For all estimations using the SPY ETF market, the significant 
 coefficients of social media variables were consistently negative, while the 
-positive coefficients were large but not significant \@ref(sec:svar-table-1).
-([*desc1figVAR*]{style="color:red"})
+positive coefficients were large but not significant (\@ref(sec:svar-table-1)).
 For the $Tariff$, $Trade$ and $China$ mention variables, the first, second and sometimes forth 
 lag were positive and relatively large (especially in the case of Tariff), while 
 the remaining ones were not. In contrast, for $TweetCount$ and $TweetDummy$, we 
@@ -42,8 +41,8 @@ that the contemporaneous effects of the shocks were all positive and relatively
 strong. This leads to two types of scenarios : either 
 the IRF's experienced a positive shock and remain elevated ($Tariff$, $Trade$ and $China$), 
 or a highly positive shock occurs, but the cumulative effect turns negative after few 
-hours ($TweetDummy$ and $Count$). \@ref(sec:irf-dummy), \@ref(sec:irf-cum-dummy)
-[*IRFtarifVAR*]{style="color:red"} [*IRFdummyVAR*]{style="color:red"}
+hours ($TweetDummy$ and $Count$) (\@ref(sec:irf-dummy), \@ref(sec:irf-tariff)).
+
 
 Finally, except for $Tariff$, all Granger causality tests indicate that Trump's 
 posts have an impact on volatility. However, due to serial correlation in the 
@@ -67,10 +66,9 @@ of the test itself, as such results appear unrealistic.
 
 ### Split Sample
 
-For the split framework, the results were similar and striking \@ref(sec:irf-china-2)
-[*IRFchinasecondtermVAR*]{style="color:red"}. While we
-observed relatively small shock effects and almost entirely negative coefficients 
-during the first term \@ref(sec:tab-svar-1) ([*descFirsttermfigVAR*]{style="color:red"}), leading the 
+For the split framework, the results were similar and striking (\@ref(sec:irf-china-2)).
+While we observed relatively small shock effects and almost entirely negative coefficients 
+during the first term (\@ref(sec:tab-svar-1)), leading the 
 cumulative IRF's to indicate a negative impact of posts, the shock effects in the
 second term were substantially larger, ranging from 5 times (for $TweetCount$ and 
 $TweetDummy$) to as much as 25 times greater (for $Tariff$). the only exception was 
@@ -80,7 +78,7 @@ the first, second and forth lags. However, none of these coefficients were
 statistically significant, but the cumulative IRF's clearly show a high positive 
 impact on everything except for $TweetDummy$ and $TweetCount$, whose
 coefficients and cumulative IRF's displayed similar patterns to those observed 
-in the first term. \@ref(sec:tab-svar-2) ([*descSecondtermfigVAR*]{style="color:red"})
+in the first term (\@ref(sec:tab-svar-2))
 Moreover, the Granger tests generally failed in both terms, with the sole
 exception being $China$ in the second term. 
 Regarding the ASHR ETF, we found results similar to those for the US ETF. Surprisingly, 

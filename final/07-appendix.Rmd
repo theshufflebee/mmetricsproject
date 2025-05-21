@@ -852,17 +852,19 @@ custom_names <- list(
 ```{r tab:first-var, warning=FALSE, results='asis', echo=FALSE}
 tmpfile <- tempfile(fileext = ".html")  # create temp file
 
-table_texreg_html <- htmlreg(
-  l = models_list,
-  override.se = robust_ses,
-  override.pvalues = robust_pvals,
-  custom.coef.map = custom_names,
-  custom.model.names = c("TweetDummy", "TweetCount", "Tariff", "Trade", "China"),
-  caption = "VAR Models of Average Hourly Volatility",
-  digits = 6,
-  custom.gof.rows = list("Shock (IRF)" = c(0.0041713, 0.003061, 0.001189, 0.000215, 0.001937)),
-  custom.note = "This table displays VAR regression with only two variables: AHV and the X regressor. Column names represent the X variable for the selected model.",
-  file = tmpfile
+suppressMessages(
+  htmlreg(
+    l = models_list,
+    override.se = robust_ses,
+    override.pvalues = robust_pvals,
+    custom.coef.map = custom_names,
+    custom.model.names = c("TweetDummy", "TweetCount", "Tariff", "Trade", "China"),
+    caption = "VAR Models of Average Hourly Volatility",
+    digits = 6,
+    custom.gof.rows = list("Shock (IRF)" = c(0.0041713, 0.003061, 0.001189, 0.000215, 0.001937)),
+    custom.note = "This table displays VAR regression with only two variables: AHV and the X regressor. Column names represent the X variable for the selected model.",
+    file = tmpfile
+  )
 )
 
 # Manually add a caption in HTML format
@@ -1376,7 +1378,7 @@ custom_names <- list(
 tmpfile_f <- tempfile(fileext = ".html")  # create temp file
 
 # Generate table
-table_texreg_f <- htmlreg(
+suppressMessages(htmlreg(
   l = models_list_f,
   override.se = robust_ses_f,
   override.pvalues = robust_pvals_f,
@@ -1390,7 +1392,7 @@ table_texreg_f <- htmlreg(
   star.cutoffs = c(0.001, 0.01, 0.05),
   custom.note = "This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.",
   file = tmpfile_f
-)
+))
 
 # Print table
 cat(readLines(tmpfile_f), sep = "\n")
@@ -1502,7 +1504,7 @@ tmpfile_s <- tempfile(fileext = ".html")  # create temp file
 
 
 # Generate table
-table_texreg_s <- htmlreg(
+suppressMessages(htmlreg(
   l = models_list_s,
   override.se = robust_ses_s,
   override.pvalues = robust_pvals_s,
@@ -1516,7 +1518,7 @@ table_texreg_s <- htmlreg(
   star.cutoffs = c(0.05, 0.01, 0.001),
   custom.note = "This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.",
   file = tmpfile_s
-)
+))
 
  
 # Print

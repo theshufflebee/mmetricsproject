@@ -549,8 +549,7 @@ to compute robust standard errors.
 As in the ARMA-X framework, we initially estimate a model for each of our five
 main variables. For all estimations using the SPY ETF market, the significant 
 coefficients of social media variables were consistently negative, while the 
-positive coefficients were large but not significant \@ref(sec:svar-table-1).
-([*desc1figVAR*]{style="color:red"})
+positive coefficients were large but not significant (\@ref(sec:svar-table-1)).
 For the $Tariff$, $Trade$ and $China$ mention variables, the first, second and sometimes forth 
 lag were positive and relatively large (especially in the case of Tariff), while 
 the remaining ones were not. In contrast, for $TweetCount$ and $TweetDummy$, we 
@@ -559,8 +558,8 @@ that the contemporaneous effects of the shocks were all positive and relatively
 strong. This leads to two types of scenarios : either 
 the IRF's experienced a positive shock and remain elevated ($Tariff$, $Trade$ and $China$), 
 or a highly positive shock occurs, but the cumulative effect turns negative after few 
-hours ($TweetDummy$ and $Count$). \@ref(sec:irf-dummy), \@ref(sec:irf-cum-dummy)
-[*IRFtarifVAR*]{style="color:red"} [*IRFdummyVAR*]{style="color:red"}
+hours ($TweetDummy$ and $Count$) (\@ref(sec:irf-dummy), \@ref(sec:irf-tariff)).
+
 
 Finally, except for $Tariff$, all Granger causality tests indicate that Trump's 
 posts have an impact on volatility. However, due to serial correlation in the 
@@ -584,10 +583,9 @@ of the test itself, as such results appear unrealistic.
 
 ### Split Sample
 
-For the split framework, the results were similar and striking \@ref(sec:irf-china-2)
-[*IRFchinasecondtermVAR*]{style="color:red"}. While we
-observed relatively small shock effects and almost entirely negative coefficients 
-during the first term \@ref(sec:tab-svar-1) ([*descFirsttermfigVAR*]{style="color:red"}), leading the 
+For the split framework, the results were similar and striking (\@ref(sec:irf-china-2)).
+While we observed relatively small shock effects and almost entirely negative coefficients 
+during the first term (\@ref(sec:tab-svar-1)), leading the 
 cumulative IRF's to indicate a negative impact of posts, the shock effects in the
 second term were substantially larger, ranging from 5 times (for $TweetCount$ and 
 $TweetDummy$) to as much as 25 times greater (for $Tariff$). the only exception was 
@@ -597,7 +595,7 @@ the first, second and forth lags. However, none of these coefficients were
 statistically significant, but the cumulative IRF's clearly show a high positive 
 impact on everything except for $TweetDummy$ and $TweetCount$, whose
 coefficients and cumulative IRF's displayed similar patterns to those observed 
-in the first term. \@ref(sec:tab-svar-2) ([*descSecondtermfigVAR*]{style="color:red"})
+in the first term (\@ref(sec:tab-svar-2))
 Moreover, the Granger tests generally failed in both terms, with the sole
 exception being $China$ in the second term. 
 Regarding the ASHR ETF, we found results similar to those for the US ETF. Surprisingly, 
@@ -1506,17 +1504,19 @@ custom_names <- list(
 ```{r tab:first-var, warning=FALSE, results='asis', echo=FALSE}
 tmpfile <- tempfile(fileext = ".html")  # create temp file
 
-table_texreg_html <- htmlreg(
-  l = models_list,
-  override.se = robust_ses,
-  override.pvalues = robust_pvals,
-  custom.coef.map = custom_names,
-  custom.model.names = c("TweetDummy", "TweetCount", "Tariff", "Trade", "China"),
-  caption = "VAR Models of Average Hourly Volatility",
-  digits = 6,
-  custom.gof.rows = list("Shock (IRF)" = c(0.0041713, 0.003061, 0.001189, 0.000215, 0.001937)),
-  custom.note = "This table displays VAR regression with only two variables: AHV and the X regressor. Column names represent the X variable for the selected model.",
-  file = tmpfile
+suppressMessages(
+  htmlreg(
+    l = models_list,
+    override.se = robust_ses,
+    override.pvalues = robust_pvals,
+    custom.coef.map = custom_names,
+    custom.model.names = c("TweetDummy", "TweetCount", "Tariff", "Trade", "China"),
+    caption = "VAR Models of Average Hourly Volatility",
+    digits = 6,
+    custom.gof.rows = list("Shock (IRF)" = c(0.0041713, 0.003061, 0.001189, 0.000215, 0.001937)),
+    custom.note = "This table displays VAR regression with only two variables: AHV and the X regressor. Column names represent the X variable for the selected model.",
+    file = tmpfile
+  )
 )
 
 # Manually add a caption in HTML format
@@ -2030,7 +2030,7 @@ custom_names <- list(
 tmpfile_f <- tempfile(fileext = ".html")  # create temp file
 
 # Generate table
-table_texreg_f <- htmlreg(
+suppressMessages(htmlreg(
   l = models_list_f,
   override.se = robust_ses_f,
   override.pvalues = robust_pvals_f,
@@ -2044,7 +2044,7 @@ table_texreg_f <- htmlreg(
   star.cutoffs = c(0.001, 0.01, 0.05),
   custom.note = "This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.",
   file = tmpfile_f
-)
+))
 
 # Print table
 cat(readLines(tmpfile_f), sep = "\n")
@@ -2156,7 +2156,7 @@ tmpfile_s <- tempfile(fileext = ".html")  # create temp file
 
 
 # Generate table
-table_texreg_s <- htmlreg(
+suppressMessages(htmlreg(
   l = models_list_s,
   override.se = robust_ses_s,
   override.pvalues = robust_pvals_s,
@@ -2170,7 +2170,7 @@ table_texreg_s <- htmlreg(
   star.cutoffs = c(0.05, 0.01, 0.001),
   custom.note = "This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.",
   file = tmpfile_s
-)
+))
 
  
 # Print
