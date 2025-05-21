@@ -96,7 +96,14 @@ This is a Website for a class project from the 2025 Class Macroeconometrics at U
 
 # Abstract {.unnumbered}
 
-This Project assesses to what extent Financial Markets react to information provided by Donald Trump on Twitter and Truth Social. We asses the impact of posts on hourly volatility using ARMA-X. We evaluate multiple time horizons and independent variables, such as if Trump posts anything, specific words such as tariff and sentiments. We then calculate IRFs and show that there are significant impacts on volatility.
+
+In this short paper, we aim to asses to what extent financial markets may react
+to Donald Trump's social media posts, and specifically the effect on average
+realised volatility. We do so using both ARMA-X and VAR models, with data spanning
+the 1st of January 2014, to the 7th of May 2025, over various time horizons and
+independent variables. We find limited evidence that there is a significant positive
+effect, and provide some explanations as to why this could be the case.
+
 
 
 <!--chapter:end:index.Rmd-->
@@ -423,7 +430,7 @@ plot.title = element_text(face = "bold", hjust = 0.5))
 
 
 ## Final Dataframe
-
+Here is a look into our final, fully cleaned, fully transformed dataset.
 ```{r data, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 
 tail(data[1:4])
@@ -559,9 +566,10 @@ However, we would suggest strong against trying to interpret these results given
 that the models seem to not fit particularly well. This may be due to seasonality
 in our data (a common trend seen is our daily AVH is high volatility in the first 
 open hours, and a gradual slowdown for the rest of the day), or to our handling 
-of non-market hours. Further work could look at these issues in more detail, could
-further complicate the models by adding more variables and interaction between them,
+of non-market hours. Further work could look at exploring said issues in greater depth,
+further complicate the models by adding more variables and interactions between them,
 and/or additionally <span style="color:red"> *use more sophisticated models, such as models including co-integration.* </span>
+
 
 <!--chapter:end:05-conclusion.Rmd-->
 
