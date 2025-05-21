@@ -3,9 +3,9 @@ title: "Final_VAR"
 author: "pte"
 date: "2025-05-15"
 output:
+  pdf_document: default
   html_document:
     css: "table-style.css"
-  pdf_document: default
 editor_options:
   markdown:
     wrap: 72
