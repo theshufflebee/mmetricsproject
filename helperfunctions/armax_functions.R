@@ -252,10 +252,9 @@ irf.plot = function(model,T, title="ARMA-X IRF"){
     
     plot = ggplot(IRF,aes(x = Period, y = IRFdata)) +
             geom_line(color = "steelblue", size = 1.2) +
-            labs(title = title, y="Hours after shock") +
-            theme_minimal(base_size = 14) +
-            theme(axis.text.x = element_text(angle = 45, hjust = 1),
-            plot.title = element_text(face = "bold", hjust = 0.5))
+            labs(title = title, x="Hours after shock", y="") +
+            theme_minimal() +
+            theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
   return(plot)}
 

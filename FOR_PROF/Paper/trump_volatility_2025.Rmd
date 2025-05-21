@@ -9,6 +9,10 @@ output:
     latex_engine: lualatex
 header-includes:
   - \usepackage{amsmath}
+  - \usepackage{geometry}
+  - \usepackage{placeins}
+  - \usepackage{float}
+geometry: "left=1.6cm,right=1.6cm,top=1cm,bottom=2cm"
 bibliography: [packages.bib, citations.bib] #name bib files
 link-citations: true           # optional but helpful for clickable citations
 csl: apa.csl
@@ -57,9 +61,7 @@ Over the past 15 years social media has become an important
 communication tool for politicians. One of the pioneers of this novel
 approach has been Donald Trump, the 45th and 47th President of the United
 States. Since his ban on Twitter after the January 6th riots, his quantity of
-social media posts has drastically increased[^1].
-
-[^1]: Includes both Posts and Reposts
+social media posts has drastically increased.
 
 The content of his posts can sometimes have announcements or teases of future
 political decisions. Note the recent infamous "THIS IS A GREAT TIME TO BUY!!! DJT"
@@ -115,12 +117,12 @@ Information is one of the most valuable assets in the financial market.
 Its importance lies at the core of the "Efficient Market Hypothesis", 
 which states that the prices of assets fully reflect all
 available information, adjusting immediately to any new data
-@famaAdjustmentStockPrices2003 , and thereby creating a strong demand
+(@famaAdjustmentStockPrices2003) , and thereby creating a strong demand
 for information flow. In addition, the “Mixture of Distribution
 Hypothesis” states that the release of new information is closely linked
 to movements in both realized and implied volatility
-@andersenReturnVolatilityTrading1996, @frenchStockReturnVariances1986,
-@vlastakisInformationDemandStock2012.
+(@andersenReturnVolatilityTrading1996, @frenchStockReturnVariances1986,
+@vlastakisInformationDemandStock2012).
 
 Consequently, a large part of the literature had focused on the relation
 between announcements, news and market activity. For example,
@@ -138,8 +140,8 @@ which revolutionized the dissemination and accessibility of information.
 Social media enable investors, analysts or politicians to instantly
 share their information, news or opinions. This led some studies to
 focus on the communication dynamics of social platform to predict
-changes in the returns of financial assets @dechoudhuryCanBlogCommunication2008 & 
-@bartovCanTwitterHelp2018. In this context, the
+changes in the returns of financial assets (@dechoudhuryCanBlogCommunication2008 and 
+@bartovCanTwitterHelp2018). In this context, the
 impact of Trump’s tweets on various financial and macroeconomic
 variables has been analysed by several studies, especially during his
 first mandate.
@@ -149,20 +151,20 @@ Using high-frequency financial data,
 trading volume, along with a decline in the U.S. stock market—regardless
 of the tweet's content. However, the effect was stronger when Trump used
 confrontational words such as "tariff" or "trade war." Some of his
-announcements also influenced the U.S. dollar exchange rate @vlastakisInformationDemandStock2012
+announcements also influenced the U.S. dollar exchange rate (@vlastakisInformationDemandStock2012)
 and certain market indices within minutes of the tweet being posted
-@colonescuEffectsDonaldTrumps2018 & @kinyuaAnalysisImpactPresident2021.
+(@colonescuEffectsDonaldTrumps2018 and @kinyuaAnalysisImpactPresident2021).
 
 Other scholars have shown that negative Trump tweets about specific
-companies tended to reduce demand for their stocks @bransHisThumbEffect2020 &
-@mendelsStanfordResearchSeries2019, whereas some
+companies tended to reduce demand for their stocks (@bransHisThumbEffect2020 and
+@mendelsStanfordResearchSeries2019), whereas some
 other have shown that they also impact market volatility indices such as
-the VIX @fendelPoliticalNewsStock2019 or the Volfele @klausMeasuringTrumpVolfefe2021.
+the VIX (@fendelPoliticalNewsStock2019) or the Volfele (@klausMeasuringTrumpVolfefe2021).
 The effects of his tweets also extended beyond the U.S.. For example,
 @nishimuraImpactsDonaldTrumps2025 shows a
 positive relationship between volatility in European stock markets and
-tweeter activity of Trump, and this effect tends to intensify as public
-intention for his tweet grows @nishimuraImpactsDonaldTrumps2025.
+Twitter activity of Trump, and this effect tends to intensify as public
+intention for his tweet grows.
 
 
 
@@ -262,9 +264,9 @@ hvol_plotter(SPY, breaks = "yearly", title = "SPY Realised Volatility")
 
 ```
 
-We can clearly see that the last few months show a new era of never seen before
+We note that the last few months show a new era of never seen before
 levels of volatility. Shocks on volatility recently have reached, and even surpassed
-(for a few data points) levels seen during the COVID-19 pandemic.
+levels seen during the COVID-19 pandemic.
 
 
 ## Political Data
@@ -281,9 +283,9 @@ A big problem we had in our analysis was what to do with social media posts
 which appeared outside market hours. We first decided to simply ignore them, but 
 it turned out to remove a lot of observations. We finally decided to push all the 
 social media information outside market hours to the next open hour. This comes 
-as an assumption[^2]. 
+as an assumption[^1]. 
 
-[^2]: For instance, if Trump tweets on Good Friday (market holiday), then the 
+[^1]: For instance, if Trump tweets on Good Friday (market holiday), then the 
 market will only react to this new information on Monday at 9:30 am. 
 
 Since our financial data is hourly, we aggregate the social data by hour. We 
@@ -344,17 +346,17 @@ which sees minimal AIC loss and simplifying our models considerably.
 
 ### Full Timeframe
 We run models with the following exogenous regressors: $TweetDummy$, $TweetCount$,
-and the mentions of words $Tariff$, $Trade$, and $China$. We first note on the table
- in section \@ref(tab:spy-table) that all the x-regressors are significant,
+and the mentions of words $Tariff$, $Trade$, and $China$. We first note in Table 
+\@ref(tab:armax) that all the x-regressors are significant,
 apart from trade. Notice also that all the coefficients (apart from $Tariff_{t-3}$)
 are positive, in line with our main hypothesis. The effect of $Tariff_{t-1}$ and 
-$Tariff_{t-2}$ are especially large, given the usual size of the volatility as seen
-in Section \@ref(tab:means-table). We in fact predict that an 
+$Tariff_{t-2}$ are especially large, given the average size of the volatility being 
+about 0.023 over the whole sample. We in fact predict that an 
 extra mention of tariffs one hour ago, leads to a whopping extra 0.02 in volatility
  which is just about the average size for the full timeframe. We can see the
-impulse response function (IRF) for this shock, in \@ref(fig:SPY-IRF) Notice that
+impulse response function (IRF) for this shock, in Figure \@ref(fig:armaxirf1) Notice that
 there is a large response in the first periods, and then a graduate
-decline over time. Something to note is that in our analyses of IRF's, when including
+decline over time. Something to note is that in our analyses of IRF, when including
 MA terms, the decline shows up gradual while being much sharper when only including
 AR terms. 
 Note that we ran all these models on the VGK and ASHR ETF's as well, though no
@@ -363,21 +365,19 @@ of the tariff variable for VGK.
 
 ### Split Samples
 We then split our sample for the first and second term of the Trump presidency.
-We only run models on tariff, trade and china this time. As seen on table
-\@ref(tab:spy-table-terms), the first interesting result
+We only run models on tariff, trade and china this time. As seen on Table
+\@ref(tab:armaxterm), the first interesting result
 is in the coefficients of tariff being significant and very large in the second
 term, while being small and not statistically significant in the first. A similar
 story goes for the China variable. This may lend some evidence to support the 
 claim that investors are much more reactive to Trump's social media presence
-now than before. We've found similar IRF's as for the full timeframe. Tables \@ref(fig:SPY-IRF)
-show the IRF's for the second term, of the impacts of tariff and china mention
-shocks on the AHV.
+now than before. We've found similar IRF as for the full timeframe. 
 Finally, we can check the residuals of all these models to test them somewhat. 
-In Section \@ref(tab:SPY-res-test), the pvalues being zero
-for the full timeframe and first term indicate that there is autocorrelation in 
-the residuals, thus suggesting that these estimations have problems. Note however,
-that the p-values for the second term are quite high, lending support to our
-models on the split sample. These results suggest that perhaps ARMA-X models are
+We find that p-values are zero for the full timeframe and first term models, which 
+indicates that there is autocorrelation in the residuals, thus suggesting that these 
+estimations are problematic. However, for the second term, the p-values are quite high 
+(~ 0.8 for $Tariff$), lending support to our models on the split sample. 
+These results suggest that perhaps ARMA-X models are
 not right in this context as it is not unreasonable to think that Trump does 
 in fact react to market movements, which would break the exogeneity assumption
 that is critical for this type of model. With this information, we decided to run
@@ -451,12 +451,8 @@ source(here("helperfunctions/armax_functions.R"))
 
 ```
 
-## ARMAX
 
-We choose the specification in the armax_models file. In this file, we will
-just run said specifications to produce nice tables and graphs to include in 
-our final paper. This is also why there are specification differences in the 
-separate timeframes. We always use the best fit we found earlier.
+## ARMAX
 
 ```{r datasetup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
 
@@ -502,8 +498,11 @@ models[["Model 5"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 
 ```
 
-### SPY ARMAX Table (Jan 2014 - May 2025) 
-```{r spy-table, results="asis", warning=F, message=F, echo=FALSE}
+### SPY ARMA-X Models (Jan 2014 - May 2025) 
+
+\FloatBarrier
+
+```{r armax1, results="asis", warning=F, message=F, echo=FALSE}
 
 names = list( "ar1" = "AR(1)",
               "ar2" = "AR(2)",
@@ -527,20 +526,23 @@ names = list( "ar1" = "AR(1)",
 table1 = texreg(models,
           custom.model.names = names(models), 
           custom.coef.map = names,
-          caption = "ARMAX Models of Average Hourly Volatility",
+          caption = "ARMA-X Models of Average Hourly Volatility",
           caption.above = TRUE,
           label = "tab:armax",
-          digits = 4)
+          digits = 4,
+          fontsize = "small",
+          float.pos = 'H')
 table1
-
-#write(table1, file = "armax_table1.tex")
 
 ```
 
+\FloatBarrier
 
-### SPY ARMAX IRFs (Jan 2014 - May 2025)
+\newpage
 
-```{r SPY-IRF, results="asis", warning=F, message=F, echo=FALSE, cache=TRUE}
+### SPY ARMA-X IRF (Jan 2014 - May 2025)
+
+```{r armaxirf1, results="asis", warning=F, message=F, echo=FALSE, cache=TRUE, fig.cap="ARMA-X IRF", fig.width=6, fig.height=2.5}
 
 #we want to plot the IRFs of these models
 nb.periods = 7 * 15
@@ -558,7 +560,7 @@ plot1
 ```
 
 
-```{r, warning=F, message=F, echo=FALSE, results=F}
+```{r calc res, warning=F, message=F, echo=FALSE, results=F}
 #Calculate residuals
 
 res1 = checkresiduals(models[["Model 1"]], plot = FALSE)
@@ -697,12 +699,11 @@ pvals_combined <- cbind(pvals_combined, pvals_new2)
 
 ```
 
+### SPY ARMA-X Split Models
 
-### SPY ARMAX Table (Split Presidential Terms)
+\FloatBarrier
 
-\centering 
-
-```{r spy-table-terms, results="asis", warning=F, message=F}
+```{r armax2, results="asis", warning=F, message=F, echo=FALSE}
 
 xnames = list("ar1" = "AR(1)",
               "ar2" = "AR(2)",
@@ -722,20 +723,18 @@ xnames = list("ar1" = "AR(1)",
 table2 = texreg(models,
        custom.model.names = names(models), 
        custom.coef.map = xnames,
-       caption = "Split-Term ARMAX Models of Average Hourly Volatility",
+       caption = "Split-Term ARMA-X Models of Average Hourly Volatility",
        caption.above = TRUE,
-       label = "tab:armax_term",
-       digits = 4)
-table2
+       label = "tab:armaxterm",
+       digits = 4,
+       fontsize = "small",
+       float.pos = "H")
 
-#write(table2, file = "armax_table2.tex")
+table2
 
 ```
 
-
-### SPY ARMAX IRFs (Split Terms)
-
-```{r SPY-SPLIT-IRF, warning=F, message=F, echo=FALSE, cache=TRUE}
+```{r armaxirf2, warning=F, message=F, echo=FALSE, cache=TRUE, eval=FALSE}
 
 #we want to plot the IRFs of these models
 nb.periods = 7 * 15
@@ -750,41 +749,32 @@ plot3 = irf.plot(models[["Second Term (3)"]],nb.periods,
                  title="China Mention Shock - Second Term")
 plot3
 
-#ggsave("armax_plot3.png",plot=plot3,bg="white")
-
 ```
 
 
-### Residual Test 
+```{r armax3, message=FALSE, warning=FALSE, results="asis", echo=FALSE, eval=FALSE}
 
-```{r SPY-res-test, message=FALSE, warning=FALSE, results="asis"}
-
-table3 = knitr::kable(pvals_combined, digits = 100, format="latex",
+table3 = knitr::kable(pvals_combined, digits = 100, booktabs=T,
              caption = "Ljung-Box Test p-values for Residuals")
 
 table3
 
-#write(table3, file = "armax_table3.tex")
-
 ```
 
-### Descriptive Stats
  
-```{r means-table, message=F, warning=F, results="asis"}
+```{r means, message=F, warning=F, results="asis", echo=FALSE, eval=FALSE}
 
 means <- data.frame(
-  Model = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
+  Timeframe = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
   `SPY Volatility Mean` = c(
     mean1,
     mean2,
     mean3))
 
-table4 = knitr::kable(means, digits = 6, format="latex",
+table4 = knitr::kable(means, digits = 6, booktabs=T,
              caption = "Summary Statistics of SPY Volatility")
 
 table4
-
-#write(table4, file = "armax_table4.tex")
 
 ```
 
@@ -803,6 +793,3 @@ table4
 
 
 
-
-
-\clearpage
