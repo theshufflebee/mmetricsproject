@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.22.0 (TeX Live 2025)  (format=lualatex 2025.5.16)  21 MAY 2025 10:22
+This is LuaHBTeX, Version 1.22.0 (TeX Live 2025)  (format=lualatex 2025.5.16)  21 MAY 2025 10:35
  restricted system commands enabled.
 **SVAR_FIGURES.tex
 (./SVAR_FIGURES.tex
@@ -937,11 +937,6 @@ Underfull \vbox (badness 10000) detected at line 1152
 
 
 [23]
-Overfull \hbox (87.067pt too wide) in paragraph at lines 1157--1196
- [] 
- []
-
-
 
 [24]
 Underfull \vbox (badness 10000) detected at line 1319
@@ -964,11 +959,6 @@ Underfull \vbox (badness 10000) detected at line 1319
 
 
 [26]
-Overfull \hbox (87.067pt too wide) in paragraph at lines 1324--1363
- [] 
- []
-
-
 
 [27] (./SVAR_FIGURES.aux)
  ***********
@@ -985,15 +975,15 @@ Here is how much of LuaTeX's memory you used:
  125007,953878 words of node,token memory allocated
  547 words of node memory still in use:
    6 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 7 attribute, 63 glue_spec, 7 attribute_list, 1 write, 1 user_defined nodes
-   avail lists: 2:3735,3:295,4:892,5:880,6:77,7:11434,8:12,9:1370,10:2,11:54
+   avail lists: 2:3855,3:295,4:892,5:904,6:77,7:11548,8:12,9:1374,10:2,11:54
  45938 multiletter control sequences out of 65536+600000
- 67 fonts using 19603311 bytes
+ 67 fonts using 19603159 bytes
  90i,11n,114p,527b,461s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman7-regular.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman9-italic.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-italic.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmonolt10-bold.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-regular.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-bold.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-regular.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman12-bold.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman17-regular.otf>
-Output written on SVAR_FIGURES.pdf (27 pages, 136439 bytes).
+<c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman9-italic.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-italic.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmonolt10-bold.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-regular.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-bold.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-regular.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman12-bold.otf><c:/Users/jonas/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman17-regular.otf>
+Output written on SVAR_FIGURES.pdf (27 pages, 132217 bytes).
 
-PDF statistics: 323 PDF objects out of 1000 (max. 8388607)
- 246 compressed objects within 3 object streams
+PDF statistics: 316 PDF objects out of 1000 (max. 8388607)
+ 242 compressed objects within 3 object streams
  50 named destinations out of 1000 (max. 131072)
  137 words of extra memory for PDF output out of 10000 (max. 100000000)
 
