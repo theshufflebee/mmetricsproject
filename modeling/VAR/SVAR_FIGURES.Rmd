@@ -1,13 +1,13 @@
 ---
 title: "Final_VAR"
 output:
-  html_document:
-    toc: true
-    df_print: paged
   pdf_document:
     toc: true
     fig_caption: true
     latex_engine: lualatex
+  html_document:
+    toc: true
+    df_print: paged
 header-includes: \usepackage{amsmath}
 ---
 \newpage

@@ -1,3 +1,14 @@
+---
+title: "SVAR Models Explanation"
+output:
+  pdf_document:
+    toc: true
+    fig_caption: true
+    latex_engine: lualatex
+header-includes: \usepackage{amsmath}
+---
+\newpage
+
 # Setup
 
 ## Load packages & functions
@@ -79,7 +90,7 @@ We begin by testing whether our variables are stationary over time.
 We use the Augmented Dickey-Fuller test on the volatility of 
 different markets and on variables derived from Trump post.
 
-```{r adf tests, warning=FALSE, message=FALSE}
+```{r adf tests, warning=FALSE, message=FALSE, results=FALSE}
 
 adf.test(data$SPY_vol)
 adf.test(data$VGK_vol)
@@ -154,7 +165,7 @@ We run a Portmanteau-Godfrey test in order to detect some serial correlation on 
 residuals. We found strong evidence of the presence of serial correlation in all 
 estimations.  
 
-```{r dummy, warning=FALSE, message=FALSE}
+```{r test, warning=FALSE, message=FALSE}
 
 serial2 = serial.test(est.VAR, lags.pt =6, type = "PT.asymptotic")
 serial2
