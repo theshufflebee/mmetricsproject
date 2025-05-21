@@ -232,6 +232,8 @@ robust = 2*(1-pt(abs(t_stat), df = df.residual(lm_clean)))
 
 ```
 
+### IRF 1
+
 ```{r B mat}
 
 #Recreate a Robust Omega Matrix
@@ -319,8 +321,6 @@ ggplot(Yd,aes(x=period, y=cumsum(response))) +
 
 
 
-#IRF
-
 ## Tariff (Overall)
 
 ```{r estime tariff overall, message=FALSE, warning=FALSE}
@@ -346,6 +346,9 @@ t_stat3 = coef3/nw_se3
 robust3 = 2*(1-pt(abs(t_stat3), df = df.residual(lm_clean3)))
 
 ```
+
+
+### IRF 3
 
 ```{r B mat tariff}
 #Recreate a Robust Omega Matrix
@@ -467,90 +470,7 @@ robust = 2*(1-pt(abs(t_stat), df = df.residual(lm_clean)))
 
 ```
 
-```{r B mat dummy}
 
-#Recreate a Robust Omega Matrix
-U = residuals(est.VAR)
-T = nrow(U)
-L = 6 #number of lag
-Omega = matrix(0, ncol(U), ncol(U))
-for(l in 0:L) {
-  weight = 1 - l/(L+1)
-  Gamma_l_ = t(U[(l+1):T, , drop=FALSE]) %*% U[1:(T-l), , drop=FALSE] /T
-  if (l == 0){
-    Omega = Omega + Gamma_l_
-  } else {
-    Omega = Omega + weight*(Gamma_l_ + t(Gamma_l_))
-  }
-}
-
-
-#make the B matrix
-loss <- function(param){
-  #Define the restriction
-  B <- matrix(c(param[1], param[2], 0, param[3]), ncol = 2)
-  
-  #Make BB' approximatively equal to omega
-  X <- Omega - B %*% t(B)
-  
-  #loss function
-  loss <- sum(X^2)
-  return(loss)
-}
-
-res.opt <- optim(c(1, 0, 1), loss, method = "BFGS")
-B.hat <- matrix(c(res.opt$par[1], res.opt$par[2], 0, res.opt$par[3]), ncol = 2)
-
-
-
-```
-
-
-```{r IRF for dummy}
-nb.sim = 7*7
-#get back the coefficient of est.VAR
-phi <- Acoef(est.VAR)
-PHI = make.PHI(phi)
-
-#take the constant
-constant <- sapply(est.VAR$varresult, function(eq) coef(eq)["const"])
-c=as.matrix(constant)
-
-#Simulate the IRF
-p <- length(phi)
-n <- dim(phi[[1]])[1]
-
-
-Y <- simul.VAR(c=c, Phi = phi, B = B.hat, nb.sim ,y0.star=rep(0, n*p),
-                  indic.IRF = 1, u.shock = c(1,0))
-
-
-
-Yd = data.frame(
-  period = 1:nrow(Y),
-  response = Y[,2])
-
-ggplot(Yd,aes(x=period, y=response)) +
-  geom_hline(yintercept = 0, color="red") +
-  geom_line() +
-  theme_light() +
-  ggtitle("S&P IRF of Dummy on Volatility")+
-  ylab("")+
-  xlab("") +
-  theme_minimal()
-
-```
-
-```{r IRF 2Dummy}
-ggplot(Yd,aes(x=period, y=cumsum(response))) +
-  geom_hline(yintercept = 0, color="red") +
-  geom_line() +
-  theme_light() +
-  ggtitle("S&P Cumulalitve IRF of Dummy on Volatility") +
-  ylab("")+
-  xlab("") +
-  theme_minimal()
-```
 
 ## N
 
@@ -604,86 +524,7 @@ robust3 = 2*(1-pt(abs(t_stat3), df = df.residual(lm_clean3)))
 
 ```
 
-```{r B mat3}
-#Recreate a Robust Omega Matrix
-U3 = residuals(est.VAR3)
-T3 = nrow(U3)
-Omega3 = matrix(0, ncol(U3), ncol(U3))
-for(l in 0:L) {
-  weight = 1 - l/(L+1)
-  Gamma_l_3 = t(U3[(l+1):T3, , drop=FALSE]) %*% U3[1:(T3-l), , drop=FALSE] /T3
-  if (l == 0){
-    Omega3 = Omega3 + Gamma_l_3
-  } else {
-    Omega3 = Omega3 + weight*(Gamma_l_3 + t(Gamma_l_3))
-  }
-}
 
-
-#make the B matrix
-loss3 <- function(param3){
-  #Define the restriction
-  B3 <- matrix(c(param3[1], param3[2], 0, param3[3]), ncol = 2)
-  
-  #Make BB' approximatively equal to omega
-  X3 <- Omega3 - B3 %*% t(B3)
-  
-  #loss function
-  loss3 <- sum(X3^2)
-  return(loss3)
-}
-
-res.opt3 <- optim(c(1, 0, 1), loss3, method = "BFGS")
-B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol = 2)
-
-
-
-```
-
-
-```{r IRF tariffff}
-#get back the coefficient of est.VAR
-phi3 <- Acoef(est.VAR3)
-PHI3 = make.PHI(phi3)
-
-#take the constant
-constant3 <- sapply(est.VAR3$varresult, function(eq) coef(eq)["const"])
-c3=as.matrix(constant3)
-
-#Simulate the IRF
-p3 <- length(phi3)
-n3 <- dim(phi3[[1]])[1]
-
-Y3 <- simul.VAR(c=c3, Phi = phi3, B = B.hat3, nb.sim ,y0.star=rep(0, n3*p3),
-                  indic.IRF = 1, u.shock = c(1,0))
-
-
-#Plot the IRF
-Yd3 = data.frame(
-  period = 1:nrow(Y3),
-  response = Y3[,2])
-
-ggplot(Yd3,aes(x=period, y=response)) +
-  geom_hline(yintercept = 0, color="red") +
-  geom_line() +
-  theme_light() +
-  ggtitle("S&P IRF of tariff on Volatility") +
-  ylab("")+
-  xlab("") +
-  theme_minimal()
-```
-
-
-```{r IRF tariff}
-ggplot(Yd3,aes(x=period, y=cumsum(response))) +
-  geom_hline(yintercept = 0, color="red") +
-  geom_line() +
-  theme_light() +
-  ggtitle("S&P Cumulalitve IRF of tariff on Volatility") +
-  ylab("")+
-  xlab("") +
-  theme_minimal()
-```
 
 ## Trade
 
@@ -1162,6 +1003,7 @@ robust_s_tr = 2*(1-pt(abs(t_stat_s_tr), df = df.residual(lm_clean_s_tr)))
 
 ## China
 
+### IRF 3
 ```{r second mandate china, warning=FALSE, message=FALSE, results="asis"}
 
 y_s_ch = cbind(Vdata_s$china, Vdata_s$SPY_vol)
