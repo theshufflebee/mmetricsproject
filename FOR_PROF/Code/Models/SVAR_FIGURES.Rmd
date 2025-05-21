@@ -1,5 +1,5 @@
 ---
-title: "Final_VAR"
+title: "SVAR - Figures"
 output:
   pdf_document:
     toc: true
@@ -70,6 +70,8 @@ source(here::here("helperfunctions/r.vol_calculators.R"))
 source(here::here("helperfunctions/truths_cleaning_function.R"))
 source(here::here("helperfunctions/armax_functions.R"))
 ```
+
+# Full Timeframe
 
 ```{r load data, message=FALSE, warning=FALSE, results=FALSE, echo=FALSE}
 rm(Vdata)
@@ -554,9 +556,9 @@ Vdata_s = filter(data,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05
 
 ```
 
-## First Term
+# First Term
 
-### Dummy
+## Dummy
 
 ```{r first mandate dum, warning=FALSE, message=FALSE, results="asis"}
 y_f_d = cbind(Vdata_f$dummy, Vdata_f$SPY_vol)
