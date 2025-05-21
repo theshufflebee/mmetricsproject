@@ -90,13 +90,8 @@ Where $\Delta p_t$ is the difference in price (open - close) and $i$ represents
 every minute.
 
 We used a custom function in order to get the AHV for each open market hour. Note 
-that the first hour is from 9:30 am to 10:00 am since the 
-<<<<<<< HEAD
-market open on a half-hour but closes at 4:00 pm. We can plot this data.
-=======
-market open on a half-hour but closes at 4:00 pm. We can plot this data in
-the following table:
->>>>>>> 249c30f04f33d9c802ee965feef5b2f53edab0bc
+that the first hour is from 9:30 am to 10:00 am since the market opens on a half-hour 
+but closes at 4:00 pm. We can plot this data in the following table:
 
 
 ```{r fin plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
