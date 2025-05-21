@@ -346,7 +346,7 @@ robust3 = 2*(1-pt(abs(t_stat3), df = df.residual(lm_clean3)))
 
 ```
 
-```{r B mat3}
+```{r B mat tariff}
 #Recreate a Robust Omega Matrix
 U3 = residuals(est.VAR3)
 T3 = nrow(U3)
@@ -466,7 +466,7 @@ robust = 2*(1-pt(abs(t_stat), df = df.residual(lm_clean)))
 
 ```
 
-```{r B mat}
+```{r B mat dummy}
 
 #Recreate a Robust Omega Matrix
 U = residuals(est.VAR)
