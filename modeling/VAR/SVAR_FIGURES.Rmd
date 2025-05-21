@@ -1,12 +1,14 @@
 ---
 title: "Final_VAR"
 output:
-  pdf_document: 
+  html_document:
     toc: true
-    fig_caption: yes
+    df_print: paged
+  pdf_document:
+    toc: true
+    fig_caption: true
     latex_engine: lualatex
-header-includes:
-  - \usepackage{amsmath}
+header-includes: \usepackage{amsmath}
 ---
 \newpage
 
@@ -142,7 +144,6 @@ loss <- function(param){
 res.opt <- optim(c(1, 0, 1), loss, method = "BFGS")
 B.hat <- matrix(c(res.opt$par[1], res.opt$par[2], 0, res.opt$par[3]), ncol = 2)
 
-print(cbind(Omega,B.hat %*% t(B.hat)))
 
 
 ```
@@ -278,7 +279,6 @@ loss3 <- function(param3){
 res.opt3 <- optim(c(1, 0, 1), loss3, method = "BFGS")
 B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol = 2)
 
-print(cbind(Omega3,B.hat3 %*% t(B.hat3)))
 
 
 ```
@@ -458,11 +458,11 @@ f_tchina <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vo
 modelchina <- lm(f_tchina, data = dt_tchina)
 
 
-nw_se_t <- sqrt(diag(sandwich::NeweyWest(model, lag = 6, prewhite = FALSE)))
-nw_se2_t <- sqrt(diag(sandwich::NeweyWest(model2, lag = 6, prewhite = FALSE)))
-nw_se3_t <- sqrt(diag(sandwich::NeweyWest(model3, lag = 6, prewhite = FALSE)))
-nw_se4_t <- sqrt(diag(sandwich::NeweyWest(model4, lag = 6, prewhite = FALSE)))
-nw_sechina_t <- sqrt(diag(sandwich::NeweyWest(modelchina, lag = 6, prewhite = FALSE)))
+nw_se_t <- sqrt(diag(sandwich::NeweyWest(model, lag = 6)))
+nw_se2_t <- sqrt(diag(sandwich::NeweyWest(model2, lag = 6)))
+nw_se3_t <- sqrt(diag(sandwich::NeweyWest(model3, lag = 6)))
+nw_se4_t <- sqrt(diag(sandwich::NeweyWest(model4, lag = 6)))
+nw_sechina_t <- sqrt(diag(sandwich::NeweyWest(modelchina, lag = 6)))
 
 
 robust_t <- 2 * (1-pt(abs(coef(model) / nw_se_t), df = df.residual(model)))
@@ -487,16 +487,16 @@ robustchina_t <- robustchina_t[names(coef(modelchina))]
 
 
 
-# Créer la liste des modèles
+# Create list for models
 models_list <- list(model, model2, model3, model4, modelchina)
 
-# Créer la liste des SE robustes
+# Create list for SE robustes
 robust_ses <- list(nw_se_t, nw_se2_t, nw_se3_t, nw_se4_t, nw_sechina_t)
 
-# Créer la liste des p-values
+# Create list for p-value
 robust_pvals <- list(robust_t, robust2_t, robust3_t, robust4_t, robustchina_t)
 
-# Nom des variables (affichées dans le tableau)
+# Name of Variables
 custom_names <- list(
   "vol.l1" = "$AHV_{t-1}$",
   "vol.l2" = "$AHV_{t-2}$",
@@ -513,7 +513,7 @@ custom_names <- list(
   "const" = "Constant"
 )
 
-# Générer le tableau
+# Generate table
 table_texreg <- texreg(
   l = models_list,
   override.se = robust_ses,
@@ -531,7 +531,7 @@ table_texreg <- texreg(
 
 
 
-# Afficher dans le Viewer
+# print
 table_texreg
 
 
@@ -693,7 +693,7 @@ robust_f_ch = 2*(1-pt(abs(t_stat_f_ch), df = df.residual(lm_clean_f_ch)))
 
 
 
-# Second Mandate
+# Second Term
 
 ## Dummy
 
@@ -863,7 +863,7 @@ loss_s_ch <- function(param_s_ch){
 res.opt_s_ch <- optim(c(1, 0, 1), loss_s_ch, method = "BFGS")
 B.hat_s_ch <- matrix(c(res.opt_s_ch$par[1], res.opt_s_ch$par[2], 0, res.opt_s_ch$par[3]), ncol = 2)
 
-print(cbind(Omega_s_ch,B.hat_s_ch %*% t(B.hat_s_ch)))
+
 
 ```
 
@@ -982,11 +982,11 @@ model_f_ch <- lm(f_t_f_ch, data = d_f_ch_t)
 
 
 
-nw_se_f_d_t <- sqrt(diag(sandwich::NeweyWest(model_f_d, lag = 6, prewhite = FALSE)))
-nw_se_f_n_t <- sqrt(diag(sandwich::NeweyWest(model_f_n, lag = 6, prewhite = FALSE)))
-nw_se_f_ta_t <- sqrt(diag(sandwich::NeweyWest(model_f_ta, lag = 6, prewhite = FALSE)))
-nw_se_f_tr_t <- sqrt(diag(sandwich::NeweyWest(model_f_tr, lag = 6, prewhite = FALSE)))
-nw_se_f_china_t <- sqrt(diag(sandwich::NeweyWest(model_f_ch, lag = 6, prewhite = FALSE)))
+nw_se_f_d_t <- sqrt(diag(sandwich::NeweyWest(model_f_d, lag = 6)))
+nw_se_f_n_t <- sqrt(diag(sandwich::NeweyWest(model_f_n, lag = 6)))
+nw_se_f_ta_t <- sqrt(diag(sandwich::NeweyWest(model_f_ta, lag = 6)))
+nw_se_f_tr_t <- sqrt(diag(sandwich::NeweyWest(model_f_tr, lag = 6)))
+nw_se_f_china_t <- sqrt(diag(sandwich::NeweyWest(model_f_ch, lag = 6)))
 
 
 robust_f_d_t <- 2 * (1-pt(abs(coef(model_f_d) / nw_se_f_d_t), df = df.residual(model_f_d)))
@@ -996,16 +996,24 @@ robust_f_tr_t <- 2 * (1-pt(abs(coef(model_f_tr) / nw_se_f_tr_t), df = df.residua
 robust_f_ch_t <- 2 * (1-pt(abs(coef(model_f_ch) / nw_se_f_china_t), df = df.residual(model_f_ch)))
 
 
-nw_se_f_d_t <- nw_se_f_d_t[names(coef(model_f_d))]
-robust_f_d_t <- robust_f_d_t[names(coef(model_f_d))]
+nw_se_f_d_t       <- nw_se_f_d_t[names(coef(model_f_d))]
+robust_f_d_t      <- robust_f_d_t[names(coef(model_f_d))]
+nw_se_f_n_t      <- nw_se_f_n_t[names(coef(model_f_n))]
+robust_f_n_t     <- robust_f_n_t[names(coef(model_f_n))]
+nw_se_f_ta_t      <- nw_se_f_ta_t[names(coef(model_f_ta))]
+robust_f_ta_t     <- robust_f_ta_t[names(coef(model_f_ta))]
+nw_se_f_tr_t     <- nw_se_f_tr_t[names(coef(model_f_tr))]
+robust_f_tr_t     <- robust_f_tr_t[names(coef(model_f_tr))]
+nw_se_f_china_t  <- nw_se_f_china_t[names(coef(model_f_ch))]
+robust_f_ch_t <- robust_f_ch_t[names(coef(model_f_ch))]
 
 
-# Listes modèles, SE robustes et p-values robustes pour first
+# list of models, SE and p-value
 models_list_f <- list(model_f_d, model_f_n, model_f_ta, model_f_tr, model_f_ch)
 robust_ses_f <- list(nw_se_f_d_t, nw_se_f_n_t, nw_se_f_ta_t, nw_se_f_tr_t, nw_se_f_china_t)
 robust_pvals_f <- list(robust_f_d_t, robust_f_n_t, robust_f_ta_t, robust_f_tr_t, robust_f_ch_t)
 
-# Noms personnalisés des coefficients
+# Name of coefficient
 custom_names <- list(
   "vol.l1" = "$AHV_{t-1}$",
   "vol.l2" = "$AHV_{t-2}$",
@@ -1022,7 +1030,7 @@ custom_names <- list(
   "const" = "Constant"
 )
 
-# Générer tableau texreg pour first
+# Generate table
 table_texreg_f <- texreg(
   l = models_list_f,
   override.se = robust_ses_f,
@@ -1038,7 +1046,7 @@ table_texreg_f <- texreg(
   custom.note = "This table displays VAR regression with only two variables : AHV and the X regressor. The column names represent the X variable for the selected model."
 )
 
-# Afficher le tableau
+# Print table
 table_texreg_f
 ```
 
@@ -1116,11 +1124,11 @@ f_t_s_ch <- as.formula("y ~ -1 + vol.l1 + vol.l2 + vol.l3 + vol.l4 + vol.l5 + vo
 model_s_ch <- lm(f_t_s_ch, data = d_s_ch_t)
 
 
-nw_se_s_d_t <- sqrt(diag(sandwich::NeweyWest(model_s_d, lag = 6, prewhite = FALSE)))
-nw_se_s_n_t <- sqrt(diag(sandwich::NeweyWest(model_s_n, lag = 6, prewhite = FALSE)))
-nw_se_s_ta_t <- sqrt(diag(sandwich::NeweyWest(model_s_ta, lag = 6, prewhite = FALSE)))
-nw_se_s_tr_t <- sqrt(diag(sandwich::NeweyWest(model_s_tr, lag = 6, prewhite = FALSE)))
-nw_se_s_china_t <- sqrt(diag(sandwich::NeweyWest(model_s_ch, lag = 6, prewhite = FALSE)))
+nw_se_s_d_t <- sqrt(diag(sandwich::NeweyWest(model_s_d, lag = 6)))
+nw_se_s_n_t <- sqrt(diag(sandwich::NeweyWest(model_s_n, lag = 6)))
+nw_se_s_ta_t <- sqrt(diag(sandwich::NeweyWest(model_s_ta, lag = 6)))
+nw_se_s_tr_t <- sqrt(diag(sandwich::NeweyWest(model_s_tr, lag = 6)))
+nw_se_s_china_t <- sqrt(diag(sandwich::NeweyWest(model_s_ch, lag = 6)))
 
 
 robust_s_d_t <- 2 * (1-pt(abs(coef(model_s_d) / nw_se_s_d_t), df = df.residual(model_s_d)))
@@ -1129,15 +1137,23 @@ robust_s_ta_t <- 2 * (1-pt(abs(coef(model_s_ta) / nw_se_s_ta_t), df = df.residua
 robust_s_tr_t <- 2 * (1-pt(abs(coef(model_s_tr) / nw_se_s_tr_t), df = df.residual(model_s_tr)))
 robust_s_ch_t <- 2 * (1-pt(abs(coef(model_s_ch) / nw_se_s_china_t), df = df.residual(model_s_ch)))
 
-nw_se_s_d_t <- nw_se_s_d_t[names(coef(model_s_d))]
-robust_s_d_t <- robust_s_d_t[names(coef(model_s_d))]
+nw_se_s_d_t       <- nw_se_s_d_t[names(coef(model_s_d))]
+robust_s_d_t      <- robust_s_d_t[names(coef(model_s_d))]
+nw_se_s_n_t      <- nw_se_s_n_t[names(coef(model_s_n))]
+robust_s_n_t     <- robust_s_n_t[names(coef(model_s_n))]
+nw_se_s_ta_t      <- nw_se_s_ta_t[names(coef(model_s_ta))]
+robust_s_ta_t     <- robust_s_ta_t[names(coef(model_s_ta))]
+nw_se_s_tr_t     <- nw_se_s_tr_t[names(coef(model_s_tr))]
+robust_s_tr_t     <- robust_s_tr_t[names(coef(model_s_tr))]
+nw_se_s_china_t  <- nw_se_s_china_t[names(coef(model_s_ch))]
+robust_s_ch_t <- robust_s_ch_t[names(coef(model_s_ch))]
 
-# Listes modèles, SE robustes et p-values robustes pour second
+# lists of model, robust SE  and p-values 
 models_list_s <- list(model_s_d, model_s_n, model_s_ta, model_s_tr, model_s_ch)
 robust_ses_s <- list(nw_se_s_d_t, nw_se_s_n_t, nw_se_s_ta_t, nw_se_s_tr_t, nw_se_s_china_t)
 robust_pvals_s <- list(robust_s_d_t, robust_s_n_t, robust_s_ta_t, robust_s_tr_t, robust_s_ch_t)
 
-# Générer tableau texreg pour second
+# Generate table
 table_texreg_s <- texreg(
   l = models_list_s,
   override.se = robust_ses_s,
@@ -1148,14 +1164,14 @@ table_texreg_s <- texreg(
   label = "tab:VAR_Second_Term",
   caption.above = TRUE,
   digits = 6,
-  custom.gof.rows = list("Shock (IRF)" = c(0.016739, 0.015714, 0.011582, -0.004131, 0.015569)),
+  custom.gof.rows = list("Shock (IRF)" = c(0.014659, 0.013315, 0.010752, -0.005665, 0.013937)),
   star.cutoffs = c(0.05, 0.01, 0.001),
   custom.note = "This table displays VAR regression with only two variables : AHV and the X regressor. The column names represent the X variable for the selected model."
 )
 
 
 
-# Afficher le tableau
+# Print
 table_texreg_s
 
 
