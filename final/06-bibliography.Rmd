@@ -1,3 +1,12 @@
+---
+bibliography: macroeconometrics_citations.bib  #
+csl: apa.csl
+link-citations: true
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
 # Bibliography
 
 
@@ -5,3 +14,5 @@
 `r if (knitr::is_html_output()) '
 ## References {-}
 '`
+
+<div id="refs"></div>

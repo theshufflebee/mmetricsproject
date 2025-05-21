@@ -1,7 +1,7 @@
 # Appendix
 
 
-```{r library_setup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
+```{r library_setup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
 rm(list=ls())
 # Core utilities
 require(tinytex)       # LaTeX
@@ -120,7 +120,7 @@ models[["Model 5"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 ```
 
 ### SPY ARMAX Table (Jan 2014 - May 2025) {#sec:spy-table}
-```{r armaxfull, results="asis", warning=FALSE, echo=FALSE, message=FALSE}
+```{r armaxfull, results="asis", warning=FALSE, echo=FALSE, message=FALSE, cache=TRUE}
 library(texreg)
 
 # Define variable display names (HTML-friendly using <sub>)
@@ -324,7 +324,7 @@ pvals_combined <- cbind(pvals_combined, pvals_new2)
 
 \centering
 
-```{r armax1, results="asis", warning=F, echo=FALSE, message=F}
+```{r armax1, results="asis", warning=F, echo=FALSE, message=F, cache=TRUE}
 
 library(texreg)
 
@@ -395,7 +395,7 @@ kable(pvals_combined, digits = 6, format="html", caption = "Ljung-Box Test p-val
 
 ### Descriptive Stats{#sec:means-table}
  
-```{r means, message=F, warning=F, results="asis"}
+```{r means, message=F, warning=F, results="asis", cache=TRUE}
 
 means <- data.frame(
   Model = c("Full Time Mean", "First Term Mean", "Second Term Mean"),
@@ -418,10 +418,10 @@ kable(means, digits = 6, format="html", caption = "Summary Statistics of SPY Vol
 Vdata = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
 ```
 
+```{r Estime dummy, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+# Dummy Estimates
+#-------------------------
 
-## Dummy
-
-```{r Estime dummy, message=FALSE, warning=FALSE}
 y = cbind(Vdata$dummy, Vdata$SPY_vol)
 colnames(y)[1:2] <- c("dummy", "vol")
 est.VAR <- VAR(y,p=6)
@@ -444,7 +444,7 @@ t_stat = coef/nw_se
 robust = 2*(1-pt(abs(t_stat), df = df.residual(lm_clean)))
 ```
 
-```{r B mat}
+```{r B mat, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 #Recreate a Robust Omega Matrix
 U = residuals(est.VAR)
 T = nrow(U)
@@ -479,7 +479,7 @@ B.hat <- matrix(c(res.opt$par[1], res.opt$par[2], 0, res.opt$par[3]), ncol = 2)
 
 ### Full Timeframe IRF Tweet Dummy
 
-```{r IRF 1dummy}
+```{r IRF 1dummy, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 nb.sim = 7*7
 #get back the coefficient of est.VAR
 phi <- Acoef(est.VAR)
@@ -516,7 +516,7 @@ ggplot(Yd,aes(x=period, y=response)) +
 
 ### Cumultative IRF of Dummy Full term
 
-```{r IRF 2Dummy}
+```{r IRF 2Dummy, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 ggplot(Yd,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
@@ -527,7 +527,7 @@ ggplot(Yd,aes(x=period, y=cumsum(response))) +
   theme_minimal()
 ```
 
-```{r estimate with N, message=FALSE, warning=FALSE}
+```{r estimate with N, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 y2 = cbind(Vdata$N, Vdata$SPY_vol)
 colnames(y2)[1:2] <- c("N", "vol")
 est.VAR2 <- VAR(y2,p=6)
@@ -551,9 +551,9 @@ robust2 = 2*(1-pt(abs(t_stat2), df = df.residual(lm_clean2)))
 
 ```
 
-## Tariff
-
-```{r estime tariff, message=FALSE, warning=FALSE}
+```{r estime tariff, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+# Tariff Estimates
+#---------------------
 y3 = cbind(Vdata$tariff, Vdata$SPY_vol)
 colnames(y3)[1:2] <- c("tariff", "vol")
 est.VAR3 <- VAR(y3,p=6)
@@ -577,7 +577,7 @@ robust3 = 2*(1-pt(abs(t_stat3), df = df.residual(lm_clean3)))
 
 ```
 
-```{r B mat3}
+```{r B mat3, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 #Recreate a Robust Omega Matrix
 U3 = residuals(est.VAR3)
 T3 = nrow(U3)
@@ -615,7 +615,7 @@ B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol =
 
 ### IRF Tariff full Timeframe
 
-```{r IRF tariffff}
+```{r IRF tariffff, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 #get back the coefficient of est.VAR
 phi3 <- Acoef(est.VAR3)
 PHI3 = make.PHI(phi3)
@@ -649,7 +649,7 @@ ggplot(Yd3,aes(x=period, y=response)) +
 
 ### IRF Tariff Cumultative
 
-```{r IRF tariff}
+```{r IRF tariff, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 ggplot(Yd3,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
@@ -660,9 +660,11 @@ ggplot(Yd3,aes(x=period, y=cumsum(response))) +
   theme_minimal()
 ```
 
-## Trade
 
-```{r estimate trade, message=FALSE, warning=FALSE}
+```{r estimate trade, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+# Trade Estimates
+#----------------------
+
 y4 = cbind(Vdata$trade, Vdata$SPY_vol)
 colnames(y4)[1:2] <- c("trade", "vol")
 est.VAR4 <- VAR(y4,p=6)
@@ -687,10 +689,9 @@ robust4 = 2*(1-pt(abs(t_stat4), df = df.residual(lm_clean4)))
 
 ```
 
-## China
-
-```{r estime China, message=FALSE, warning=FALSE}
-
+```{r estime China, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+# Chinae Estimates
+#---------------------
 ychina = cbind(Vdata$china, Vdata$SPY_vol)
 colnames(ychina)[1:2] <- c("china", "vol")
 est.VARchina <- VAR(ychina,p=6)
@@ -713,9 +714,9 @@ t_statchina = coefchina/nw_sechina
 robustchina = 2*(1-pt(abs(t_statchina), df = df.residual(lm_cleanchina)))
 ```
 
-### Table 1 VAR
+### Table 1 VAR results='asis'
 
-```{r mana, message=FALSE, warning=FALSE, results='asis'}
+```{r mana, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 dt_t = d %>%
     rename(X.l1 = dummy.l1,
     X.l2 = dummy.l2,
@@ -842,30 +843,32 @@ custom_names <- list(
   "X.l6" = "$X_{t-6}$",
   "const" = "Constant"
 )
+```
+### html table
 
-# Generate table
-table_texreg <- texreg(
+```{r, warning=FALSE, results='asis'}
+tmpfile <- tempfile(fileext = ".html")  # create temp file
+
+table_texreg_html <- htmlreg(
   l = models_list,
   override.se = robust_ses,
-  custom.coef.map = custom_names,
   override.pvalues = robust_pvals,
+  custom.coef.map = custom_names,
   custom.model.names = c("TweetDummy", "TweetCount", "Tariff", "Trade", "China"),
   caption = "VAR Models of Average Hourly Volatility",
-  label = "tab:VAR_Second_Term",
-  caption.above = TRUE,
   digits = 6,
   custom.gof.rows = list("Shock (IRF)" = c(0.0041713, 0.003061, 0.001189, 0.000215, 0.001937)),
-  custom.note = "\\parbox[t]{0.9\\textwidth}{\\small\\textit{This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.}}"
+  custom.note = "This table displays VAR regression with only two variables: AHV and the X regressor. Column names represent the X variable for the selected model.",
+  file = tmpfile
 )
 
-
-
-# print
-table_texreg
+cat(readLines(tmpfile), sep = "\n")
 ```
 
 
-```{r datasetup2, results=FALSE, warning=FALSE, message=FALSE}
+
+
+```{r datasetup2, results=FALSE, warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE}
 data <- c(0)
 
 source(here("helperfunctions/full_data.R"))
@@ -882,11 +885,15 @@ Vdata_s = filter(data,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05
 
 ```
 
-## First Term
 
-### Dummy
+### Dummy First Term
 
-```{r first mandate dum, warning=FALSE, message=FALSE, results="asis"}
+```{r first mandate dum, warning=FALSE, message=FALSE, results="asis", cache=TRUE}
+# First Term Estimates
+#------------------------
+# Dummy
+
+
 y_f_d = cbind(Vdata_f$dummy, Vdata_f$SPY_vol)
 colnames(y_f_d)[1:2] <- c("dummy", "vol")
 est.VAR_f_d <- VAR(y_f_d,p=6)
@@ -911,9 +918,9 @@ robust_f_d = 2*(1-pt(abs(t_stat_f_d), df = df.residual(lm_clean_f_d)))
 
 ```
 
-## N
+### First Mandate
 
-```{r first mandate N, warning=FALSE, message=FALSE, results="asis"}
+```{r first mandate N, warning=FALSE, message=FALSE, results="asis", cache=TRUE}
 
 y_f_n = cbind(Vdata_f$N, Vdata_f$SPY_vol)
 colnames(y_f_n)[1:2] <- c("N", "vol")
@@ -937,9 +944,9 @@ t_stat_f_n = coef_f_n/nw_se_f_n
 robust_f_n = 2*(1-pt(abs(t_stat_f_n), df = df.residual(lm_clean_f_n)))
 ```
 
-## Tariff
+### Tariff first Mandate
 
-```{r first mandate tariff, warning=FALSE, message=FALSE, results="asis"}
+```{r first mandate tariff, warning=FALSE, message=FALSE, results="asis", cache=TRUE}
 
 y_f_ta = cbind(Vdata_f$tariff, Vdata_f$SPY_vol)
 colnames(y_f_ta)[1:2] <- c("tariff", "vol")
@@ -964,9 +971,9 @@ robust_f_ta = 2*(1-pt(abs(t_stat_f_ta), df = df.residual(lm_clean_f_ta)))
 
 ```
 
-## Trade
+### Trade First Mandate
 
-```{r first mandate trade, warning=FALSE, message=FALSE, results="asis"}
+```{r first mandate trade, warning=FALSE, message=FALSE, results="asis", cache=TRUE}
 
 y_f_tr = cbind(Vdata_f$trade, Vdata_f$SPY_vol)
 colnames(y_f_tr)[1:2] <- c("trade", "vol")
@@ -990,9 +997,9 @@ t_stat_f_tr = coef_f_tr/nw_se_f_tr
 robust_f_tr = 2*(1-pt(abs(t_stat_f_tr), df = df.residual(lm_clean_f_tr)))
 ```
 
-## China
+### China First Mandate
 
-```{r first mandate china, warning=FALSE, message=FALSE, results="asis"}
+```{r first mandate china, warning=FALSE, message=FALSE, results="asis", cache=TRUE}
 
 y_f_ch = cbind(Vdata_f$china, Vdata_f$SPY_vol)
 colnames(y_f_ch)[1:2] <- c("china", "vol")
@@ -1020,11 +1027,11 @@ robust_f_ch = 2*(1-pt(abs(t_stat_f_ch), df = df.residual(lm_clean_f_ch)))
 
 
 
-# Second Term
+### Second Term
 
-## Dummy
+### Dummy
 
-```{r second mandate dum, warning=FALSE, message=FALSE, results="asis"}
+```{r second mandate dum, warning=FALSE, message=FALSE, results="asis", cache=TRUE}
 
 y_s_d = cbind(Vdata_s$dummy, Vdata_s$SPY_vol)
 colnames(y_s_d)[1:2] <- c("dummy", "vol")
@@ -1049,9 +1056,9 @@ robust_s_d = 2*(1-pt(abs(t_stat_s_d), df = df.residual(lm_clean_s_d)))
 ```
 
 
-## N 
+### N 
 
-```{r second mandate N, warning=FALSE, message=FALSE, results="asis"}
+```{r second mandate N, warning=FALSE, message=FALSE, results="asis", cache=TRUE}
 
 y_s_n = cbind(Vdata_s$N, Vdata_s$SPY_vol)
 colnames(y_s_n)[1:2] <- c("N", "vol")
@@ -1077,9 +1084,9 @@ robust_s_n = 2*(1-pt(abs(t_stat_s_n), df = df.residual(lm_clean_s_n)))
 
 ```
 
-## Tariff
+### Tariff
 
-```{r second mandate tariff, warning=FALSE, message=FALSE, results="asis"}
+```{r second mandate tariff, warning=FALSE, message=FALSE, results="asis", cache=TRUE}
 
 y_s_ta = cbind(Vdata_s$tariff, Vdata_s$SPY_vol)
 colnames(y_s_ta)[1:2] <- c("tariff", "vol")
@@ -1104,9 +1111,9 @@ robust_s_ta = 2*(1-pt(abs(t_stat_s_ta), df = df.residual(lm_clean_s_ta)))
 
 ```
 
-## Trade
+### Trade
 
-```{r second mandate trade, warning=FALSE, message=FALSE, results="asis"}
+```{r second mandate trade, warning=FALSE, message=FALSE, results="asis", cache=TRUE}
 
 y_s_tr = cbind(Vdata_s$trade, Vdata_s$SPY_vol)
 colnames(y_s_tr)[1:2] <- c("trade", "vol")
@@ -1131,9 +1138,9 @@ robust_s_tr = 2*(1-pt(abs(t_stat_s_tr), df = df.residual(lm_clean_s_tr)))
 
 ```
 
-## China
+### China
 
-```{r second mandate china, warning=FALSE, message=FALSE, results="asis"}
+```{r second mandate china, warning=FALSE, message=FALSE, results="asis", cache=TRUE}
 
 y_s_ch = cbind(Vdata_s$china, Vdata_s$SPY_vol)
 colnames(y_s_ch)[1:2] <- c("china", "vol")
@@ -1160,8 +1167,11 @@ robust_s_ch = 2*(1-pt(abs(t_stat_s_ch), df = df.residual(lm_clean_s_ch)))
 
 ###
 
-```{r B mat second mandate china, warning=FALSE, message=FALSE}
+```{r B mat second mandate china, warning=FALSE, message=FALSE, cache=TRUE}
 #Construct the Robust Omega Matrix
+L <- 6
+nb.sim = 7*7
+
 U_s_ch = residuals(est.VAR_s_ch)
 T_s_ch = nrow(U_s_ch)
 Omega_s_ch = matrix(0, ncol(U_s_ch), ncol(U_s_ch))
@@ -1198,7 +1208,7 @@ B.hat_s_ch <- matrix(c(res.opt_s_ch$par[1], res.opt_s_ch$par[2], 0, res.opt_s_ch
 
 ### IRF Second Term China
 
-```{r IRF second china, warning=FALSE, message=FALSE}
+```{r IRF second china, warning=FALSE, message=FALSE, cache=TRUE}
 #get back the coefficient of est.VAR
 phi_s_ch <- Acoef(est.VAR_s_ch)
 PHI_s_ch = make.PHI(phi_s_ch)
@@ -1230,8 +1240,8 @@ ggplot(Yd_s_ch,aes(x=period, y=response)) +
   theme_minimal()
 ```
 
-# IRF Cumultative Second Term China
-```{r IRF _s_ch}
+## IRF Cumultative Second Term China
+```{r IRF _s_ch, cache=TRUE}
 ggplot(Yd_s_ch,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
@@ -1242,9 +1252,9 @@ ggplot(Yd_s_ch,aes(x=period, y=cumsum(response))) +
   theme_minimal()
 ```
 
-# Tables Terms
+## Tables Terms
 
-```{r table first term, message=FALSE, warning=FALSE, results='asis'}
+```{r table first term, message=FALSE, warning=FALSE, results='asis', cache=TRUE}
 
 
 #first
@@ -1362,8 +1372,10 @@ custom_names <- list(
   "const" = "Constant"
 )
 
+tmpfile_f <- tempfile(fileext = ".html")  # create temp file
+
 # Generate table
-table_texreg_f <- texreg(
+table_texreg_f <- htmlreg(
   l = models_list_f,
   override.se = robust_ses_f,
   override.pvalues = robust_pvals_f,
@@ -1375,16 +1387,18 @@ table_texreg_f <- texreg(
   digits = 6,
   custom.gof.rows = list("Shock (IRF)" = c(0.002919, 0.002236, 0.000484, 0.000702, 0.000904)),
   star.cutoffs = c(0.001, 0.01, 0.05),
-  custom.note = "\\parbox[t]{0.9\\textwidth}{\\small\\textit{This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.}}"
+  custom.note = "\\parbox[t]{0.9\\textwidth}{\\small\\textit{This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.}}",
+  file = tmpfile_f
 )
 
 # Print table
-table_texreg_f
+cat(readLines(tmpfile_f), sep = "\n")
+
 ```
 
 ### VAR Third Table
 
-```{r third_table, message=FALSE, warning=FALSE, results='asis'}
+```{r third_table, message=FALSE, warning=FALSE, results='asis', cache=TRUE}
 
 #Second
 
@@ -1483,8 +1497,11 @@ models_list_s <- list(model_s_d, model_s_n, model_s_ta, model_s_tr, model_s_ch)
 robust_ses_s <- list(nw_se_s_d_t, nw_se_s_n_t, nw_se_s_ta_t, nw_se_s_tr_t, nw_se_s_china_t)
 robust_pvals_s <- list(robust_s_d_t, robust_s_n_t, robust_s_ta_t, robust_s_tr_t, robust_s_ch_t)
 
+tmpfile_s <- tempfile(fileext = ".html")  # create temp file
+
+
 # Generate table
-table_texreg_s <- texreg(
+table_texreg_s <- htmlreg(
   l = models_list_s,
   override.se = robust_ses_s,
   override.pvalues = robust_pvals_s,
@@ -1496,10 +1513,11 @@ table_texreg_s <- texreg(
   digits = 6,
   custom.gof.rows = list("Shock (IRF)" = c(0.014659, 0.013315, 0.010752, -0.005665, 0.013937)),
   star.cutoffs = c(0.05, 0.01, 0.001),
-  custom.note = "\\parbox[t]{0.9\\textwidth}{\\small\\textit{This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.}}"
+  custom.note = "\\parbox[t]{0.9\\textwidth}{\\small\\textit{This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.}}",
+  file = tmpfile_s
 )
 
  
 # Print
-table_texreg_s
+cat(readLines(tmpfile_s), sep = "\n")
 ```
