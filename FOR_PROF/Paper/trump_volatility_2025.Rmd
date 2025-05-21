@@ -22,7 +22,7 @@ abstract: "In this short paper, we aim to asses to what extent financial markets
 
 
 
-```{r setup, warning=FALSE, echo=FALSE, cache=TRUE, message=FALSE}
+```{r setup, warning=FALSE, echo=FALSE, message=FALSE}
 require("here")
 require("stringr")
 require("dplyr")
@@ -75,7 +75,7 @@ This brings us to our research question:  Do Donald Trumps Posts impact market V
     
 
 
-```{r fig1, eval=FALSE, echo=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)", warning=FALSE, cache=TRUE}
+```{r fig1, eval=FALSE, echo=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)", warning=FALSE}
  #Create the scatter plot
 ggplot(truths, aes(x = day, y = time_shifted)) +
   geom_point(alpha = 0.5, color = "blue", size = 0.55) +  # Transparancy to create "heatmap"
@@ -173,7 +173,7 @@ intention for his tweet grows.
 
 # Data
 
-```{r library_setup_data, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+```{r library_setup_data, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
 rm(list=ls())
 require(tinytex) #LaTeX
 require(ggplot2) #plots
@@ -216,7 +216,7 @@ source(here("helperfunctions/armax_functions.R"))
 
 ```
 
-```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
 
 #load final dataset
 source(here("helperfunctions/full_data.R"))
@@ -235,7 +235,7 @@ data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07
 
 For our financial data, we decided to try to find minute-by-minute prices for 
 broad market indices. While the actual indices do not update their prices so often,
-we had to take proxies under the form of ETF's that track them. Our 3 markets of
+we had to take proxies under the form of ETFs that track them. Our 3 markets of
 analysis are: SPY to track the S&P500, VGK to track the FTSE Developed Europe 
 All Cap Index, and finally ASHR to track the CSI 300 China. We accessed this data
 through a free stock API, Alpha Vantage. Our timeframe is from the first 
@@ -258,7 +258,7 @@ that the first hour is from 9:30 am to 10:00 am since the market opens on a half
 but closes at 4:00 pm. 
 
 
-```{r fin plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE, eval=FALSE}
+```{r fin plots, message=FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
 
 hvol_plotter(SPY, breaks = "yearly", title = "SPY Realised Volatility")
 
@@ -296,7 +296,7 @@ sentiment analysis algorithms on the data to see if there are certain sentiments
 in his tweets that move the markets. Details on all our data management procedures
 can be found in the GitHub repository.
 
-```{r social plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE, eval=FALSE}
+```{r social plots, message=FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
 
 #find count
 tweetcount_alltime = dplyr::select(data,timestamp,N)
@@ -359,7 +359,7 @@ there is a large response in the first periods, and then a graduate
 decline over time. Something to note is that in our analyses of IRF, when including
 MA terms, the decline shows up gradual while being much sharper when only including
 AR terms. 
-Note that we ran all these models on the VGK and ASHR ETF's as well, though no
+Note that we ran all these models on the VGK and ASHR ETFs as well, though no
 significant results appear apart from a small but statistically significant effect
 of the tariff variable for VGK.
 
@@ -412,6 +412,67 @@ to compute robust standard errors.
 
 ## Results
 
+### Full Timeframe
+
+As in the ARMA-X framework, we initially estimate a model for each of our five
+main variables. Table \@ref(tab:VAR) shows all estimations using the SPY ETF, where
+we notice that the positive coefficients (of the social media variables) are large 
+but not statistically significant. Oddly, the only significant coefficients are
+consistently negative.
+
+For the $Tariff$, $Trade$ and $China$ variables, the first, second and sometimes forth 
+lags are positive and relatively large (especially in the case of $Tariff$), while 
+the remaining ones are not. In contrast, for $TweetCount$ and $TweetDummy$, we 
+observe fewer and smaller positive coefficients. At the same time, we find 
+that the contemporaneous effects of the shocks are all positive and relatively 
+strong. This leads to two types of scenarios : either 
+the IRFs experienced a positive shock and remain elevated $Tariff$, $Trade$ and $China$), 
+or a highly positive shock occurs, but the cumulative effect turns negative after a few 
+hours ($TweetDummy$ and $Count$). You can find the IRFs for $Tariff$ on Figure 
+\@ref(fig:VARirf1).
+
+Finally, except for $Tariff$, all Granger causality tests indicate that Trump's 
+posts have an impact on volatility. However, due to serial correlation in the 
+residuals, these results should be interpreted with caution. Overall, this model 
+suggest that Trump's posts tend to have a positive instantaneous effect on 
+volatility, but with very low persistence.
+When analyzing the European and Chinese ETFs, we observe similar patterns 
+though with lower magnitude, except for the impact of $Tariff$ and $China$ on the 
+ASHR ETF (Chinese Market), where the cumulative effects show no positive impact. Additionally, 
+the VGK ETF (European Market) appears to react more strongly than ASHR to 
+Trump's posts, especially those mentioning $Trade$ and $Tariff$.
+
+Regarding the impact of AHV on Trump's posts, we find some evidence of a 
+negative effect. For all variables, we observe one or two significantly 
+negative coefficients per variables, typically on the first and fourth lag, alongside many 
+insignificant ones. However, only $TweetCount$ and China pass the Granger test in 
+the US ETF Surprisingly, a large number of Granger tests in the Chinese and 
+European ETFs indicate strong Granger causality, which may point to a limitation 
+of the test itself, as such results appear unrealistic. 
+
+
+### Split Sample
+
+Tables \@ref(tab:VARf) and \@ref(tab:VARs) show the models for the split terms,
+where we notice the results are similar and striking. While we
+observe relatively small shock effects and almost entirely negative coefficients 
+during the first term, (which explain why the 
+cumulative IRFs indicate a negative impact of posts), the shock effects in the
+second term are substantially larger, ranging from 5 times (for $TweetCount$ and 
+$TweetDummy$) to as much as 25 times greater (for $Tariff$). the only exception is 
+$Trade$ in the second term, which shows the only negative impact from a shock.
+Once again, we find positive lagged coefficients in the second term, mostly on 
+the first, second and fourth lags. However, none of these coefficients are
+statistically significant, though the cumulative IRFs clearly show a high positive 
+impact on everything except for $TweetDummy$ and $TweetCount$, whose
+coefficients and cumulative IRFs display similar patterns to those observed 
+in the first term. 
+Moreover, the Granger tests generally failed in both terms, with the sole
+exception being $China$ in the second term. 
+Regarding the ASHR ETF, we found results similar to those for the US ETF. Surprisingly, 
+in the case of the European market, we observe a positive
+impact of Trump’s posts on AHV during the first term. Nevertheless, the results 
+still indicate a stronger impact of posts during the second term.
 
 # Conclusion
 
@@ -478,7 +539,7 @@ source(here("helperfunctions/armax_functions.R"))
 
 ## ARMAX
 
-```{r datasetup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+```{r datasetup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
 
 #load final dataset
 source(here("helperfunctions/full_data.R"))
@@ -496,7 +557,7 @@ mean1 = mean(data$SPY_vol)
 ```
 
 
-```{r fitting models, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
+```{r fitting models, results=F, warning=F, message=F, echo=FALSE}
 #All SPY models for the full Dataframe
 
 models <- list()
@@ -567,7 +628,7 @@ table1
 
 ### SPY ARMA-X IRF 
 
-```{r armaxirf1, results="asis", warning=F, message=F, echo=FALSE, cache=TRUE, fig.cap="ARMA-X IRF", fig.width=6, fig.height=2.5}
+```{r armaxirf1, results="asis", warning=F, message=F, echo=FALSE, fig.cap="ARMA-X IRF", fig.width=6, fig.height=2.5}
 
 #we want to plot the IRFs of these models
 nb.periods = 7 * 15
@@ -596,7 +657,7 @@ res5 = checkresiduals(models[["Model 5"]], plot = FALSE)
 
 ```
 
-```{r SPYres, warning=F, message=F, echo=FALSE, cache=TRUE}
+```{r SPYres, warning=F, message=F, echo=FALSE}
 
 resnames = c("Twitter Dummy", "Twitter Count", "Tariff", "Trade", "China")
 
@@ -615,7 +676,7 @@ pvals <- data.frame("X-Regressor" = resnames,
 
 
 
-```{r datasetup first, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+```{r datasetup first, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
 #First term Calculations
 
 #load final dataset
@@ -630,7 +691,7 @@ mean2 = mean(data$SPY_vol)
 ```
 
 
-```{r 1st term models, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
+```{r 1st term models, results=F, warning=F, message=F, echo=FALSE}
 #SPY Models first Term
 
 models <- list()
@@ -650,7 +711,7 @@ models[["First Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 ```
 
 
-```{r 1st SPYresiduals, warning=F, message=F, results=F, echo=FALSE, cache=TRUE}
+```{r 1st SPYresiduals, warning=F, message=F, results=F, echo=FALSE}
 # Run first term residuals
 res6 = checkresiduals(models[["First Term (1)"]], plot = FALSE)
 res7 = checkresiduals(models[["First Term (2)"]], plot = FALSE)
@@ -669,7 +730,7 @@ pvals_new1 <- data.frame(
 
 
 
-```{r datasetup second, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+```{r datasetup second, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
 #Second Term Calculations
 
 #load final dataset
@@ -684,7 +745,7 @@ mean3 = mean(data$SPY_vol)
 ```
 
 
-```{r 2nd term models, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
+```{r 2nd term models, results=F, warning=F, message=F, echo=FALSE}
 #Run Second Term Models
 
 # ARMA-X(3,2,3) with Tariff Mentions as Exogenous
@@ -703,7 +764,7 @@ models[["Second Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 
 
 
-```{r 2nd SPYresiduals, results=F, warning=F, message=F, echo=FALSE, cache=TRUE}
+```{r 2nd SPYresiduals, results=F, warning=F, message=F, echo=FALSE}
 # Calculate SPY residuals for the second term
 
 res9 = checkresiduals(models[["Second Term (1)"]], plot = FALSE)
@@ -759,7 +820,7 @@ table2
 
 ```
 
-```{r armaxirf2, warning=F, message=F, echo=FALSE, cache=TRUE, eval=FALSE}
+```{r armaxirf2, warning=F, message=F, echo=FALSE, eval=FALSE}
 
 #we want to plot the IRFs of these models
 nb.periods = 7 * 15
@@ -831,7 +892,7 @@ require(vars)
 
 ### SPY VAR Models (Jan 2014 - May 2025) 
 
-```{r Estime dummy, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+```{r Estime dummy, message=FALSE, warning=FALSE, echo=FALSE}
 y = cbind(Vdata$dummy, Vdata$SPY_vol)
 colnames(y)[1:2] <- c("dummy", "vol")
 est.VAR <- VAR(y,p=6)
@@ -858,7 +919,7 @@ robust = 2*(1-pt(abs(t_stat), df = df.residual(lm_clean)))
 
 ```
 
-```{r B mat, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+```{r B mat, message=FALSE, warning=FALSE, echo=FALSE}
 
 #Recreate a Robust Omega Matrix
 U = residuals(est.VAR)
@@ -894,7 +955,7 @@ B.hat <- matrix(c(res.opt$par[1], res.opt$par[2], 0, res.opt$par[3]), ncol = 2)
 
 ```
 
-```{r estimate with N, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+```{r estimate with N, message=FALSE, warning=FALSE, echo=FALSE}
 y2 = cbind(Vdata$N, Vdata$SPY_vol)
 colnames(y2)[1:2] <- c("N", "vol")
 est.VAR2 <- VAR(y2,p=6)
@@ -918,7 +979,7 @@ robust2 = 2*(1-pt(abs(t_stat2), df = df.residual(lm_clean2)))
 
 ```
 
-```{r estime tariff, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+```{r estime tariff, message=FALSE, warning=FALSE, echo=FALSE}
 y3 = cbind(Vdata$tariff, Vdata$SPY_vol)
 colnames(y3)[1:2] <- c("tariff", "vol")
 est.VAR3 <- VAR(y3,p=6)
@@ -942,7 +1003,7 @@ robust3 = 2*(1-pt(abs(t_stat3), df = df.residual(lm_clean3)))
 
 ```
 
-```{r B mat3, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+```{r B mat3, message=FALSE, warning=FALSE, echo=FALSE}
 #Recreate a Robust Omega Matrix
 U3 = residuals(est.VAR3)
 T3 = nrow(U3)
@@ -976,7 +1037,7 @@ B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol =
 
 ```
 
-```{r estimate trade, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+```{r estimate trade, message=FALSE, warning=FALSE, echo=FALSE}
 y4 = cbind(Vdata$trade, Vdata$SPY_vol)
 colnames(y4)[1:2] <- c("trade", "vol")
 est.VAR4 <- VAR(y4,p=6)
@@ -1001,7 +1062,7 @@ robust4 = 2*(1-pt(abs(t_stat4), df = df.residual(lm_clean4)))
 
 ```
 
-```{r estime China, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE, results="asis"}
+```{r estime China, message=FALSE, warning=FALSE, echo=FALSE, results="asis"}
 
 ychina = cbind(Vdata$china, Vdata$SPY_vol)
 colnames(ychina)[1:2] <- c("china", "vol")
@@ -1027,7 +1088,7 @@ robustchina = 2*(1-pt(abs(t_statchina), df = df.residual(lm_cleanchina)))
 ```
 
 
-```{r vartable1, message=FALSE, warning=FALSE, results='asis', echo=FALSE, cache=TRUE}
+```{r vartable1, message=FALSE, warning=FALSE, results='asis', echo=FALSE}
 
 dt_t = d %>%
     rename(X.l1 = dummy.l1,
@@ -1180,7 +1241,7 @@ table_texreg
 
 ### SPY VAR IRFs 
 
-```{r VARirf1, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE, fig.cap="VAR IRF 1", fig.width=6, fig.height=2.3}
+```{r VARirf1, warning=FALSE, message=FALSE, echo=FALSE, fig.cap="VAR IRF 1", fig.width=6, fig.height=2.3}
 nb.sim = 7*7
 #get back the coefficient of est.VAR
 phi3 <- Acoef(est.VAR3)
@@ -1214,7 +1275,7 @@ ggplot(Yd3,aes(x=period, y=response)) +
             theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-```{r VARirf2, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE, fig.cap="VAR IRF 2", fig.width=6, fig.height=2.5, results='asis', fig.pos="H"}
+```{r VARirf2, warning=FALSE, message=FALSE, echo=FALSE, fig.cap="VAR IRF 2", fig.width=6, fig.height=2.5, results='asis', fig.pos="H"}
 ggplot(Yd3,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
   geom_line() +
@@ -1228,7 +1289,7 @@ ggplot(Yd3,aes(x=period, y=cumsum(response))) +
 
 ### SPY VAR First-Term Models
 
-```{r datasetup2, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+```{r datasetup2, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
 
 # First and Second Mandate
 
@@ -1240,7 +1301,7 @@ Vdata_s = filter(Vdata,between(timestamp, as.Date('2025-01-20'), as.Date('2025-0
 
 ```
 
-```{r first mandate dum, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+```{r first mandate dum, warning=FALSE, message=FALSE, results="asis", echo=FALSE}
 y_f_d = cbind(Vdata_f$dummy, Vdata_f$SPY_vol)
 colnames(y_f_d)[1:2] <- c("dummy", "vol")
 est.VAR_f_d <- VAR(y_f_d,p=6)
@@ -1264,7 +1325,7 @@ robust_f_d = 2*(1-pt(abs(t_stat_f_d), df = df.residual(lm_clean_f_d)))
 
 ```
 
-```{r first mandate N, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+```{r first mandate N, warning=FALSE, message=FALSE, results="asis", echo=FALSE}
 
 y_f_n = cbind(Vdata_f$N, Vdata_f$SPY_vol)
 colnames(y_f_n)[1:2] <- c("N", "vol")
@@ -1288,7 +1349,7 @@ t_stat_f_n = coef_f_n/nw_se_f_n
 robust_f_n = 2*(1-pt(abs(t_stat_f_n), df = df.residual(lm_clean_f_n)))
 ```
 
-```{r first mandate tariff, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+```{r first mandate tariff, warning=FALSE, message=FALSE, results="asis", echo=FALSE}
 
 y_f_ta = cbind(Vdata_f$tariff, Vdata_f$SPY_vol)
 colnames(y_f_ta)[1:2] <- c("tariff", "vol")
@@ -1313,7 +1374,7 @@ robust_f_ta = 2*(1-pt(abs(t_stat_f_ta), df = df.residual(lm_clean_f_ta)))
 
 ```
 
-```{r first mandate trade, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+```{r first mandate trade, warning=FALSE, message=FALSE, results="asis", echo=FALSE}
 
 y_f_tr = cbind(Vdata_f$trade, Vdata_f$SPY_vol)
 colnames(y_f_tr)[1:2] <- c("trade", "vol")
@@ -1337,7 +1398,7 @@ t_stat_f_tr = coef_f_tr/nw_se_f_tr
 robust_f_tr = 2*(1-pt(abs(t_stat_f_tr), df = df.residual(lm_clean_f_tr)))
 ```
 
-```{r first mandate china, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+```{r first mandate china, warning=FALSE, message=FALSE, results="asis", echo=FALSE}
 
 y_f_ch = cbind(Vdata_f$china, Vdata_f$SPY_vol)
 colnames(y_f_ch)[1:2] <- c("china", "vol")
@@ -1362,7 +1423,7 @@ robust_f_ch = 2*(1-pt(abs(t_stat_f_ch), df = df.residual(lm_clean_f_ch)))
 
 ```
 
-```{r table first term, message=FALSE, warning=FALSE, results='asis', echo=FALSE, cache=TRUE, eval=TRUE}
+```{r table first term, message=FALSE, warning=FALSE, results='asis', echo=FALSE, eval=TRUE}
 
 
 #first
@@ -1504,7 +1565,7 @@ table_texreg_f
 
 ### SPY VAR Second-Term Models
 
-```{r second mandate dum, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+```{r second mandate dum, warning=FALSE, message=FALSE, results="asis", echo=FALSE}
 
 y_s_d = cbind(Vdata_s$dummy, Vdata_s$SPY_vol)
 colnames(y_s_d)[1:2] <- c("dummy", "vol")
@@ -1528,7 +1589,7 @@ t_stat_s_d = coef_s_d/nw_se_s_d
 robust_s_d = 2*(1-pt(abs(t_stat_s_d), df = df.residual(lm_clean_s_d)))
 ```
 
-```{r second mandate N, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+```{r second mandate N, warning=FALSE, message=FALSE, results="asis", echo=FALSE}
 
 y_s_n = cbind(Vdata_s$N, Vdata_s$SPY_vol)
 colnames(y_s_n)[1:2] <- c("N", "vol")
@@ -1554,7 +1615,7 @@ robust_s_n = 2*(1-pt(abs(t_stat_s_n), df = df.residual(lm_clean_s_n)))
 
 ```
 
-```{r second mandate tariff, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+```{r second mandate tariff, warning=FALSE, message=FALSE, results="asis", echo=FALSE}
 
 y_s_ta = cbind(Vdata_s$tariff, Vdata_s$SPY_vol)
 colnames(y_s_ta)[1:2] <- c("tariff", "vol")
@@ -1579,7 +1640,7 @@ robust_s_ta = 2*(1-pt(abs(t_stat_s_ta), df = df.residual(lm_clean_s_ta)))
 
 ```
 
-```{r second mandate trade, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+```{r second mandate trade, warning=FALSE, message=FALSE, results="asis", echo=FALSE}
 
 y_s_tr = cbind(Vdata_s$trade, Vdata_s$SPY_vol)
 colnames(y_s_tr)[1:2] <- c("trade", "vol")
@@ -1604,7 +1665,7 @@ robust_s_tr = 2*(1-pt(abs(t_stat_s_tr), df = df.residual(lm_clean_s_tr)))
 
 ```
 
-```{r second mandate china, warning=FALSE, message=FALSE, results="asis", echo=FALSE, cache=TRUE}
+```{r second mandate china, warning=FALSE, message=FALSE, results="asis", echo=FALSE}
 
 y_s_ch = cbind(Vdata_s$china, Vdata_s$SPY_vol)
 colnames(y_s_ch)[1:2] <- c("china", "vol")
@@ -1629,7 +1690,7 @@ robust_s_ch = 2*(1-pt(abs(t_stat_s_ch), df = df.residual(lm_clean_s_ch)))
 
 ```
 
-```{r B mat second mandate china, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+```{r B mat second mandate china, warning=FALSE, message=FALSE, echo=FALSE}
 #Construct the Robust Omega Matrix
 U_s_ch = residuals(est.VAR_s_ch)
 T_s_ch = nrow(U_s_ch)
@@ -1663,7 +1724,7 @@ B.hat_s_ch <- matrix(c(res.opt_s_ch$par[1], res.opt_s_ch$par[2], 0, res.opt_s_ch
 
 ```
 
-```{r Table second Term, message=FALSE, warning=FALSE, results='asis', echo=FALSE, cache=TRUE}
+```{r Table second Term, message=FALSE, warning=FALSE, results='asis', echo=FALSE}
 
 #Second
 
