@@ -524,9 +524,9 @@ table_texreg <- texreg(
   label = "tab:VAR_Second_Term",
   caption.above = TRUE,
   digits = 6,
+  output.type = c("latex")
   custom.gof.rows = list("Shock (IRF)" = c(0.0041713, 0.003061, 0.001189, 0.000215, 0.001937)),
-  custom.note = "This table displays VAR regression with only two variables : 
-  AHV and the X regressor. The column names represent the X variable for the selected model."
+  custom.note = c("This table displays VAR regression with only two variables : AHV and X regressor.", "The column names represent the X variable for the selected model.")
 )
 
 
