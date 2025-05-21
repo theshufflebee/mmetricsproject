@@ -73,7 +73,7 @@ This brings us to our research question:  Do Donald Trumps Posts impact market V
     
 
 
-```{r fig1, echo=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)", warning=FALSE, cache=TRUE}
+```{r fig1, eval=FALSE, echo=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)", warning=FALSE, cache=TRUE}
  #Create the scatter plot
 ggplot(truths, aes(x = day, y = time_shifted)) +
   geom_point(alpha = 0.5, color = "blue", size = 0.55) +  # Transparancy to create "heatmap"
@@ -397,12 +397,15 @@ a VAR model to deepen our understanding of these variables.
 
 \clearpage
 
-\AtEndDocument{\pagebreak
-\begin{appendix}
 
+# References
 
+<div id="refs"></div>
+
+\newpage
 
 # Appendix
+
 
 
 ```{r library_setup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
@@ -796,11 +799,6 @@ table4
 
 
 
-
-
-
-
-\end{appendix}}
 
 
 
