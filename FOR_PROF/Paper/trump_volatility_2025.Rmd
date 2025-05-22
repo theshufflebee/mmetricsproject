@@ -16,9 +16,13 @@ geometry: "left=2cm,right=2cm,top=1cm,bottom=2cm"
 bibliography: [packages.bib, citations.bib] #name bib files
 link-citations: true           # optional but helpful for clickable citations
 csl: apa.csl
-abstract: "In this short paper, we aim to asses to what extent financial markets may react to Donald Trump’s social media posts, and more specifically, the effect on average realised volatility. We do so using both ARMA-X and SVAR models, with data spanning the 1st of January 2014, to the 7th of May 2025, over various time horizons and variables. We include the number of posts, a dummy for whether there was a post, and counts for mentions of words like tariffs, trade and China. Being limited by persistent auto-correlation in the residuals and often high standard errors, we find limited evidence that there is a statistically significant positive effect, and provide some explanations as to why this might be the case."
+abstract: "In this short paper, we aim to asses to what extent financial markets may react to Donald Trump’s social media posts, and more specifically, the effect on average realised volatility. We do so using both ARMA-X and SVAR models, with data spanning the 1st of January 2014, to the 7th of May 2025, over various time horizons and variables. We include the number of posts, a dummy for whether there was a post, and counts for mentions of words like tariffs, trade and China. While we do find significant and large
+impacts of mentions of tariffs in the ARMA-X model, with well-behaved residuals when restricting our sample to the second term, all other models and specifications suffer from persistent auto-correlation
+in the residuals and often high standard errors. Overall, we find limited evidence that there is a statistically significant positive effect, and provide some explanations as to why this might be the case."
 ---
 \newpage
+
+While we do find significant impacts of mentions of tariff and and tweets with our ARMA-X model, especially when we restrict our sample to his second term, limitations such as autocorrelation...
 
 
 
@@ -69,11 +73,11 @@ political decisions. Note the recent infamous "THIS IS A GREAT TIME TO BUY!!! DJ
 post sent just an hour before lifting his reciprocal tariffs. It is then not 
 improbable that agents in financial markets might take this information into 
 account in their decision making. This question has been asked before in the 
-literature, focusing rather on his first term. 
+literature, primarily focusing on his first term. 
 
 This brings us to our research question:  Do Donald Trump's posts impact market volatility?
 
-```{r fig1, echo=FALSE, fig.cap="Number of Twitter & Truth Social Posts (EDT Timezone)", warning=FALSE, fig.width=6, fig.height=4}
+```{r fig1, echo=FALSE, fig.cap="Number of Twitter & Truth Social Posts (EDT, red lines represent open market hours)", warning=FALSE, fig.width=6, fig.height=4}
  #Create the scatter plot
 ggplot(truths, aes(x = day, y = time_shifted)) +
   geom_point(alpha = 0.5, color = "blue", size = 0.2) +  # Transparancy to create "heatmap"
@@ -266,7 +270,7 @@ hvol_plotter(SPY, breaks = "yearly", title = "SPY Realised Volatility")
 ## Political Data
 
 We have two types of data for Trump's posts, Tweets \& "Truths" (from Truth Social). 
-The Tweets are sourced from Kaggle @shantanuDonaldTrumpTweets and stop in January 2021,
+The Tweets are sourced from Kaggle (@shantanuDonaldTrumpTweets) and stop in January 2021,
 seen as Trump was then banned. Due to this, we have a gap in this data going until February 2022, 
 when he first posted on his own new platform. All Truth Social posts were pulled from
 "trumpstruth.org", a webpage that aims to conserve all his posts. Note that we have 
@@ -370,16 +374,15 @@ term, while being small and not statistically significant in the first. A simila
 story goes for the $China$ variable. This may lend some evidence to support the 
 claim that investors are much more reactive to Trump's social media presence
 now than before. We've found similar IRFs as for the full timeframe. 
-Finally, we can check the residuals of all these models to test them somewhat. 
+Finally, we check the residuals of all these models with Ljung-Box tests. 
 We find that p-values are zero for the full timeframe \& first term models, which 
 suggests that there is significant auto-correlation and that these 
 estimations are then problematic. However, for the second term, the p-values are quite high 
-(~ 0.8 for $Tariff$), lending support to our models on the split sample. 
-These results show that perhaps ARMA-X models are
-not quite right in this context as it is not unreasonable to think that Trump does 
-in fact react to market movements, which would break the exogeneity assumption
-that is critical for this type of model. With this information, we decide to run
-an SVAR model to account for possible endogeneity.
+(~ 0.8 for $Tariff$), giving our split sample models more validity relative to the full time frame models.
+
+These results show that perhaps ARMA-X may not be the right choice in this context 
+as it is not unreasonable to think that Trump does in fact react to market movements, 
+violating the exogeneity assumption that is critical for this type of model. With this information, we decide to run SVAR specifications to account for possible endogeneity.
 
 
 
@@ -505,7 +508,8 @@ remarks, while others would be treated as official policy statements with concre
 consequences to the economy. If this were to be the case, our coefficients would be 
 biased downwards, underestimating the impact of the \textit{relevant} posts and would explain 
 the high standard errors. A way to counteract this could be to find a way to filter 
-the social media posts dataset for only the financially relevant shocks.
+the social media posts dataset for only the financially relevant shocks, possibly 
+by using more sophisticated sentiment analysis.
 
 Altogether, we would strongly suggest against trying to interpret these results given that the models seem to not fit particularly well. This may be due to seasonality in our data (a common trend seen in our daily AVH being high volatility in the first open hours, and a gradual slowdown for the rest of the day), or to our handling of non-market hours. Further work could look at exploring said issues in greater depth, further complicate the models by adding more variables and interactions between them, and/or additionally use more sophisticated models with very large lag counts. 
 
