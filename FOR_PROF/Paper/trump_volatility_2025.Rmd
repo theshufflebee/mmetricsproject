@@ -231,8 +231,10 @@ For our financial data, we decided to use minute-by-minute prices for
 broad market indices. Since the actual indices do not update their prices that often,
 we had to take proxies under the form of ETFs that track them. These ETFs exist to provide investors with direct exposure to whole markets and have very small to no deviations to the corresponding index. Our 3 markets of analysis are: SPY to track the S&P500 (note that this ETF has a very large trading volume relative to the others), VGK to track the FTSE Developed Europe 
 All Cap Index, and finally ASHR to track the CSI 300 China. We accessed this data
-through a free stock API, Alpha Vantage. Our timeframe starts on the first 
+through a free stock API, Alpha Vantage[^1]. Our timeframe starts on the first 
 of January 2014 and goes to the 7th of May 2025.
+
+[^1]: https://www.alphavantage.co/ 
 
 We had to transform this data to get our main variable of interest, Average
 Hourly Volatility (AHV). Note that this is \textit{realised} market volatility. We did so 
@@ -275,9 +277,9 @@ which appeared outside market hours. We first decided to simply ignore them, but
 it turned out to remove such a large amount of observations, that it severly limited 
 our analysis. We finally decided to push all the 
 social media information outside market hours to the next open hour. This comes 
-as a critical assumption[^1]. 
+as a critical assumption[^2]. 
 
-[^1]: For instance, if Trump tweets on Good Friday (market holiday), then the 
+[^2]: For instance, if Trump tweets on Good Friday (market holiday), then the 
 market will only react to this new information on Monday at 9:30 am. 
 
 Since our financial data is hourly, we aggregate the social data by hour as well and construct multiple variables from this. These variables include
