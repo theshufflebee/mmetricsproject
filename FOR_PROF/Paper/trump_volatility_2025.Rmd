@@ -404,7 +404,28 @@ the greater the persistence of a shock up to unrealistic levels such as 150 days
 for the number of Tweets, which seems implausible. Therefore, we chose to fix the
 number of lags at a maximum of 6. Finally, given the presence of heteroscedasticity
 and serial correlation in the residuals, we use the Newey-West estimator
-to compute robust standard errors.
+to compute robust standard errors. Our specification is built as follows:
+$$
+\begin{aligned}
+y_t = c + \Phi_1 y_{t-1} + \cdots +
+\Phi_6 y_{t-6} + B \eta_t, \hspace{0.2cm} \text{where:} \hspace{0.2cm}
+y_t =
+\begin{bmatrix}
+X_t \\
+AHV_t
+\end{bmatrix},
+ \quad B =
+\begin{bmatrix}
+b_{11} & 0 \\
+b_{21} & b_{22}
+\end{bmatrix}, \quad
+\eta_t =
+\begin{bmatrix}
+\eta^{X}_t \\
+\eta^{AHV}_t
+\end{bmatrix}
+\end{aligned}
+$$
 
 ## Results
 
