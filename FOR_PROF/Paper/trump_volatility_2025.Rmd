@@ -22,9 +22,6 @@ in the residuals and often high standard errors. Overall, we find limited eviden
 ---
 \newpage
 
-While we do find significant impacts of mentions of tariff and and tweets with our ARMA-X model, especially when we restrict our sample to his second term, limitations such as autocorrelation...
-
-
 
 ```{r setup, warning=FALSE, echo=FALSE, message=FALSE}
 require("here")
