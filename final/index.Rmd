@@ -88,7 +88,7 @@ textplot_wordcloud(
 
 # Readme {.unnumbered}
 
-This is a Website for a class project from the 2025 Class Macroeconometrics at Université de Lausanne. It is intended as an archive and Display of our Project. You can find all data for recreation on [GitHub](www.github.com/theshufflebee/mmetricsproject) .
+This is a Website for a class project from the 2025 Class Macroeconometrics at Université de Lausanne. It is intended as an archive and Display of our Project. You can find all data for recreation on [GitHub](https://www.github.com/theshufflebee/mmetricsproject) .
 
 # Abstract {.unnumbered}
 
