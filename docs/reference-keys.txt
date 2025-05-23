@@ -2,8 +2,6 @@ fig:fig1
 tab:data
 tab:tab-res-test
 tab:tab-means
-fig:nice-fig
-tab:nice-tab
 introduction
 motivation
 literature-review
@@ -41,6 +39,3 @@ sec:irf-china-2
 sec:irf-cum-china-2
 sec:tab-svar-1
 sec:tab-svar-2
-cross
-chapters-and-sub-chapters
-captioned-figures-and-tables

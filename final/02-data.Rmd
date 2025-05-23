@@ -80,6 +80,62 @@ All Cap Index, and finally ASHR to track the CSI 300 China. We accessed this dat
 through a free stock API, Alpha Vantage[^2]. Our timeframe starts on the first 
 of January 2014 and goes to the 7th of May 2025.
 
+
+```{r snp_download, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+library(fredr)
+
+sp500_data <- fredr(
+  series_id = "SP500",
+  observation_start = as.Date("2016-01-01"),
+  observation_end = Sys.Date(),
+  frequency = "d"  # daily data
+)
+
+sp500_select <- sp500_data%>%
+  drop_na()%>%
+  select(date, value)%>%
+  mutate(index_sp500 = value / dplyr::first(value) * 100)
+
+df_last_close <- SPY %>%
+  mutate(day = as.Date(timestamp)) %>%               # extract the date
+  group_by(day) %>%
+  filter(timestamp == max(timestamp)) %>%            # last timestamp per day
+  select(day, close) %>%                   
+  ungroup()
+
+df_last_close_indexed <- df_last_close %>%
+  arrange(day) %>%
+  filter(day >= as.Date("2016-01-01"))%>%
+  mutate(index_SPY = close / dplyr::first(close) * 100)
+
+SPY_comp <- left_join(df_last_close_indexed, sp500_select, by = c("day" = "date"))
+
+```
+
+
+```{r fig-spy-snp, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+ggplot(SPY_comp,aes(x = day))+
+  geom_line(aes(y = index_SPY, color = "SPY Daily Close")) +
+  geom_line(aes(y = index_sp500, color = "S&P 500 Daily Close")) +
+  scale_color_manual(values = c("SPY Daily Close" = "blue", "S&P 500 Daily Close" = "red")) +
+  labs(title = "SPY vs. S&P 500 (Indexed: 2016 = 100) ",
+       x = NULL,
+       y = NULL,
+       color = "Legend") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  theme(
+    panel.grid.minor = element_blank(),  
+    panel.grid.major = element_line(linewidth = 0.5)
+  )+
+   # Add caption  
+  labs(caption = str_wrap("To show that SPY tracks the S&P 500 almost perfectly, we've sourced the S&P 500 daily close from FRED and plotted it against our SPY closing Prices. The blue line that tracks the SPY ETF is barely visible", width = 100)) +
+  theme(plot.caption = element_text(hjust = 0, face = "italic", size = 10))
+
+
+```
+
+
 [^2]: https://www.alphavantage.co/ 
 
 We had to transform this data to get our main variable of interest, Average
@@ -99,6 +155,7 @@ but closes at 4:00 pm. Plotting this data, we observe that the last few months (
 to Donald Trump's first 100 days in office) display 
 unprecedented levels of volatility which have reached, and even surpassed, levels seen
 during the COVID-19 pandemic.
+
 
 
 ```{r fig-spy-price, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
@@ -236,7 +293,21 @@ ggplot(daily_counts, aes(x = day, y = N)) +
 
 
 ## Final Dataframe
-Here is a look into our final, fully cleaned, fully transformed dataset.
+Our final Dataframe is quite wide and contains the following Variables:
+
+| Variable | Description                                                                                                    |
+|----------|----------------------------------------------------------------------------------------------------------------|
+| _vol     | The hourly volatility of given indices                                                                        |
+| dummy    | A dummy variable, 1 if Trump posted in that hour                                                               |
+| N        | Number of posts in that hour                                                                                   |
+| tariff   | Mentions of tariff in that hour                                                                                 |
+| trade    | Mentions of trade in that hour                                                                                   |
+| china    | Mentions of China in that hour                                                                                   |
+| prop     | Sentiments according to NRC sentiment lexicon. Calculated as share of total sentiment and add up to 1. Positive and negative are separate measures and also add up to 1. |
+
+
+And here is a look at the final Dataframe. The sentiments aren't important for our final analysis are we dind't get any useful results
+with them and decided to cut them from our final analysis: 
 ```{r data, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 
 tail(data[1:4])
