@@ -2,8 +2,8 @@
 bibliography: citations.bib
 csl: apa.csl
 link-citations: true
-editor_options: 
-  markdown: 
+editor_options:
+  markdown:
     wrap: 72
 ---
 
@@ -35,6 +35,8 @@ require(texreg) #arima tables
 require(future.apply) #parallel computation (speed)
 require(aTSA) #adf test
 require(bookdown)
+require(scales)
+
 
 getwd()
 #setwd("X:/Onedrive/Desktop/Macroeconometrics/R stuff/Project/mmetricsproject/final") 
@@ -54,6 +56,7 @@ source(here("helperfunctions/armax_functions.R"))
 
 #load final dataset
 source(here("helperfunctions/full_data.R"))
+truths <- read.csv(here("data/mothership", "social.csv"))
 
 #load initial financial for plots
 SPY <- read.csv(here("data/mothership", "SPY.csv"))
@@ -64,6 +67,7 @@ SPY = filter(SPY,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')
 data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
 
 ```
+
 
 # Data
 
@@ -96,13 +100,66 @@ to Donald Trump's first 100 days in office) display
 unprecedented levels of volatility which have reached, and even surpassed, levels seen
 during the COVID-19 pandemic.
 
-```{r fin plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 
-price_plotter(SPY, title = "SPY Prices")
+```{r fig-spy-price, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+combined_plot <- function(data, title, breaks = "monthly") {
+  
+  # Index close price so first value = 100
+  data <- data[order(data$timestamp), ]  # ensure data sorted by time
+  data$close_indexed <- 100 * data$close / data$close[1]
+  
+  # take the range of both datasets (using indexed close price)
+  price_range <- range(data$close_indexed, na.rm = TRUE)
+  vol_range <- range(data$r_vol_h, na.rm = TRUE)
+  
+  # find the scale factor for volatility to fit price scale
+  scale_factor <- diff(price_range) / diff(vol_range)
+  
+  # rescale volatility to price scale
+  data$scaled_vol <- (data$r_vol_h - vol_range[1]) * scale_factor + price_range[1]
 
-hvol_plotter(SPY, breaks = "yearly", title = "SPY Realised Volatility")
+  # Pick x-axis breaks
+  x_scale <- switch(breaks,
+                    "yearly" = scale_x_datetime(date_labels = "%b %Y", date_breaks = "6 month"),
+                    "monthly" = scale_x_datetime(date_labels = "%b %Y", date_breaks = "1 month"),
+                    "daily"   = scale_x_datetime(date_labels = "%a %d", date_breaks = "1 day"),
+                    "hourly"  = scale_x_datetime(date_labels = "%Hh", date_breaks = "1 hour"),
+                    NULL)
+
+  ggplot(data, aes(x = as.POSIXct(timestamp))) +
+    # Price line (indexed)
+    geom_line(aes(y = close_indexed), color = "darkblue", linewidth = 0.5) +
+    # Volatility line (scaled)
+    geom_line(aes(y = scaled_vol), color = "darkred", linewidth = 0.5, linetype = "dashed") +
+    
+    # Left axis: price (indexed)
+    scale_y_continuous(
+      name = "Indexed SPY Close Price (Blue)",
+      sec.axis = sec_axis(~ (. - price_range[1]) / scale_factor + vol_range[1],
+                          name = "Hourly Realised Volatility (Red)",
+                          labels = scales::percent_format(accuracy = 0.1))
+    ) +
+    
+    x_scale +
+    labs(title = title, x = "") +
+    theme_classic(base_size = 14) +
+    
+    # theme adjustments
+    theme(
+    panel.grid.minor = element_blank(),  
+    panel.grid.major = element_line(linewidth = 0.5),  # Major gridlines only
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10)
+  )+
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      plot.title = element_text(face = "bold", hjust = 0.5)
+    )
+}
+combined_plot(SPY, "SPY Close Price vs Volatility", breaks = "yearly")
 
 ```
+
 
 ## Political Data
 
@@ -132,27 +189,50 @@ for mentions of certain words ($Tariff$, $Trade$, \& $China$).
 Furthermore, we applied simple sentiment analysis algorithms in order to extract emotions and proportions for the amount of "positive" and "negative" words from the posts. We however ended up not 
 including these in our final analyses as results were not particularly interesting. Details on all our data management procedures as well as the final dataset can be found in the GitHub repository.
 
-```{r social plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+```{r social plots, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+truths_2 <- dplyr::select(truths, timestamp, tariff, trade, china)
 
-#find count
-tweetcount_alltime = dplyr::select(data,timestamp,N)
-#select time period
-tweetcount = filter(tweetcount_alltime,
-between(timestamp,
-as.Date('2014-01-01'),
-as.Date('2025-04-10')))
-#plot
-ggplot(tweetcount_alltime, aes(x = timestamp, y = N)) +
-geom_point(color = "#253494", size = 1) +
-scale_x_datetime(date_labels = "%b %Y", date_breaks = "9 month") +
-labs(title = "Trump Social Media Count",
-x = NULL,
-y = "number of tweets/truths") +
-theme_minimal(base_size = 14) +
-theme(axis.text.x = element_text(angle = 45, hjust = 1),
-plot.title = element_text(face = "bold", hjust = 0.5))
 
+daily_counts <- truths_2 %>%
+  mutate(day = as.Date(timestamp)) %>%
+  filter(day >= as.Date("2014-01-01")) %>%
+  group_by(day) %>%
+  summarise(
+    N = n(),
+    across(where(is.numeric), sum, na.rm = TRUE), .groups = "drop")
+
+
+ggplot(daily_counts, aes(x = day, y = N)) +
+  # First plot points where tariff == 0, in light blue
+  geom_point(data = filter(daily_counts, tariff == 0), color = "lightblue", size = 1) +
+  
+  # Then plot points where tariff > 0, in dark blue (on top)
+  geom_point(data = filter(daily_counts, tariff > 0), color = "darkblue", size = 1) +
+  
+  geom_smooth(method = "loess", span = 0.2, se = FALSE, color = "darkred", size = 1) +
+  scale_x_date(date_labels = "%b %Y", date_breaks = "9 months") +
+  scale_y_log10() +
+  labs(
+    title = "Trump Social Media Posts",
+    x = NULL,
+    y = "Number of posts (log scale)"
+  ) +
+  theme_classic(base_size = 14) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(linewidth = 0.5),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(face = "bold", hjust = 0.5)
+  )+
+  
+   # Add caption  
+  labs(caption = str_wrap("Every dot represents number of tweets on a given day. Darkblue dots represent days where Trump mentioned tariff in at least one of his posts.", width = 150)) +
+  theme(plot.caption = element_text(hjust = 0, face = "italic", size = 10))
 ```
+
+
 
 
 ## Final Dataframe

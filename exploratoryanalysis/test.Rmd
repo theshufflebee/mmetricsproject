@@ -1,5 +1,6 @@
 ---
 title: "test"
+runtime: shiny
 editor_options:
   markdown:
     wrap: 72
@@ -27,6 +28,51 @@ b_{21} & b_{22}
 \eta^{AHV}_t
 \end{bmatrix}
 $$
+
+
+```{r}
+library(shiny)
+library(ggplot2)
+library(plotly)
+library(dplyr)
+
+# UI input
+selectInput("highlight_var", "Highlight condition:", 
+            choices = c("tariff", "trade", "china"), 
+            selected = "tariff")
+
+# Render plot
+renderPlotly({
+  var <- input$highlight_var
+  daily_counts <- daily_counts %>%
+    mutate(highlight = .data[[var]] > 0)
+
+  p <- ggplot(daily_counts, aes(x = day, y = N)) +
+    geom_point(aes(color = highlight), size = 1) +
+    geom_smooth(method = "loess", span = 0.2, se = FALSE, color = "darkred", size = 1) +
+    scale_color_manual(values = c("FALSE" = "lightblue", "TRUE" = "darkblue"), guide = "none") +
+    scale_x_date(date_labels = "%b %Y", date_breaks = "9 months") +
+    scale_y_log10() +
+    labs(
+      title = "Trump Social Media Posts",
+      x = NULL,
+      y = "Number of posts (log scale)"
+    ) +
+    theme_classic(base_size = 14) +
+    theme(
+      panel.grid.minor = element_blank(),
+      panel.grid.major = element_line(linewidth = 0.5),
+      axis.title = element_text(size = 12),
+      axis.text = element_text(size = 10),
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      plot.title = element_text(face = "bold", hjust = 0.5)
+    )
+
+  ggplotly(p)
+})
+
+
+```
 
 
 

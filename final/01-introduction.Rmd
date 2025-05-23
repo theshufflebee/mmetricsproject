@@ -59,21 +59,21 @@ literature, primarily focusing on his first term.
 This brings us to our research question:  Do Donald Trump's posts impact market volatility?
 
     
-```{r fig1, echo=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)", warning=FALSE, cache=TRUE}
+```{r fig1, fig.width=10, fig.height=5, echo=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)", warning=FALSE, cache=TRUE}
  #Create the scatter plot
 ggplot(truths, aes(x = day, y = time_shifted)) +
-  geom_point(alpha = 0.5, color = "blue", size = 0.55) +  # Transparancy to create "heatmap"
+  geom_point(alpha = 0.5, color = "darkblue", size = 0.55) +  # Transparancy to create "heatmap"
   scale_y_continuous(
     breaks = seq(-12, 12, by = 3),  # Custom Y scale
     labels = c("00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00", "24:00")  # 24-hour format labels
   ) +
   labs(title = "Terminally Online: Trumps Twitter & Truth Social Posts (EDT)",
        x = "",
-       y = "Time of Day") +
-  theme_minimal() +
+       y = "") +
+  theme_classic() +
   
   
-  # Customize X Axis
+  # X Axis adjustments
   scale_x_date(
     date_labels = "%b %Y",  # Format labels to show month and year
     date_breaks = "9 months"
@@ -81,17 +81,22 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
   
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   
-  # Add vertical lines at 9:30 AM and 4:00 PM for stock market
+  # Add market opening/closing lines
   geom_hline(yintercept = (9 + 30 / 60) - 12, linetype = "longdash", color = "red") + 
-  geom_hline(yintercept = 16 - 12, linetype = "dashed", color = "red") +   
+  geom_hline(yintercept = 16 - 12, linetype = "dashed", color = "red") +
   
   # theme adjustments
   theme(
-    panel.grid.minor = element_blank(),  # Remove minor gridlines
-    panel.grid.major = element_line(linewidth = 0.5),  # Major gridlines
+    panel.grid.minor = element_blank(),  
+    panel.grid.major = element_line(linewidth = 0.5),  # Major gridlines only
     axis.title = element_text(size = 12),
     axis.text = element_text(size = 10)
-  )
+  )+
+  
+  # Add caption  
+  labs(caption = "Every blue dot represents a post or repost. Red lines indicate market opening hours.") +
+  theme(plot.caption = element_text(hjust = 0, face = "italic", size = 10))
+  
 ```
 
 
@@ -137,7 +142,9 @@ of tweet content. It is relevant to note however, that the effect was stronger w
 Trump used confrontational words such as "tariff" or "trade war." Some of his
 announcements also influenced the U.S. dollar exchange rate (@vlastakisInformationDemandStock2012)
 and certain market indices within minutes of the tweet being posted
-(@colonescuEffectsDonaldTrumps2018 and @kinyuaAnalysisImpactPresident2021). Furthermore, scholars have shown that negative Trump tweets about specific
+(@colonescuEffectsDonaldTrumps2018 and @kinyuaAnalysisImpactPresident2021).
+
+Furthermore, scholars have shown that negative Trump tweets about specific
 companies tended to reduce demand for their stocks (@bransHisThumbEffect2020 and
 @mendelsStanfordResearchSeries2019), whereas some
 others have shown that they also impact market volatility indices such as
