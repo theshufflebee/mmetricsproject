@@ -244,7 +244,7 @@ impact of Trump’s tweets on various financial and macroeconomic
 variables has been analysed by several studies, especially during his
 first mandate. Using high-frequency financial data,
 @gjerstadPresidentTrumpsTweets2021 found consistent increases in uncertainty and
-trading volume, along with a decline in the U.S. stock market, regardless
+trading volume, along with a decline in the US stock market, regardless
 of tweet content. It is relevant to note however, that the effect was stronger when 
 Trump used confrontational words such as "tariff" or "trade war." Some of his
 announcements also influenced the U.S. dollar exchange rate (@vlastakisInformationDemandStock2012)
@@ -256,7 +256,7 @@ companies tended to reduce demand for their stocks (@bransHisThumbEffect2020 and
 @mendelsStanfordResearchSeries2019), whereas some
 others have shown that they also impact market volatility indices such as
 the VIX (@fendelPoliticalNewsStock2019) or the Volfele (@klausMeasuringTrumpVolfefe2021).
-The effects of his tweets also extended beyond the U.S.. For example,
+The effects of his tweets also extended beyond the US. For example,
 @nishimuraImpactsDonaldTrumps2025 show a
 positive relationship between volatility in European stock markets and
 Twitter activity of Trump, and this effect tends to intensify as public
@@ -307,10 +307,6 @@ require(future.apply) #parallel computation (speed)
 require(aTSA) #adf test
 require(bookdown)
 require(scales)
-
-
-getwd()
-#setwd("X:/Onedrive/Desktop/Macroeconometrics/R stuff/Project/mmetricsproject/final") 
 
 #load helper functions
 source(here("helperfunctions/data_loaders.R"))
@@ -368,9 +364,9 @@ sp500_select <- sp500_data%>%
   mutate(index_sp500 = value / dplyr::first(value) * 100)
 
 df_last_close <- SPY %>%
-  mutate(day = as.Date(timestamp)) %>%               # extract the date
+  mutate(day = as.Date(timestamp)) %>%               
   group_by(day) %>%
-  filter(timestamp == max(timestamp)) %>%            # last timestamp per day
+  filter(timestamp == max(timestamp)) %>%            
   select(day, close) %>%                   
   ungroup()
 
@@ -387,8 +383,8 @@ SPY_comp <- left_join(df_last_close_indexed, sp500_select, by = c("day" = "date"
 ```{r fig-spy-snp, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 ggplot(SPY_comp,aes(x = day))+
   geom_line(aes(y = index_SPY, color = "SPY Daily Close")) +
-  geom_line(aes(y = index_sp500, color = "S&P 500 Value")) +
-  scale_color_manual(values = c("SPY Daily Close" = "blue", "S&P 500 Value" = "red")) +
+  geom_line(aes(y = index_sp500, color = "S&P 500 Daily Close")) +
+  scale_color_manual(values = c("SPY Daily Close" = "blue", "S&P 500 Daily Close" = "red")) +
   labs(title = "SPY vs. S&P 500 (Indexed: 2016 = 100) ",
        x = NULL,
        y = NULL,
@@ -399,8 +395,8 @@ ggplot(SPY_comp,aes(x = day))+
     panel.grid.minor = element_blank(),  
     panel.grid.major = element_line(linewidth = 0.5)
   )+
-   # Add caption  
-  labs(caption = str_wrap("To show that SPY tracks the S&P 500 almost perfectly, we've sourced the S&P 500 daily close from FRED and plotted it against our SPY closing Prices. The blue line that tracks the SPY ETF is barely visible", width = 100)) +
+
+  labs(caption = str_wrap("To show that SPY tracks the S&P 500 almost perfectly, we've sourced the S&P 500 daily close from FRED and plotted it against our SPY ETF closing prices. The blue line that tracks the SPY ETF is barely visible.", width = 150)) +
   theme(plot.caption = element_text(hjust = 0, face = "italic", size = 10))
 
 

@@ -37,10 +37,6 @@ require(aTSA) #adf test
 require(bookdown)
 require(scales)
 
-
-getwd()
-#setwd("X:/Onedrive/Desktop/Macroeconometrics/R stuff/Project/mmetricsproject/final") 
-
 #load helper functions
 source(here("helperfunctions/data_loaders.R"))
 source(here("helperfunctions/date_selector.R"))
@@ -97,9 +93,9 @@ sp500_select <- sp500_data%>%
   mutate(index_sp500 = value / dplyr::first(value) * 100)
 
 df_last_close <- SPY %>%
-  mutate(day = as.Date(timestamp)) %>%               # extract the date
+  mutate(day = as.Date(timestamp)) %>%               
   group_by(day) %>%
-  filter(timestamp == max(timestamp)) %>%            # last timestamp per day
+  filter(timestamp == max(timestamp)) %>%            
   select(day, close) %>%                   
   ungroup()
 
@@ -128,8 +124,8 @@ ggplot(SPY_comp,aes(x = day))+
     panel.grid.minor = element_blank(),  
     panel.grid.major = element_line(linewidth = 0.5)
   )+
-   # Add caption  
-  labs(caption = str_wrap("To show that SPY tracks the S&P 500 almost perfectly, we've sourced the S&P 500 daily close from FRED and plotted it against our SPY closing Prices. The blue line that tracks the SPY ETF is barely visible", width = 150)) +
+
+  labs(caption = str_wrap("To show that SPY tracks the S&P 500 almost perfectly, we've sourced the S&P 500 daily close from FRED and plotted it against our SPY ETF closing prices. The blue line that tracks the SPY ETF is barely visible.", width = 150)) +
   theme(plot.caption = element_text(hjust = 0, face = "italic", size = 10))
 
 
