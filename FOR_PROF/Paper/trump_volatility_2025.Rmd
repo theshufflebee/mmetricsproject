@@ -16,7 +16,7 @@ geometry: "left=2cm,right=2cm,top=1cm,bottom=2cm"
 bibliography: [packages.bib, citations.bib] #name bib files
 link-citations: true           # optional but helpful for clickable citations
 csl: apa.csl
-abstract: "In this short paper, we aim to asses to what extent financial markets may react to Donald Trump’s social media posts, and more specifically, the effect on average realised volatility. We do so using both ARMA-X and SVAR models, with data spanning the 1st of January 2014, to the 7th of May 2025, over various time horizons and variables. We include the number of posts, a dummy for whether there was a post, and counts for mentions of words like tariffs, trade and China. While we do find significant and large
+abstract: "In this short paper, we aim to asses to what extent financial markets may react to Donald Trump’s social media posts, and more specifically, the effect on average realised volatility. We do so using both ARMA-X and SVAR models, with data spanning the 1st of January 2014 to the 7th of May 2025, over various time horizons and variables. We include the number of posts, a dummy for whether there was a post, and counts for mentions of words like tariffs, trade and China. While we do find significant and large
 impacts of mentions of tariffs in the ARMA-X model, with well-behaved residuals when restricting our sample to the second term, all other models and specifications suffer from persistent auto-correlation
 in the residuals and often high standard errors. Overall, we find limited evidence that there is a statistically significant positive effect, and provide some explanations as to why this might be the case."
 ---
@@ -61,9 +61,9 @@ truths <- truths_raw %>%
 Over the past 15 years, social media has become an important
 communication tool for politicians. One of the pioneers of this novel
 approach has been Donald Trump, the 45th and 47th President of the United
-States. Since his ban on Twitter after the January 6th riots, his quantity of
-social media posts has drastically increased to absurd levels as clearly visible
-on Figure \@ref(fig:fig1).
+States. His prominent level of posting is clearly visible on Figure \@ref(fig:fig1),
+where the gap between 2021 and 2022 represents his ban from Twitter after the 
+January 6th riots.
 
 The content of his posts can sometimes have announcements or teases of future
 political decisions. Note the recent infamous "THIS IS A GREAT TIME TO BUY!!! DJT"
@@ -275,7 +275,7 @@ had to use web-scrapping methods in order to download all these posts in a datas
 
 A big problem we had in our analysis was what to do with social media posts
 which appeared outside market hours. We first decided to simply ignore them, but 
-it turned out to remove such a large amount of observations, that it severly limited 
+it turned out to remove such a large amount of observations that it severely limited 
 our analysis. We finally decided to push all the 
 social media information outside market hours to the next open hour. This comes 
 as a critical assumption[^2]. 
@@ -323,13 +323,12 @@ plot.title = element_text(face = "bold", hjust = 0.5))
 
 We first thought of a simple ARMA-X type specification, taking the AHV as our
 "y variable" and taking any of the social media variables as the exogenous
-regressors. The assumption here is that, while the market reacts to Trump posts,
-Trump's posts are chaotic, nonsensical, and random enough to be considered 
-exogenous. 
+regressors. The assumption here is that, while the market reacts to Trump's posts,
+Trump's posts are chaotic and random enough to be considered exogenous. 
 
 We of course first start by checking stationarity of our variables (using ADF tests), where we find
 p-values of 0.01 suggesting that the processes are not explosive. Then, we use 
-a custom function in order to choose the number of lags based on the AIC criterion.
+a custom function in order to choose the number of lags ($p$, $q$ and $r$) based on the AIC criterion.
 This would often choose a very high number of lags, which could be 
 explained by our data being hourly. As such we decided to put a limit of 3 lags,
 which sees minimal AIC loss, similar results, and allows considerable simplification of the models. 
@@ -351,7 +350,7 @@ $Tariff_{t-2}$ are especially large, given the average size of the volatility be
 about 0.023 over the whole sample. We in fact predict that an 
 extra mention of tariffs one hour ago leads to a whopping extra 0.02 in volatility
 which means it would just about double the AHV if at the average. We can see the
-impulse response function (IRF) for this shock, in Figure \@ref(fig:armaxirf1). Notice that
+impulse response function (IRF) for this shock in Figure \@ref(fig:armaxirf1). Notice that
 there is a large positive response in the first periods, and then a graduate
 decline over time. Something to note is that in our various specifications, when including
 MA terms, the decline shows up gradual while being much sharper when only including
@@ -467,7 +466,7 @@ negative coefficients, typically on the first and fourth lag, alongside many
 insignificant ones. However, only $TweetCount$ and $China$ pass the Granger test in 
 the SPY ETF. Surprisingly, a large number of Granger tests in the VGK and 
 ASHR ETFs indicate strong Granger causality, which may point to a limitation 
-of the test itself, as such results appear unrealistic. 
+of the test itself as such results appear unrealistic. 
 
 
 ### Split Sample
