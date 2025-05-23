@@ -340,142 +340,30 @@ display: none;
 </div>
 
 
-<pre class="r"><code>tmpfile &lt;- tempfile(fileext = &quot;.html&quot;)  # create temp file
-
-html_output &lt;- htmlreg(list(model1, model2),
-                       custom.model.names = c(&quot;HP&quot;, &quot;Weight&quot;),
-                       caption = &quot;Test Models&quot;,
-                       file = tmpfile)
-
-# Read and print the HTML content
-cat(readLines(tmpfile), sep = &quot;\n&quot;)</code></pre>
-<table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;">
-<caption>
-Test Models
-</caption>
-<thead>
-<tr>
-<th style="padding-left: 5px;padding-right: 5px;">
- 
-</th>
-<th style="padding-left: 5px;padding-right: 5px;">
-HP
-</th>
-<th style="padding-left: 5px;padding-right: 5px;">
-Weight
-</th>
-</tr>
-</thead>
-<tbody>
-<tr style="border-top: 1px solid #000000;">
-<td style="padding-left: 5px;padding-right: 5px;">
-(Intercept)
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-30.10<sup>***</sup>
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-37.29<sup>***</sup>
-</td>
-</tr>
-<tr>
-<td style="padding-left: 5px;padding-right: 5px;">
- 
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-(1.63)
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-(1.88)
-</td>
-</tr>
-<tr>
-<td style="padding-left: 5px;padding-right: 5px;">
-hp
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
--0.07<sup>***</sup>
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
- 
-</td>
-</tr>
-<tr>
-<td style="padding-left: 5px;padding-right: 5px;">
- 
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-(0.01)
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
- 
-</td>
-</tr>
-<tr>
-<td style="padding-left: 5px;padding-right: 5px;">
-wt
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
- 
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
--5.34<sup>***</sup>
-</td>
-</tr>
-<tr>
-<td style="padding-left: 5px;padding-right: 5px;">
- 
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
- 
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-(0.56)
-</td>
-</tr>
-<tr style="border-top: 1px solid #000000;">
-<td style="padding-left: 5px;padding-right: 5px;">
-R<sup>2</sup>
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.60
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.75
-</td>
-</tr>
-<tr>
-<td style="padding-left: 5px;padding-right: 5px;">
-Adj. R<sup>2</sup>
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.59
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.74
-</td>
-</tr>
-<tr style="border-bottom: 2px solid #000000;">
-<td style="padding-left: 5px;padding-right: 5px;">
-Num. obs.
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-32
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-32
-</td>
-</tr>
-</tbody>
-<tfoot>
-<tr>
-<td style="font-size: 0.8em;" colspan="3">
-<sup>***</sup>p &lt; 0.001; <sup>**</sup>p &lt; 0.01; <sup>*</sup>p &lt; 0.05
-</td>
-</tr>
-</tfoot>
-</table>
-<p>```</p>
+<p><span class="math inline">\(y_t = \phi_1 y_{t-1} + \phi_2 y_{t-2} + \cdots + \phi_p y_{t-p} + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2} + \cdots + \theta_q \varepsilon_{t-q} + \beta_0 x_t + \beta_1 x_{t-1} + \cdots + \beta_r x_{t-r}\)</span></p>
+<p><span class="math inline">\(\text{SVAR: } y_t = c + \Phi_1 y_{t-1} + \cdots + \Phi_p y_{t-p} + B \eta_t\)</span></p>
+<p><span class="math display">\[
+\begin{equation}
+\text{SVAR: } y_t = c + \Phi_1 y_{t-1} + \cdots +
+\Phi_6 y_{t-6} + B \eta_t, \quad \text{where:}
+\quad
+y_t =
+\begin{bmatrix}
+\text{X}_t \\
+\text{AHV}_t
+\end{bmatrix},
+\quad B =
+\begin{bmatrix}
+b_{11} &amp; 0 \\
+b_{21} &amp; b_{22}
+\end{bmatrix}, \quad
+\eta_t =
+\begin{bmatrix}
+\eta^{\text{X}}_t \\
+\eta^{\text{AHv}}_t
+\end{bmatrix}
+\end{equation}
+\]</span></p>
 
 
 

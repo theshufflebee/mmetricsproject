@@ -69,30 +69,32 @@ data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07
 
 ## Financial Data
 
-For our financial data, we decided to try to find minute-by-minute prices for 
-broad market indices. While the actual indices do not update their prices so often,
-we had to take proxies under the form of ETF's that track them. Our 3 markets of
-analysis are: SPY to track the S&P500, VGK to track the FTSE Developed Europe 
+For our financial data, we decided to use minute-by-minute prices for 
+broad market indices. Since the actual indices do not update their prices that often,
+we had to take proxies under the form of ETFs that track them. These ETFs exist to provide investors with direct exposure to whole markets and have very small to no deviations to the corresponding index. Our 3 markets of analysis are: SPY to track the S&P500 (note that this ETF has a very large trading volume relative to the others), VGK to track the FTSE Developed Europe 
 All Cap Index, and finally ASHR to track the CSI 300 China. We accessed this data
-through a free stock API, Alpha Vantage. Our timeframe is from the first 
-of January 2014 to the 7th of May 2025.
+through a free stock API, Alpha Vantage[^2]. Our timeframe starts on the first 
+of January 2014 and goes to the 7th of May 2025.
 
+[^2]: https://www.alphavantage.co/ 
 
-We then had to transform this data to get our main variable of interest, Average
-Hourly Volatility (AHV). Note that this is realised market volatility. We did so 
-with the following formula:
+We had to transform this data to get our main variable of interest, Average
+Hourly Volatility (AHV). Note that this is \textit{realised} market volatility. We did so 
+using the following formula:
 $$
 \begin{aligned}
-  v_t = \frac{1}{N}&\sum_{i=1}^N(\Delta p_{t,i})^2 
+  AHV_t = \frac{1}{N}&\sum_{i=1}^N(\Delta p_{t,i})^2 
 \end{aligned}
 $$
-Where $\Delta p_t$ is the difference in price (open - close) and $i$ represents
-every minute.
+Where $\Delta p_t$ is the difference in price (open - close), $i$ represents
+every minute, $t$ represents an hour, and $N$ is the total number of minutes in each hour.
 
-We used a custom function in order to get the AHV for each open market hour. Note 
+Ultimately, we compute the AHV for each open market hour since 2014. Note 
 that the first hour is from 9:30 am to 10:00 am since the market opens on a half-hour 
-but closes at 4:00 pm. We can plot this data in the following table:
-
+but closes at 4:00 pm. Plotting this data, we observe that the last few months (corresponding
+to Donald Trump's first 100 days in office) display 
+unprecedented levels of volatility which have reached, and even surpassed, levels seen
+during the COVID-19 pandemic.
 
 ```{r fin plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 
@@ -102,33 +104,33 @@ hvol_plotter(SPY, breaks = "yearly", title = "SPY Realised Volatility")
 
 ```
 
-We can clearly see that the last few months show a new era of never seen before
-levels of volatility. Shocks on volatility recently have reached, and even surpassed
-(for a few data points) levels seen during the COVID-19 pandemic.
-
 ## Political Data
 
-We have two sources for Trump's posts. The Tweets are from Kaggle
-@shantanuDonaldTrumpTweets and go until the 8th of January 2021. Since he
-switched his primary posting platform to Truth Social we use only that
-Data from 2021 onwards. All Truth Social posts were scrapped from
-trumpstruth.org, a webpage that aims to conserve all his posts. Note that we have 
-had to use web-scrapping methods in order to download all his Truth Social posts
-in a dataset.
+
+We have two types of data for Trump's posts, Tweets \& "Truths" (from Truth Social). 
+The Tweets are sourced from Kaggle (@shantanuDonaldTrumpTweets) and stop in January 2021,
+seen as Trump was then banned. Due to this, we have a gap in this data going until February 2022, 
+when he first posted on his own new platform. All Truth Social posts were pulled from
+"trumpstruth.org", a webpage that aims to conserve all his posts. Note that we have 
+had to use web-scrapping methods in order to download all these posts in a dataset.
 
 A big problem we had in our analysis was what to do with social media posts
 which appeared outside market hours. We first decided to simply ignore them, but 
-it turned out to remove a lot of observations. We finally decided to push all the 
+it turned out to remove such a large amount of observations that it severely limited 
+our analysis. We finally decided to push all the 
 social media information outside market hours to the next open hour. This comes 
-as an assumption.^[2] 
+as a critical assumption[^3]. 
 
-Since our financial data is hourly, we aggregate the social data by hour. We 
-then construct multiple variables from the social media data. These include
-a dummy for whether there was a post, the number of posts an hour and counts
-for certain words ("tariffs","trade","china"). Further we applied some simple 
-sentiment analysis algorithms on the data to see if there are certain sentiments 
-in his tweets that move the markets. Details on all our data management procedures
-can be found in the GitHub repository.
+[^3]: For instance, if Trump tweets on Good Friday (market holiday), then the 
+market will only react to this new information on Monday at 9:30 am. 
+
+Since our financial data is hourly, we aggregate the social data by hour as well and construct multiple variables from this. These variables include
+a dummy for whether there was a post in a particular hour ($TweetDummy$), the number of posts in an hour 
+($TweetCount$), and counts
+for mentions of certain words ($Tariff$, $Trade$, \& $China$). 
+
+Furthermore, we applied simple sentiment analysis algorithms in order to extract emotions and proportions for the amount of "positive" and "negative" words from the posts. We however ended up not 
+including these in our final analyses as results were not particularly interesting. Details on all our data management procedures as well as the final dataset can be found in the GitHub repository.
 
 ```{r social plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 
@@ -167,10 +169,3 @@ tail(data[15:19])
 
 ```
 
-
-
-
-
-¨
-^[2]: For instance, if Trump tweets on Good Friday (market holiday), then the 
-market will only react to this new information on Monday at 9:30 am. 

@@ -1,25 +1,33 @@
 ---
 title: "test"
-output: bookdown::html_document2
+editor_options:
+  markdown:
+    wrap: 72
+output: pdf_document
 ---
 
-  
-```{r setup, include=FALSE}
-library(texreg)
-model1 <- lm(mpg ~ hp, data = mtcars)
-model2 <- lm(mpg ~ wt, data = mtcars)
-```
 
-```{r, results='asis', message=FALSE}
-tmpfile <- tempfile(fileext = ".html")  # create temp file
+$$
+y_t = c + \Phi_1 y_{t-1} + \cdots +
+\Phi_6 y_{t-6} + B \eta_t, \quad \text{where}
+\quad
+y_t =
+\begin{bmatrix}
+X_t \\
+AHV_t
+\end{bmatrix},
+ \quad B =
+\begin{bmatrix}
+b_{11} & 0 \\
+b_{21} & b_{22}
+\end{bmatrix}, \quad
+\eta_t =
+\begin{bmatrix}
+\eta^{X}_t \\
+\eta^{AHV}_t
+\end{bmatrix}
+$$
 
-html_output <- htmlreg(list(model1, model2),
-                       custom.model.names = c("HP", "Weight"),
-                       caption = "Test Models",
-                       file = tmpfile)
 
-# Read and print the HTML content
-cat(readLines(tmpfile), sep = "\n")
-```
-```
+
 

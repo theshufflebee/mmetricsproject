@@ -1,12 +1,11 @@
 ---
-title: "Terminally Online: Does Donald Trump impact Financial Markets"
+title: "The Art of the Tweet: Do Trump's Posts Affect Market Volatility?"
 author: "Marcos Constantinou, Ryan Fellarhi & Jonas Bruno"
-date: "Last edited: 20.05.2025"
+date: "Last edited: 23.05.2025"
 site: bookdown::bookdown_site
 documentclass: book
 bibliography: [packages.bib, citations.bib] #name bib files
-# url: your book url like https://bookdown.org/yihui/bookdown
-# cover-image: path to the social sharing image like images/cover.jpg -> Do Later
+cover-image: final/book_cover.jpg
 description: |
   This is our website for a Universityproject. We put this together from a basic bookdown example so there might be some stuff in here from that.
 link-citations: true           # clickable citations
@@ -87,6 +86,7 @@ textplot_wordcloud(
   min_count = 200,
   color = RColorBrewer::brewer.pal(8, "Reds")
 )
+
 ```
 
 
@@ -97,11 +97,8 @@ This is a Website for a class project from the 2025 Class Macroeconometrics at U
 # Abstract {.unnumbered}
 
 
-In this short paper, we aim to asses to what extent financial markets may react
-to Donald Trump's social media posts, and specifically the effect on average
-realised volatility. We do so using both ARMA-X and VAR models, with data spanning
-the 1st of January 2014, to the 7th of May 2025, over various time horizons and
-independent variables. We find limited evidence that there is a significant positive
-effect, and provide some explanations as to why this could be the case.
+In this short paper, we aim to asses to what extent financial markets may react to Donald Trump’s social media posts, and more specifically, the effect on average realised volatility. We do so using both ARMA-X and SVAR models, with data spanning the 1st of January 2014 to the 7th of May 2025, over various time horizons and variables. We include the number of posts, a dummy for whether there was a post, and counts for mentions of words like tariffs, trade and China. While we do find significant and large
+impacts of mentions of tariffs in the ARMA-X model, with well-behaved residuals when restricting our sample to the second term, all other models and specifications suffer from persistent auto-correlation
+in the residuals and often high standard errors. Overall, we find limited evidence that there is a statistically significant positive effect, and provide some explanations as to why this might be the case.
 
 

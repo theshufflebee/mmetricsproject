@@ -2,18 +2,48 @@
 
 ## Methodology
 
-We develop an SVARmodel in order to assess the impact of short-run shocks from Trump’s posts on AHV, and to evaluate
-whether market volatility can, in turn, influence Trump’s posting behavior. In this framework, we systematically pair
-AHV with one explanatory variable at a time (our X-regressor). The SVAR approach offers the advantage of accounting
-for structural endogeneity. Our main assumption is that the volatility does not contemporaneously affect Trump’s posting
-activity- neither quantitatively nor qualitatively, while Trump’s posts do affect markets instantly. In essence, we impose
-a short-run restriction on the shock of volatility for all the social media variables.
-Based on the information criteria, we found similar results across all specifications, with a recommended lag length of
-around 70. However, inducing more than 6 lags (corresponding to a full trading day) introduces strong seasonality.
-Moreover, the higher the number of lags, the greater the persistence of a shock, up to unrealistic levels such as 150 days
-for the number of Tweets, which seems implausible. Therefore, we chose to fix the number of lags at a maximum of 6.
-Finally, given the presence of heteroscedasticity and serial correlation in the residuals, we use the Newey-West estimator
-to compute robust standard errors.
+We develop an SVAR model in order to assess the impact of
+short-run shocks from Trump's posts on AHV, and to evaluate whether
+market volatility can, in turn, influence Trump's posting behaviour. In
+this framework, we systematically pair AHV with one explanatory variable
+at a time (our x-regressor). The SVAR approach offers the advantage of accounting for
+structural endogeneity. Our main assumption is that the volatility
+does not contemporaneously affect Trump's posting activity - neither
+quantitatively nor qualitatively - while Trump's posts do affect markets instantly. 
+In essence, we impose a short-run restriction on the shock of volatility for all the
+social media variables.
+
+Based on the information criteria, we found similar results across all
+specifications, with a recommended lag length of around 70. However,
+including more than 6 lags (corresponding to a full trading day)
+introduces strong seasonal patterns. Moreover, the higher the number of lags,
+the greater the persistence of a shock up to unrealistic levels such as 150 days 
+for the number of Tweets, which seems implausible. Therefore, we chose to fix the
+number of lags at a maximum of 6. Finally, given the presence of heteroscedasticity
+and serial correlation in the residuals, we use the Newey-West estimator
+to compute robust standard errors. Our specification is built as follows:
+
+$$
+\begin{aligned}
+y_t = c + \Phi_1 y_{t-1} + \cdots +
+\Phi_6 y_{t-6} + B \eta_t, \hspace{0.2cm} \text{where:} \hspace{0.2cm}
+y_t =
+\begin{bmatrix}
+X_t \\
+AHV_t
+\end{bmatrix},
+ \quad B =
+\begin{bmatrix}
+b_{11} & 0 \\
+b_{21} & b_{22}
+\end{bmatrix}, \quad
+\eta_t =
+\begin{bmatrix}
+\eta^{X}_t \\
+\eta^{AHV}_t
+\end{bmatrix}
+\end{aligned}
+$$
 
 ## Results
 
@@ -21,58 +51,62 @@ to compute robust standard errors.
 
 
 As in the ARMA-X framework, we initially estimate a model for each of our five
-main variables. For all estimations using the SPY ETF market, the significant 
-coefficients of social media variables were consistently negative, while the 
-positive coefficients were large but not significant (\@ref(sec:svar-table-1)).
-For the $Tariff$, $Trade$ and $China$ mention variables, the first, second and sometimes forth 
-lag were positive and relatively large (especially in the case of Tariff), while 
-the remaining ones were not. In contrast, for $TweetCount$ and $TweetDummy$, we 
-observed fewer and smaller positive coefficients. At the same time, we found 
-that the contemporaneous effects of the shocks were all positive and relatively 
+main variables across the full dataset. Table (\@ref(sec:svar-table-1)) shows all estimations using the SPY ETF, where
+we notice that the positive coefficients (of the social media variables) are large 
+but not statistically significant. Oddly, the only significant coefficients are
+consistently negative.
+
+For the $Tariff$, $Trade$ and $China$ variables, the first, second and sometimes fourth 
+lags are positive and relatively large (especially in the case of $Tariff$), while 
+the remaining ones are not. In contrast, for $TweetCount$ and $TweetDummy$, we 
+observe fewer and smaller positive coefficients. At the same time, we find 
+that the contemporaneous effects of the shocks are all positive and relatively 
 strong. This leads to two types of scenarios : either 
-the IRF's experienced a positive shock and remain elevated ($Tariff$, $Trade$ and $China$), 
-or a highly positive shock occurs, but the cumulative effect turns negative after few 
-hours ($TweetDummy$ and $Count$) (\@ref(sec:irf-dummy), \@ref(sec:irf-tariff)).
+the IRFs experience a positive shock and remain elevated ($Tariff$, $Trade$ and $China$), 
+or a highly positive shock occurs, but the cumulative effect turns negative after a few 
+hours ($TweetDummy$ and $TweetCount$). You can find the IRFs for $Tariff$ on Figures
+(\@ref(sec:irf-dummy), \@ref(sec:irf-tariff)).
 
-
-Finally, except for $Tariff$, all Granger causality tests indicate that Trump's 
-posts have an impact on volatility. However, due to serial correlation in the 
-residuals, these results should be interpreted with caution. Overall, this model 
-suggest that Trump's posts tend to have a positive instantaneous effect on 
+Finally, apart for $Tariff$, all Granger causality tests indicate that Trump's 
+posts Granger-cause volatility. However, due to serial correlation in the 
+residuals, these results should be interpreted with extreme caution. Overall, this model 
+suggests that Trump's posts tend to have a positive instantaneous effect on 
 volatility, but with very low persistence.
-When analyzing the European and Chinese ETF's, we observe similar patterns 
-though with lower magnitude, except for the impact of $Tariff$ and $China$ on the 
-ASHR ETF (Chinese Market), where the cumulative effects show no positive impact. Additionally, 
-the VGK ETF (European Market) appears to react more strongly than ASHR to 
+When analyzing the VGK \& ASHR ETFs, we observe similar patterns 
+though with lower magnitude, except for the impact of $Tariff$ and $China$ on 
+ASHR, where the cumulative effects show no positive impact. Additionally, 
+the VGK ETF appears to react more strongly than ASHR to 
 Trump's posts, especially those mentioning $Trade$ and $Tariff$.
 
 Regarding the impact of AHV on Trump's posts, we find some evidence of a 
 negative effect. For all variables, we observe one or two significantly 
-negative coefficients per variables, typically on the first and fourth lag, alongside many 
-insignificant ones. However, only $TweetCount$ and China pass the Granger test in 
-the US ETF Surprisingly, a large number of Granger tests in the Chinese and 
-European ETFs indicate strong Granger causality, which may point to a limitation 
-of the test itself, as such results appear unrealistic. 
+negative coefficients, typically on the first and fourth lag, alongside many 
+insignificant ones. However, only $TweetCount$ and $China$ pass the Granger test in 
+the SPY ETF. Surprisingly, a large number of Granger tests in the VGK and 
+ASHR ETFs indicate strong Granger causality, which may point to a limitation 
+of the test itself as such results appear unrealistic. 
 
 
 ### Split Sample
 
-For the split framework, the results were similar and striking (\@ref(sec:irf-china-2)).
-While we observed relatively small shock effects and almost entirely negative coefficients 
-during the first term (\@ref(sec:tab-svar-1)), leading the 
-cumulative IRF's to indicate a negative impact of posts, the shock effects in the
-second term were substantially larger, ranging from 5 times (for $TweetCount$ and 
-$TweetDummy$) to as much as 25 times greater (for $Tariff$). the only exception was 
-$Trade$ in the second term, which showed the only negative impact from a shock.
-Once again, we found positive lagged coefficients in the second term, mostly on 
-the first, second and forth lags. However, none of these coefficients were
-statistically significant, but the cumulative IRF's clearly show a high positive 
+Tables (\@ref(sec:tab-svar-1)), (\@ref(sec:tab-svar-2)) show the models for the split terms,
+where we notice the results are strikingly similar. While we
+observe relatively small shock effects and almost entirely negative coefficients 
+during the first term, (which explain why the 
+cumulative IRFs indicate a negative impact of posts), the shock effects in the
+second term are substantially larger, ranging from 5 times (for $TweetCount$ and 
+$TweetDummy$) to as much as 25 times greater (for $Tariff$). The only exception is 
+$Trade$ in the second term, which shows the only negative impact from a shock.
+Once again we find positive lagged coefficients in the second term, mostly on 
+the first, second and fourth lags. However, none of these coefficients are
+statistically significant though the cumulative IRFs clearly show a high positive 
 impact on everything except for $TweetDummy$ and $TweetCount$, whose
-coefficients and cumulative IRF's displayed similar patterns to those observed 
-in the first term (\@ref(sec:tab-svar-2))
+coefficients and cumulative IRFs display similar patterns to those observed 
+in the first term (such as \@ref(sec:irf-china-2)). 
+
 Moreover, the Granger tests generally failed in both terms, with the sole
 exception being $China$ in the second term. 
-Regarding the ASHR ETF, we found results similar to those for the US ETF. Surprisingly, 
-in the case of the European market, we observed a positive
+Regarding the ASHR ETF, we found results similar to those for SPY. Surprisingly, 
+in the case of VGK, we observe a positive
 impact of Trump’s posts on AHV during the first term. Nevertheless, the results 
 still indicate a stronger impact of posts during the second term.
