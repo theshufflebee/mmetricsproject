@@ -7,7 +7,7 @@ editor_options:
     wrap: 72
 ---
 
-```{r library_setup_data, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+```{r library_setup_data, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
 rm(list=ls())
 require(tinytex) #LaTeX
 require(ggplot2) #plots
@@ -48,7 +48,7 @@ source(here("helperfunctions/armax_functions.R"))
 
 ```
 
-```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=TRUE}
+```{r datasetup, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
 
 #load final dataset
 source(here("helperfunctions/full_data.R"))
@@ -77,7 +77,7 @@ through a free stock API, Alpha Vantage[^2]. Our timeframe starts on the first
 of January 2014 and goes to the 7th of May 2025.
 
 
-```{r snp_download, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+```{r snp_download, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 library(fredr)
 
 sp500_data <- fredr(
@@ -109,7 +109,7 @@ SPY_comp <- left_join(df_last_close_indexed, sp500_select, by = c("day" = "date"
 ```
 
 
-```{r fig-spy-snp, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+```{r fig-spy-snp, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 ggplot(SPY_comp,aes(x = day))+
   geom_line(aes(y = index_SPY, color = "SPY Daily Close")) +
   geom_line(aes(y = index_sp500, color = "S&P 500 Daily Close")) +
@@ -154,7 +154,7 @@ during the COVID-19 pandemic.
 
 
 
-```{r fig-spy-price, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+```{r fig-spy-price, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 combined_plot <- function(data, title, breaks = "monthly") {
   
   # Index close price so first value = 100
@@ -242,7 +242,7 @@ for mentions of certain words ($Tariff$, $Trade$, \& $China$).
 Furthermore, we applied simple sentiment analysis algorithms in order to extract emotions and proportions for the amount of "positive" and "negative" words from the posts. We however ended up not 
 including these in our final analyses as results were not particularly interesting. Details on all our data management procedures as well as the final dataset can be found in the GitHub repository.
 
-```{r social plots, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+```{r social plots, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 truths_2 <- dplyr::select(truths, timestamp, tariff, trade, china)
 
 
@@ -302,9 +302,9 @@ Our final Dataframe is quite wide and contains the following Variables:
 | prop     | Sentiments according to NRC sentiment lexicon. Calculated as share of total sentiment and add up to 1. Positive and negative are separate measures and also add up to 1. |
 
 
-And here is a look at the final Dataframe. The sentiments aren't important for our final analysis are we dind't get any useful results
+And here is a look at the final Dataframe. The sentiments aren't important for our final analysis as we didn't get any useful results
 with them and decided to cut them from our final analysis: 
-```{r data, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
+```{r data, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 
 tail(data[1:4])
 

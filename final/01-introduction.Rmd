@@ -7,7 +7,7 @@ editor_options:
     wrap: 72
 ---
 
-```{r, warning=FALSE, echo=FALSE, cache=TRUE}
+```{r, warning=FALSE, echo=FALSE, cache=FALSE}
 require("here")
 require("stringr")
 require("dplyr")
@@ -59,7 +59,7 @@ literature, primarily focusing on his first term.
 This brings us to our research question:  Do Donald Trump's posts impact market volatility?
 
     
-```{r fig1, fig.width=10, fig.height=5, echo=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)", warning=FALSE, cache=TRUE}
+```{r fig1, fig.width=10, fig.height=5, echo=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)", warning=FALSE, cache=FALSE}
  #Create the scatter plot
 ggplot(truths, aes(x = day, y = time_shifted)) +
   geom_point(alpha = 0.5, color = "darkblue", size = 0.55) +  # Transparancy to create "heatmap"

@@ -13,7 +13,6 @@ csl: apa.csl
 github-repo: www.github.com/theshufflebee/mmetricsproject
 ---
 
-
 ```{r r library_setup:index, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
 #rm(list=ls())
 require(here)
@@ -50,8 +49,6 @@ truths <- read.csv(here("data/political_data/truths250510.csv"))
 source(here("helperfunctions/truths_cleaning_function.R"))
 ```
 
-
-
 ```{r data_title, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
 #Only keep original Tweets
 tweets_clean <- tweets %>% filter(isRetweet != "t")
@@ -78,8 +75,6 @@ tokens_tweets <- tokens_remove(tokens_tweets, all_stopwords)  # Remove stopwords
 dfm_tweets <- dfm(tokens_tweets)
 ```
 
-
-
 ```{r wordcloud, fig.width=8, fig.height=6, echo=FALSE, warning=FALSE, message=FALSE}
 textplot_wordcloud(
   dfm_tweets,
@@ -89,16 +84,12 @@ textplot_wordcloud(
 
 ```
 
+![Wordcloud with Trump's most used Words in Social Media Posts.](book_cover.jpg)
 
 # Readme {.unnumbered}
 
-This is a Website for a class project from the 2025 Class Macroeconometrics at Université de Lausanne. It is intended as an archive and Display of our Project. You can find all data for recreation on www.github.com/theshufflebee/mmetricsproject.
+This is a Website for a class project from the 2025 Class Macroeconometrics at Université de Lausanne. It is intended as an archive and Display of our Project. You can find all data for recreation on [GitHub](www.github.com/theshufflebee/mmetricsproject) .
 
 # Abstract {.unnumbered}
 
-
-In this short paper, we aim to asses to what extent financial markets may react to Donald Trump’s social media posts, and more specifically, the effect on average realised volatility. We do so using both ARMA-X and SVAR models, with data spanning the 1st of January 2014 to the 7th of May 2025, over various time horizons and variables. We include the number of posts, a dummy for whether there was a post, and counts for mentions of words like tariffs, trade and China. While we do find significant and large
-impacts of mentions of tariffs in the ARMA-X model, with well-behaved residuals when restricting our sample to the second term, all other models and specifications suffer from persistent auto-correlation
-in the residuals and often high standard errors. Overall, we find limited evidence that there is a statistically significant positive effect, and provide some explanations as to why this might be the case.
-
-
+In this short paper, we aim to asses to what extent financial markets may react to Donald Trump’s social media posts, and more specifically, the effect on average realised volatility. We do so using both ARMA-X and SVAR models, with data spanning the 1st of January 2014 to the 7th of May 2025, over various time horizons and variables. We include the number of posts, a dummy for whether there was a post, and counts for mentions of words like tariffs, trade and China. While we do find significant and large impacts of mentions of tariffs in the ARMA-X model, with well-behaved residuals when restricting our sample to the second term, all other models and specifications suffer from persistent auto-correlation in the residuals and often high standard errors. Overall, we find limited evidence that there is a statistically significant positive effect, and provide some explanations as to why this might be the case.
