@@ -1,12 +1,11 @@
 ---
-title: "Terminally Online: Does Donald Trump impact Financial Markets"
+title: "The Art of the Tweet: Do Trump's Posts Affect Market Volatility?"
 author: "Marcos Constantinou, Ryan Fellarhi & Jonas Bruno"
-date: "Last edited: 20.05.2025"
+date: "Last edited: 23.05.2025"
 site: bookdown::bookdown_site
 documentclass: book
 bibliography: [packages.bib, citations.bib] #name bib files
-# url: your book url like https://bookdown.org/yihui/bookdown
-# cover-image: path to the social sharing image like images/cover.jpg -> Do Later
+cover-image: final/book_cover.jpg
 description: |
   This is our website for a Universityproject. We put this together from a basic bookdown example so there might be some stuff in here from that.
 link-citations: true           # clickable citations
@@ -87,6 +86,7 @@ textplot_wordcloud(
   min_count = 200,
   color = RColorBrewer::brewer.pal(8, "Reds")
 )
+
 ```
 
 
@@ -97,12 +97,9 @@ This is a Website for a class project from the 2025 Class Macroeconometrics at U
 # Abstract {.unnumbered}
 
 
-In this short paper, we aim to asses to what extent financial markets may react
-to Donald Trump's social media posts, and specifically the effect on average
-realised volatility. We do so using both ARMA-X and VAR models, with data spanning
-the 1st of January 2014, to the 7th of May 2025, over various time horizons and
-independent variables. We find limited evidence that there is a significant positive
-effect, and provide some explanations as to why this could be the case.
+In this short paper, we aim to asses to what extent financial markets may react to Donald Trump’s social media posts, and more specifically, the effect on average realised volatility. We do so using both ARMA-X and SVAR models, with data spanning the 1st of January 2014 to the 7th of May 2025, over various time horizons and variables. We include the number of posts, a dummy for whether there was a post, and counts for mentions of words like tariffs, trade and China. While we do find significant and large
+impacts of mentions of tariffs in the ARMA-X model, with well-behaved residuals when restricting our sample to the second term, all other models and specifications suffer from persistent auto-correlation
+in the residuals and often high standard errors. Overall, we find limited evidence that there is a statistically significant positive effect, and provide some explanations as to why this might be the case.
 
 
 
@@ -150,12 +147,12 @@ truths <- truths_raw %>%
 
 ## Motivation
 
-Over the past 15 years social media has become an important
+Over the past 15 years, social media has become an important
 communication tool for politicians. One of the pioneers of this novel
 approach has been Donald Trump, the 45th and 47th President of the United
-States. Since his ban on Twitter after the January 6th riots, his quantity of
-social media posts has drastically increased. This is shown in the following
-figure. [^1]
+States. His prominent level of posting is clearly visible on Figure \@ref(fig:fig1),
+where the gap between 2021 and 2022 represents his ban from Twitter after the 
+January 6th riots.[^1]
 
 [^1]: Includes both Posts and Reposts
 
@@ -164,13 +161,11 @@ political decisions. Note the recent infamous "THIS IS A GREAT TIME TO BUY!!! DJ
 post sent just an hour before lifting his reciprocal tariffs. It is then not 
 improbable that agents in financial markets might take this information into 
 account in their decision making. This question has been asked before in the 
-literature, focusing rather on his first term. 
+literature, primarily focusing on his first term. 
 
-This brings us to our research question:  Do Donald Trumps Posts impact market Volatility?
+This brings us to our research question:  Do Donald Trump's posts impact market volatility?
 
     
-\@ref(fig:fig1)
-
 ```{r fig1, echo=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)", warning=FALSE, cache=TRUE}
  #Create the scatter plot
 ggplot(truths, aes(x = day, y = time_shifted)) +
@@ -210,63 +205,60 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
 
 ## Literature Review
 
+
 Information is one of the most valuable assets in the financial market.
 Its importance lies at the core of the "Efficient Market Hypothesis", 
 which states that the prices of assets fully reflect all
 available information, adjusting immediately to any new data
-(@famaAdjustmentStockPrices2003) , and thereby creating a strong demand
+(@famaAdjustmentStockPrices2003), and thereby creating a strong demand
 for information flow. In addition, the “Mixture of Distribution
 Hypothesis” states that the release of new information is closely linked
 to movements in both realized and implied volatility
 (@andersenReturnVolatilityTrading1996, @frenchStockReturnVariances1986,
 @vlastakisInformationDemandStock2012).
 
-Consequently, a large part of the literature had focused on the relation
+Consequently, a large part of the literature has focused on the relationship
 between announcements, news and market activity. For example,
 @schumakerTextualAnalysisStock2009 use various linguistic and textual
 representations derived from financial news to predict stock market
 prices. Similarly, @ederingtonHowMarketsProcess1993 analyze the impact
 of macroeconomic news announcements on interest rate and foreign
 exchange futures markets, particularly in terms of price changes and
-volatility. Both studies, among others, find that prices— such as stock
-prices—react primarily within minutes after the release of new
+volatility. Both studies, among others, find that prices, such as stock
+prices, react primarily within minutes after the release of new
 information.
 
 Recently, the world has witnessed the rise of the Internet
 which revolutionized the dissemination and accessibility of information.
-Social media enable investors, analysts or politicians to instantly
+Social media enables investors, analysts or politicians to instantly
 share their information, news or opinions. This led some studies to
-focus on the communication dynamics of social platform to predict
-changes in the returns of financial assets (@dechoudhuryCanBlogCommunication2008,
+focus on the communication dynamics of social platforms to predict
+changes in the returns of financial assets (@dechoudhuryCanBlogCommunication2008 and 
 @bartovCanTwitterHelp2018). In this context, the
 impact of Trump’s tweets on various financial and macroeconomic
 variables has been analysed by several studies, especially during his
-first mandate.
-
-Using high-frequency financial data,
-@gjerstadPresidentTrumpsTweets2021 found an increase in uncertainty and
-trading volume, along with a decline in the U.S. stock market—regardless
-of the tweet's content. However, the effect was stronger when Trump used
-confrontational words such as "tariff" or "trade war." Some of his
+first mandate. Using high-frequency financial data,
+@gjerstadPresidentTrumpsTweets2021 found consistent increases in uncertainty and
+trading volume, along with a decline in the U.S. stock market, regardless
+of tweet content. It is relevant to note however, that the effect was stronger when 
+Trump used confrontational words such as "tariff" or "trade war." Some of his
 announcements also influenced the U.S. dollar exchange rate (@vlastakisInformationDemandStock2012)
-and certain market indices within minutes of the tweet being posted(
-@colonescuEffectsDonaldTrumps2018 & @kinyuaAnalysisImpactPresident2021).
-
-Other scholars have shown that negative Trump tweets about specific
-companies tended to reduce demand for their stocks (@bransHisThumbEffect2020,
+and certain market indices within minutes of the tweet being posted
+(@colonescuEffectsDonaldTrumps2018 and @kinyuaAnalysisImpactPresident2021). Furthermore, scholars have shown that negative Trump tweets about specific
+companies tended to reduce demand for their stocks (@bransHisThumbEffect2020 and
 @mendelsStanfordResearchSeries2019), whereas some
-other have shown that they also impact market volatility indices such as
+others have shown that they also impact market volatility indices such as
 the VIX (@fendelPoliticalNewsStock2019) or the Volfele (@klausMeasuringTrumpVolfefe2021).
 The effects of his tweets also extended beyond the U.S.. For example,
-@nishimuraImpactsDonaldTrumps2025 shows a
+@nishimuraImpactsDonaldTrumps2025 show a
 positive relationship between volatility in European stock markets and
-tweeter activity of Trump, and this effect tends to intensify as public
-intention for his tweet grows.
+Twitter activity of Trump, and this effect tends to intensify as public
+interest for his tweet grows.
 
 Our paper is built as follows: Section 2 describes the data, their sources, and 
 the several transformations applied. Section 3 focuses on ARMA-X models, describing 
 both our methodology and results. Section 4 does the same, though for our VAR models. 
-Section 5 concludes.
+Section 5 concludes and importantly Section 7 provides all the figures and tables.
 
 <!--chapter:end:01-introduction.Rmd-->
 
@@ -341,30 +333,32 @@ data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07
 
 ## Financial Data
 
-For our financial data, we decided to try to find minute-by-minute prices for 
-broad market indices. While the actual indices do not update their prices so often,
-we had to take proxies under the form of ETF's that track them. Our 3 markets of
-analysis are: SPY to track the S&P500, VGK to track the FTSE Developed Europe 
+For our financial data, we decided to use minute-by-minute prices for 
+broad market indices. Since the actual indices do not update their prices that often,
+we had to take proxies under the form of ETFs that track them. These ETFs exist to provide investors with direct exposure to whole markets and have very small to no deviations to the corresponding index. Our 3 markets of analysis are: SPY to track the S&P500 (note that this ETF has a very large trading volume relative to the others), VGK to track the FTSE Developed Europe 
 All Cap Index, and finally ASHR to track the CSI 300 China. We accessed this data
-through a free stock API, Alpha Vantage. Our timeframe is from the first 
-of January 2014 to the 7th of May 2025.
+through a free stock API, Alpha Vantage[^2]. Our timeframe starts on the first 
+of January 2014 and goes to the 7th of May 2025.
 
+[^2]: https://www.alphavantage.co/ 
 
-We then had to transform this data to get our main variable of interest, Average
-Hourly Volatility (AHV). Note that this is realised market volatility. We did so 
-with the following formula:
+We had to transform this data to get our main variable of interest, Average
+Hourly Volatility (AHV). Note that this is \textit{realised} market volatility. We did so 
+using the following formula:
 $$
 \begin{aligned}
-  v_t = \frac{1}{N}&\sum_{i=1}^N(\Delta p_{t,i})^2 
+  AHV_t = \frac{1}{N}&\sum_{i=1}^N(\Delta p_{t,i})^2 
 \end{aligned}
 $$
-Where $\Delta p_t$ is the difference in price (open - close) and $i$ represents
-every minute.
+Where $\Delta p_t$ is the difference in price (open - close), $i$ represents
+every minute, $t$ represents an hour, and $N$ is the total number of minutes in each hour.
 
-We used a custom function in order to get the AHV for each open market hour. Note 
+Ultimately, we compute the AHV for each open market hour since 2014. Note 
 that the first hour is from 9:30 am to 10:00 am since the market opens on a half-hour 
-but closes at 4:00 pm. We can plot this data in the following table:
-
+but closes at 4:00 pm. Plotting this data, we observe that the last few months (corresponding
+to Donald Trump's first 100 days in office) display 
+unprecedented levels of volatility which have reached, and even surpassed, levels seen
+during the COVID-19 pandemic.
 
 ```{r fin plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 
@@ -374,33 +368,33 @@ hvol_plotter(SPY, breaks = "yearly", title = "SPY Realised Volatility")
 
 ```
 
-We can clearly see that the last few months show a new era of never seen before
-levels of volatility. Shocks on volatility recently have reached, and even surpassed
-(for a few data points) levels seen during the COVID-19 pandemic.
-
 ## Political Data
 
-We have two sources for Trump's posts. The Tweets are from Kaggle
-@shantanuDonaldTrumpTweets and go until the 8th of January 2021. Since he
-switched his primary posting platform to Truth Social we use only that
-Data from 2021 onwards. All Truth Social posts were scrapped from
-trumpstruth.org, a webpage that aims to conserve all his posts. Note that we have 
-had to use web-scrapping methods in order to download all his Truth Social posts
-in a dataset.
+
+We have two types of data for Trump's posts, Tweets \& "Truths" (from Truth Social). 
+The Tweets are sourced from Kaggle (@shantanuDonaldTrumpTweets) and stop in January 2021,
+seen as Trump was then banned. Due to this, we have a gap in this data going until February 2022, 
+when he first posted on his own new platform. All Truth Social posts were pulled from
+"trumpstruth.org", a webpage that aims to conserve all his posts. Note that we have 
+had to use web-scrapping methods in order to download all these posts in a dataset.
 
 A big problem we had in our analysis was what to do with social media posts
 which appeared outside market hours. We first decided to simply ignore them, but 
-it turned out to remove a lot of observations. We finally decided to push all the 
+it turned out to remove such a large amount of observations that it severely limited 
+our analysis. We finally decided to push all the 
 social media information outside market hours to the next open hour. This comes 
-as an assumption.^[2] 
+as a critical assumption[^3]. 
 
-Since our financial data is hourly, we aggregate the social data by hour. We 
-then construct multiple variables from the social media data. These include
-a dummy for whether there was a post, the number of posts an hour and counts
-for certain words ("tariffs","trade","china"). Further we applied some simple 
-sentiment analysis algorithms on the data to see if there are certain sentiments 
-in his tweets that move the markets. Details on all our data management procedures
-can be found in the GitHub repository.
+[^3]: For instance, if Trump tweets on Good Friday (market holiday), then the 
+market will only react to this new information on Monday at 9:30 am. 
+
+Since our financial data is hourly, we aggregate the social data by hour as well and construct multiple variables from this. These variables include
+a dummy for whether there was a post in a particular hour ($TweetDummy$), the number of posts in an hour 
+($TweetCount$), and counts
+for mentions of certain words ($Tariff$, $Trade$, \& $China$). 
+
+Furthermore, we applied simple sentiment analysis algorithms in order to extract emotions and proportions for the amount of "positive" and "negative" words from the posts. We however ended up not 
+including these in our final analyses as results were not particularly interesting. Details on all our data management procedures as well as the final dataset can be found in the GitHub repository.
 
 ```{r social plots, message=FALSE, warning=FALSE, echo=FALSE, cache=TRUE}
 
@@ -440,76 +434,70 @@ tail(data[15:19])
 ```
 
 
-
-
-
-¨
-^[2]: For instance, if Trump tweets on Good Friday (market holiday), then the 
-market will only react to this new information on Monday at 9:30 am. 
-
 <!--chapter:end:02-data.Rmd-->
 
 # ARMA-X
 
 ## Methodology
 
-Once we have our final dataframe, we could then finally start on some analysis.
 We first thought of a simple ARMA-X type specification, taking the AHV as our
 "y variable" and taking any of the social media variables as the exogenous
-regressors. The assumption here is that, while the market reacts to Trump posts,
-Trump's posts are chaotic, nonsensical, and random enough to be considered 
-exogenous. 
+regressors. The assumption here is that, while the market reacts to Trump's posts,
+Trump's posts are chaotic and random enough to be considered exogenous. 
 
-We of course first start by checking stationarity of our variables (ADF), where we find
+We of course first start by checking stationarity of our variables (using ADF tests), where we find
 p-values of 0.01 suggesting that the processes are not explosive. Then, we use 
-a custom function in order to choose the number of lags based on the AIC criterion.
-This however, while often choose a very high number of lags, which could be 
+a custom function in order to choose the number of lags ($p$, $q$ and $r$) based on the AIC criterion.
+This would often choose a very high number of lags, which could be 
 explained by our data being hourly. As such we decided to put a limit of 3 lags,
-which sees minimal AIC loss and simplifying our models considerably.
+which sees minimal AIC loss, similar results, and allows considerable simplification of the models. 
+Our specifications follow the standard formula:
+$$
+AHV_t = \phi_1 AHV_{t-1} + \phi_2 AHV_{t-2} + \cdots + \phi_p AHV_{t-p} + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2} + \cdots + \theta_q \varepsilon_{t-q} + \beta_0 x_t + \beta_1 x_{t-1} + \cdots + \beta_r x_{t-r}
+$$
 
 ## Results
 
 
 ### Full Timeframe
 We run models with the following exogenous regressors: $TweetDummy$, $TweetCount$,
-and the mentions of words $Tariff$, $Trade$, and $China$. We first note on the table
- in section \@ref(sec:spy-table) that all the x-regressors are significant,
-apart from trade. Notice also that all the coefficients (apart from $Tariff_{t-3}$)
+and the mentions of words $Tariff$, $Trade$, and $China$. We first note in Table
+\@ref(sec:spy-table) that all the x-regressors are significant,
+apart from $Trade$. Notice also that all the coefficients (apart from $Tariff_{t-3}$)
 are positive, in line with our main hypothesis. The effect of $Tariff_{t-1}$ and 
-$Tariff_{t-2}$ are especially large, given the usual size of the volatility as seen
-in Section \@ref(sec:means-table). We in fact predict that an 
-extra mention of tariffs one hour ago, leads to a whopping extra 0.02 in volatility
- which is just about the average size for the full timeframe. We can see the
-impulse response function (IRF) for this shock, in \@ref(sec:SPY-IRF) Notice that
-there is a large response in the first periods, and then a graduate
-decline over time. Something to note is that in our analyses of IRF's, when including
+$Tariff_{t-2}$ are especially large, given the average size of the volatility being 
+about 0.023 over the whole sample. We in fact predict that an 
+extra mention of tariffs one hour ago leads to a whopping extra 0.02 in volatility
+which means it would just about double the AHV if at the average. We can see the
+impulse response function (IRF) for this shock in Figure \@ref(sec:SPY-IRF) Notice that
+there is a large positive response in the first periods, and then a graduate
+decline over time. Something to note is that in our various specifications, when including
 MA terms, the decline shows up gradual while being much sharper when only including
 AR terms. 
-Note that we ran all these models on the VGK and ASHR ETF's as well, though no
+We also ran all these models on the VGK and ASHR ETFs, though no
 significant results appear apart from a small but statistically significant effect
-of the tariff variable for VGK.
+of the tariff variable for VGK. It is worthy to note that the average volatility in those
+markets are much lower than for SPY, as the trading volume is much lower.
 
 ### Split Samples
-We then split our sample for the first and second term of the Trump presidency.
-We only run models on tariff, trade and china this time. As seen on table
+We then split our sample for the first and second term of the Trump presidency to 
+explore whether there has been a shift in how markets respond from the first presidency.
+We only run models using $Tariff$, $Trade$ and $China$. As seen on Table
 \@ref(sec:spy-table-terms), the first interesting result
-is in the coefficients of tariff being significant and very large in the second
+is in the coefficients of $Tariff$ being significant and very large in the second
 term, while being small and not statistically significant in the first. A similar
-story goes for the China variable. This may lend some evidence to support the 
+story goes for the $China$ variable. This may lend some evidence to support the 
 claim that investors are much more reactive to Trump's social media presence
-now than before. We've found similar IRF's as for the full timeframe. Tables \@ref(sec:SPY-IRF)
-show the IRF's for the second term, of the impacts of tariff and china mention
-shocks on the AHV.
-Finally, we can check the residuals of all these models to test them somewhat. 
-In Section \@ref(sec:SPY-res-test), the pvalues being zero
-for the full timeframe and first term indicate that there is autocorrelation in 
-the residuals, thus suggesting that these estimations have problems. Note however,
-that the p-values for the second term are quite high, lending support to our
-models on the split sample. These results suggest that perhaps ARMA-X models are
-not right in this context as it is not unreasonable to think that Trump does 
-in fact react to market movements, which would break the exogeneity assumption
-that is critical for this type of model. With this information, we decided to run
-a VAR model to deepen our understanding of these variables.
+now than before. We've found similar IRFs as for the full timeframe. 
+Finally, we check the residuals of all these models with Ljung-Box tests \@ref(sec:SPY-res-test). 
+We find that p-values are zero for the full timeframe \& first term models, which 
+suggests that there is significant auto-correlation and that these 
+estimations are then problematic. However, for the second term, the p-values are quite high 
+(~ 0.8 for $Tariff$), giving our split sample models more validity relative to the full time frame models.
+
+These results show that perhaps ARMA-X may not be the right choice in this context 
+as it is not unreasonable to think that Trump does in fact react to market movements, 
+violating the exogeneity assumption that is critical for this type of model. With this information, we decide to run SVAR specifications to account for possible endogeneity.
 
 
 
@@ -519,27 +507,48 @@ a VAR model to deepen our understanding of these variables.
 
 ## Methodology
 
-We develop a SVAR model in order to assess the impact of
+We develop an SVAR model in order to assess the impact of
 short-run shocks from Trump's posts on AHV, and to evaluate whether
-market volatility can, in turn, influence Trump's posting behavior. In
+market volatility can, in turn, influence Trump's posting behaviour. In
 this framework, we systematically pair AHV with one explanatory variable
-at a time (our X-regressor). The SVAR approach offers the advantage of accounting for
+at a time (our x-regressor). The SVAR approach offers the advantage of accounting for
 structural endogeneity. Our main assumption is that the volatility
 does not contemporaneously affect Trump's posting activity - neither
-quantitatively nor qualitatively, while Trump's posts do affect markets instantly. 
+quantitatively nor qualitatively - while Trump's posts do affect markets instantly. 
 In essence, we impose a short-run restriction on the shock of volatility for all the
 social media variables.
 
 Based on the information criteria, we found similar results across all
 specifications, with a recommended lag length of around 70. However,
-inducing more than 6 lags (corresponding to a full trading day)
-introduces strong seasonality. Moreover, the higher the number of lags,
-the greater the persistence of a shock, up to unrealistic levels such as 150 days 
+including more than 6 lags (corresponding to a full trading day)
+introduces strong seasonal patterns. Moreover, the higher the number of lags,
+the greater the persistence of a shock up to unrealistic levels such as 150 days 
 for the number of Tweets, which seems implausible. Therefore, we chose to fix the
 number of lags at a maximum of 6. Finally, given the presence of heteroscedasticity
 and serial correlation in the residuals, we use the Newey-West estimator
-to compute robust standard errors.
+to compute robust standard errors. Our specification is built as follows:
 
+$$
+\begin{aligned}
+y_t = c + \Phi_1 y_{t-1} + \cdots +
+\Phi_6 y_{t-6} + B \eta_t, \hspace{0.2cm} \text{where:} \hspace{0.2cm}
+y_t =
+\begin{bmatrix}
+X_t \\
+AHV_t
+\end{bmatrix},
+ \quad B =
+\begin{bmatrix}
+b_{11} & 0 \\
+b_{21} & b_{22}
+\end{bmatrix}, \quad
+\eta_t =
+\begin{bmatrix}
+\eta^{X}_t \\
+\eta^{AHV}_t
+\end{bmatrix}
+\end{aligned}
+$$
 
 ## Results
 
@@ -547,59 +556,63 @@ to compute robust standard errors.
 
 
 As in the ARMA-X framework, we initially estimate a model for each of our five
-main variables. For all estimations using the SPY ETF market, the significant 
-coefficients of social media variables were consistently negative, while the 
-positive coefficients were large but not significant (\@ref(sec:svar-table-1)).
-For the $Tariff$, $Trade$ and $China$ mention variables, the first, second and sometimes forth 
-lag were positive and relatively large (especially in the case of Tariff), while 
-the remaining ones were not. In contrast, for $TweetCount$ and $TweetDummy$, we 
-observed fewer and smaller positive coefficients. At the same time, we found 
-that the contemporaneous effects of the shocks were all positive and relatively 
+main variables across the full dataset. Table (\@ref(sec:svar-table-1)) shows all estimations using the SPY ETF, where
+we notice that the positive coefficients (of the social media variables) are large 
+but not statistically significant. Oddly, the only significant coefficients are
+consistently negative.
+
+For the $Tariff$, $Trade$ and $China$ variables, the first, second and sometimes fourth 
+lags are positive and relatively large (especially in the case of $Tariff$), while 
+the remaining ones are not. In contrast, for $TweetCount$ and $TweetDummy$, we 
+observe fewer and smaller positive coefficients. At the same time, we find 
+that the contemporaneous effects of the shocks are all positive and relatively 
 strong. This leads to two types of scenarios : either 
-the IRF's experienced a positive shock and remain elevated ($Tariff$, $Trade$ and $China$), 
-or a highly positive shock occurs, but the cumulative effect turns negative after few 
-hours ($TweetDummy$ and $Count$) (\@ref(sec:irf-dummy), \@ref(sec:irf-tariff)).
+the IRFs experience a positive shock and remain elevated ($Tariff$, $Trade$ and $China$), 
+or a highly positive shock occurs, but the cumulative effect turns negative after a few 
+hours ($TweetDummy$ and $TweetCount$). You can find the IRFs for $Tariff$ on Figures
+(\@ref(sec:irf-dummy), \@ref(sec:irf-tariff)).
 
-
-Finally, except for $Tariff$, all Granger causality tests indicate that Trump's 
-posts have an impact on volatility. However, due to serial correlation in the 
-residuals, these results should be interpreted with caution. Overall, this model 
-suggest that Trump's posts tend to have a positive instantaneous effect on 
+Finally, apart for $Tariff$, all Granger causality tests indicate that Trump's 
+posts Granger-cause volatility. However, due to serial correlation in the 
+residuals, these results should be interpreted with extreme caution. Overall, this model 
+suggests that Trump's posts tend to have a positive instantaneous effect on 
 volatility, but with very low persistence.
-When analyzing the European and Chinese ETF's, we observe similar patterns 
-though with lower magnitude, except for the impact of $Tariff$ and $China$ on the 
-ASHR ETF (Chinese Market), where the cumulative effects show no positive impact. Additionally, 
-the VGK ETF (European Market) appears to react more strongly than ASHR to 
+When analyzing the VGK \& ASHR ETFs, we observe similar patterns 
+though with lower magnitude, except for the impact of $Tariff$ and $China$ on 
+ASHR, where the cumulative effects show no positive impact. Additionally, 
+the VGK ETF appears to react more strongly than ASHR to 
 Trump's posts, especially those mentioning $Trade$ and $Tariff$.
 
 Regarding the impact of AHV on Trump's posts, we find some evidence of a 
 negative effect. For all variables, we observe one or two significantly 
-negative coefficients per variables, typically on the first and fourth lag, alongside many 
-insignificant ones. However, only $TweetCount$ and China pass the Granger test in 
-the US ETF Surprisingly, a large number of Granger tests in the Chinese and 
-European ETFs indicate strong Granger causality, which may point to a limitation 
-of the test itself, as such results appear unrealistic. 
+negative coefficients, typically on the first and fourth lag, alongside many 
+insignificant ones. However, only $TweetCount$ and $China$ pass the Granger test in 
+the SPY ETF. Surprisingly, a large number of Granger tests in the VGK and 
+ASHR ETFs indicate strong Granger causality, which may point to a limitation 
+of the test itself as such results appear unrealistic. 
 
 
 ### Split Sample
 
-For the split framework, the results were similar and striking (\@ref(sec:irf-china-2)).
-While we observed relatively small shock effects and almost entirely negative coefficients 
-during the first term (\@ref(sec:tab-svar-1)), leading the 
-cumulative IRF's to indicate a negative impact of posts, the shock effects in the
-second term were substantially larger, ranging from 5 times (for $TweetCount$ and 
-$TweetDummy$) to as much as 25 times greater (for $Tariff$). the only exception was 
-$Trade$ in the second term, which showed the only negative impact from a shock.
-Once again, we found positive lagged coefficients in the second term, mostly on 
-the first, second and forth lags. However, none of these coefficients were
-statistically significant, but the cumulative IRF's clearly show a high positive 
+Tables (\@ref(sec:tab-svar-1)), (\@ref(sec:tab-svar-2)) show the models for the split terms,
+where we notice the results are strikingly similar. While we
+observe relatively small shock effects and almost entirely negative coefficients 
+during the first term, (which explain why the 
+cumulative IRFs indicate a negative impact of posts), the shock effects in the
+second term are substantially larger, ranging from 5 times (for $TweetCount$ and 
+$TweetDummy$) to as much as 25 times greater (for $Tariff$). The only exception is 
+$Trade$ in the second term, which shows the only negative impact from a shock.
+Once again we find positive lagged coefficients in the second term, mostly on 
+the first, second and fourth lags. However, none of these coefficients are
+statistically significant though the cumulative IRFs clearly show a high positive 
 impact on everything except for $TweetDummy$ and $TweetCount$, whose
-coefficients and cumulative IRF's displayed similar patterns to those observed 
-in the first term (\@ref(sec:tab-svar-2))
+coefficients and cumulative IRFs display similar patterns to those observed 
+in the first term (such as \@ref(sec:irf-china-2)). 
+
 Moreover, the Granger tests generally failed in both terms, with the sole
 exception being $China$ in the second term. 
-Regarding the ASHR ETF, we found results similar to those for the US ETF. Surprisingly, 
-in the case of the European market, we observed a positive
+Regarding the ASHR ETF, we found results similar to those for SPY. Surprisingly, 
+in the case of VGK, we observe a positive
 impact of Trump’s posts on AHV during the first term. Nevertheless, the results 
 still indicate a stronger impact of posts during the second term.
 
@@ -607,25 +620,20 @@ still indicate a stronger impact of posts during the second term.
 
 # Conclusion
 
-We started this project with the intention of understanding whether the impact 
-of Trump's social media posts affect financial markets, and to see if there
-is perhaps a difference from his first presidential mandate. After various 
-headaches with our data, we first ran ARMA-X models where we found significant
-and positive results albeit with strong auto-correlation in the errors, with only
-the second term analysis offering more convincing results. We then try VAR models
-for a possibly more accurate picture, albeit with little to no success. We once
-again find strong auto-correlation in the errors, which we here fix by using 
-Newey-West standard errors. We found that the only significant coefficients are
-actually negative, suggesting Trump's social media presence would reduce volatility.
 
-However, we would suggest strong against trying to interpret these results given
-that the models seem to not fit particularly well. This may be due to seasonality
-in our data (a common trend seen is our daily AVH is high volatility in the first 
-open hours, and a gradual slowdown for the rest of the day), or to our handling 
-of non-market hours. Further work could look at exploring said issues in greater depth,
-further complicate the models by adding more variables and interactions between them,
-and/or additionally <span style="color:red"> *use more sophisticated models, such as models including co-integration.* </span>
+We started this project with the intention of understanding whether the impact of Trump’s social media posts affect financial markets, and to see if there is perhaps a difference from his first presidential mandate. After various headaches with our data, we first ran ARMA-X models where we found significant and positive results albeit with strong auto-correlation in the errors, with only the second term analysis offering more convincing results. We then tried SVAR models for a possibly more accurate picture, though with little to no success. We once again saw strong auto-correlation in the errors, which we accounted for by using Newey-West standard errors. We found that the only significant coefficients are actually negative, suggesting Trump’s social media presence would actually \textit{reduce} volatility. There is, however, a consistent pattern in the signs and magnitude of the SVAR coefficients (particularly for $Tariff$ \& $China$)
+and the fact that the standard errors are large may reflect a lack of precision in 
+the selection of the shocks. It might well be that there are two types of social media posts:
+information and noise. That is to say, certain posts may be completely disregarded by investors
+as, for instance, emotional outbursts, personal attacks, or other financially irrelevant
+remarks, while others would be treated as official policy statements with concrete
+consequences to the economy. If this were to be the case, our coefficients would be 
+biased downwards, underestimating the impact of the \textit{relevant} posts and would explain 
+the high standard errors. A way to counteract this could be to find a way to filter 
+the social media posts dataset for only the financially relevant shocks, possibly 
+by using more sophisticated sentiment analysis.
 
+Altogether, we would strongly suggest against trying to interpret these results given that the models seem to not fit particularly well. This may be due to seasonality in our data (a common trend seen in our daily AVH being high volatility in the first open hours, and a gradual slowdown for the rest of the day), or to our handling of non-market hours. Further work could look at exploring said issues in greater depth, further complicate the models by adding more variables and interactions between them, and/or additionally use more sophisticated models with very large lag counts. 
 
 <!--chapter:end:05-conclusion.Rmd-->
 

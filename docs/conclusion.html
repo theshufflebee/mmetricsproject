@@ -4,21 +4,21 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Part 5 Conclusion | Terminally Online: Does Donald Trump impact Financial Markets</title>
+  <title>Part 5 Conclusion | The Art of the Tweet: Do Trump’s Posts Affect Market Volatility?</title>
   <meta name="description" content="&lt;p&gt;This is our website for a Universityproject. We put this together from a basic bookdown example so there might be some stuff in here from that.&lt;/p&gt;" />
   <meta name="generator" content="bookdown 0.43 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Part 5 Conclusion | Terminally Online: Does Donald Trump impact Financial Markets" />
+  <meta property="og:title" content="Part 5 Conclusion | The Art of the Tweet: Do Trump’s Posts Affect Market Volatility?" />
   <meta property="og:type" content="book" />
-  
+  <meta property="og:image" content="/final/book_cover.jpg" />
   <meta property="og:description" content="&lt;p&gt;This is our website for a Universityproject. We put this together from a basic bookdown example so there might be some stuff in here from that.&lt;/p&gt;" />
   <meta name="github-repo" content="www.github.com/theshufflebee/mmetricsproject" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Part 5 Conclusion | Terminally Online: Does Donald Trump impact Financial Markets" />
+  <meta name="twitter:title" content="Part 5 Conclusion | The Art of the Tweet: Do Trump’s Posts Affect Market Volatility?" />
   
   <meta name="twitter:description" content="&lt;p&gt;This is our website for a Universityproject. We put this together from a basic bookdown example so there might be some stuff in here from that.&lt;/p&gt;" />
-  
+  <meta name="twitter:image" content="/final/book_cover.jpg" />
 
 <meta name="author" content="Marcos Constantinou, Ryan Fellarhi &amp; Jonas Bruno" />
 
@@ -2304,7 +2304,7 @@ margin-left: 2em;
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Terminally Online: Does Donald Trump impact Financial Markets</a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">The Art of the Tweet: Do Trump’s Posts Affect Market Volatility?</a>
           </h1>
         </div>
 
@@ -2314,23 +2314,18 @@ margin-left: 2em;
             <section class="normal" id="section-">
 <div id="conclusion" class="section level1 hasAnchor" number="5">
 <h1><span class="header-section-number">Part 5</span> Conclusion<a href="conclusion.html#conclusion" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>We started this project with the intention of understanding whether the impact
-of Trump’s social media posts affect financial markets, and to see if there
-is perhaps a difference from his first presidential mandate. After various
-headaches with our data, we first ran ARMA-X models where we found significant
-and positive results albeit with strong auto-correlation in the errors, with only
-the second term analysis offering more convincing results. We then try VAR models
-for a possibly more accurate picture, albeit with little to no success. We once
-again find strong auto-correlation in the errors, which we here fix by using
-Newey-West standard errors. We found that the only significant coefficients are
-actually negative, suggesting Trump’s social media presence would reduce volatility.</p>
-<p>However, we would suggest strong against trying to interpret these results given
-that the models seem to not fit particularly well. This may be due to seasonality
-in our data (a common trend seen is our daily AVH is high volatility in the first
-open hours, and a gradual slowdown for the rest of the day), or to our handling
-of non-market hours. Further work could look at exploring said issues in greater depth,
-further complicate the models by adding more variables and interactions between them,
-and/or additionally <span style="color:red"> <em>use more sophisticated models, such as models including co-integration.</em> </span></p>
+<p>We started this project with the intention of understanding whether the impact of Trump’s social media posts affect financial markets, and to see if there is perhaps a difference from his first presidential mandate. After various headaches with our data, we first ran ARMA-X models where we found significant and positive results albeit with strong auto-correlation in the errors, with only the second term analysis offering more convincing results. We then tried SVAR models for a possibly more accurate picture, though with little to no success. We once again saw strong auto-correlation in the errors, which we accounted for by using Newey-West standard errors. We found that the only significant coefficients are actually negative, suggesting Trump’s social media presence would actually volatility. There is, however, a consistent pattern in the signs and magnitude of the SVAR coefficients (particularly for <span class="math inline">\(Tariff\)</span> &amp; <span class="math inline">\(China\)</span>)
+and the fact that the standard errors are large may reflect a lack of precision in
+the selection of the shocks. It might well be that there are two types of social media posts:
+information and noise. That is to say, certain posts may be completely disregarded by investors
+as, for instance, emotional outbursts, personal attacks, or other financially irrelevant
+remarks, while others would be treated as official policy statements with concrete
+consequences to the economy. If this were to be the case, our coefficients would be
+biased downwards, underestimating the impact of the posts and would explain
+the high standard errors. A way to counteract this could be to find a way to filter
+the social media posts dataset for only the financially relevant shocks, possibly
+by using more sophisticated sentiment analysis.</p>
+<p>Altogether, we would strongly suggest against trying to interpret these results given that the models seem to not fit particularly well. This may be due to seasonality in our data (a common trend seen in our daily AVH being high volatility in the first open hours, and a gradual slowdown for the rest of the day), or to our handling of non-market hours. Further work could look at exploring said issues in greater depth, further complicate the models by adding more variables and interactions between them, and/or additionally use more sophisticated models with very large lag counts.</p>
 
 </div>
             </section>
