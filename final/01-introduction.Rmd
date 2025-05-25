@@ -60,7 +60,7 @@ This brings us to our research question:  Do Donald Trump's posts impact market 
 
     
 ```{r fig1, fig.width=10, fig.height=5, echo=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)", warning=FALSE, cache=FALSE}
- #Create the scatter plot
+ #Create the scatter plot -> x axis is day column, y axis is time
 ggplot(truths, aes(x = day, y = time_shifted)) +
   geom_point(alpha = 0.5, color = "darkblue", size = 0.55) +  # Transparancy to create "heatmap"
   scale_y_continuous(
@@ -75,7 +75,7 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
   
   # X Axis adjustments
   scale_x_date(
-    date_labels = "%b %Y",  # Format labels to show month and year
+    date_labels = "%b %Y",
     date_breaks = "9 months"
   ) +
   
@@ -85,7 +85,7 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
   geom_hline(yintercept = (9 + 30 / 60) - 12, linetype = "longdash", color = "red") + 
   geom_hline(yintercept = 16 - 12, linetype = "dashed", color = "red") +
   
-  # theme adjustments
+  # grid adjustments
   theme(
     panel.grid.minor = element_blank(),  
     panel.grid.major = element_line(linewidth = 0.5),  # Major gridlines only
@@ -93,7 +93,6 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
     axis.text = element_text(size = 10)
   )+
   
-  # Add caption  
   labs(caption = "Every blue dot represents a post or repost. Red lines indicate market opening hours.") +
   theme(plot.caption = element_text(hjust = 0, face = "italic", size = 10))
   

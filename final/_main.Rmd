@@ -158,7 +158,7 @@ This brings us to our research question:  Do Donald Trump's posts impact market 
 
     
 ```{r fig1, fig.width=10, fig.height=5, echo=FALSE, fig.cap="Terminally Online: Trump's Twitter & Truth Social Posts (EDT)", warning=FALSE, cache=FALSE}
- #Create the scatter plot
+ #Create the scatter plot -> x axis is day column, y axis is time
 ggplot(truths, aes(x = day, y = time_shifted)) +
   geom_point(alpha = 0.5, color = "darkblue", size = 0.55) +  # Transparancy to create "heatmap"
   scale_y_continuous(
@@ -173,7 +173,7 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
   
   # X Axis adjustments
   scale_x_date(
-    date_labels = "%b %Y",  # Format labels to show month and year
+    date_labels = "%b %Y",
     date_breaks = "9 months"
   ) +
   
@@ -183,7 +183,7 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
   geom_hline(yintercept = (9 + 30 / 60) - 12, linetype = "longdash", color = "red") + 
   geom_hline(yintercept = 16 - 12, linetype = "dashed", color = "red") +
   
-  # theme adjustments
+  # grid adjustments
   theme(
     panel.grid.minor = element_blank(),  
     panel.grid.major = element_line(linewidth = 0.5),  # Major gridlines only
@@ -191,7 +191,6 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
     axis.text = element_text(size = 10)
   )+
   
-  # Add caption  
   labs(caption = "Every blue dot represents a post or repost. Red lines indicate market opening hours.") +
   theme(plot.caption = element_text(hjust = 0, face = "italic", size = 10))
   
@@ -323,7 +322,6 @@ SPY = filter(SPY,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')
 
 #select timeframe 
 data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07')))
-
 ```
 
 
@@ -341,24 +339,27 @@ of January 2014 and goes to the 7th of May 2025.
 
 ```{r snp_download, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 library(fredr)
+# For recreation API key is needed
 
 sp500_data <- fredr(
   series_id = "SP500",
-  observation_start = as.Date("2016-01-01"),
+  observation_start = as.Date("2025-01-01"),
   observation_end = Sys.Date(),
   frequency = "d"  # daily data
 )
 
 sp500_select <- sp500_data%>%
   drop_na()%>%
-  select(date, value)%>%
+  dplyr::select(date, value)%>%
   mutate(index_sp500 = value / dplyr::first(value) * 100)
 
-df_last_close <- SPY %>%
+SPY2 = filter(SPY,between(timestamp, as.Date('2025-01-01'), as.Date('2025-05-07')))
+
+df_last_close <- SPY2 %>%
   mutate(day = as.Date(timestamp)) %>%               
   group_by(day) %>%
   filter(timestamp == max(timestamp)) %>%            
-  select(day, close) %>%                   
+  dplyr::select(day, close) %>%                   
   ungroup()
 
 df_last_close_indexed <- df_last_close %>%
@@ -376,7 +377,7 @@ ggplot(SPY_comp,aes(x = day))+
   geom_line(aes(y = index_SPY, color = "SPY Daily Close")) +
   geom_line(aes(y = index_sp500, color = "S&P 500 Daily Close")) +
   scale_color_manual(values = c("SPY Daily Close" = "blue", "S&P 500 Daily Close" = "red")) +
-  labs(title = "SPY vs. S&P 500 (Indexed: 2016 = 100) ",
+  labs(title = "SPY vs. S&P 500 (Indexed: 2025 = 100) ",
        x = NULL,
        y = NULL,
        color = "Legend") +
@@ -420,17 +421,17 @@ during the COVID-19 pandemic.
 combined_plot <- function(data, title, breaks = "monthly") {
   
   # Index close price so first value = 100
-  data <- data[order(data$timestamp), ]  # ensure data sorted by time
+  data <- data[order(data$timestamp), ]  
   data$close_indexed <- 100 * data$close / data$close[1]
   
   # take the range of both datasets (using indexed close price)
   price_range <- range(data$close_indexed, na.rm = TRUE)
   vol_range <- range(data$r_vol_h, na.rm = TRUE)
   
-  # find the scale factor for volatility to fit price scale
+  # scale factor for 2 different x axis
   scale_factor <- diff(price_range) / diff(vol_range)
   
-  # rescale volatility to price scale
+  # rescale to have the two x axis in same size
   data$scaled_vol <- (data$r_vol_h - vol_range[1]) * scale_factor + price_range[1]
 
   # Pick x-axis breaks
@@ -462,7 +463,7 @@ combined_plot <- function(data, title, breaks = "monthly") {
     # theme adjustments
     theme(
     panel.grid.minor = element_blank(),  
-    panel.grid.major = element_line(linewidth = 0.5),  # Major gridlines only
+    panel.grid.major = element_line(linewidth = 0.5),
     axis.title = element_text(size = 12),
     axis.text = element_text(size = 10)
   )+
@@ -518,10 +519,10 @@ daily_counts <- truths_2 %>%
 
 
 ggplot(daily_counts, aes(x = day, y = N)) +
-  # First plot points where tariff == 0, in light blue
+  # First plot points where tariff == 0,
   geom_point(data = filter(daily_counts, tariff == 0), color = "lightblue", size = 1) +
   
-  # Then plot points where tariff > 0, in dark blue (on top)
+  # Then plot points where tariff > 0,
   geom_point(data = filter(daily_counts, tariff > 0), color = "darkblue", size = 1) +
   
   geom_smooth(method = "loess", span = 0.2, se = FALSE, color = "darkred", size = 1) +
@@ -542,7 +543,6 @@ ggplot(daily_counts, aes(x = day, y = N)) +
     plot.title = element_text(face = "bold", hjust = 0.5)
   )+
   
-   # Add caption  
   labs(caption = str_wrap("Every dot represents number of tweets on a given day. Darkblue dots represent days where Trump mentioned tariff in at least one of his posts.", width = 150)) +
   theme(plot.caption = element_text(hjust = 0, face = "italic", size = 10))
 ```
@@ -793,11 +793,6 @@ editor_options:
 
 # Bibliography
 
-
-
-`r if (knitr::is_html_output()) '
-## References {-}
-'`
 
 <div id="refs"></div>
 
