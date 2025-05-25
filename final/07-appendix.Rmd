@@ -649,7 +649,7 @@ ggplot(Yd3,aes(x=period, y=response)) +
   theme_minimal()
 ```
 
-### SVAR Cumultatove IRF for Tariff{#sec:irf-cum-tariff}
+### SVAR Cumultative IRF for Tariff{#sec:irf-cum-tariff}
 
 ```{r IRF tariff, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 ggplot(Yd3,aes(x=period, y=cumsum(response))) +

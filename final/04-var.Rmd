@@ -62,10 +62,10 @@ the remaining ones are not. In contrast, for $TweetCount$ and $TweetDummy$, we
 observe fewer and smaller positive coefficients. At the same time, we find 
 that the contemporaneous effects of the shocks are all positive and relatively 
 strong. This leads to two types of scenarios : either 
-the IRFs experience a positive shock and remain elevated ($Tariff$, $Trade$ and $China$), 
+the IRFs experience a positive shock and remain elevated ($Trade$, $China$ and $Tariff$: \@ref(sec:irf-tariff), \@ref(sec:irf-cum-tariff)), 
 or a highly positive shock occurs, but the cumulative effect turns negative after a few 
-hours ($TweetDummy$ and $TweetCount$). You can find the IRFs for $Tariff$ on Figures
-(\@ref(sec:irf-dummy), \@ref(sec:irf-tariff)).
+hours ($TweetDummy$ and $TweetCount$). You can find both IRFs for $TweetDummy$ on Figures
+(\@ref(sec:irf-dummy), \@ref(sec:irf-cum-dummy)).
 
 Finally, apart for $Tariff$, all Granger causality tests indicate that Trump's 
 posts Granger-cause volatility. However, due to serial correlation in the 
@@ -100,7 +100,7 @@ $Trade$ in the second term, which shows the only negative impact from a shock.
 Once again we find positive lagged coefficients in the second term, mostly on 
 the first, second and fourth lags. However, none of these coefficients are
 statistically significant though the cumulative IRFs clearly show a high positive 
-impact on everything except for $TweetDummy$ and $TweetCount$, whose
+impact on everything \@ref(sec:irf-cum-china-2) except for $TweetDummy$ and $TweetCount$, whose
 coefficients and cumulative IRFs display similar patterns to those observed 
 in the first term (such as \@ref(sec:irf-china-2)). 
 

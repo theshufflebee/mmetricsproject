@@ -104,12 +104,12 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
 
 
 Information is one of the most valuable assets in the financial market.
-Its importance lies at the core of the "Efficient Market Hypothesis", 
+Its importance lies at the core of the **Efficient Market Hypothesis**, 
 which states that the prices of assets fully reflect all
 available information, adjusting immediately to any new data
 (@famaAdjustmentStockPrices2003), and thereby creating a strong demand
-for information flow. In addition, the “Mixture of Distribution
-Hypothesis” states that the release of new information is closely linked
+for information flow. In addition, the **Mixture of Distribution Hypothesis**
+states that the release of new information is closely linked
 to movements in both realized and implied volatility
 (@andersenReturnVolatilityTrading1996, @frenchStockReturnVariances1986,
 @vlastakisInformationDemandStock2012).
@@ -122,7 +122,7 @@ prices. Similarly, @ederingtonHowMarketsProcess1993 analyze the impact
 of macroeconomic news announcements on interest rate and foreign
 exchange futures markets, particularly in terms of price changes and
 volatility. Both studies, among others, find that prices, such as stock
-prices, react primarily within minutes after the release of new
+prices, react primarily _within minutes_ after the release of new
 information.
 
 Recently, the world has witnessed the rise of the Internet
@@ -135,7 +135,7 @@ changes in the returns of financial assets (@dechoudhuryCanBlogCommunication2008
 impact of Trump’s tweets on various financial and macroeconomic
 variables has been analysed by several studies, especially during his
 first mandate. Using high-frequency financial data,
-@gjerstadPresidentTrumpsTweets2021 found consistent increases in uncertainty and
+@gjerstadPresidentTrumpsTweets2021 found _consistent increases_ in uncertainty and
 trading volume, along with a decline in the US stock market, regardless
 of tweet content. It is relevant to note however, that the effect was stronger when 
 Trump used confrontational words such as "tariff" or "trade war." Some of his

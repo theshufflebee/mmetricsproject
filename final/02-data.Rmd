@@ -137,7 +137,7 @@ ggplot(SPY_comp,aes(x = day))+
 [^2]: https://www.alphavantage.co/ 
 
 We had to transform this data to get our main variable of interest, Average
-Hourly Volatility (AHV). Note that this is \textit{realised} market volatility. We did so 
+Hourly Volatility (AHV). Note that this is _realized_ market volatility. We did so 
 using the following formula:
 $$
 \begin{aligned}
@@ -294,7 +294,7 @@ Our final Dataframe is quite wide and contains the following Variables:
 
 | Variable | Description                                                                                                    |
 |----------|----------------------------------------------------------------------------------------------------------------|
-| _vol     | The hourly volatility of given indices                                                                        |
+| _vol     | The average hourly reaöized volatility of given indices                                                                        |
 | dummy    | A dummy variable, 1 if Trump posted in that hour                                                               |
 | N        | Number of posts in that hour                                                                                   |
 | tariff   | Mentions of tariff in that hour                                                                                 |
