@@ -111,7 +111,7 @@ SPY_comp <- left_join(df_last_close_indexed, sp500_select, by = c("day" = "date"
 ```
 
 
-```{r fig-spy-snp, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
+```{r fig-spy-snp, fig.width=10, fig.height=5, fig.cap="SPY vs. S&P 500 (Indexed: 2025 = 100)", message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 ggplot(SPY_comp,aes(x = day))+
   geom_line(aes(y = index_SPY, color = "SPY Daily Close")) +
   geom_line(aes(y = index_sp500, color = "S&P 500 Daily Close")) +
@@ -156,7 +156,7 @@ during the COVID-19 pandemic.
 
 
 
-```{r fig-spy-price, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
+```{r fig-spy-price, fig.width=10, fig.height=5, fig.cap="SPY Close Price vs Volatility", message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 combined_plot <- function(data, title, breaks = "monthly") {
   
   # Index close price so first value = 100
@@ -244,7 +244,7 @@ for mentions of certain words ($Tariff$, $Trade$, \& $China$).
 Furthermore, we applied simple sentiment analysis algorithms in order to extract emotions and proportions for the amount of "positive" and "negative" words from the posts. We however ended up not 
 including these in our final analyses as results were not particularly interesting. Details on all our data management procedures as well as the final dataset can be found in the GitHub repository.
 
-```{r social plots, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
+```{r social plots, fig.width=10, fig.height=5, fig.cap="Poster in Chief: Number of Social Media Posts with Mentions of Tariff", message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 truths_2 <- dplyr::select(truths, timestamp, tariff, trade, china)
 
 
