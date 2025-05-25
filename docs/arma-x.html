@@ -2244,64 +2244,22 @@ margin-left: 2em;
 <h1><span class="header-section-number">Part 3</span> ARMA-X<a href="arma-x.html#arma-x" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <div id="methodology" class="section level2 hasAnchor" number="3.1">
 <h2><span class="header-section-number">3.1</span> Methodology<a href="arma-x.html#methodology" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>We first thought of a simple ARMA-X type specification, taking the AHV as our
-“y variable” and taking any of the social media variables as the exogenous
-regressors. The assumption here is that, while the market reacts to Trump’s posts,
-Trump’s posts are chaotic and random enough to be considered exogenous.</p>
-<p>We of course first start by checking stationarity of our variables (using ADF tests), where we find
-p-values of 0.01 suggesting that the processes are not explosive. Then, we use
-a custom function in order to choose the number of lags (<span class="math inline">\(p\)</span>, <span class="math inline">\(q\)</span> and <span class="math inline">\(r\)</span>) based on the AIC criterion.
-This would often choose a very high number of lags, which could be
-explained by our data being hourly. As such we decided to put a limit of 3 lags,
-which sees minimal AIC loss, similar results, and allows considerable simplification of the models.
-Our specifications follow the standard formula:
-<span class="math display">\[
-AHV_t = \phi_1 AHV_{t-1} + \phi_2 AHV_{t-2} + \cdots + \phi_p AHV_{t-p} + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2} + \cdots + \theta_q \varepsilon_{t-q} + \beta_0 x_t + \beta_1 x_{t-1} + \cdots + \beta_r x_{t-r}
+<p>We first thought of a simple ARMA-X type specification, taking the AHV as our “y variable” and taking any of the social media variables as the exogenous regressors. The assumption here is that, while the market reacts to Trump’s posts, Trump’s posts are chaotic and random enough to be considered exogenous.</p>
+<p>We of course first start by checking stationarity of our variables (using ADF tests), where we find p-values of 0.01 suggesting that the processes are not explosive. Then, we use a custom function in order to choose the number of lags (<span class="math inline">\(p\)</span>, <span class="math inline">\(q\)</span> and <span class="math inline">\(r\)</span>) based on the AIC criterion. This would often choose a very high number of lags, which could be explained by our data being hourly. As such we decided to put a limit of 3 lags, which sees minimal AIC loss, similar results, and allows considerable simplification of the models. Our specifications follow the standard formula:</p>
+<p><span class="math display">\[
+AHV_t = \phi_1 AHV_{t-1} + \phi_2 AHV_{t-2} + \cdots + \phi_p AHV_{t-p} + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2} + \cdots\\ +\theta_q \varepsilon_{t-q} + \beta_0 x_t + \beta_1 x_{t-1} + \cdots + \beta_r x_{t-r}
 \]</span></p>
 </div>
 <div id="results" class="section level2 hasAnchor" number="3.2">
 <h2><span class="header-section-number">3.2</span> Results<a href="arma-x.html#results" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div id="full-timeframe" class="section level3 hasAnchor" number="3.2.1">
 <h3><span class="header-section-number">3.2.1</span> Full Timeframe<a href="arma-x.html#full-timeframe" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>We run models with the following exogenous regressors: <span class="math inline">\(TweetDummy\)</span>, <span class="math inline">\(TweetCount\)</span>,
-and the mentions of words <span class="math inline">\(Tariff\)</span>, <span class="math inline">\(Trade\)</span>, and <span class="math inline">\(China\)</span>. We first note in Table
-<a href="appendix.html#sec:spy-table">7.1.1</a> that all the x-regressors are significant,
-apart from <span class="math inline">\(Trade\)</span>. Notice also that all the coefficients (apart from <span class="math inline">\(Tariff_{t-3}\)</span>)
-are positive, in line with our main hypothesis. The effect of <span class="math inline">\(Tariff_{t-1}\)</span> and
-<span class="math inline">\(Tariff_{t-2}\)</span> are especially large, given the average size of the volatility being
-about 0.023 over the whole sample<a href="appendix.html#sec:means-table">7.1.6</a>. We in fact predict that an
-extra mention of tariffs one hour ago leads to a whopping extra 0.02 in volatility
-which means it would just about double the AHV if at the average. We can see the
-impulse response function (IRF) for this shock in Figure <a href="appendix.html#sec:SPY-IRF">7.1.2</a> Notice that
-there is a large positive response in the first periods, and then a graduate
-decline over time. Something to note is that in our various specifications, when including
-MA terms, the decline shows up gradual while being much sharper when only including
-AR terms.
-We also ran all these models on the VGK and ASHR ETFs, though no
-significant results appear apart from a small but statistically significant effect
-of the tariff variable for VGK. It is worthy to note that the average volatility in those
-markets are much lower than for SPY, as the trading volume is much lower.</p>
+<p>We run models with the following exogenous regressors: <span class="math inline">\(TweetDummy\)</span>, <span class="math inline">\(TweetCount\)</span>, and the mentions of words <span class="math inline">\(Tariff\)</span>, <span class="math inline">\(Trade\)</span>, and <span class="math inline">\(China\)</span>. We first note in Table <a href="appendix.html#sec:spy-table">7.1.1</a> that all the x-regressors are significant, apart from <span class="math inline">\(Trade\)</span>. Notice also that all the coefficients (apart from <span class="math inline">\(Tariff_{t-3}\)</span>) are positive, in line with our main hypothesis. The effect of <span class="math inline">\(Tariff_{t-1}\)</span> and <span class="math inline">\(Tariff_{t-2}\)</span> are especially large, given the average size of the volatility being about 0.023 over the whole sample <a href="appendix.html#sec:means-table">7.1.6</a>. We in fact predict that an extra mention of tariffs one hour ago leads to a whopping extra 0.02 in volatility which means it would just about double the AHV if at the average. We can see the impulse response function (IRF) for this shock in Figure <a href="appendix.html#sec:SPY-IRF">7.1.2</a> Notice that there is a large positive response in the first periods, and then a graduate decline over time. Something to note is that in our various specifications, when including MA terms, the decline shows up gradual while being much sharper when only including AR terms. We also ran all these models on the VGK and ASHR ETFs, though no significant results appear apart from a small but statistically significant effect of the tariff vax§riable for VGK. It is worthy to note that the average volatility in those markets are much lower than for SPY, as the trading volume is much lower.</p>
 </div>
 <div id="split-samples" class="section level3 hasAnchor" number="3.2.2">
 <h3><span class="header-section-number">3.2.2</span> Split Samples<a href="arma-x.html#split-samples" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>We then split our sample for the first and second term of the Trump presidency to
-explore whether there has been a shift in how markets respond from the first presidency.
-We only run models using <span class="math inline">\(Tariff\)</span>, <span class="math inline">\(Trade\)</span> and <span class="math inline">\(China\)</span>. As seen on Table
-<a href="appendix.html#sec:spy-table-terms">7.1.3</a>, the first interesting result
-is in the coefficients of <span class="math inline">\(Tariff\)</span> being significant and very large in the second
-term, while being small and not statistically significant in the first. A similar
-story goes for the <span class="math inline">\(China\)</span> variable. This may lend some evidence to support the
-claim that investors are much more reactive to Trump’s social media presence
-now than before. We’ve found similar IRFs as for the full timeframe <a href="appendix.html#sec:SPY-SPLIT-IRF">7.1.4</a>.
-Finally, we check the residuals of all these models with Ljung-Box tests <a href="appendix.html#sec:SPY-res-test">7.1.5</a>.
-We find that p-values are zero for the full timeframe &amp; first term models, which
-suggests that there is significant auto-correlation and that these
-estimations are then problematic. However, for the second term, the p-values are quite high
-(~ 0.8 for <span class="math inline">\(Tariff\)</span>), giving our split sample models more validity relative to the full time frame models.</p>
-<p>These results show that perhaps ARMA-X may not be the right choice in this context
-as it is not unreasonable to think that Trump does in fact react to market movements,
-violating the exogeneity assumption that is critical for this type of model. With this
-information, we decide to run SVAR specifications to account for possible endogeneity.</p>
+<p>We then split our sample for the first and second term of the Trump presidency to explore whether there has been a shift in how markets respond from the first presidency. We only run models using <span class="math inline">\(Tariff\)</span>, <span class="math inline">\(Trade\)</span> and <span class="math inline">\(China\)</span>. As seen on Table <a href="appendix.html#sec:spy-table-terms">7.1.3</a>, the first interesting result is in the coefficients of <span class="math inline">\(Tariff\)</span> being significant and very large in the second term, while being small and not statistically significant in the first. A similar story goes for the <span class="math inline">\(China\)</span> variable. This may lend some evidence to support the claim that investors are much more reactive to Trump’s social media presence now than before. We’ve found similar IRFs as for the full timeframe <a href="appendix.html#sec:SPY-SPLIT-IRF">7.1.4</a>. Finally, we check the residuals of all these models with Ljung-Box tests <a href="appendix.html#sec:SPY-res-test">7.1.5</a>. We find that p-values are zero for the full timeframe &amp; first term models, which suggests that there is significant auto-correlation and that these estimations are then problematic. However, for the second term, the p-values are quite high (~ 0.8 for <span class="math inline">\(Tariff\)</span>), giving our split sample models more validity relative to the full time frame models.</p>
+<p>These results show that perhaps ARMA-X may not be the right choice in this context as it is not unreasonable to think that Trump does in fact react to market movements, violating the exogeneity assumption that is critical for this type of model. With this information, we decide to run SVAR specifications to account for possible endogeneity.</p>
 
 </div>
 </div>

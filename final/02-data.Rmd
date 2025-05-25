@@ -244,7 +244,7 @@ for mentions of certain words ($Tariff$, $Trade$, \& $China$).
 Furthermore, we applied simple sentiment analysis algorithms in order to extract emotions and proportions for the amount of "positive" and "negative" words from the posts. We however ended up not 
 including these in our final analyses as results were not particularly interesting. Details on all our data management procedures as well as the final dataset can be found in the GitHub repository.
 
-```{r social plots, fig.width=10, fig.height=5, fig.cap="Poster in Chief: Number of Social Media Posts with Mentions of Tariff", message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
+```{r fig social plots, fig.width=10, fig.height=5, fig.cap="Poster in Chief: Number of Social Media Posts with Mentions of Tariff", message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 truths_2 <- dplyr::select(truths, timestamp, tariff, trade, china)
 
 
