@@ -2212,7 +2212,7 @@ margin-left: 2em;
 <li class="chapter" data-level="7.2.1" data-path="appendix.html"><a href="appendix.html#sec:irf-dummy"><i class="fa fa-check"></i><b>7.2.1</b> SVAR IRF for Tweet Dummy</a></li>
 <li class="chapter" data-level="7.2.2" data-path="appendix.html"><a href="appendix.html#sec:irf-cum-dummy"><i class="fa fa-check"></i><b>7.2.2</b> SVAR Cumultative IRF of Tweet Dummy</a></li>
 <li class="chapter" data-level="7.2.3" data-path="appendix.html"><a href="appendix.html#sec:irf-tariff"><i class="fa fa-check"></i><b>7.2.3</b> SVAR IRF for Tariff</a></li>
-<li class="chapter" data-level="7.2.4" data-path="appendix.html"><a href="appendix.html#sec:irf-cum-tariff"><i class="fa fa-check"></i><b>7.2.4</b> SVAR Cumultatove IRF for Tariff</a></li>
+<li class="chapter" data-level="7.2.4" data-path="appendix.html"><a href="appendix.html#sec:irf-cum-tariff"><i class="fa fa-check"></i><b>7.2.4</b> SVAR Cumultative IRF for Tariff</a></li>
 <li class="chapter" data-level="7.2.5" data-path="appendix.html"><a href="appendix.html#sec:svar-table-1"><i class="fa fa-check"></i><b>7.2.5</b> SVAR Table Full Timeframe</a></li>
 <li class="chapter" data-level="7.2.6" data-path="appendix.html"><a href="appendix.html#sec:irf-china-2"><i class="fa fa-check"></i><b>7.2.6</b> SVAR IRF for China - Second Term</a></li>
 <li class="chapter" data-level="7.2.7" data-path="appendix.html"><a href="appendix.html#sec:irf-cum-china-2"><i class="fa fa-check"></i><b>7.2.7</b> SVAR Cumultative IRF for China - Second Term</a></li>
@@ -2269,7 +2269,7 @@ and the mentions of words <span class="math inline">\(Tariff\)</span>, <span cla
 apart from <span class="math inline">\(Trade\)</span>. Notice also that all the coefficients (apart from <span class="math inline">\(Tariff_{t-3}\)</span>)
 are positive, in line with our main hypothesis. The effect of <span class="math inline">\(Tariff_{t-1}\)</span> and
 <span class="math inline">\(Tariff_{t-2}\)</span> are especially large, given the average size of the volatility being
-about 0.023 over the whole sample. We in fact predict that an
+about 0.023 over the whole sample<a href="appendix.html#sec:means-table">7.1.6</a>. We in fact predict that an
 extra mention of tariffs one hour ago leads to a whopping extra 0.02 in volatility
 which means it would just about double the AHV if at the average. We can see the
 impulse response function (IRF) for this shock in Figure <a href="appendix.html#sec:SPY-IRF">7.1.2</a> Notice that
@@ -2292,7 +2292,7 @@ is in the coefficients of <span class="math inline">\(Tariff\)</span> being sign
 term, while being small and not statistically significant in the first. A similar
 story goes for the <span class="math inline">\(China\)</span> variable. This may lend some evidence to support the
 claim that investors are much more reactive to Trump’s social media presence
-now than before. We’ve found similar IRFs as for the full timeframe.
+now than before. We’ve found similar IRFs as for the full timeframe <a href="appendix.html#sec:SPY-SPLIT-IRF">7.1.4</a>.
 Finally, we check the residuals of all these models with Ljung-Box tests <a href="appendix.html#sec:SPY-res-test">7.1.5</a>.
 We find that p-values are zero for the full timeframe &amp; first term models, which
 suggests that there is significant auto-correlation and that these
@@ -2300,7 +2300,8 @@ estimations are then problematic. However, for the second term, the p-values are
 (~ 0.8 for <span class="math inline">\(Tariff\)</span>), giving our split sample models more validity relative to the full time frame models.</p>
 <p>These results show that perhaps ARMA-X may not be the right choice in this context
 as it is not unreasonable to think that Trump does in fact react to market movements,
-violating the exogeneity assumption that is critical for this type of model. With this information, we decide to run SVAR specifications to account for possible endogeneity.</p>
+violating the exogeneity assumption that is critical for this type of model. With this
+information, we decide to run SVAR specifications to account for possible endogeneity.</p>
 
 </div>
 </div>

@@ -1,4 +1,6 @@
 fig:fig1
+fig:fig-spy-snp
+fig:fig-spy-price
 tab:data
 tab:tab-res-test
 tab:tab-means

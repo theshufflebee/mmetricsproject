@@ -2,64 +2,22 @@
 
 ## Methodology
 
-We first thought of a simple ARMA-X type specification, taking the AHV as our
-"y variable" and taking any of the social media variables as the exogenous
-regressors. The assumption here is that, while the market reacts to Trump's posts,
-Trump's posts are chaotic and random enough to be considered exogenous. 
+We first thought of a simple ARMA-X type specification, taking the AHV as our "y variable" and taking any of the social media variables as the exogenous regressors. The assumption here is that, while the market reacts to Trump's posts, Trump's posts are chaotic and random enough to be considered exogenous.
 
-We of course first start by checking stationarity of our variables (using ADF tests), where we find
-p-values of 0.01 suggesting that the processes are not explosive. Then, we use 
-a custom function in order to choose the number of lags ($p$, $q$ and $r$) based on the AIC criterion.
-This would often choose a very high number of lags, which could be 
-explained by our data being hourly. As such we decided to put a limit of 3 lags,
-which sees minimal AIC loss, similar results, and allows considerable simplification of the models. 
-Our specifications follow the standard formula:
+We of course first start by checking stationarity of our variables (using ADF tests), where we find p-values of 0.01 suggesting that the processes are not explosive. Then, we use a custom function in order to choose the number of lags ($p$, $q$ and $r$) based on the AIC criterion. This would often choose a very high number of lags, which could be explained by our data being hourly. As such we decided to put a limit of 3 lags, which sees minimal AIC loss, similar results, and allows considerable simplification of the models. Our specifications follow the standard formula:
+
 $$
-AHV_t = \phi_1 AHV_{t-1} + \phi_2 AHV_{t-2} + \cdots + \phi_p AHV_{t-p} + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2} + \cdots + \theta_q \varepsilon_{t-q} + \beta_0 x_t + \beta_1 x_{t-1} + \cdots + \beta_r x_{t-r}
+AHV_t = \phi_1 AHV_{t-1} + \phi_2 AHV_{t-2} + \cdots + \phi_p AHV_{t-p} + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2} + \cdots\\ +\theta_q \varepsilon_{t-q} + \beta_0 x_t + \beta_1 x_{t-1} + \cdots + \beta_r x_{t-r}
 $$
 
 ## Results
 
-
 ### Full Timeframe
-We run models with the following exogenous regressors: $TweetDummy$, $TweetCount$,
-and the mentions of words $Tariff$, $Trade$, and $China$. We first note in Table
-\@ref(sec:spy-table) that all the x-regressors are significant,
-apart from $Trade$. Notice also that all the coefficients (apart from $Tariff_{t-3}$)
-are positive, in line with our main hypothesis. The effect of $Tariff_{t-1}$ and 
-$Tariff_{t-2}$ are especially large, given the average size of the volatility being 
-about 0.023 over the whole sample\@ref(sec:means-table). We in fact predict that an 
-extra mention of tariffs one hour ago leads to a whopping extra 0.02 in volatility
-which means it would just about double the AHV if at the average. We can see the
-impulse response function (IRF) for this shock in Figure \@ref(sec:SPY-IRF) Notice that
-there is a large positive response in the first periods, and then a graduate
-decline over time. Something to note is that in our various specifications, when including
-MA terms, the decline shows up gradual while being much sharper when only including
-AR terms. 
-We also ran all these models on the VGK and ASHR ETFs, though no
-significant results appear apart from a small but statistically significant effect
-of the tariff variable for VGK. It is worthy to note that the average volatility in those
-markets are much lower than for SPY, as the trading volume is much lower.
+
+We run models with the following exogenous regressors: $TweetDummy$, $TweetCount$, and the mentions of words $Tariff$, $Trade$, and $China$. We first note in Table \@ref(sec:spy-table) that all the x-regressors are significant, apart from $Trade$. Notice also that all the coefficients (apart from $Tariff_{t-3}$) are positive, in line with our main hypothesis. The effect of $Tariff_{t-1}$ and $Tariff_{t-2}$ are especially large, given the average size of the volatility being about 0.023 over the whole sample \@ref(sec:means-table). We in fact predict that an extra mention of tariffs one hour ago leads to a whopping extra 0.02 in volatility which means it would just about double the AHV if at the average. We can see the impulse response function (IRF) for this shock in Figure \@ref(sec:SPY-IRF) Notice that there is a large positive response in the first periods, and then a graduate decline over time. Something to note is that in our various specifications, when including MA terms, the decline shows up gradual while being much sharper when only including AR terms. We also ran all these models on the VGK and ASHR ETFs, though no significant results appear apart from a small but statistically significant effect of the tariff variable for VGK. It is worthy to note that the average volatility in those markets are much lower than for SPY, as the trading volume is much lower.
 
 ### Split Samples
-We then split our sample for the first and second term of the Trump presidency to 
-explore whether there has been a shift in how markets respond from the first presidency.
-We only run models using $Tariff$, $Trade$ and $China$. As seen on Table
-\@ref(sec:spy-table-terms), the first interesting result
-is in the coefficients of $Tariff$ being significant and very large in the second
-term, while being small and not statistically significant in the first. A similar
-story goes for the $China$ variable. This may lend some evidence to support the 
-claim that investors are much more reactive to Trump's social media presence
-now than before. We've found similar IRFs as for the full timeframe \@ref(sec:SPY-SPLIT-IRF). 
-Finally, we check the residuals of all these models with Ljung-Box tests \@ref(sec:SPY-res-test). 
-We find that p-values are zero for the full timeframe \& first term models, which 
-suggests that there is significant auto-correlation and that these 
-estimations are then problematic. However, for the second term, the p-values are quite high 
-(~ 0.8 for $Tariff$), giving our split sample models more validity relative to the full time frame models.
 
-These results show that perhaps ARMA-X may not be the right choice in this context 
-as it is not unreasonable to think that Trump does in fact react to market movements, 
-violating the exogeneity assumption that is critical for this type of model. With this
-information, we decide to run SVAR specifications to account for possible endogeneity.
+We then split our sample for the first and second term of the Trump presidency to explore whether there has been a shift in how markets respond from the first presidency. We only run models using $Tariff$, $Trade$ and $China$. As seen on Table \@ref(sec:spy-table-terms), the first interesting result is in the coefficients of $Tariff$ being significant and very large in the second term, while being small and not statistically significant in the first. A similar story goes for the $China$ variable. This may lend some evidence to support the claim that investors are much more reactive to Trump's social media presence now than before. We've found similar IRFs as for the full timeframe \@ref(sec:SPY-SPLIT-IRF). Finally, we check the residuals of all these models with Ljung-Box tests \@ref(sec:SPY-res-test). We find that p-values are zero for the full timeframe & first term models, which suggests that there is significant auto-correlation and that these estimations are then problematic. However, for the second term, the p-values are quite high (\~ 0.8 for $Tariff$), giving our split sample models more validity relative to the full time frame models.
 
-
+These results show that perhaps ARMA-X may not be the right choice in this context as it is not unreasonable to think that Trump does in fact react to market movements, violating the exogeneity assumption that is critical for this type of model. With this information, we decide to run SVAR specifications to account for possible endogeneity.

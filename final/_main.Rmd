@@ -88,7 +88,7 @@ textplot_wordcloud(
 
 # Readme {.unnumbered}
 
-This is a Website for a class project from the 2025 Class Macroeconometrics at Université de Lausanne. It is intended as an archive and Display of our Project. You can find all data for recreation on [GitHub](https://www.github.com/theshufflebee/mmetricsproject) .
+This is a website for a class project from the 2025 Class Macroeconometrics at Université de Lausanne. It is intended as an archive and display of our project. You can find all data for recreation on [GitHub](https://www.github.com/theshufflebee/mmetricsproject) .
 
 # Abstract {.unnumbered}
 
@@ -202,12 +202,12 @@ ggplot(truths, aes(x = day, y = time_shifted)) +
 
 
 Information is one of the most valuable assets in the financial market.
-Its importance lies at the core of the "Efficient Market Hypothesis", 
+Its importance lies at the core of the **Efficient Market Hypothesis**, 
 which states that the prices of assets fully reflect all
 available information, adjusting immediately to any new data
 (@famaAdjustmentStockPrices2003), and thereby creating a strong demand
-for information flow. In addition, the “Mixture of Distribution
-Hypothesis” states that the release of new information is closely linked
+for information flow. In addition, the **Mixture of Distribution Hypothesis**
+states that the release of new information is closely linked
 to movements in both realized and implied volatility
 (@andersenReturnVolatilityTrading1996, @frenchStockReturnVariances1986,
 @vlastakisInformationDemandStock2012).
@@ -220,7 +220,7 @@ prices. Similarly, @ederingtonHowMarketsProcess1993 analyze the impact
 of macroeconomic news announcements on interest rate and foreign
 exchange futures markets, particularly in terms of price changes and
 volatility. Both studies, among others, find that prices, such as stock
-prices, react primarily within minutes after the release of new
+prices, react primarily _within minutes_ after the release of new
 information.
 
 Recently, the world has witnessed the rise of the Internet
@@ -233,7 +233,7 @@ changes in the returns of financial assets (@dechoudhuryCanBlogCommunication2008
 impact of Trump’s tweets on various financial and macroeconomic
 variables has been analysed by several studies, especially during his
 first mandate. Using high-frequency financial data,
-@gjerstadPresidentTrumpsTweets2021 found consistent increases in uncertainty and
+@gjerstadPresidentTrumpsTweets2021 found _consistent increases_ in uncertainty and
 trading volume, along with a decline in the US stock market, regardless
 of tweet content. It is relevant to note however, that the effect was stronger when 
 Trump used confrontational words such as "tariff" or "trade war." Some of his
@@ -372,7 +372,7 @@ SPY_comp <- left_join(df_last_close_indexed, sp500_select, by = c("day" = "date"
 ```
 
 
-```{r fig-spy-snp, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
+```{r fig-spy-snp, fig.width=10, fig.height=5, fig.cap="SPY vs. S&P 500 (Indexed: 2025 = 100)", message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 ggplot(SPY_comp,aes(x = day))+
   geom_line(aes(y = index_SPY, color = "SPY Daily Close")) +
   geom_line(aes(y = index_sp500, color = "S&P 500 Daily Close")) +
@@ -398,7 +398,7 @@ ggplot(SPY_comp,aes(x = day))+
 [^2]: https://www.alphavantage.co/ 
 
 We had to transform this data to get our main variable of interest, Average
-Hourly Volatility (AHV). Note that this is \textit{realised} market volatility. We did so 
+Hourly Volatility (AHV). Note that this is _realized_ market volatility. We did so 
 using the following formula:
 $$
 \begin{aligned}
@@ -417,7 +417,7 @@ during the COVID-19 pandemic.
 
 
 
-```{r fig-spy-price, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
+```{r fig-spy-price, fig.width=10, fig.height=5, fig.cap="SPY Close Price vs Volatility", message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 combined_plot <- function(data, title, breaks = "monthly") {
   
   # Index close price so first value = 100
@@ -505,7 +505,7 @@ for mentions of certain words ($Tariff$, $Trade$, \& $China$).
 Furthermore, we applied simple sentiment analysis algorithms in order to extract emotions and proportions for the amount of "positive" and "negative" words from the posts. We however ended up not 
 including these in our final analyses as results were not particularly interesting. Details on all our data management procedures as well as the final dataset can be found in the GitHub repository.
 
-```{r social plots, fig.width=10, fig.height=5, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
+```{r social plots, fig.width=10, fig.height=5, fig.cap="Poster in Chief: Number of Social Media Posts with Mentions of Tariff", message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 truths_2 <- dplyr::select(truths, timestamp, tariff, trade, china)
 
 
@@ -555,7 +555,7 @@ Our final Dataframe is quite wide and contains the following Variables:
 
 | Variable | Description                                                                                                    |
 |----------|----------------------------------------------------------------------------------------------------------------|
-| _vol     | The hourly volatility of given indices                                                                        |
+| _vol     | The average hourly reaöized volatility of given indices                                                                        |
 | dummy    | A dummy variable, 1 if Trump posted in that hour                                                               |
 | N        | Number of posts in that hour                                                                                   |
 | tariff   | Mentions of tariff in that hour                                                                                 |
@@ -611,7 +611,7 @@ and the mentions of words $Tariff$, $Trade$, and $China$. We first note in Table
 apart from $Trade$. Notice also that all the coefficients (apart from $Tariff_{t-3}$)
 are positive, in line with our main hypothesis. The effect of $Tariff_{t-1}$ and 
 $Tariff_{t-2}$ are especially large, given the average size of the volatility being 
-about 0.023 over the whole sample. We in fact predict that an 
+about 0.023 over the whole sample\@ref(sec:means-table). We in fact predict that an 
 extra mention of tariffs one hour ago leads to a whopping extra 0.02 in volatility
 which means it would just about double the AHV if at the average. We can see the
 impulse response function (IRF) for this shock in Figure \@ref(sec:SPY-IRF) Notice that
@@ -633,7 +633,7 @@ is in the coefficients of $Tariff$ being significant and very large in the secon
 term, while being small and not statistically significant in the first. A similar
 story goes for the $China$ variable. This may lend some evidence to support the 
 claim that investors are much more reactive to Trump's social media presence
-now than before. We've found similar IRFs as for the full timeframe. 
+now than before. We've found similar IRFs as for the full timeframe \@ref(sec:SPY-SPLIT-IRF). 
 Finally, we check the residuals of all these models with Ljung-Box tests \@ref(sec:SPY-res-test). 
 We find that p-values are zero for the full timeframe \& first term models, which 
 suggests that there is significant auto-correlation and that these 
@@ -642,7 +642,8 @@ estimations are then problematic. However, for the second term, the p-values are
 
 These results show that perhaps ARMA-X may not be the right choice in this context 
 as it is not unreasonable to think that Trump does in fact react to market movements, 
-violating the exogeneity assumption that is critical for this type of model. With this information, we decide to run SVAR specifications to account for possible endogeneity.
+violating the exogeneity assumption that is critical for this type of model. With this
+information, we decide to run SVAR specifications to account for possible endogeneity.
 
 
 
@@ -712,10 +713,10 @@ the remaining ones are not. In contrast, for $TweetCount$ and $TweetDummy$, we
 observe fewer and smaller positive coefficients. At the same time, we find 
 that the contemporaneous effects of the shocks are all positive and relatively 
 strong. This leads to two types of scenarios : either 
-the IRFs experience a positive shock and remain elevated ($Tariff$, $Trade$ and $China$), 
+the IRFs experience a positive shock and remain elevated ($Trade$, $China$ and $Tariff$: \@ref(sec:irf-tariff), \@ref(sec:irf-cum-tariff)), 
 or a highly positive shock occurs, but the cumulative effect turns negative after a few 
-hours ($TweetDummy$ and $TweetCount$). You can find the IRFs for $Tariff$ on Figures
-(\@ref(sec:irf-dummy), \@ref(sec:irf-tariff)).
+hours ($TweetDummy$ and $TweetCount$). You can find both IRFs for $TweetDummy$ on Figures
+(\@ref(sec:irf-dummy), \@ref(sec:irf-cum-dummy)).
 
 Finally, apart for $Tariff$, all Granger causality tests indicate that Trump's 
 posts Granger-cause volatility. However, due to serial correlation in the 
@@ -750,7 +751,7 @@ $Trade$ in the second term, which shows the only negative impact from a shock.
 Once again we find positive lagged coefficients in the second term, mostly on 
 the first, second and fourth lags. However, none of these coefficients are
 statistically significant though the cumulative IRFs clearly show a high positive 
-impact on everything except for $TweetDummy$ and $TweetCount$, whose
+impact on everything \@ref(sec:irf-cum-china-2) except for $TweetDummy$ and $TweetCount$, whose
 coefficients and cumulative IRFs display similar patterns to those observed 
 in the first term (such as \@ref(sec:irf-china-2)). 
 
@@ -1449,7 +1450,7 @@ ggplot(Yd3,aes(x=period, y=response)) +
   theme_minimal()
 ```
 
-### SVAR Cumultatove IRF for Tariff{#sec:irf-cum-tariff}
+### SVAR Cumultative IRF for Tariff{#sec:irf-cum-tariff}
 
 ```{r IRF tariff, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 ggplot(Yd3,aes(x=period, y=cumsum(response))) +

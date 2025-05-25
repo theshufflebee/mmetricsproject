@@ -65,7 +65,7 @@ strong. This leads to two types of scenarios : either
 the IRFs experience a positive shock and remain elevated ($Trade$, $China$ and $Tariff$: \@ref(sec:irf-tariff), \@ref(sec:irf-cum-tariff)), 
 or a highly positive shock occurs, but the cumulative effect turns negative after a few 
 hours ($TweetDummy$ and $TweetCount$). You can find both IRFs for $TweetDummy$ on Figures
-(\@ref(sec:irf-dummy), \@ref(sec:irf-cum-dummy)).
+\@ref(sec:irf-dummy) and \@ref(sec:irf-cum-dummy).
 
 Finally, apart for $Tariff$, all Granger causality tests indicate that Trump's 
 posts Granger-cause volatility. However, due to serial correlation in the 
