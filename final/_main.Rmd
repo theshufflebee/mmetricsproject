@@ -505,7 +505,7 @@ for mentions of certain words ($Tariff$, $Trade$, \& $China$).
 Furthermore, we applied simple sentiment analysis algorithms in order to extract emotions and proportions for the amount of "positive" and "negative" words from the posts. We however ended up not 
 including these in our final analyses as results were not particularly interesting. Details on all our data management procedures as well as the final dataset can be found in the GitHub repository.
 
-```{r fig social plots, fig.width=10, fig.height=5, fig.cap="Poster in Chief: Number of Social Media Posts with Mentions of Tariff", message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
+```{r fig-social-plots2, fig.width=10, fig.height=5, fig.cap="Poster in Chief: Number of Social Media Posts with Mentions of Tariff", message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 truths_2 <- dplyr::select(truths, timestamp, tariff, trade, china)
 
 
@@ -759,7 +759,6 @@ editor_options:
 
 # Appendix
 
-
 ```{r library_setup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
 rm(list=ls())
 # Core utilities
@@ -829,10 +828,7 @@ source(here("helperfunctions/armax_functions.R"))
 
 ## ARMAX
 
-We choose the specification in the armax_models file. In this file, we will
-just run said specifications to produce nice tables and graphs to include in 
-our final paper. This is also why there are specification differences in the 
-separate timeframes. We always use the best fit we found earlier.
+We choose the specification in the armax_models file. In this file, we will just run said specifications to produce nice tables and graphs to include in our final paper. This is also why there are specification differences in the separate timeframes. We always use the best fit we found earlier.
 
 ```{r datasetup_appendix, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
 
@@ -849,7 +845,6 @@ data = filter(data,between(timestamp, as.Date('2014-01-01'), as.Date('2025-05-07
 mean1 = mean(data$SPY_vol)
 
 ```
-
 
 ```{r fitting models, results=F, warning=F, message=F, echo=FALSE, cache=FALSE}
 #All SPY models for the full Dataframe
@@ -879,6 +874,7 @@ models[["Model 5"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 ```
 
 ### SPY ARMAX Table (Jan 2014 - May 2025) {#sec:spy-table}
+
 ```{r tab-armax-full, results="asis", warning=FALSE, echo=FALSE, message=FALSE, cache=FALSE}
 library(texreg)
 
@@ -908,6 +904,7 @@ names <- list(
 cat(
   htmlreg(
     models,
+    single.row = TRUE,
     custom.model.names = names(models),
     custom.coef.map = names,
     caption = "ARMAX Models of Average Hourly Volatility",
@@ -918,8 +915,7 @@ cat(
 
 ```
 
-
-### SPY ARMAX IRFs (Jan 2014 - May 2025){#sec:SPY-IRF}
+### SPY ARMAX IRFs (Jan 2014 - May 2025) {#sec:SPY-IRF}
 
 ```{r fig-SPYirf, results="asis", warning=F, message=F, echo=FALSE, cache=FALSE}
 
@@ -937,7 +933,6 @@ plot1
 ggsave("armax_plot1.png",plot=plot1,bg="white")
 
 ```
-
 
 ```{r, warning=F, message=F, echo=FALSE, results=F}
 #Calculate residuals
@@ -966,9 +961,6 @@ pvals <- data.frame("X-Regressor" = resnames,
 
 ```
 
-
-
-
 ```{r datasetup first, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
 #First term Calculations
 
@@ -982,7 +974,6 @@ data = filter(data,between(timestamp, as.Date('2017-01-20'), as.Date('2021-01-20
 mean2 = mean(data$SPY_vol)
 
 ```
-
 
 ```{r 1st term models, results=F, warning=F, message=F, echo=FALSE, cache=FALSE}
 #SPY Models first Term
@@ -1003,7 +994,6 @@ models[["First Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
 
 ```
 
-
 ```{r 1st SPYresiduals, warning=F, message=F, results=F, echo=FALSE, cache=FALSE}
 # Run first term residuals
 res6 = checkresiduals(models[["First Term (1)"]], plot = FALSE)
@@ -1020,9 +1010,6 @@ pvals_new1 <- data.frame(
 
 ```
 
-
-
-
 ```{r datasetup second, results=FALSE, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE}
 #Second Term Calculations
 
@@ -1036,7 +1023,6 @@ data = filter(data,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05-07
 mean3 = mean(data$SPY_vol)
 
 ```
-
 
 ```{r 2nd term models, results=F, warning=F, message=F, echo=FALSE, cache=FALSE}
 #Run Second Term Models
@@ -1054,8 +1040,6 @@ models[["Second Term (3)"]] <- armax(data$SPY_vol, xreg = data$china, latex = F,
                              nb.lags = 2, p = 1, q = 2) 
 
 ```
-
-
 
 ```{r 2nd SPYresiduals, results=F, warning=F, message=F, echo=FALSE, cache=FALSE}
 # Calculate SPY residuals for the second term
@@ -1078,8 +1062,7 @@ pvals_combined <- cbind(pvals_combined, pvals_new2)
 
 ```
 
-
-### SPY ARMAX Table (Split Presidential Terms){#sec:spy-table-terms}
+### SPY ARMAX Table (Split Presidential Terms) {#sec:spy-table-terms}
 
 \centering
 
@@ -1094,6 +1077,23 @@ model_names <- c(
 )
 names(models) <- model_names
 
+x_names_map =list(
+  "ar1" = "AR(1)",
+  "ar2" = "AR(2)",
+  "ar3" = "AR(3)",
+  "ma1" = "MA(1)",
+  "ma2" = "MA(2)",
+  "ma3" = "MA(3)",
+  "intercept" = NA,
+  "tariff_lag_0" = "Tariff<sub>t</sub>",
+  "tariff_lag_1" = "Tariff<sub>t-1</sub>",
+  "tariff_lag_2" = "Tariff<sub>t-2</sub>",
+  "trade_lag_0" = "Trade<sub>t</sub>",
+  "china_lag_0" = "China<sub>t</sub>",
+  "china_lag_1" = "China<sub>t-1</sub>",
+  "china_lag_2" = "China<sub>t-2</sub>"
+)
+
 # HTML coefficients names adjusted (is this correct?)
 xnames_ordered <- c(
   "AR(1)", "AR(2)", "AR(3)",
@@ -1106,8 +1106,9 @@ xnames_ordered <- c(
 
 # Render as html -> need to render file to have it nice
 htmlreg(
-  models,
-  custom.coef.names = xnames_ordered,
+  models, #custom.coef.names = xnames_ordered,
+  custom.coef.map = x_names_map,
+  single.row = TRUE,
   custom.model.names = model_names,
   caption = "Split-Term ARMAX Models of Average Hourly Volatility",
   caption.above = TRUE,
@@ -1118,8 +1119,7 @@ htmlreg(
 
 ```
 
-
-### SPY ARMAX IRFs (Split Terms){#sec:SPY-SPLIT-IRF}
+### SPY ARMAX IRFs (Split Terms) {#sec:SPY-SPLIT-IRF}
 
 ```{r 2nd SPYirf, warning=F, message=F, echo=FALSE, cache=FALSE}
 
@@ -1140,7 +1140,6 @@ plot3
 
 ```
 
-
 ### Residual Test {#sec:SPY-res-test}
 
 ```{r tab-res-test, message=F, warning=F, results="asis", echo=FALSE, cache=FALSE}
@@ -1152,8 +1151,8 @@ kable(pvals_combined, digits = 6, format="html", caption = "Ljung-Box Test p-val
 
 ```
 
-### Descriptive Stats{#sec:means-table}
- 
+### Descriptive Stats {#sec:means-table}
+
 ```{r tab-means, message=F, warning=F, results="asis", cache=FALSE, echo=FALSE}
 
 means <- data.frame(
@@ -1238,7 +1237,7 @@ res.opt <- optim(c(1, 0, 1), loss, method = "BFGS")
 B.hat <- matrix(c(res.opt$par[1], res.opt$par[2], 0, res.opt$par[3]), ncol = 2)
 ```
 
-### SVAR IRF for Tweet Dummy{#sec:irf-dummy}
+### SVAR IRF for Tweet Dummy {#sec:irf-dummy}
 
 ```{r IRF 1dummy, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 nb.sim = 7*7
@@ -1275,7 +1274,7 @@ ggplot(Yd,aes(x=period, y=response)) +
 
 ```
 
-### SVAR Cumultative IRF of Tweet Dummy{#sec:irf-cum-dummy}
+### SVAR Cumultative IRF of Tweet Dummy {#sec:irf-cum-dummy}
 
 ```{r IRF 2Dummy, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 ggplot(Yd,aes(x=period, y=cumsum(response))) +
@@ -1374,7 +1373,7 @@ B.hat3 <- matrix(c(res.opt3$par[1], res.opt3$par[2], 0, res.opt3$par[3]), ncol =
 
 ```
 
-### SVAR IRF for Tariff{#sec:irf-tariff}
+### SVAR IRF for Tariff {#sec:irf-tariff}
 
 ```{r IRF tariffff, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 #get back the coefficient of est.VAR
@@ -1408,7 +1407,7 @@ ggplot(Yd3,aes(x=period, y=response)) +
   theme_minimal()
 ```
 
-### SVAR Cumultative IRF for Tariff{#sec:irf-cum-tariff}
+### SVAR Cumultative IRF for Tariff {#sec:irf-cum-tariff}
 
 ```{r IRF tariff, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 ggplot(Yd3,aes(x=period, y=cumsum(response))) +
@@ -1420,7 +1419,6 @@ ggplot(Yd3,aes(x=period, y=cumsum(response))) +
   xlab("") +
   theme_minimal()
 ```
-
 
 ```{r estimate trade, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 # Trade Estimates
@@ -1474,7 +1472,6 @@ t_statchina = coefchina/nw_sechina
 #recalculate p-values
 robustchina = 2*(1-pt(abs(t_statchina), df = df.residual(lm_cleanchina)))
 ```
-
 
 ```{r mana, message=FALSE, warning=FALSE, echo=FALSE, cache=FALSE}
 # Full Timeframe Table Preparation
@@ -1606,7 +1603,8 @@ custom_names <- list(
   "const" = "Constant"
 )
 ```
-### SVAR Table Full Timeframe{#sec:svar-table-1}
+
+### SVAR Table Full Timeframe {#sec:svar-table-1}
 
 ```{r tab:first-var, warning=FALSE, results='asis', echo=FALSE}
 tmpfile <- tempfile(fileext = ".html")  # create temp file
@@ -1620,6 +1618,7 @@ suppressMessages(
     custom.model.names = c("TweetDummy", "TweetCount", "Tariff", "Trade", "China"),
     caption = "VAR Models of Average Hourly Volatility",
     digits = 6,
+    single.row = TRUE,
     custom.gof.rows = list("Shock (IRF)" = c(0.0041713, 0.003061, 0.001189, 0.000215, 0.001937)),
     custom.note = "This table displays VAR regression with only two variables: AHV and the X regressor. Column names represent the X variable for the selected model.",
     file = tmpfile
@@ -1629,9 +1628,6 @@ suppressMessages(
 # Manually add a caption in HTML format
 cat(readLines(tmpfile), sep = "\n")
 ```
-
-
-
 
 ```{r datasetup2, results=FALSE, warning=FALSE, message=FALSE, cache=FALSE, echo=FALSE}
 data <- c(0)
@@ -1649,8 +1645,6 @@ Vdata_f = filter(data,between(timestamp, as.Date('2017-01-20'), as.Date('2021-01
 Vdata_s = filter(data,between(timestamp, as.Date('2025-01-20'), as.Date('2025-05-07')))
 
 ```
-
-
 
 ```{r first mandate dum, warning=FALSE, message=FALSE, results="asis", cache=FALSE, echo=FALSE}
 # First Term Estimates
@@ -1682,7 +1676,6 @@ robust_f_d = 2*(1-pt(abs(t_stat_f_d), df = df.residual(lm_clean_f_d)))
 
 ```
 
-
 ```{r first mandate N, warning=FALSE, message=FALSE, results="asis", cache=FALSE, echo=FALSE}
 # First Mandate Calculations
 #-------------------------------
@@ -1707,7 +1700,6 @@ t_stat_f_n = coef_f_n/nw_se_f_n
 #recalculate p-values
 robust_f_n = 2*(1-pt(abs(t_stat_f_n), df = df.residual(lm_clean_f_n)))
 ```
-
 
 ```{r first mandate tariff, warning=FALSE, message=FALSE, results="asis", cache=FALSE, echo=FALSE}
 # Tariff first Mandate
@@ -1736,7 +1728,6 @@ robust_f_ta = 2*(1-pt(abs(t_stat_f_ta), df = df.residual(lm_clean_f_ta)))
 
 ```
 
-
 ```{r first mandate trade, warning=FALSE, message=FALSE, results="asis", cache=FALSE, echo=FALSE}
 # Trade FIrst Mandate
 #------------------------
@@ -1761,7 +1752,6 @@ t_stat_f_tr = coef_f_tr/nw_se_f_tr
 #recalculate p-values
 robust_f_tr = 2*(1-pt(abs(t_stat_f_tr), df = df.residual(lm_clean_f_tr)))
 ```
-
 
 ```{r first mandate china, warning=FALSE, message=FALSE, results="asis", cache=FALSE, echo=FALSE}
 # China First Mandate
@@ -1791,7 +1781,6 @@ robust_f_ch = 2*(1-pt(abs(t_stat_f_ch), df = df.residual(lm_clean_f_ch)))
 
 ```
 
-
 ```{r second mandate dum, warning=FALSE, message=FALSE, results="asis", cache=FALSE, echo=FALSE}
 # Second term
 #---------------------
@@ -1816,7 +1805,6 @@ t_stat_s_d = coef_s_d/nw_se_s_d
 #recalculate p-values
 robust_s_d = 2*(1-pt(abs(t_stat_s_d), df = df.residual(lm_clean_s_d)))
 ```
-
 
 ```{r second mandate N, warning=FALSE, message=FALSE, results="asis", cache=FALSE, echo=FALSE}
 
@@ -1843,7 +1831,6 @@ robust_s_n = 2*(1-pt(abs(t_stat_s_n), df = df.residual(lm_clean_s_n)))
 
 
 ```
-
 
 ```{r second mandate tariff, warning=FALSE, message=FALSE, results="asis", cache=FALSE, echo=FALSE}
 # Tariff
@@ -1872,7 +1859,6 @@ robust_s_ta = 2*(1-pt(abs(t_stat_s_ta), df = df.residual(lm_clean_s_ta)))
 
 ```
 
-
 ```{r second mandate trade, warning=FALSE, message=FALSE, results="asis", cache=FALSE, echo=FALSE}
 # Trade
 #----------
@@ -1900,7 +1886,6 @@ robust_s_tr = 2*(1-pt(abs(t_stat_s_tr), df = df.residual(lm_clean_s_tr)))
 
 ```
 
-
 ```{r second mandate china, warning=FALSE, message=FALSE, results="asis", cache=FALSE, echo=FALSE}
 # China
 #--------------
@@ -1927,7 +1912,6 @@ t_stat_s_ch = coef_s_ch/nw_se_s_ch
 robust_s_ch = 2*(1-pt(abs(t_stat_s_ch), df = df.residual(lm_clean_s_ch)))
 
 ```
-
 
 ```{r B mat second mandate china, warning=FALSE, message=FALSE, cache=FALSE, echo=FALSE}
 #Construct the Robust Omega Matrix
@@ -1968,7 +1952,7 @@ B.hat_s_ch <- matrix(c(res.opt_s_ch$par[1], res.opt_s_ch$par[2], 0, res.opt_s_ch
 
 ```
 
-### SVAR IRF for China - Second Term{#sec:irf-china-2}
+### SVAR IRF for China - Second Term {#sec:irf-china-2}
 
 ```{r IRF second china, warning=FALSE, message=FALSE, cache=FALSE, echo=FALSE}
 #get back the coefficient of est.VAR
@@ -2002,7 +1986,8 @@ ggplot(Yd_s_ch,aes(x=period, y=response)) +
   theme_minimal()
 ```
 
-### SVAR Cumultative IRF for China - Second Term{#sec:irf-cum-china-2}
+### SVAR Cumultative IRF for China - Second Term {#sec:irf-cum-china-2}
+
 ```{r IRF _s_ch, cache=FALSE, echo=FALSE}
 ggplot(Yd_s_ch,aes(x=period, y=cumsum(response))) +
   geom_hline(yintercept = 0, color="red") +
@@ -2014,7 +1999,7 @@ ggplot(Yd_s_ch,aes(x=period, y=cumsum(response))) +
   theme_minimal()
 ```
 
-### SVAR Table First Term{#sec:tab-svar-1}
+### SVAR Table First Term {#sec:tab-svar-1}
 
 ```{r tab-second-var, message=FALSE, warning=FALSE, results='asis', cache=FALSE, echo=FALSE}
 
@@ -2143,6 +2128,7 @@ suppressMessages(htmlreg(
   override.pvalues = robust_pvals_f,
   custom.model.names = c("TweetDummy", "TweetCount", "Tariff", "Trade", "China"),
   custom.coef.map = custom_names,
+  single.row = TRUE,
   caption = "First-Term VAR Models of Average Hourly Volatility",
   label = "tab:VAR_First_Term",
   caption.above = TRUE,
@@ -2158,7 +2144,7 @@ cat(readLines(tmpfile_f), sep = "\n")
 
 ```
 
-### SVAR Table Second Term{#sec:tab-svar-2}
+### SVAR Table Second Term {#sec:tab-svar-2}
 
 ```{r tab-third-var, message=FALSE, warning=FALSE, results='asis', cache=FALSE, echo=FALSE}
 
@@ -2273,6 +2259,7 @@ suppressMessages(htmlreg(
   label = "tab:VAR_Second_Term",
   caption.above = TRUE,
   digits = 6,
+  single.row = TRUE,
   custom.gof.rows = list("Shock (IRF)" = c(0.014659, 0.013315, 0.010752, -0.005665, 0.013937)),
   star.cutoffs = c(0.05, 0.01, 0.001),
   custom.note = "This table displays VAR regression with only two variables : AHV and X regressor. The column names represent the X variable for the selected model.",

@@ -1,6 +1,7 @@
 fig:fig1
 fig:fig-spy-snp
 fig:fig-spy-price
+fig:fig-social-plots2
 tab:data
 tab:tab-res-test
 tab:tab-means
